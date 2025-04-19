@@ -252,7 +252,9 @@ public class PunishingGrayRavenPostProcess : ScriptableRendererFeature
                     Shader.SetGlobalVector(data.finalBlendFactorId, s.finalBlendFactor);
                     Shader.SetGlobalVector(data.userLutParamsId, s.userLutParams);
                     cmd.SetGlobalTexture("_BloomTex", data.combineTemp);
-                    Blitter.BlitCameraTexture(cmd, data.source, data.source, load, store, mat, 6);
+                    RTHandle sourceHandle = data.source;
+                    Vector2 viewportScale = sourceHandle.useScaling ? new Vector2(sourceHandle.rtHandleProperties.rtHandleScale.x, sourceHandle.rtHandleProperties.rtHandleScale.y) : Vector2.one;
+                    Blitter.BlitTexture(cmd, data.source, viewportScale, mat, 6);
 
                     cmd.EndSample(K_GRAY_RAVEN_TAG);
                 });
