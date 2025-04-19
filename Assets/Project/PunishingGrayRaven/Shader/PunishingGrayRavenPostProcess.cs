@@ -78,7 +78,6 @@ public class PunishingGrayRavenPostProcess : ScriptableRendererFeature
             internal TextureHandle bloom64_0, bloom64_1;
             internal TextureHandle bloom32_0, bloom32_1;
             internal TextureHandle combineTemp;
-            internal TextureHandle colorGradingTemp;
 
             internal int filterThresholdId, filterScalerId;
             internal int blurDirId;
@@ -144,7 +143,6 @@ public class PunishingGrayRavenPostProcess : ScriptableRendererFeature
 
             // 4) 合并临时 & 色彩分级临时
             var combineTemp = UniversalRenderer.CreateRenderGraphTexture(renderGraph, lumaDesc, "_BloomCombineTemp", true, FilterMode.Bilinear);
-            var colorGradingTemp = UniversalRenderer.CreateRenderGraphTexture(renderGraph, desc, "_ColorGradingTemp", true, FilterMode.Bilinear);
 
             using (var builder = renderGraph.AddUnsafePass<PassData>(K_GRAY_RAVEN_TAG, out var pd, PROFILING_SAMPLER))
             {
@@ -165,7 +163,6 @@ public class PunishingGrayRavenPostProcess : ScriptableRendererFeature
                 builder.UseTexture(bloom32_0, AccessFlags.ReadWrite);
                 builder.UseTexture(bloom32_1, AccessFlags.ReadWrite);
                 builder.UseTexture(combineTemp, AccessFlags.ReadWrite);
-                builder.UseTexture(colorGradingTemp, AccessFlags.ReadWrite);
 
                 // 数据传递
                 pd.material = _material;
@@ -184,7 +181,6 @@ public class PunishingGrayRavenPostProcess : ScriptableRendererFeature
                 pd.bloom32_0 = bloom32_0;
                 pd.bloom32_1 = bloom32_1;
                 pd.combineTemp = combineTemp;
-                pd.colorGradingTemp = colorGradingTemp;
                 pd.filterThresholdId = _filterThresholdId;
                 pd.filterScalerId = _filterScalerId;
                 pd.blurDirId = _blurDirId;
