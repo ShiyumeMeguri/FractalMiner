@@ -71,6 +71,7 @@ public class PunishingGrayRavenPostProcess : ScriptableRendererFeature
             internal Material material;
             internal Settings settings;
             internal TextureHandle source;
+            internal TextureHandle sourceCopy;
             internal TextureHandle bloom0, bloom1, bloomLuma;
             internal TextureHandle bloom256_0, bloom256_1;
             internal TextureHandle bloom128_0, bloom128_1;
@@ -102,6 +103,9 @@ public class PunishingGrayRavenPostProcess : ScriptableRendererFeature
             var desc = cameraData.cameraTargetDescriptor;
             desc.msaaSamples = 1;
             desc.depthBufferBits = 0;
+
+            var sourceCopyDesc = desc;
+            var srcHandleCopy = UniversalRenderer.CreateRenderGraphTexture(renderGraph, sourceCopyDesc, "_SourceCopy", true, FilterMode.Bilinear);
 
             // 1) 四分之一分辨率输入
             var quarterDesc = desc;
@@ -148,6 +152,7 @@ public class PunishingGrayRavenPostProcess : ScriptableRendererFeature
 
                 // 资源声明
                 builder.UseTexture(srcHandle, AccessFlags.ReadWrite);
+                builder.UseTexture(srcHandleCopy, AccessFlags.ReadWrite);
                 builder.UseTexture(bloom0, AccessFlags.ReadWrite);
                 builder.UseTexture(bloom1, AccessFlags.ReadWrite);
                 builder.UseTexture(bloomLuma, AccessFlags.ReadWrite);
@@ -166,6 +171,7 @@ public class PunishingGrayRavenPostProcess : ScriptableRendererFeature
                 pd.material = _material;
                 pd.settings = _settings;
                 pd.source = srcHandle;
+                pd.sourceCopy = srcHandleCopy;
                 pd.bloom0 = bloom0;
                 pd.bloom1 = bloom1;
                 pd.bloomLuma = bloomLuma;
@@ -252,9 +258,8 @@ public class PunishingGrayRavenPostProcess : ScriptableRendererFeature
                     Shader.SetGlobalVector(data.finalBlendFactorId, s.finalBlendFactor);
                     Shader.SetGlobalVector(data.userLutParamsId, s.userLutParams);
                     cmd.SetGlobalTexture("_BloomTex", data.combineTemp);
-                    RTHandle sourceHandle = data.source;
-                    Vector2 viewportScale = sourceHandle.useScaling ? new Vector2(sourceHandle.rtHandleProperties.rtHandleScale.x, sourceHandle.rtHandleProperties.rtHandleScale.y) : Vector2.one;
-                    Blitter.BlitTexture(cmd, data.source, viewportScale, mat, 6);
+                    cmd.Blit(data.source, data.sourceCopy);
+                    Blitter.BlitCameraTexture(cmd, data.sourceCopy, data.source, load, store, mat, 6);
 
                     cmd.EndSample(K_GRAY_RAVEN_TAG);
                 });
