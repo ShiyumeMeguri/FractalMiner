@@ -1,6 +1,13 @@
 基于 2.4.0 版本分析
 
-Gbuffer0    R16G16B16A16_FLOAT
+1.0: Gubuffer预渲染 人物写入0x0A 眼睛嘴巴写入0x0E 背景写入0x00
+1.1: 角色描边
+2.0: 角色阴影
+2.1: 场景阴影
+
+
+
+Gbuffer0    R16G16B16A16_FLOAT  RGB=全局光照 A=未使用
 Gbuffer1    R10G10B10A2_UNORM   XYZ=法线  A=?
 Gbuffer2    B8G8R8A8_TYPELESS   XY=? Z=金属度 A=MaterialID
 Gbuffer3    B8G8R8A8_TYPELESS   XYZ=BaseColor   A=Alpha
