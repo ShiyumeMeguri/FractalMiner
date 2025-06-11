@@ -1,3 +1,4 @@
+// 给我最小修改 根据代码实际逻辑推断出所有变量正确名字 保证代码完全等价的情况下 重构为更易读的形式 Properties和sampler2D和cb的名字不要改 不准省略任何代码
 Shader "Custom/WWToon"
 {
     Properties
@@ -77,17 +78,16 @@ Shader "Custom/WWToon"
             StructuredBuffer<float4> cb1;
             StructuredBuffer<float4> cb2;
             
-            // Known input texture information:
-            // IN0 (_IN0): Depth+Stencil
-            // IN1 (_IN1): Normal XYZ, A unknown
-            // IN2 (_IN2): Unknown, deduced to be material properties/ID
-            // IN3 (_IN3): Albedo and Alpha
-            // IN4 (_IN4): Unknown
-            // IN5 (_IN5): Unknown
-            // IN6 (_IN6): R16 Depth
-            // IN7 (_IN7): 1x1 pixel, all 0
-            // IN8 (_IN8): SSAO
-            // IN9 (_IN9): 1x1 pixel, R32G32B32A32 constants
+            // 已知 IN0 是深度+Stencil 
+            // 已知 IN1 XYZ是法线 A未知
+            // 未知 IN2 
+            // 已知 IN3 是Albedo和Alpha
+            // 未知 IN4
+            // 未知 IN5
+            // 已知 IN6 R16深度
+            // 已知 IN7 1x1像素 全0
+            // 已知 IN8 MSSAO
+            // 已知 IN9 1x1像素 R32G32B32A32 值看上去是 1.0 0.98065 0.07967 0.43407
             
             fixed4 frag (VertexToFragment fragmentInput) : SV_Target
             {
