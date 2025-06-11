@@ -25,6 +25,10 @@ public class BufferToMaterial : MonoBehaviour
         // 先释放旧的资源，防止重复加载
         ReleaseBuffers();
         LoadBuffersFromScriptDirectory();
+        for (int i = 0; i < graphicsBuffers.Count; i++)
+        {
+            targetMaterial.SetBuffer(shaderPropertyNames[i], graphicsBuffers[i]);
+        }
     }
 
     void LoadBuffersFromScriptDirectory()
@@ -107,12 +111,13 @@ public class BufferToMaterial : MonoBehaviour
     void Update()
     {
         if (targetMaterial == null || graphicsBuffers.Count == 0) return;
-
+/*
         // 在每一帧将 buffer 绑定到材质上
         for (int i = 0; i < graphicsBuffers.Count; i++)
         {
             targetMaterial.SetBuffer(shaderPropertyNames[i], graphicsBuffers[i]);
         }
+*/
     }
 
     void OnDisable()

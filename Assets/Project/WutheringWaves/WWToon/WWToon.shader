@@ -73,7 +73,18 @@ Shader "Custom/WWToon"
             StructuredBuffer<float4> cb0;
             StructuredBuffer<float4> cb1;
             StructuredBuffer<float4> cb2;
-
+            
+            // 已知 IN0 是深度+Stencil 
+            // 已知 IN1 XYZ是法线 A未知
+            // 未知 IN2 
+            // 已知 IN3 是Albedo和Alpha
+            // 未知 IN4
+            // 未知 IN5
+            // 已知 IN6 R16深度
+            // 已知 IN7 1x1像素 全0
+            // 已知 IN8 MSSAO
+            // 已知 IN9 1x1像素 R32G32B32A32 值看上去是 1.0 0.98065 0.07967 0.43407
+            
             fixed4 frag (v2f i) : SV_Target
             {
                 // 基于输入uv定义v0，为zw分量提供默认值
