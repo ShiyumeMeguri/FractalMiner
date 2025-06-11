@@ -1,4 +1,3 @@
-// 给我最小修改 根据代码实际逻辑推断出所有变量正确名字 保证代码完全等价的情况下 重构为更易读的形式 Properties和sampler2D和cb的名字不要改 不准省略任何代码
 Shader "Custom/WWToon"
 {
     Properties
@@ -78,16 +77,16 @@ Shader "Custom/WWToon"
             StructuredBuffer<float4> cb1;
             StructuredBuffer<float4> cb2;
             
-            // 已知 IN0 是深度+Stencil 
-            // 已知 IN1 XYZ是法线 A未知
-            // 未知 IN2 
-            // 已知 IN3 是Albedo和Alpha
-            // 未知 IN4
-            // 未知 IN5
-            // 已知 IN6 R16深度
-            // 已知 IN7 1x1像素 全0
-            // 已知 IN8 MSSAO
-            // 已知 IN9 1x1像素 R32G32B32A32 值看上去是 1.0 0.98065 0.07967 0.43407
+            // 已知 _IN0 是深度+Stencil 
+            // 已知 _IN1 XYZ是法线 A是PerObjectData
+            // 已知 _IN2 X是Metallic Y是Specular Z是Roughness W是ShadingModelID 
+            // 已知 _IN3 是Albedo和Alpha
+            // 未知 _IN4
+            // 未知 _IN5 R是阴影 G不知道 B是反光强度? A为什么和B一样
+            // 已知 _IN6 R16深度
+            // 已知 _IN7 1x1像素 全0
+            // 已知 _IN8 MSSAO 多分辨率屏幕空间AO
+            // 已知 _IN9 1x1像素 R32G32B32A32 值看上去是 1.0 0.98065 0.07967 0.43407
             
             fixed4 frag (VertexToFragment fragmentInput) : SV_Target
             {
@@ -98,93 +97,93 @@ Shader "Custom/WWToon"
                 
                 // Temporary registers renamed for clarity. Due to heavy reuse (common in compiled shaders),
                 // names reflect their initial or most significant role.
-                float4 packedNormalAndMiscData, materialAndWorldNormal, albedoAndDepth, shadingParams1, shadingInfo, shadingParams2, worldPosAndNormal, lightingTempA, lightingTempB, lightingTempC, accumulatedLightColor, lightLoopTempA, lightLoopTempB, lightLoopTempC, lightLoopTempD, lightLoopTempE, lightLoopTempF;
+                float4 packedNormal_PerObjectData, Metallic_Specular_Roughness_ShadingModelID, albedoAlpha, shadingParams1, shadingInfo, shadingParams2, worldPosAndNormal, lightingTempA, lightingTempB, lightingTempC, accumulatedLightColor, lightLoopTempA, lightLoopTempB, lightLoopTempC, lightLoopTempD, lightLoopTempE, lightLoopTempF;
                 uint4 bitmask, uiDest;
                 float4 fDest;
 
-                packedNormalAndMiscData.xyzw = tex2Dlod(_IN1, float4(screenUV.xy, 0, 0)).wxyz;
-                materialAndWorldNormal.xyzw = tex2Dlod(_IN2, float4(screenUV.xy, 0, 0)).xyzw;
-                albedoAndDepth.xyz = tex2Dlod(_IN3, float4(screenUV.xy, 0, 0)).xyz;
+                packedNormal_PerObjectData.xyzw = tex2Dlod(_IN1, float4(screenUV.xy, 0, 0)).wxyz;
+                Metallic_Specular_Roughness_ShadingModelID.xyzw = tex2Dlod(_IN2, float4(screenUV.xy, 0, 0)).xyzw;
+                albedoAlpha.xyz = tex2Dlod(_IN3, float4(screenUV.xy, 0, 0)).xyz;
                 shadingParams1.xyz = tex2Dlod(_IN4, float4(screenUV.xy, 0, 0)).yxz;
-                albedoAndDepth.w = tex2Dlod(_IN0, float4(screenUV.xy, 0, 0)).x;
-                shadingParams1.w = albedoAndDepth.w * cb1[65].x + cb1[65].y;
-                albedoAndDepth.w = albedoAndDepth.w * cb1[65].z + -cb1[65].w;
-                albedoAndDepth.w = 1 / albedoAndDepth.w;
-                albedoAndDepth.w = shadingParams1.w + albedoAndDepth.w;
+                albedoAlpha.w = tex2Dlod(_IN0, float4(screenUV.xy, 0, 0)).x;
+                shadingParams1.w = albedoAlpha.w * cb1[65].x + cb1[65].y;
+                albedoAlpha.w = albedoAlpha.w * cb1[65].z + -cb1[65].w;
+                albedoAlpha.w = 1 / albedoAlpha.w;
+                albedoAlpha.w = shadingParams1.w + albedoAlpha.w;
                 shadingInfo.xy = cb1[138].xy * screenUV.xy;
                 shadingInfo.xy = (uint2)shadingInfo.xy;
                 shadingParams1.w = (uint)cb1[158].x;
                 shadingInfo.x = (int)shadingInfo.y + (int)shadingInfo.x;
                 shadingParams1.w = (int)shadingParams1.w + (int)shadingInfo.x;
                 shadingParams1.w = (int)shadingParams1.w & 1;
-                materialAndWorldNormal.w = 255 * materialAndWorldNormal.w;
-                materialAndWorldNormal.w = round(materialAndWorldNormal.w);
-                materialAndWorldNormal.w = (uint)materialAndWorldNormal.w;
-                shadingInfo.xy = (int2)materialAndWorldNormal.ww & int2(15,-16);
-                materialAndWorldNormal.w = ((int)shadingInfo.x != 12) ? 1.0 : 0.0;
+                Metallic_Specular_Roughness_ShadingModelID.w = 255 * Metallic_Specular_Roughness_ShadingModelID.w;
+                Metallic_Specular_Roughness_ShadingModelID.w = round(Metallic_Specular_Roughness_ShadingModelID.w);
+                Metallic_Specular_Roughness_ShadingModelID.w = (uint)Metallic_Specular_Roughness_ShadingModelID.w;
+                shadingInfo.xy = (int2)Metallic_Specular_Roughness_ShadingModelID.ww & int2(15,-16);
+                Metallic_Specular_Roughness_ShadingModelID.w = ((int)shadingInfo.x != 12) ? 1.0 : 0.0;
                 shadingParams2.xyz = ((int3)shadingInfo.xxx == int3(13,14,15)) ? 1.0 : 0.0;
                 shadingInfo.z = (int)shadingParams2.z | (int)shadingParams2.y;
                 shadingInfo.z = (int)shadingInfo.z | (int)shadingParams2.x;
-                materialAndWorldNormal.w = materialAndWorldNormal.w ? shadingInfo.z : -1;
-                if (materialAndWorldNormal.w != 0) {
+                Metallic_Specular_Roughness_ShadingModelID.w = Metallic_Specular_Roughness_ShadingModelID.w ? shadingInfo.z : -1;
+                if (Metallic_Specular_Roughness_ShadingModelID.w != 0) {
                     shadingInfo.x = shadingParams2.x ? 13 : 12;
                     shadingParams2.xz = shadingParams2.yz ? float2(1,1) : 0;
-                    shadingInfo.zw = packedNormalAndMiscData.yz * float2(2,2) + float2(-1,-1);
-                    materialAndWorldNormal.w = dot(float2(1,1), abs(shadingInfo.zw));
-                    worldPosAndNormal.z = 1 + -materialAndWorldNormal.w;
-                    materialAndWorldNormal.w = max(0, -worldPosAndNormal.z);
+                    shadingInfo.zw = packedNormal_PerObjectData.yz * float2(2,2) + float2(-1,-1);
+                    Metallic_Specular_Roughness_ShadingModelID.w = dot(float2(1,1), abs(shadingInfo.zw));
+                    worldPosAndNormal.z = 1 + -Metallic_Specular_Roughness_ShadingModelID.w;
+                    Metallic_Specular_Roughness_ShadingModelID.w = max(0, -worldPosAndNormal.z);
                     lightingTempA.xy = (shadingInfo.zw >= float2(0,0)) ? 1.0 : 0.0;
                     lightingTempA.xy = lightingTempA.xy ? float2(0.5,0.5) : float2(-0.5,-0.5);
-                    lightingTempA.xy = lightingTempA.xy * materialAndWorldNormal.ww;
+                    lightingTempA.xy = lightingTempA.xy * Metallic_Specular_Roughness_ShadingModelID.ww;
                     worldPosAndNormal.xy = lightingTempA.xy * float2(-2,-2) + shadingInfo.zw;
-                    materialAndWorldNormal.w = dot(worldPosAndNormal.xyz, worldPosAndNormal.xyz);
-                    materialAndWorldNormal.w = rsqrt(materialAndWorldNormal.w);
-                    worldPosAndNormal.xyz = worldPosAndNormal.xyz * materialAndWorldNormal.www;
-                    lightingTempA.xyz = materialAndWorldNormal.xyz * materialAndWorldNormal.xyz;
+                    Metallic_Specular_Roughness_ShadingModelID.w = dot(worldPosAndNormal.xyz, worldPosAndNormal.xyz);
+                    Metallic_Specular_Roughness_ShadingModelID.w = rsqrt(Metallic_Specular_Roughness_ShadingModelID.w);
+                    worldPosAndNormal.xyz = worldPosAndNormal.xyz * Metallic_Specular_Roughness_ShadingModelID.www;
+                    lightingTempA.xyz = Metallic_Specular_Roughness_ShadingModelID.xyz * Metallic_Specular_Roughness_ShadingModelID.xyz;
                     shadingParams2.y = shadingParams1.z;
                 } else {
-                    materialAndWorldNormal.w = ((int)shadingInfo.x == 10) ? 1.0 : 0.0;
-                    materialAndWorldNormal.xyz = saturate(materialAndWorldNormal.xyz);
-                    materialAndWorldNormal.xyz = float3(16777215,65535,255) * materialAndWorldNormal.xyz;
-                    materialAndWorldNormal.xyz = round(materialAndWorldNormal.xyz);
-                    materialAndWorldNormal.xyz = (uint3)materialAndWorldNormal.xyz;
-                    bitmask.y = ((~(-1 << 8)) << 0) & 0xffffffff;  materialAndWorldNormal.y = (((uint)materialAndWorldNormal.z << 0) & bitmask.y) | ((uint)materialAndWorldNormal.y & ~bitmask.y);
-                    bitmask.x = ((~(-1 << 16)) << 0) & 0xffffffff;  materialAndWorldNormal.x = (((uint)materialAndWorldNormal.y << 0) & bitmask.x) | ((uint)materialAndWorldNormal.x & ~bitmask.x);
-                    materialAndWorldNormal.x = (uint)materialAndWorldNormal.x;
-                    materialAndWorldNormal.x = 5.96046519e-008 * materialAndWorldNormal.x;
-                    materialAndWorldNormal.y = materialAndWorldNormal.x * cb1[65].x + cb1[65].y;
-                    materialAndWorldNormal.x = materialAndWorldNormal.x * cb1[65].z + -cb1[65].w;
-                    materialAndWorldNormal.x = 1 / materialAndWorldNormal.x;
-                    materialAndWorldNormal.x = materialAndWorldNormal.y + materialAndWorldNormal.x;
-                    albedoAndDepth.w = materialAndWorldNormal.w ? materialAndWorldNormal.x : albedoAndDepth.w;
-                    worldPosAndNormal.xyz = packedNormalAndMiscData.yzw * float3(2,2,2) + float3(-1,-1,-1);
+                    Metallic_Specular_Roughness_ShadingModelID.w = ((int)shadingInfo.x == 10) ? 1.0 : 0.0;
+                    Metallic_Specular_Roughness_ShadingModelID.xyz = saturate(Metallic_Specular_Roughness_ShadingModelID.xyz);
+                    Metallic_Specular_Roughness_ShadingModelID.xyz = float3(16777215,65535,255) * Metallic_Specular_Roughness_ShadingModelID.xyz;
+                    Metallic_Specular_Roughness_ShadingModelID.xyz = round(Metallic_Specular_Roughness_ShadingModelID.xyz);
+                    Metallic_Specular_Roughness_ShadingModelID.xyz = (uint3)Metallic_Specular_Roughness_ShadingModelID.xyz;
+                    bitmask.y = ((~(-1 << 8)) << 0) & 0xffffffff;  Metallic_Specular_Roughness_ShadingModelID.y = (((uint)Metallic_Specular_Roughness_ShadingModelID.z << 0) & bitmask.y) | ((uint)Metallic_Specular_Roughness_ShadingModelID.y & ~bitmask.y);
+                    bitmask.x = ((~(-1 << 16)) << 0) & 0xffffffff;  Metallic_Specular_Roughness_ShadingModelID.x = (((uint)Metallic_Specular_Roughness_ShadingModelID.y << 0) & bitmask.x) | ((uint)Metallic_Specular_Roughness_ShadingModelID.x & ~bitmask.x);
+                    Metallic_Specular_Roughness_ShadingModelID.x = (uint)Metallic_Specular_Roughness_ShadingModelID.x;
+                    Metallic_Specular_Roughness_ShadingModelID.x = 5.96046519e-008 * Metallic_Specular_Roughness_ShadingModelID.x;
+                    Metallic_Specular_Roughness_ShadingModelID.y = Metallic_Specular_Roughness_ShadingModelID.x * cb1[65].x + cb1[65].y;
+                    Metallic_Specular_Roughness_ShadingModelID.x = Metallic_Specular_Roughness_ShadingModelID.x * cb1[65].z + -cb1[65].w;
+                    Metallic_Specular_Roughness_ShadingModelID.x = 1 / Metallic_Specular_Roughness_ShadingModelID.x;
+                    Metallic_Specular_Roughness_ShadingModelID.x = Metallic_Specular_Roughness_ShadingModelID.y + Metallic_Specular_Roughness_ShadingModelID.x;
+                    albedoAlpha.w = Metallic_Specular_Roughness_ShadingModelID.w ? Metallic_Specular_Roughness_ShadingModelID.x : albedoAlpha.w;
+                    worldPosAndNormal.xyz = packedNormal_PerObjectData.yzw * float3(2,2,2) + float3(-1,-1,-1);
                     lightingTempA.xyz = float3(0,0,0);
                     shadingParams2.xyz = float3(0,0,0);
-                    packedNormalAndMiscData.xw = float2(0,0);
+                    packedNormal_PerObjectData.xw = float2(0,0);
                     shadingParams1.xy = float2(0,0);
                 }
-                packedNormalAndMiscData.y = dot(worldPosAndNormal.xyz, worldPosAndNormal.xyz);
-                packedNormalAndMiscData.y = rsqrt(packedNormalAndMiscData.y);
-                materialAndWorldNormal.xyz = worldPosAndNormal.xyz * packedNormalAndMiscData.yyy;
-                packedNormalAndMiscData.yz = ((int2)shadingInfo.xx == int2(5,13)) ? 1.0 : 0.0;
-                materialAndWorldNormal.w = (0 < cb1[162].y) ? 1.0 : 0.0;
+                packedNormal_PerObjectData.y = dot(worldPosAndNormal.xyz, worldPosAndNormal.xyz);
+                packedNormal_PerObjectData.y = rsqrt(packedNormal_PerObjectData.y);
+                Metallic_Specular_Roughness_ShadingModelID.xyz = worldPosAndNormal.xyz * packedNormal_PerObjectData.yyy;
+                packedNormal_PerObjectData.yz = ((int2)shadingInfo.xx == int2(5,13)) ? 1.0 : 0.0;
+                Metallic_Specular_Roughness_ShadingModelID.w = (0 < cb1[162].y) ? 1.0 : 0.0;
                 shadingInfo.z = (0 < cb1[220].z) ? 1.0 : 0.0;
-                materialAndWorldNormal.w = materialAndWorldNormal.w ? shadingInfo.z : 0;
+                Metallic_Specular_Roughness_ShadingModelID.w = Metallic_Specular_Roughness_ShadingModelID.w ? shadingInfo.z : 0;
                 shadingInfo.z = (0 != cb1[162].y) ? 1.0 : 0.0;
-                worldPosAndNormal.xyz = shadingInfo.zzz ? float3(1,1,1) : albedoAndDepth.xyz;
+                worldPosAndNormal.xyz = shadingInfo.zzz ? float3(1,1,1) : albedoAlpha.xyz;
                 shadingParams1.w = shadingParams1.w ? 1 : 0;
-                worldPosAndNormal.xyz = materialAndWorldNormal.www ? shadingParams1.www : worldPosAndNormal.xyz;
-                albedoAndDepth.xyz = packedNormalAndMiscData.yyy ? worldPosAndNormal.xyz : albedoAndDepth.xyz;
-                packedNormalAndMiscData.y = tex2Dlod(_IN9, float4(0, 0, 0, 0)).x;
-                shadingInfo.zw = screenUV.zw * albedoAndDepth.ww; // This will be 0 due to screenUV.zw initialization
+                worldPosAndNormal.xyz = Metallic_Specular_Roughness_ShadingModelID.www ? shadingParams1.www : worldPosAndNormal.xyz;
+                albedoAlpha.xyz = packedNormal_PerObjectData.yyy ? worldPosAndNormal.xyz : albedoAlpha.xyz;
+                packedNormal_PerObjectData.y = tex2Dlod(_IN9, float4(0, 0, 0, 0)).x;
+                shadingInfo.zw = screenUV.zw * albedoAlpha.ww; // This will be 0 due to screenUV.zw initialization
                 worldPosAndNormal.xyz = cb1[49].xyz * shadingInfo.www;
                 worldPosAndNormal.xyz = shadingInfo.zzz * cb1[48].xyz + worldPosAndNormal.xyz;
-                worldPosAndNormal.xyz = albedoAndDepth.www * cb1[50].xyz + worldPosAndNormal.xyz;
+                worldPosAndNormal.xyz = albedoAlpha.www * cb1[50].xyz + worldPosAndNormal.xyz;
                 worldPosAndNormal.xyz = cb1[51].xyz + worldPosAndNormal.xyz;
                 shadingInfo.zw = tex2Dlod(_IN5, float4(screenUV.xy, 0, 0)).xz;
                 shadingInfo.zw = shadingInfo.zw * shadingInfo.zw;
-                materialAndWorldNormal.w = shadingInfo.z * shadingInfo.w;
-                shadingParams1.w = cb1[253].y * materialAndWorldNormal.w;
+                Metallic_Specular_Roughness_ShadingModelID.w = shadingInfo.z * shadingInfo.w;
+                shadingParams1.w = cb1[253].y * Metallic_Specular_Roughness_ShadingModelID.w;
                 if (cb1[255].x != 0) {
                     lightingTempB.xyz = float3(0,0,0);
                     shadingInfo.zw = float2(0,0);
@@ -217,12 +216,12 @@ Shader "Custom/WWToon"
                     shadingInfo.z = (int)shadingInfo.z + 1;
                     }
                     lightingTempB.xyz = lightingTempB.xyz / worldPosAndNormal.www;
-                    lightingTempC.xyz = (float3(0.644999981,0.312000006,0.978999972) < packedNormalAndMiscData.xxx) ? 1.0 : 0.0;
-                    accumulatedLightColor.xyz = (packedNormalAndMiscData.xxx < float3(0.685000002,0.351999998,1.02100003)) ? 1.0 : 0.0;
+                    lightingTempC.xyz = (float3(0.644999981,0.312000006,0.978999972) < packedNormal_PerObjectData.xxx) ? 1.0 : 0.0;
+                    accumulatedLightColor.xyz = (packedNormal_PerObjectData.xxx < float3(0.685000002,0.351999998,1.02100003)) ? 1.0 : 0.0;
                     lightingTempC.xyz = lightingTempC.xyz ? accumulatedLightColor.xyz : 0;
-                    packedNormalAndMiscData.x = lightingTempC.z ? 1.000000 : 0;
-                    packedNormalAndMiscData.x = lightingTempC.y ? 0 : packedNormalAndMiscData.x;
-                    packedNormalAndMiscData.x = lightingTempC.x ? 1 : packedNormalAndMiscData.x;
+                    packedNormal_PerObjectData.x = lightingTempC.z ? 1.000000 : 0;
+                    packedNormal_PerObjectData.x = lightingTempC.y ? 0 : packedNormal_PerObjectData.x;
+                    packedNormal_PerObjectData.x = lightingTempC.x ? 1 : packedNormal_PerObjectData.x;
                     shadingInfo.z = (int)lightingTempC.y | (int)lightingTempC.z;
                     shadingInfo.z = (int)shadingInfo.z & 0x3f800000;
                     shadingInfo.z = lightingTempC.x ? 0 : shadingInfo.z;
@@ -231,11 +230,11 @@ Shader "Custom/WWToon"
                     shadingParams1.x = (uint)shadingParams1.x;
                     lightingTempC.xyzw = (int4)shadingParams1.xxxx & int4(15,240,240,15);
                     lightingTempC.xyzw = (uint4)lightingTempC.xyzw;
-                    shadingParams1.x = saturate(packedNormalAndMiscData.w + packedNormalAndMiscData.w);
+                    shadingParams1.x = saturate(packedNormal_PerObjectData.w + packedNormal_PerObjectData.w);
                     shadingInfo.w = shadingParams1.x * -2 + 3;
                     shadingParams1.x = shadingParams1.x * shadingParams1.x;
                     shadingParams1.x = shadingInfo.w * shadingParams1.x;
-                    shadingInfo.w = -0.5 + packedNormalAndMiscData.w;
+                    shadingInfo.w = -0.5 + packedNormal_PerObjectData.w;
                     shadingInfo.w = saturate(shadingInfo.w + shadingInfo.w);
                     shadingParams2.w = shadingInfo.w * -2 + 3;
                     shadingInfo.w = shadingInfo.w * shadingInfo.w;
@@ -249,14 +248,14 @@ Shader "Custom/WWToon"
                     shadingParams2.w = worldPosAndNormal.w * shadingParams2.w;
                     worldPosAndNormal.w = shadingParams2.w * shadingInfo.w;
                     lightingTempA.w = cb1[265].y + -cb1[265].x;
-                    lightingTempB.w = materialAndWorldNormal.w * cb1[253].y + -cb1[265].x;
+                    lightingTempB.w = Metallic_Specular_Roughness_ShadingModelID.w * cb1[253].y + -cb1[265].x;
                     lightingTempA.w = 1 / lightingTempA.w;
                     lightingTempB.w = saturate(lightingTempB.w * lightingTempA.w);
                     accumulatedLightColor.x = lightingTempB.w * -2 + 3;
                     lightingTempB.w = lightingTempB.w * lightingTempB.w;
                     lightingTempB.w = accumulatedLightColor.x * lightingTempB.w;
                     lightingTempB.w = lightingTempB.w * worldPosAndNormal.w;
-                    accumulatedLightColor.x = materialAndWorldNormal.w * cb1[253].y + -lightingTempB.w;
+                    accumulatedLightColor.x = Metallic_Specular_Roughness_ShadingModelID.w * cb1[253].y + -lightingTempB.w;
                     lightingTempB.w = cb1[265].z * accumulatedLightColor.x + lightingTempB.w;
                     accumulatedLightColor.x = -cb1[265].x + lightingTempB.w;
                     lightingTempA.w = saturate(accumulatedLightColor.x * lightingTempA.w);
@@ -314,9 +313,9 @@ Shader "Custom/WWToon"
                     lightLoopTempC.xyz = lightingTempC.xyz * shadingInfo.www + float3(-1,-1,-1);
                     lightLoopTempC.xyz = lightLoopTempC.xyz * float3(0.600000024,0.600000024,0.600000024) + float3(1,1,1);
                     lightingTempC.xyz = -lightingTempC.xyz * shadingInfo.www + lightLoopTempC.xyz;
-                    lightingTempC.xyz = packedNormalAndMiscData.xxx * lightingTempC.xyz + lightLoopTempB.xyz;
-                    lightLoopTempB.xyz = lightingTempC.xyz + -albedoAndDepth.xyz;
-                    lightLoopTempB.xyz = lightLoopTempB.xyz * float3(0.850000024,0.850000024,0.850000024) + albedoAndDepth.xyz;
+                    lightingTempC.xyz = packedNormal_PerObjectData.xxx * lightingTempC.xyz + lightLoopTempB.xyz;
+                    lightLoopTempB.xyz = lightingTempC.xyz + -albedoAlpha.xyz;
+                    lightLoopTempB.xyz = lightLoopTempB.xyz * float3(0.850000024,0.850000024,0.850000024) + albedoAlpha.xyz;
                     lightLoopTempA.xyz = lightLoopTempA.zzz * lightLoopTempB.xyz + -lightingTempC.xyz;
                     lightingTempC.xyz = lightingTempB.www * lightLoopTempA.xyz + lightingTempC.xyz;
                     lightingTempC.xyz = float3(-1,-1,-1) + lightingTempC.xyz;
@@ -325,14 +324,14 @@ Shader "Custom/WWToon"
                     lightLoopTempB.xyz = cb1[262].xyz * float3(0.5,0.5,0.5) + -lightLoopTempA.xyz;
                     lightLoopTempA.xyz = shadingParams2.www * lightLoopTempB.xyz + lightLoopTempA.xyz;
                     lightLoopTempA.xyz = cb1[260].xxx * lightLoopTempA.xyz;
-                    lightLoopTempA.xyz = lightLoopTempA.xyz * albedoAndDepth.xyz;
+                    lightLoopTempA.xyz = lightLoopTempA.xyz * albedoAlpha.xyz;
                     lightLoopTempB.xyz = lightLoopTempA.xyz * lightingTempA.xyz;
-                    lightLoopTempC.xyz = cb1[261].xyz * albedoAndDepth.xyz;
-                    packedNormalAndMiscData.x = shadingParams1.x * 0.300000012 + 0.699999988;
-                    lightLoopTempD.xyz = lightLoopTempC.xyz * packedNormalAndMiscData.xxx;
-                    lightLoopTempE.xyz = cb1[262].xyz * albedoAndDepth.xyz;
-                    lightLoopTempB.xyz = lightLoopTempC.xyz * packedNormalAndMiscData.xxx + lightLoopTempB.xyz;
-                    lightLoopTempC.xyz = albedoAndDepth.xyz * cb1[262].xyz + -lightLoopTempD.xyz;
+                    lightLoopTempC.xyz = cb1[261].xyz * albedoAlpha.xyz;
+                    packedNormal_PerObjectData.x = shadingParams1.x * 0.300000012 + 0.699999988;
+                    lightLoopTempD.xyz = lightLoopTempC.xyz * packedNormal_PerObjectData.xxx;
+                    lightLoopTempE.xyz = cb1[262].xyz * albedoAlpha.xyz;
+                    lightLoopTempB.xyz = lightLoopTempC.xyz * packedNormal_PerObjectData.xxx + lightLoopTempB.xyz;
+                    lightLoopTempC.xyz = albedoAlpha.xyz * cb1[262].xyz + -lightLoopTempD.xyz;
                     lightLoopTempC.xyz = lightLoopTempC.xyz * float3(0.400000006,0.400000006,0.400000006) + lightLoopTempD.xyz;
                     lightLoopTempF.xyz = lightLoopTempD.xyz * lightingTempC.xyz;
                     lightLoopTempC.xyz = lightLoopTempC.xyz * lightingTempC.xyz + -lightLoopTempF.xyz;
@@ -342,20 +341,20 @@ Shader "Custom/WWToon"
                     lightLoopTempC.xyz = lightLoopTempE.xyz * lightingTempA.www;
                     lightingTempC.xyz = lightLoopTempC.xyz * lightingTempC.xyz + -lightLoopTempB.xyz;
                     lightingTempC.xyz = accumulatedLightColor.xxx * lightingTempC.xyz + lightLoopTempB.xyz;
-                    packedNormalAndMiscData.x = tex2Dlod(_IN8, float4(screenUV.xy, 0, 0)).x;
-                    packedNormalAndMiscData.x = -1 + packedNormalAndMiscData.x;
-                    packedNormalAndMiscData.x = shadingInfo.z * packedNormalAndMiscData.x + 1;
+                    packedNormal_PerObjectData.x = tex2Dlod(_IN8, float4(screenUV.xy, 0, 0)).x;
+                    packedNormal_PerObjectData.x = -1 + packedNormal_PerObjectData.x;
+                    packedNormal_PerObjectData.x = shadingInfo.z * packedNormal_PerObjectData.x + 1;
                     lightingTempC.xyz = lightingTempC.xyz + -lightLoopTempA.xyz;
                     lightingTempC.xyz = shadingParams2.www * lightingTempC.xyz + lightLoopTempA.xyz;
                     lightLoopTempA.xyz = float3(1,1,1) + -lightingTempB.xyz;
-                    lightingTempB.xyz = packedNormalAndMiscData.xxx * lightLoopTempA.xyz + lightingTempB.xyz;
+                    lightingTempB.xyz = packedNormal_PerObjectData.xxx * lightLoopTempA.xyz + lightingTempB.xyz;
                     lightingTempB.xyz = lightingTempC.xyz * lightingTempB.xyz;
                 } else {
-                    packedNormalAndMiscData.x = saturate(packedNormalAndMiscData.w + packedNormalAndMiscData.w);
-                    shadingParams1.x = packedNormalAndMiscData.x * -2 + 3;
-                    packedNormalAndMiscData.x = packedNormalAndMiscData.x * packedNormalAndMiscData.x;
-                    packedNormalAndMiscData.x = shadingParams1.x * packedNormalAndMiscData.x;
-                    shadingParams1.x = -0.5 + packedNormalAndMiscData.w;
+                    packedNormal_PerObjectData.x = saturate(packedNormal_PerObjectData.w + packedNormal_PerObjectData.w);
+                    shadingParams1.x = packedNormal_PerObjectData.x * -2 + 3;
+                    packedNormal_PerObjectData.x = packedNormal_PerObjectData.x * packedNormal_PerObjectData.x;
+                    packedNormal_PerObjectData.x = shadingParams1.x * packedNormal_PerObjectData.x;
+                    shadingParams1.x = -0.5 + packedNormal_PerObjectData.w;
                     shadingParams1.x = saturate(shadingParams1.x + shadingParams1.x);
                     shadingInfo.z = shadingParams1.x * -2 + 3;
                     shadingParams1.x = shadingParams1.x * shadingParams1.x;
@@ -369,16 +368,16 @@ Shader "Custom/WWToon"
                     shadingInfo.z = shadingInfo.w * shadingInfo.z;
                     shadingInfo.w = shadingInfo.z * shadingParams1.x;
                     shadingParams2.w = cb1[265].y + -cb1[265].x;
-                    worldPosAndNormal.w = materialAndWorldNormal.w * cb1[253].y + -cb1[265].x;
+                    worldPosAndNormal.w = Metallic_Specular_Roughness_ShadingModelID.w * cb1[253].y + -cb1[265].x;
                     shadingParams2.w = 1 / shadingParams2.w;
                     worldPosAndNormal.w = saturate(worldPosAndNormal.w * shadingParams2.w);
                     lightingTempA.w = worldPosAndNormal.w * -2 + 3;
                     worldPosAndNormal.w = worldPosAndNormal.w * worldPosAndNormal.w;
                     worldPosAndNormal.w = lightingTempA.w * worldPosAndNormal.w;
                     worldPosAndNormal.w = worldPosAndNormal.w * shadingInfo.w;
-                    materialAndWorldNormal.w = materialAndWorldNormal.w * cb1[253].y + -worldPosAndNormal.w;
-                    materialAndWorldNormal.w = cb1[265].z * materialAndWorldNormal.w + worldPosAndNormal.w;
-                    worldPosAndNormal.w = -cb1[265].x + materialAndWorldNormal.w;
+                    Metallic_Specular_Roughness_ShadingModelID.w = Metallic_Specular_Roughness_ShadingModelID.w * cb1[253].y + -worldPosAndNormal.w;
+                    Metallic_Specular_Roughness_ShadingModelID.w = cb1[265].z * Metallic_Specular_Roughness_ShadingModelID.w + worldPosAndNormal.w;
+                    worldPosAndNormal.w = -cb1[265].x + Metallic_Specular_Roughness_ShadingModelID.w;
                     shadingParams2.w = saturate(worldPosAndNormal.w * shadingParams2.w);
                     worldPosAndNormal.w = shadingParams2.w * -2 + 3;
                     shadingParams2.w = shadingParams2.w * shadingParams2.w;
@@ -386,50 +385,50 @@ Shader "Custom/WWToon"
                     shadingInfo.w = shadingParams2.w * shadingInfo.w;
                     shadingParams1.x = shadingParams1.x * shadingInfo.z + -shadingInfo.w;
                     shadingParams1.x = cb1[265].z * shadingParams1.x + shadingInfo.w;
-                    shadingInfo.z = materialAndWorldNormal.w * shadingParams2.y;
+                    shadingInfo.z = Metallic_Specular_Roughness_ShadingModelID.w * shadingParams2.y;
                     shadingInfo.z = 10 * shadingInfo.z;
-                    materialAndWorldNormal.w = -1 + materialAndWorldNormal.w;
-                    materialAndWorldNormal.w = cb1[260].y * materialAndWorldNormal.w + 1;
-                    shadingInfo.w = shadingParams1.w * shadingParams1.x + -materialAndWorldNormal.w;
-                    materialAndWorldNormal.w = shadingParams2.x * shadingInfo.w + materialAndWorldNormal.w;
+                    Metallic_Specular_Roughness_ShadingModelID.w = -1 + Metallic_Specular_Roughness_ShadingModelID.w;
+                    Metallic_Specular_Roughness_ShadingModelID.w = cb1[260].y * Metallic_Specular_Roughness_ShadingModelID.w + 1;
+                    shadingInfo.w = shadingParams1.w * shadingParams1.x + -Metallic_Specular_Roughness_ShadingModelID.w;
+                    Metallic_Specular_Roughness_ShadingModelID.w = shadingParams2.x * shadingInfo.w + Metallic_Specular_Roughness_ShadingModelID.w;
                     shadingInfo.w = shadingParams1.w * shadingParams1.x + -shadingParams1.x;
                     accumulatedLightColor.x = shadingParams2.x * shadingInfo.w + shadingParams1.x;
                     shadingParams2.xyw = float3(0.200000003,0.200000003,0.200000003) * cb1[261].xyz;
                     lightingTempC.xyz = cb1[262].xyz * float3(0.5,0.5,0.5) + -shadingParams2.xyw;
-                    shadingParams2.xyw = materialAndWorldNormal.www * lightingTempC.xyz + shadingParams2.xyw;
+                    shadingParams2.xyw = Metallic_Specular_Roughness_ShadingModelID.www * lightingTempC.xyz + shadingParams2.xyw;
                     shadingParams2.xyw = cb1[260].xxx * shadingParams2.xyw;
-                    shadingParams2.xyw = shadingParams2.xyw * albedoAndDepth.xyz;
+                    shadingParams2.xyw = shadingParams2.xyw * albedoAlpha.xyz;
                     lightingTempC.xyz = shadingParams2.xyw * lightingTempA.xyz;
-                    lightLoopTempA.xyz = cb1[261].xyz * albedoAndDepth.xyz;
-                    packedNormalAndMiscData.x = packedNormalAndMiscData.x * 0.300000012 + 0.699999988;
-                    lightLoopTempD.xyz = lightLoopTempA.xyz * packedNormalAndMiscData.xxx;
-                    lightLoopTempA.xyz = lightLoopTempA.xyz * packedNormalAndMiscData.xxx + lightingTempC.xyz;
+                    lightLoopTempA.xyz = cb1[261].xyz * albedoAlpha.xyz;
+                    packedNormal_PerObjectData.x = packedNormal_PerObjectData.x * 0.300000012 + 0.699999988;
+                    lightLoopTempD.xyz = lightLoopTempA.xyz * packedNormal_PerObjectData.xxx;
+                    lightLoopTempA.xyz = lightLoopTempA.xyz * packedNormal_PerObjectData.xxx + lightingTempC.xyz;
                     lightingTempC.xyz = lightingTempC.xyz * shadingInfo.zzz + lightLoopTempA.xyz;
-                    lightLoopTempA.xyz = albedoAndDepth.xyz * cb1[262].xyz + -lightLoopTempD.xyz;
+                    lightLoopTempA.xyz = albedoAlpha.xyz * cb1[262].xyz + -lightLoopTempD.xyz;
                     lightLoopTempA.xyz = lightLoopTempA.xyz * accumulatedLightColor.xxx;
                     lightLoopTempA.xyz = lightLoopTempA.xyz * float3(0.400000006,0.400000006,0.400000006) + lightLoopTempD.xyz;
                     shadingParams2.xyw = shadingParams2.xyw * lightingTempA.xyz + lightLoopTempA.xyz;
-                    lightLoopTempA.xyz = albedoAndDepth.xyz * cb1[262].xyz + -lightingTempC.xyz;
+                    lightLoopTempA.xyz = albedoAlpha.xyz * cb1[262].xyz + -lightingTempC.xyz;
                     lightingTempC.xyz = accumulatedLightColor.xxx * lightLoopTempA.xyz + lightingTempC.xyz;
                     lightingTempC.xyz = lightingTempC.xyz + -shadingParams2.xyw;
-                    lightingTempB.xyz = materialAndWorldNormal.www * lightingTempC.xyz + shadingParams2.xyw;
+                    lightingTempB.xyz = Metallic_Specular_Roughness_ShadingModelID.www * lightingTempC.xyz + shadingParams2.xyw;
                 }
-                packedNormalAndMiscData.x = -0.400000006 + packedNormalAndMiscData.w;
-                packedNormalAndMiscData.x = saturate(10.000001 * packedNormalAndMiscData.x);
-                packedNormalAndMiscData.w = packedNormalAndMiscData.x * -2 + 3;
-                packedNormalAndMiscData.x = packedNormalAndMiscData.x * packedNormalAndMiscData.x;
-                accumulatedLightColor.y = packedNormalAndMiscData.w * packedNormalAndMiscData.x;
+                packedNormal_PerObjectData.x = -0.400000006 + packedNormal_PerObjectData.w;
+                packedNormal_PerObjectData.x = saturate(10.000001 * packedNormal_PerObjectData.x);
+                packedNormal_PerObjectData.w = packedNormal_PerObjectData.x * -2 + 3;
+                packedNormal_PerObjectData.x = packedNormal_PerObjectData.x * packedNormal_PerObjectData.x;
+                accumulatedLightColor.y = packedNormal_PerObjectData.w * packedNormal_PerObjectData.x;
                 shadingParams2.xyw = lightingTempB.xyz * float3(0.5,0.5,0.5) + cb1[261].xyz;
-                shadingParams2.xyw = shadingParams2.xyw * albedoAndDepth.xyz;
-                lightingTempC.xyz = cb1[261].xyz * albedoAndDepth.xyz;
+                shadingParams2.xyw = shadingParams2.xyw * albedoAlpha.xyz;
+                lightingTempC.xyz = cb1[261].xyz * albedoAlpha.xyz;
                 shadingParams2.xyw = cb1[255].xxx ? shadingParams2.xyw : lightingTempC.xyz;
-                lightingTempC.xyz = packedNormalAndMiscData.zzz ? shadingParams2.xyw : lightLoopTempD.xyz;
-                shadingParams2.xyw = packedNormalAndMiscData.zzz ? shadingParams2.xyw : lightingTempB.xyz;
-                packedNormalAndMiscData.xw = packedNormalAndMiscData.zz ? float2(0,0) : accumulatedLightColor.xy;
+                lightingTempC.xyz = packedNormal_PerObjectData.zzz ? shadingParams2.xyw : lightLoopTempD.xyz;
+                shadingParams2.xyw = packedNormal_PerObjectData.zzz ? shadingParams2.xyw : lightingTempB.xyz;
+                packedNormal_PerObjectData.xw = packedNormal_PerObjectData.zz ? float2(0,0) : accumulatedLightColor.xy;
                 lightingTempB.xyz = cb1[264].xyz + cb1[264].xyz;
-                lightingTempB.xyz = packedNormalAndMiscData.xxx * lightingTempB.xyz + -cb1[264].xyz;
+                lightingTempB.xyz = packedNormal_PerObjectData.xxx * lightingTempB.xyz + -cb1[264].xyz;
                 accumulatedLightColor.xyz = float3(0,0,0);
-                materialAndWorldNormal.w = 1;
+                Metallic_Specular_Roughness_ShadingModelID.w = 1;
                 shadingParams1.x = 0;
                 while (true) {
                     shadingInfo.z = ((uint)shadingParams1.x >= asuint(cb2[128].x)) ? 1.0 : 0.0;
@@ -461,7 +460,7 @@ Shader "Custom/WWToon"
                     worldPosAndNormal.w = -lightingTempB.w * worldPosAndNormal.w + 1;
                     lightingTempA.w = rsqrt(lightingTempA.w);
                     lightLoopTempD.xyz = lightLoopTempA.xyz * lightingTempA.www;
-                    lightingTempA.w = dot(materialAndWorldNormal.xyz, lightLoopTempD.xyz);
+                    lightingTempA.w = dot(Metallic_Specular_Roughness_ShadingModelID.xyz, lightLoopTempD.xyz);
                     lightingTempA.w = 1 + lightingTempA.w;
                     lightLoopTempC.zw = cb2[lightLoopTempC.x+0].ww * float2(0.939999998,0.0600000024);
                     lightingTempA.w = lightingTempA.w * 0.5 + -lightLoopTempC.z;
@@ -472,7 +471,7 @@ Shader "Custom/WWToon"
                     lightingTempA.w = lightingTempB.w * lightingTempA.w;
                     lightingTempA.w = min(1, lightingTempA.w);
                     lightLoopTempE.xyz = cb2[lightLoopTempC.y+0].xyz * lightingTempC.xyz;
-                    lightLoopTempC.xzw = albedoAndDepth.xyz * cb2[lightLoopTempC.x+0].xyz + -lightLoopTempE.xyz;
+                    lightLoopTempC.xzw = albedoAlpha.xyz * cb2[lightLoopTempC.x+0].xyz + -lightLoopTempE.xyz;
                     lightLoopTempC.xzw = lightingTempA.www * lightLoopTempC.xzw + lightLoopTempE.xyz;
                     lightLoopTempC.xzw = cb2[shadingInfo.z+0].xxx * lightLoopTempC.xzw;
                     lightLoopTempA.xyz = cb2[shadingInfo.w+0].www * lightLoopTempA.xyz;
@@ -495,10 +494,10 @@ Shader "Custom/WWToon"
                     shadingInfo.w = lightingTempA.w ? lightingTempB.w : shadingInfo.w;
                     lightingTempA.w = dot(lightingTempB.xyz, lightLoopTempD.xyz);
                     lightingTempA.w = saturate(lightingTempA.w * 0.5 + 0.5);
-                    lightingTempA.w = packedNormalAndMiscData.w * lightingTempA.w + -packedNormalAndMiscData.x;
-                    lightingTempA.w = cb2[lightLoopTempB.w+0].w * lightingTempA.w + packedNormalAndMiscData.x;
+                    lightingTempA.w = packedNormal_PerObjectData.w * lightingTempA.w + -packedNormal_PerObjectData.x;
+                    lightingTempA.w = cb2[lightLoopTempB.w+0].w * lightingTempA.w + packedNormal_PerObjectData.x;
                     lightLoopTempA.xyz = cb2[lightLoopTempB.z+0].www * lightingTempC.xyz;
-                    lightLoopTempB.xyw = -lightingTempC.xyz * cb2[lightLoopTempB.z+0].www + albedoAndDepth.xyz;
+                    lightLoopTempB.xyw = -lightingTempC.xyz * cb2[lightLoopTempB.z+0].www + albedoAlpha.xyz;
                     lightLoopTempA.xyz = lightingTempA.www * lightLoopTempB.xyw + lightLoopTempA.xyz;
                     lightLoopTempA.xyz = cb2[lightLoopTempB.z+0].xyz * lightLoopTempA.xyz;
                     lightingTempA.w = cb2[lightLoopTempB.z+0].x + cb2[lightLoopTempB.z+0].y;
@@ -510,37 +509,37 @@ Shader "Custom/WWToon"
                     lightLoopTempA.xyz = lightLoopTempA.xyz * shadingInfo.www + lightLoopTempB.xyz;
                     worldPosAndNormal.w = worldPosAndNormal.w + -shadingInfo.w;
                     shadingInfo.w = cb2[lightLoopTempC.y+0].w * worldPosAndNormal.w + shadingInfo.w;
-                    accumulatedLightColor.xyz = lightLoopTempA.xyz * materialAndWorldNormal.www + accumulatedLightColor.xyz;
+                    accumulatedLightColor.xyz = lightLoopTempA.xyz * Metallic_Specular_Roughness_ShadingModelID.www + accumulatedLightColor.xyz;
                     shadingInfo.z = -shadingInfo.w * shadingInfo.z + 1;
-                    materialAndWorldNormal.w = shadingInfo.z * materialAndWorldNormal.w;
+                    Metallic_Specular_Roughness_ShadingModelID.w = shadingInfo.z * Metallic_Specular_Roughness_ShadingModelID.w;
                     }
                     shadingParams1.x = (int)shadingParams1.x + 1;
                 }
-                shadingInfo.yzw = materialAndWorldNormal.www * shadingParams2.xyw + accumulatedLightColor.xyz;
-                packedNormalAndMiscData.x = ((int)shadingInfo.x != 13) ? 1.0 : 0.0;
-                if (packedNormalAndMiscData.x != 0) {
-                    packedNormalAndMiscData.x = ((int)shadingInfo.x == 1) ? 1.0 : 0.0;
-                    packedNormalAndMiscData.x = packedNormalAndMiscData.x ? shadingParams1.z : shadingParams1.y;
+                shadingInfo.yzw = Metallic_Specular_Roughness_ShadingModelID.www * shadingParams2.xyw + accumulatedLightColor.xyz;
+                packedNormal_PerObjectData.x = ((int)shadingInfo.x != 13) ? 1.0 : 0.0;
+                if (packedNormal_PerObjectData.x != 0) {
+                    packedNormal_PerObjectData.x = ((int)shadingInfo.x == 1) ? 1.0 : 0.0;
+                    packedNormal_PerObjectData.x = packedNormal_PerObjectData.x ? shadingParams1.z : shadingParams1.y;
                     shadingParams1.xyz = cb1[67].xyz + -worldPosAndNormal.xyz;
-                    packedNormalAndMiscData.w = dot(shadingParams1.xyz, shadingParams1.xyz);
-                    packedNormalAndMiscData.w = rsqrt(packedNormalAndMiscData.w);
-                    shadingParams1.xyz = shadingParams1.xyz * packedNormalAndMiscData.www;
-                    packedNormalAndMiscData.w = saturate(-0.100000001 + packedNormalAndMiscData.x);
-                    packedNormalAndMiscData.x = saturate(10 * packedNormalAndMiscData.x);
-                    materialAndWorldNormal.w = packedNormalAndMiscData.w * 2000 + 50;
-                    shadingInfo.x = packedNormalAndMiscData.w + packedNormalAndMiscData.w;
-                    packedNormalAndMiscData.x = cb0[0].x * packedNormalAndMiscData.x;
-                    packedNormalAndMiscData.x = packedNormalAndMiscData.x * 0.800000012 + shadingInfo.x;
-                    shadingParams2.xyw = cb1[21].xyz * materialAndWorldNormal.yyy;
-                    shadingParams2.xyw = materialAndWorldNormal.xxx * cb1[20].xyz + shadingParams2.xyw;
-                    shadingParams2.xyw = materialAndWorldNormal.zzz * cb1[22].xyz + shadingParams2.xyw;
+                    packedNormal_PerObjectData.w = dot(shadingParams1.xyz, shadingParams1.xyz);
+                    packedNormal_PerObjectData.w = rsqrt(packedNormal_PerObjectData.w);
+                    shadingParams1.xyz = shadingParams1.xyz * packedNormal_PerObjectData.www;
+                    packedNormal_PerObjectData.w = saturate(-0.100000001 + packedNormal_PerObjectData.x);
+                    packedNormal_PerObjectData.x = saturate(10 * packedNormal_PerObjectData.x);
+                    Metallic_Specular_Roughness_ShadingModelID.w = packedNormal_PerObjectData.w * 2000 + 50;
+                    shadingInfo.x = packedNormal_PerObjectData.w + packedNormal_PerObjectData.w;
+                    packedNormal_PerObjectData.x = cb0[0].x * packedNormal_PerObjectData.x;
+                    packedNormal_PerObjectData.x = packedNormal_PerObjectData.x * 0.800000012 + shadingInfo.x;
+                    shadingParams2.xyw = cb1[21].xyz * Metallic_Specular_Roughness_ShadingModelID.yyy;
+                    shadingParams2.xyw = Metallic_Specular_Roughness_ShadingModelID.xxx * cb1[20].xyz + shadingParams2.xyw;
+                    shadingParams2.xyw = Metallic_Specular_Roughness_ShadingModelID.zzz * cb1[22].xyz + shadingParams2.xyw;
                     shadingInfo.x = asint(cb0[0].w);
                     shadingInfo.x = (0.5 < shadingInfo.x) ? 1.0 : 0.0;
                     shadingParams1.xyz = shadingInfo.xxx ? float3(0,0,0) : shadingParams1.xyz;
                     worldPosAndNormal.xy = shadingInfo.xx ? cb0[0].yz : cb1[264].xy;
                     worldPosAndNormal.z = shadingInfo.x ? 0.5 : cb1[264].z;
-                    materialAndWorldNormal.xyz = shadingInfo.xxx ? shadingParams2.xyw : materialAndWorldNormal.xyz;
-                    shadingInfo.x = dot(worldPosAndNormal.xyz, materialAndWorldNormal.xyz);
+                    Metallic_Specular_Roughness_ShadingModelID.xyz = shadingInfo.xxx ? shadingParams2.xyw : Metallic_Specular_Roughness_ShadingModelID.xyz;
+                    shadingInfo.x = dot(worldPosAndNormal.xyz, Metallic_Specular_Roughness_ShadingModelID.xyz);
                     lightingTempB.xy = float2(0.200000003,1) + shadingInfo.xx;
                     shadingInfo.x = 5 * lightingTempB.x;
                     shadingInfo.x = saturate(shadingInfo.x);
@@ -551,7 +550,7 @@ Shader "Custom/WWToon"
                     shadingParams2.w = dot(lightingTempB.xzw, lightingTempB.xzw);
                     shadingParams2.w = rsqrt(shadingParams2.w);
                     lightingTempB.xzw = lightingTempB.xzw * shadingParams2.www;
-                    shadingParams2.w = saturate(dot(materialAndWorldNormal.xyz, lightingTempB.xzw));
+                    shadingParams2.w = saturate(dot(Metallic_Specular_Roughness_ShadingModelID.xyz, lightingTempB.xzw));
                     shadingParams2.w = shadingParams2.w * shadingParams2.w;
                     shadingParams2.w = shadingParams2.w * -0.800000012 + 1;
                     shadingParams2.w = shadingParams2.w * shadingParams2.w;
@@ -564,101 +563,101 @@ Shader "Custom/WWToon"
                     worldPosAndNormal.z = worldPosAndNormal.x * -2 + 3;
                     worldPosAndNormal.x = worldPosAndNormal.x * worldPosAndNormal.x;
                     worldPosAndNormal.x = worldPosAndNormal.z * worldPosAndNormal.x + 1;
-                    materialAndWorldNormal.x = saturate(dot(shadingParams1.xyz, materialAndWorldNormal.xyz));
-                    materialAndWorldNormal.x = 0.800000012 + -materialAndWorldNormal.x;
-                    materialAndWorldNormal.x = max(0, materialAndWorldNormal.x);
-                    materialAndWorldNormal.y = max(0, cb1[133].x);
-                    materialAndWorldNormal.y = min(1.74532926, materialAndWorldNormal.y);
-                    materialAndWorldNormal.xy = float2(1.5,0.572957814) * materialAndWorldNormal.xy;
-                    materialAndWorldNormal.z = max(0, albedoAndDepth.w);
-                    shadingParams1.xy = min(float2(3000,50), materialAndWorldNormal.zz);
+                    Metallic_Specular_Roughness_ShadingModelID.x = saturate(dot(shadingParams1.xyz, Metallic_Specular_Roughness_ShadingModelID.xyz));
+                    Metallic_Specular_Roughness_ShadingModelID.x = 0.800000012 + -Metallic_Specular_Roughness_ShadingModelID.x;
+                    Metallic_Specular_Roughness_ShadingModelID.x = max(0, Metallic_Specular_Roughness_ShadingModelID.x);
+                    Metallic_Specular_Roughness_ShadingModelID.y = max(0, cb1[133].x);
+                    Metallic_Specular_Roughness_ShadingModelID.y = min(1.74532926, Metallic_Specular_Roughness_ShadingModelID.y);
+                    Metallic_Specular_Roughness_ShadingModelID.xy = float2(1.5,0.572957814) * Metallic_Specular_Roughness_ShadingModelID.xy;
+                    Metallic_Specular_Roughness_ShadingModelID.z = max(0, albedoAlpha.w);
+                    shadingParams1.xy = min(float2(3000,50), Metallic_Specular_Roughness_ShadingModelID.zz);
                     shadingParams1.xy = float2(3000,50) + -shadingParams1.xy;
                     shadingParams1.xy = float2(0.00033333333,0.0199999996) * shadingParams1.xy;
-                    materialAndWorldNormal.z = shadingParams1.x * shadingParams1.x;
-                    materialAndWorldNormal.z = materialAndWorldNormal.z * materialAndWorldNormal.z;
-                    materialAndWorldNormal.z = materialAndWorldNormal.z * materialAndWorldNormal.z + shadingParams1.y;
-                    materialAndWorldNormal.z = -1 + materialAndWorldNormal.z;
-                    materialAndWorldNormal.y = materialAndWorldNormal.y * materialAndWorldNormal.z + 1;
-                    materialAndWorldNormal.z = 1 + -materialAndWorldNormal.y;
-                    materialAndWorldNormal.y = packedNormalAndMiscData.w * materialAndWorldNormal.z + materialAndWorldNormal.y;
-                    materialAndWorldNormal.z = lightingTempB.y * 0.25 + 0.5;
-                    materialAndWorldNormal.x = materialAndWorldNormal.z * materialAndWorldNormal.x;
-                    materialAndWorldNormal.x = materialAndWorldNormal.x * materialAndWorldNormal.y;
-                    materialAndWorldNormal.x = materialAndWorldNormal.x * worldPosAndNormal.x;
-                    materialAndWorldNormal.x = 0.00999999978 * materialAndWorldNormal.x;
+                    Metallic_Specular_Roughness_ShadingModelID.z = shadingParams1.x * shadingParams1.x;
+                    Metallic_Specular_Roughness_ShadingModelID.z = Metallic_Specular_Roughness_ShadingModelID.z * Metallic_Specular_Roughness_ShadingModelID.z;
+                    Metallic_Specular_Roughness_ShadingModelID.z = Metallic_Specular_Roughness_ShadingModelID.z * Metallic_Specular_Roughness_ShadingModelID.z + shadingParams1.y;
+                    Metallic_Specular_Roughness_ShadingModelID.z = -1 + Metallic_Specular_Roughness_ShadingModelID.z;
+                    Metallic_Specular_Roughness_ShadingModelID.y = Metallic_Specular_Roughness_ShadingModelID.y * Metallic_Specular_Roughness_ShadingModelID.z + 1;
+                    Metallic_Specular_Roughness_ShadingModelID.z = 1 + -Metallic_Specular_Roughness_ShadingModelID.y;
+                    Metallic_Specular_Roughness_ShadingModelID.y = packedNormal_PerObjectData.w * Metallic_Specular_Roughness_ShadingModelID.z + Metallic_Specular_Roughness_ShadingModelID.y;
+                    Metallic_Specular_Roughness_ShadingModelID.z = lightingTempB.y * 0.25 + 0.5;
+                    Metallic_Specular_Roughness_ShadingModelID.x = Metallic_Specular_Roughness_ShadingModelID.z * Metallic_Specular_Roughness_ShadingModelID.x;
+                    Metallic_Specular_Roughness_ShadingModelID.x = Metallic_Specular_Roughness_ShadingModelID.x * Metallic_Specular_Roughness_ShadingModelID.y;
+                    Metallic_Specular_Roughness_ShadingModelID.x = Metallic_Specular_Roughness_ShadingModelID.x * worldPosAndNormal.x;
+                    Metallic_Specular_Roughness_ShadingModelID.x = 0.00999999978 * Metallic_Specular_Roughness_ShadingModelID.x;
                     shadingParams1.xy = float2(9.99999975e-005,9.99999975e-005) + shadingParams2.xy;
-                    materialAndWorldNormal.z = dot(shadingParams1.xy, shadingParams1.xy);
-                    materialAndWorldNormal.z = rsqrt(materialAndWorldNormal.z);
-                    shadingParams1.xy = shadingParams1.xy * materialAndWorldNormal.zz;
-                    shadingParams1.xy = shadingParams1.xy * packedNormalAndMiscData.xx;
-                    shadingParams1.z = shadingParams1.y * materialAndWorldNormal.x;
-                    materialAndWorldNormal.y = -0.5;
-                    materialAndWorldNormal.xy = shadingParams1.xz * materialAndWorldNormal.xy;
-                    packedNormalAndMiscData.x = 0.400000006 * worldPosAndNormal.y;
-                    materialAndWorldNormal.z = shadingInfo.x * 0.800000012 + 0.200000003;
+                    Metallic_Specular_Roughness_ShadingModelID.z = dot(shadingParams1.xy, shadingParams1.xy);
+                    Metallic_Specular_Roughness_ShadingModelID.z = rsqrt(Metallic_Specular_Roughness_ShadingModelID.z);
+                    shadingParams1.xy = shadingParams1.xy * Metallic_Specular_Roughness_ShadingModelID.zz;
+                    shadingParams1.xy = shadingParams1.xy * packedNormal_PerObjectData.xx;
+                    shadingParams1.z = shadingParams1.y * Metallic_Specular_Roughness_ShadingModelID.x;
+                    Metallic_Specular_Roughness_ShadingModelID.y = -0.5;
+                    Metallic_Specular_Roughness_ShadingModelID.xy = shadingParams1.xz * Metallic_Specular_Roughness_ShadingModelID.xy;
+                    packedNormal_PerObjectData.x = 0.400000006 * worldPosAndNormal.y;
+                    Metallic_Specular_Roughness_ShadingModelID.z = shadingInfo.x * 0.800000012 + 0.200000003;
                     shadingParams1.x = shadingParams2.w * shadingInfo.x;
                     shadingParams1.x = 1.5 * shadingParams1.x;
-                    packedNormalAndMiscData.x = packedNormalAndMiscData.x * materialAndWorldNormal.z + shadingParams1.x;
-                    materialAndWorldNormal.z = shadingParams1.w * 0.5 + 0.5;
-                    packedNormalAndMiscData.x = materialAndWorldNormal.z * packedNormalAndMiscData.x;
+                    packedNormal_PerObjectData.x = packedNormal_PerObjectData.x * Metallic_Specular_Roughness_ShadingModelID.z + shadingParams1.x;
+                    Metallic_Specular_Roughness_ShadingModelID.z = shadingParams1.w * 0.5 + 0.5;
+                    packedNormal_PerObjectData.x = Metallic_Specular_Roughness_ShadingModelID.z * packedNormal_PerObjectData.x;
                     shadingParams1.xy = screenUV.xy * cb1[138].xy + -cb1[134].xy;
-                    materialAndWorldNormal.xy = shadingParams1.xy * cb1[135].zw + materialAndWorldNormal.xy;
-                    materialAndWorldNormal.xy = materialAndWorldNormal.xy * cb1[135].xy + cb1[134].xy;
-                    materialAndWorldNormal.xy = cb1[138].zw * materialAndWorldNormal.xy;
-                    materialAndWorldNormal.x = tex2D(_IN6, materialAndWorldNormal.xy).x;
-                    materialAndWorldNormal.y = materialAndWorldNormal.x * cb1[65].x + cb1[65].y;
-                    materialAndWorldNormal.x = materialAndWorldNormal.x * cb1[65].z + -cb1[65].w;
-                    materialAndWorldNormal.x = 1 / materialAndWorldNormal.x;
-                    materialAndWorldNormal.x = materialAndWorldNormal.y + materialAndWorldNormal.x;
-                    materialAndWorldNormal.x = materialAndWorldNormal.x + -albedoAndDepth.w;
-                    materialAndWorldNormal.x = max(9.99999975e-005, materialAndWorldNormal.x);
-                    packedNormalAndMiscData.w = -packedNormalAndMiscData.w * 1000 + materialAndWorldNormal.x;
-                    materialAndWorldNormal.x = 1 / materialAndWorldNormal.w;
-                    packedNormalAndMiscData.w = saturate(materialAndWorldNormal.x * packedNormalAndMiscData.w);
-                    materialAndWorldNormal.x = packedNormalAndMiscData.w * -2 + 3;
-                    packedNormalAndMiscData.w = packedNormalAndMiscData.w * packedNormalAndMiscData.w;
-                    packedNormalAndMiscData.w = materialAndWorldNormal.x * packedNormalAndMiscData.w;
-                    packedNormalAndMiscData.w = min(1, packedNormalAndMiscData.w);
-                    materialAndWorldNormal.x = dot(cb1[263].xyz, float3(0.300000012,0.589999974,0.109999999));
-                    materialAndWorldNormal.yzw = cb1[263].xyz + -materialAndWorldNormal.xxx;
-                    materialAndWorldNormal.xyz = materialAndWorldNormal.yzw * float3(0.75,0.75,0.75) + materialAndWorldNormal.xxx;
-                    shadingParams1.xyz = cb1[263].xyz + -materialAndWorldNormal.xyz;
-                    materialAndWorldNormal.xyz = shadingParams1.www * shadingParams1.xyz + materialAndWorldNormal.xyz;
-                    materialAndWorldNormal.xyz = materialAndWorldNormal.xyz * packedNormalAndMiscData.xxx;
-                    materialAndWorldNormal.xyz = float3(0.100000001,0.100000001,0.100000001) * materialAndWorldNormal.xyz;
-                    shadingParams1.xyz = float3(1,1,1) + albedoAndDepth.xyz;
-                    shadingParams1.xyz = shadingParams1.xyz * materialAndWorldNormal.xyz;
-                    shadingParams2.xyw = albedoAndDepth.xyz * float3(1.20000005,1.20000005,1.20000005) + float3(-1,-1,-1);
+                    Metallic_Specular_Roughness_ShadingModelID.xy = shadingParams1.xy * cb1[135].zw + Metallic_Specular_Roughness_ShadingModelID.xy;
+                    Metallic_Specular_Roughness_ShadingModelID.xy = Metallic_Specular_Roughness_ShadingModelID.xy * cb1[135].xy + cb1[134].xy;
+                    Metallic_Specular_Roughness_ShadingModelID.xy = cb1[138].zw * Metallic_Specular_Roughness_ShadingModelID.xy;
+                    Metallic_Specular_Roughness_ShadingModelID.x = tex2D(_IN6, Metallic_Specular_Roughness_ShadingModelID.xy).x;
+                    Metallic_Specular_Roughness_ShadingModelID.y = Metallic_Specular_Roughness_ShadingModelID.x * cb1[65].x + cb1[65].y;
+                    Metallic_Specular_Roughness_ShadingModelID.x = Metallic_Specular_Roughness_ShadingModelID.x * cb1[65].z + -cb1[65].w;
+                    Metallic_Specular_Roughness_ShadingModelID.x = 1 / Metallic_Specular_Roughness_ShadingModelID.x;
+                    Metallic_Specular_Roughness_ShadingModelID.x = Metallic_Specular_Roughness_ShadingModelID.y + Metallic_Specular_Roughness_ShadingModelID.x;
+                    Metallic_Specular_Roughness_ShadingModelID.x = Metallic_Specular_Roughness_ShadingModelID.x + -albedoAlpha.w;
+                    Metallic_Specular_Roughness_ShadingModelID.x = max(9.99999975e-005, Metallic_Specular_Roughness_ShadingModelID.x);
+                    packedNormal_PerObjectData.w = -packedNormal_PerObjectData.w * 1000 + Metallic_Specular_Roughness_ShadingModelID.x;
+                    Metallic_Specular_Roughness_ShadingModelID.x = 1 / Metallic_Specular_Roughness_ShadingModelID.w;
+                    packedNormal_PerObjectData.w = saturate(Metallic_Specular_Roughness_ShadingModelID.x * packedNormal_PerObjectData.w);
+                    Metallic_Specular_Roughness_ShadingModelID.x = packedNormal_PerObjectData.w * -2 + 3;
+                    packedNormal_PerObjectData.w = packedNormal_PerObjectData.w * packedNormal_PerObjectData.w;
+                    packedNormal_PerObjectData.w = Metallic_Specular_Roughness_ShadingModelID.x * packedNormal_PerObjectData.w;
+                    packedNormal_PerObjectData.w = min(1, packedNormal_PerObjectData.w);
+                    Metallic_Specular_Roughness_ShadingModelID.x = dot(cb1[263].xyz, float3(0.300000012,0.589999974,0.109999999));
+                    Metallic_Specular_Roughness_ShadingModelID.yzw = cb1[263].xyz + -Metallic_Specular_Roughness_ShadingModelID.xxx;
+                    Metallic_Specular_Roughness_ShadingModelID.xyz = Metallic_Specular_Roughness_ShadingModelID.yzw * float3(0.75,0.75,0.75) + Metallic_Specular_Roughness_ShadingModelID.xxx;
+                    shadingParams1.xyz = cb1[263].xyz + -Metallic_Specular_Roughness_ShadingModelID.xyz;
+                    Metallic_Specular_Roughness_ShadingModelID.xyz = shadingParams1.www * shadingParams1.xyz + Metallic_Specular_Roughness_ShadingModelID.xyz;
+                    Metallic_Specular_Roughness_ShadingModelID.xyz = Metallic_Specular_Roughness_ShadingModelID.xyz * packedNormal_PerObjectData.xxx;
+                    Metallic_Specular_Roughness_ShadingModelID.xyz = float3(0.100000001,0.100000001,0.100000001) * Metallic_Specular_Roughness_ShadingModelID.xyz;
+                    shadingParams1.xyz = float3(1,1,1) + albedoAlpha.xyz;
+                    shadingParams1.xyz = shadingParams1.xyz * Metallic_Specular_Roughness_ShadingModelID.xyz;
+                    shadingParams2.xyw = albedoAlpha.xyz * float3(1.20000005,1.20000005,1.20000005) + float3(-1,-1,-1);
                     shadingParams2.xyw = saturate(-shadingParams2.xyw);
                     worldPosAndNormal.xyz = shadingParams2.xyw * float3(-2,-2,-2) + float3(3,3,3);
                     shadingParams2.xyw = shadingParams2.xyw * shadingParams2.xyw;
                     shadingParams2.xyw = worldPosAndNormal.xyz * shadingParams2.xyw;
                     shadingParams2.xyw = shadingParams2.xyw * float3(14,14,14) + float3(1,1,1);
-                    materialAndWorldNormal.xyz = shadingParams2.xyw * materialAndWorldNormal.xyz;
-                    materialAndWorldNormal.xyz = materialAndWorldNormal.xyz * albedoAndDepth.xyz + -shadingParams1.xyz;
-                    materialAndWorldNormal.xyz = cb1[260].zzz * materialAndWorldNormal.xyz + shadingParams1.xyz;
-                    materialAndWorldNormal.xyz = materialAndWorldNormal.xyz * packedNormalAndMiscData.www;
-                    packedNormalAndMiscData.x = -10000 + albedoAndDepth.w;
-                    packedNormalAndMiscData.x = max(0, packedNormalAndMiscData.x);
-                    packedNormalAndMiscData.x = min(5000, packedNormalAndMiscData.x);
-                    packedNormalAndMiscData.x = 5000 + -packedNormalAndMiscData.x;
-                    packedNormalAndMiscData.x = 0.000199999995 * packedNormalAndMiscData.x;
-                    materialAndWorldNormal.xyz = packedNormalAndMiscData.xxx * materialAndWorldNormal.xyz;
-                    materialAndWorldNormal.xyz = cb0[1].xyz * materialAndWorldNormal.xyz;
+                    Metallic_Specular_Roughness_ShadingModelID.xyz = shadingParams2.xyw * Metallic_Specular_Roughness_ShadingModelID.xyz;
+                    Metallic_Specular_Roughness_ShadingModelID.xyz = Metallic_Specular_Roughness_ShadingModelID.xyz * albedoAlpha.xyz + -shadingParams1.xyz;
+                    Metallic_Specular_Roughness_ShadingModelID.xyz = cb1[260].zzz * Metallic_Specular_Roughness_ShadingModelID.xyz + shadingParams1.xyz;
+                    Metallic_Specular_Roughness_ShadingModelID.xyz = Metallic_Specular_Roughness_ShadingModelID.xyz * packedNormal_PerObjectData.www;
+                    packedNormal_PerObjectData.x = -10000 + albedoAlpha.w;
+                    packedNormal_PerObjectData.x = max(0, packedNormal_PerObjectData.x);
+                    packedNormal_PerObjectData.x = min(5000, packedNormal_PerObjectData.x);
+                    packedNormal_PerObjectData.x = 5000 + -packedNormal_PerObjectData.x;
+                    packedNormal_PerObjectData.x = 0.000199999995 * packedNormal_PerObjectData.x;
+                    Metallic_Specular_Roughness_ShadingModelID.xyz = packedNormal_PerObjectData.xxx * Metallic_Specular_Roughness_ShadingModelID.xyz;
+                    Metallic_Specular_Roughness_ShadingModelID.xyz = cb0[1].xyz * Metallic_Specular_Roughness_ShadingModelID.xyz;
                 } else {
-                    materialAndWorldNormal.xyz = float3(0,0,0);
+                    Metallic_Specular_Roughness_ShadingModelID.xyz = float3(0,0,0);
                 }
-                packedNormalAndMiscData.x = (0 != shadingParams2.z) ? 1.0 : 0.0;
-                albedoAndDepth.xyz = shadingInfo.yzw * lightingTempA.xyz;
-                albedoAndDepth.xyz = cb1[263].xyz * albedoAndDepth.xyz;
-                albedoAndDepth.xyz = albedoAndDepth.xyz * float3(0.5,0.5,0.5) + -shadingInfo.yzw;
-                albedoAndDepth.xyz = packedNormalAndMiscData.www * albedoAndDepth.xyz + shadingInfo.yzw;
-                materialAndWorldNormal.xyz = shadingInfo.yzw + materialAndWorldNormal.xyz;
-                materialAndWorldNormal.xyz = packedNormalAndMiscData.xxx ? albedoAndDepth.xyz : materialAndWorldNormal.xyz;
-                packedNormalAndMiscData.xzw = packedNormalAndMiscData.zzz ? shadingInfo.yzw : materialAndWorldNormal.xyz;
-                packedNormalAndMiscData.xyz = packedNormalAndMiscData.xzw / packedNormalAndMiscData.yyy;
-                packedNormalAndMiscData.xyz = min(float3(0,0,0), -packedNormalAndMiscData.xyz);
-                finalColor.xyz = -packedNormalAndMiscData.xyz;
+                packedNormal_PerObjectData.x = (0 != shadingParams2.z) ? 1.0 : 0.0;
+                albedoAlpha.xyz = shadingInfo.yzw * lightingTempA.xyz;
+                albedoAlpha.xyz = cb1[263].xyz * albedoAlpha.xyz;
+                albedoAlpha.xyz = albedoAlpha.xyz * float3(0.5,0.5,0.5) + -shadingInfo.yzw;
+                albedoAlpha.xyz = packedNormal_PerObjectData.www * albedoAlpha.xyz + shadingInfo.yzw;
+                Metallic_Specular_Roughness_ShadingModelID.xyz = shadingInfo.yzw + Metallic_Specular_Roughness_ShadingModelID.xyz;
+                Metallic_Specular_Roughness_ShadingModelID.xyz = packedNormal_PerObjectData.xxx ? albedoAlpha.xyz : Metallic_Specular_Roughness_ShadingModelID.xyz;
+                packedNormal_PerObjectData.xzw = packedNormal_PerObjectData.zzz ? shadingInfo.yzw : Metallic_Specular_Roughness_ShadingModelID.xyz;
+                packedNormal_PerObjectData.xyz = packedNormal_PerObjectData.xzw / packedNormal_PerObjectData.yyy;
+                packedNormal_PerObjectData.xyz = min(float3(0,0,0), -packedNormal_PerObjectData.xyz);
+                finalColor.xyz = -packedNormal_PerObjectData.xyz;
                 return finalColor;
             }
             ENDCG
