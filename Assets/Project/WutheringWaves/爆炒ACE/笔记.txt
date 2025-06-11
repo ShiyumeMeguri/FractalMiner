@@ -5,3 +5,5 @@
 dx12
 0000000146514E49 D3D12CreateDevice
 0000000146514E49 改 jmp mizukiri_.dll+0x87D0E0
+
+ace11段里有个每秒启动的反作弊线程直接ret掉
