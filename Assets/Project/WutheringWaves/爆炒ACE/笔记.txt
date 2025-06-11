@@ -1,0 +1,7 @@
+0000000146742994 入口点
+
+0x146511351 改 jmp mizukiri_.dll+0x33B850
+
+dx12
+0000000146514E49 D3D12CreateDevice
+0000000146514E49 改 jmp mizukiri_.dll+0x87D0E0
