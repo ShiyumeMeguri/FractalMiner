@@ -1,4 +1,4 @@
-Shader "Custom/WWToon"
+Shader "Custom/WWToonSrc"
 {
     Properties
     {
