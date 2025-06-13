@@ -24,6 +24,7 @@ Shader "Custom/WWToonSrc"
             #pragma vertex vert
             #pragma fragment frag
             #pragma target 5.0
+            #pragma enable_d3d11_debug_symbols
 
             #include "UnityCG.cginc"
 
@@ -81,15 +82,15 @@ Shader "Custom/WWToonSrc"
             // 已知 _IN2 X是Metallic Y是Specular Z是Roughness W是ShadingModelID 
             // 已知 _IN3 是Albedo和Alpha
             // 未知 _IN4
-            // 未知 _IN5 R是阴影 G不知道 B是阴影强度 A通道为什么和B一样
+            // 已知 _IN5 R是阴影 G未使用 B是阴影强度 A通道为什么和B一样
             // 已知 _IN6 R16深度
             // 已知 _IN7 1x1像素 全0
             // 已知 _IN8 MSSAO 多分辨率屏幕空间AO
-            // 已知 _IN9 1x1像素 R32G32B32A32 值看上去是 1.0 0.98065 0.07967 0.43407
+            // 已知 _IN9 1x1像素 控制屏幕亮度
             
 float4 frag (VertexToFragment fragmentInput) : SV_Target
 {
-    // 基于输入uv定义v0，为zw分量提供默认值
+    // 基于输入uv定义v0，zw分量是NDC x（clip.x / clip.w）并复制到 zw
     float4 v0 = fragmentInput.uv; 
 
     float4 color = 0;
@@ -172,7 +173,7 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
     r6.xyz = r1.www ? r3.www : r6.xyz;
     r2.xyz = r0.yyy ? r6.xyz : r2.xyz;
     r0.y = tex2Dlod(_IN9, float4(0, 0, 0, 0)).x;
-    r4.zw = v0.zw * r2.ww; // 此处的v0.zw根据前面的定义将为0
+    r4.zw = v0.zw * r2.ww;
     r6.xyz = cb1[49].xyz * r4.www;
     r6.xyz = r4.zzz * cb1[48].xyz + r6.xyz;
     r6.xyz = r2.www * cb1[50].xyz + r6.xyz;
