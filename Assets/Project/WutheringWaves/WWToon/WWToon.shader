@@ -142,9 +142,8 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
         float encodedNormalAbsSum = dot(float2(1.0, 1.0), abs(encodedNormal));
         float worldNormalZ_unpacked = 1.0 - encodedNormalAbsSum;
         float unpack_factor = max(0.0, -worldNormalZ_unpacked);
-        float2 lightingSign = (encodedNormal >= float2(0.0, 0.0)) ? float2(1.0, 1.0) : float2(0.0, 0.0);
-        float2 lightingOffset = (lightingSign * 2.0 - 1.0) * 0.5;
-        lightingOffset = lightingOffset * unpack_factor;
+        float2 lightingSign = (encodedNormal >= float2(0.0, 0.0)) ? float2(0.5, 0.5) : float2(-0.5, -0.5);
+        float2 lightingOffset = lightingSign * unpack_factor;
         float2 worldNormalXY_unpacked = lightingOffset * -2.0 + encodedNormal;
         worldNormal = float3(worldNormalXY_unpacked.x, worldNormalXY_unpacked.y, worldNormalZ_unpacked);
         float worldNormalLengthInv = rsqrt(dot(worldNormal, worldNormal));
@@ -162,8 +161,8 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
             float3 scaled_msr = float3(16777215.0, 65535.0, 255.0) * saturated_msr;
             uint3 rounded_msr = (uint3)round(scaled_msr);
             
-            uint packed_val_y = (rounded_msr.y & ~0xFFFFFF00u) | (rounded_msr.z & 0xFFu);
-            uint packed_val_x = (rounded_msr.x & ~0xFFFF0000u) | (packed_val_y & 0xFFFFu);
+            uint packed_val_y = (rounded_msr.y & ~0x000000FFu) | (rounded_msr.z & 0x000000FFu);
+            uint packed_val_x = (rounded_msr.x & ~0x0000FFFFu) | (packed_val_y & 0x0000FFFFu);
 
             float packed_depth_float = 5.96046519e-08 * (float)packed_val_x;
             float linear_depth_temp = packed_depth_float * cb1[65].x + cb1[65].y;
@@ -200,8 +199,9 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
     
     float aoFactor = tex2Dlod(_IN9, float4(0.0, 0.0, 0.0, 0.0)).x;
 
-    float3 worldPos = depth * cb1[50].xyz;
+    float3 worldPos = cb1[49].xyz * 0.0;
     worldPos = (useDitheredLodTransition * cb1[48].xyz) + worldPos;
+    worldPos = (depth * cb1[50].xyz) + worldPos;
     worldPos = cb1[51].xyz + worldPos;
 
     float2 ssrParams = tex2Dlod(_IN5, float4(screenUV.xy, 0, 0)).xz;
@@ -264,7 +264,7 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
         fresnelTerm_IBL = fresnelTerm_IBL * fresnelTerm_IBL;
         float roughness_from_normal = fresnel_factor1_IBL * fresnelTerm_IBL;
 
-        float roughness_term = saturate(final_gbuffer_normal.z * 2.0 - 0.5 * 2.0);
+        float roughness_term = saturate(final_gbuffer_normal.z * 2.0 - 1.0);
         float roughness_factor = roughness_term * -2.0 + 3.0;
         roughness_term = roughness_term * roughness_term;
         float roughness_final = roughness_factor * roughness_term;
@@ -319,20 +319,20 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
             float hsv_V_minus_min = hsv_interp2.x - min(hsv_interp2.w, hsv_interp2.y);
             float hsv_V_minus_min_plus_delta = hsv_interp2.w - hsv_interp2.y;
             float hsv_H = hsv_interp2.z + hsv_V_minus_min_plus_delta / (hsv_V_minus_min * 6.0 + 0.00100000005);
-            float hsv_S = hsv_V_minus_min / (hsv_interp2.x + 0.00100000005);
+            float hsv_S_unclamped = hsv_V_minus_min / (hsv_interp2.x + 0.00100000005);
             float4 customDataMasks_shifted = (float4)customDataMasks * float4(0.0400000028, 0.0027450982, 0.00392156886, 0.0666666701) + float4(0.400000006, 0.400000006, 1.0, 0.5);
             float custom_mask_z_check = (customDataMasks.z >= 2.54999971) ? 1.0 : 0.0;
             float custom_mask_x = custom_mask_z_check * (customDataMasks_shifted.y - customDataMasks_shifted.x) + customDataMasks_shifted.x;
-            hsv_S = min(0.349999994, custom_mask_x * hsv_S);
+            float hsv_S = min(0.349999994, custom_mask_x * hsv_S_unclamped);
             float hsv_S_clamped = max(0.0, hsv_S);
             float3 hsv_frac_H = frac(float3(1.0, 0.666666687, 0.333333343) + hsv_H.xxx);
             float3 hsv_remap_H = saturate(abs(hsv_frac_H * 6.0 - 3.0) - 1.0);
             float3 hsv_to_rgb_base = hsv_remap_H - 1.0;
             float3 hsv_to_rgb_interp = hsv_S_clamped * hsv_to_rgb_base + 1.0;
-            float3 base_hsv_rgb = hsv_to_rgb_interp * (hsv_S_clamped + 1.0);
+            float3 base_hsv_rgb = hsv_to_rgb_interp * (hsv_S + 1.0);
             float3 lerp_factor_1 = hsv_to_rgb_interp * hsv_S_clamped - 1.0;
             lerp_factor_1 = lerp_factor_1 * 0.600000024 + 1.0;
-            float3 lerp_factor_2 = -hsv_to_rgb_interp * hsv_S_clamped + lerp_factor_1;
+            float3 lerp_factor_2 = -hsv_to_rgb_interp * hsv_S + lerp_factor_1;
             float3 final_hsv_rgb_1 = maskResult * lerp_factor_2 + base_hsv_rgb;
             float3 final_hsv_rgb_2 = (final_hsv_rgb_1 - baseColor) * 0.850000024 + baseColor;
             float3 hsv_blend_factor = customDataMasks_shifted.z * final_hsv_rgb_2 - final_hsv_rgb_1;
@@ -591,29 +591,11 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
         specTerm = specTerm * scatterRadiusClamped;
         
         float LdotV = dot(lightDir, viewVec);
-        float LdotV_remap = saturate((LdotV + LdotV) - 1.0 + 1.0);
+        float LdotV_remap = saturate((LdotV + LdotV));
         float LdotV_fresnel = (LdotV_remap * -2.0 + 3.0) * (LdotV_remap * LdotV_remap) + 1.0;
         
-        float VdotN = saturate(dot(viewVec, sssNormal));
-        float schlick_V = max(0.0, 0.800000012 - VdotN);
-        float screen_space_subsurf_falloff = min(1.74532926, max(0.0, cb1[133].x));
-        float2 schlick_and_falloff = float2(schlick_V, screen_space_subsurf_falloff) * float2(1.5, 0.572957814);
-        
-        float depth_clamped = max(0.0, depth);
-        float2 depth_remap_vals = min(float2(3000.0, 50.0), float2(depth_clamped, depth_clamped));
-        depth_remap_vals = (float2(3000.0, 50.0) - depth_remap_vals) * float2(0.00033333333, 0.0199999996);
-        float depth_falloff = depth_remap_vals.x * depth_remap_vals.x;
-        depth_falloff = depth_falloff * depth_falloff;
-        depth_falloff = depth_falloff * depth_falloff + depth_remap_vals.y;
-        
-        float sss_profile_lerp = (depth_falloff - 1.0) * schlick_and_falloff.y + 1.0;
-        float sss_profile_final = (1.0 - sss_profile_lerp) * scatterRadiusClamped + sss_profile_lerp;
-        
-        float schlick_final = (NdotL_final * 0.25 + 0.5) * schlick_and_falloff.x;
-        schlick_final = schlick_final * sss_profile_final;
-        schlick_final = schlick_final * LdotV_fresnel;
-        schlick_final = 0.00999999978 * schlick_final;
-        
+        float schlick_final = ( (0.400000006 * lightDir.y) * (NdotL_final * 0.800000012 + 0.200000003) + (1.5 * specTerm * NdotL_final) ) * (LdotV_remap * 0.5 + 0.5);
+
         float2 worldNormalXY_sq_plus_eps = sssNormal.xy * sssNormal.xy + 9.99999975e-05;
         float rsqrt_normal_xy = rsqrt(dot(worldNormalXY_sq_plus_eps, float2(1.0, 1.0)));
         float2 normal_xy_normalized = sssNormal.xy * rsqrt_normal_xy;
@@ -642,6 +624,7 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
         ambient_color = ambient_color * 0.100000001;
         float3 ambient_base = (1.0 + baseColor) * ambient_color;
         float3 spec_highlight_mask = saturate((baseColor * 1.20000005) - 1.0);
+        spec_highlight_mask = 1.0 - spec_highlight_mask;
         float3 spec_highlight_factor = (spec_highlight_mask * -2.0 + 3.0) * (spec_highlight_mask * spec_highlight_mask);
         spec_highlight_factor = spec_highlight_factor * 14.0 + 1.0;
         ambient_color = spec_highlight_factor * ambient_color;
