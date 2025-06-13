@@ -23,6 +23,7 @@ Shader "Custom/WWToon"
 
             #pragma vertex vert
             #pragma fragment frag
+            #pragma target 5.0
 
             #include "UnityCG.cginc"
 
@@ -34,12 +35,9 @@ Shader "Custom/WWToon"
 
             struct VertexToFragment
             {
-                float2 uv : TEXCOORD0;
+                float4 uv : TEXCOORD0;
                 float4 vertex : SV_POSITION;
             };
-
-            sampler2D _MainTex;
-            float4 _MainTex_ST;
             
             sampler2D _IN0;
             sampler2D _IN1;
@@ -52,7 +50,6 @@ Shader "Custom/WWToon"
             sampler2D _IN8;
             sampler2D _IN9;
 
-            
             float4 _IN0_ST;
             float4 _IN1_ST;
             float4 _IN2_ST;
@@ -68,7 +65,10 @@ Shader "Custom/WWToon"
             {
                 VertexToFragment output;
                 output.vertex = UnityObjectToClipPos(vertexInput.vertex);
-                output.uv = vertexInput.uv;
+                output.uv.xy = vertexInput.uv;
+                // 计算 NDC x（clip.x / clip.w）并复制到 zw
+                float ndcX = output.vertex.x / output.vertex.w;
+                output.uv.zw = ndcX;
                 return output;
             }
             
@@ -81,7 +81,7 @@ Shader "Custom/WWToon"
             // 已知 _IN2 X是Metallic Y是Specular Z是Roughness W是ShadingModelID 
             // 已知 _IN3 是Albedo和Alpha
             // 未知 _IN4
-            // 未知 _IN5 R是阴影 G不知道 B是反光强度? A为什么和B一样
+            // 未知 _IN5 R是阴影 G不知道 B是阴影强度 A通道为什么和B一样
             // 已知 _IN6 R16深度
             // 已知 _IN7 1x1像素 全0
             // 已知 _IN8 MSSAO 多分辨率屏幕空间AO
@@ -89,7 +89,7 @@ Shader "Custom/WWToon"
             
 float4 frag (VertexToFragment fragmentInput) : SV_Target
 {
-    float4 screenUV = float4(fragmentInput.uv.xy, 0.0, 0.0);
+    float4 screenUV = fragmentInput.uv;
 
     float4 gbufferNormalSample_raw = tex2Dlod(_IN1, float4(screenUV.xy, 0, 0)).wxyz;
     float perObjectData = gbufferNormalSample_raw.x;
