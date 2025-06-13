@@ -6,7 +6,7 @@
 最终目标 (Ultimate Goal):
 你的任务是：修正代码A，使其在逻辑上与代码B完全等含价（semantically identical）。最终交付的已修复的代码A，在被编译器处理后，应该能生成与汇编D在功能、数据流和最终计算结果上完全一致的逻辑。
 关键难题 (Core Challenge):
-代码B最大的特点是临时寄存器（如 materialParams_and_Temp, shadingInfo_and_Temp 等）的激进重用。同一个变量在着色器的不同阶段存储着完全不同的数据。例如，materialParams_and_Temp 可能先存储GBuffer材质参数，在某个分支中又被用来计算和存储一个临时的深度值，之后又被覆盖为世界法线。我的重构代码A很可能在追踪这些变量的生命周期和数据流时出了错。
+代码B最大的特点是临时寄存器（如 materialParams_and_Temp, shadingInfo_and_Temp 等）的激进重用。同一个变量在着色器的不同阶段存储着完全不同的数据。
 分析方法 (Methodology):
 以代码B和汇编D为“事实之源”: 所有的逻辑都必须以代码B为准。汇编D是验证逻辑是否正确的最终标准。
 追踪数据流，而非变量名: 不要被代码B的变量名误导。你需要逐行分析代码B，精确追踪每个分量（.x, .y, .z, .w）在每一步计算后存储的是什么逻辑值。
