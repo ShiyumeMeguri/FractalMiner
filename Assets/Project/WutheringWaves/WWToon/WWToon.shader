@@ -199,11 +199,11 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
 
     float3 worldPos = depth * cb1[50].xyz + cb1[51].xyz;
 
-    float2 ssrParams = tex2Dlod(_IN5, float4(screenUV.xy, 0, 0)).xz;
-    float2 ssrParamsSq = ssrParams * ssrParams;
-    float ssrIntensity = ssrParamsSq.x * ssrParamsSq.y;
+    float2 shadowmask_shadowIntensity = tex2Dlod(_IN5, float4(screenUV.xy, 0, 0)).xz;
+    float2 shadowmask_shadowIntensitySq = shadowmask_shadowIntensity * shadowmask_shadowIntensity;
+    float shadowMaskIntensity = shadowmask_shadowIntensitySq.x * shadowmask_shadowIntensitySq.y;
 
-    float ssrTerm_preBlend = cb1[253].y * ssrIntensity;
+    float shadowmaskTerm_preBlend = cb1[253].y * shadowMaskIntensity;
 
     float3 indirectLightingResult;
     float3 diffuseIBLBase;
@@ -272,14 +272,14 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
         
         float blend_range = cb1[265].y - cb1[265].x;
         float blend_inv_range = 1.0 / blend_range;
-        float blend_val = ssrTerm_preBlend - cb1[265].x;
+        float blend_val = shadowmaskTerm_preBlend - cb1[265].x;
         float blend_ratio = saturate(blend_val * blend_inv_range);
         float blend_factor = blend_ratio * -2.0 + 3.0;
         blend_ratio = blend_ratio * blend_ratio;
         float blend_fresnel = blend_factor * blend_ratio;
         
         float final_blend = blend_fresnel * blended_roughness;
-        float ssr_term = ssrTerm_preBlend - final_blend;
+        float ssr_term = shadowmaskTerm_preBlend - final_blend;
         float final_ssr = cb1[265].z * ssr_term + final_blend;
         
         float ssr_clamped = -cb1[265].x + final_ssr;
@@ -384,14 +384,14 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
         
         float blend_range_alt = cb1[265].y - cb1[265].x;
         float blend_inv_range_alt = 1.0 / blend_range_alt;
-        float blend_val_alt = ssrIntensity * cb1[253].y - cb1[265].x;
+        float blend_val_alt = shadowMaskIntensity * cb1[253].y - cb1[265].x;
         float blend_ratio_alt = saturate(blend_val_alt * blend_inv_range_alt);
         float blend_factor_alt = blend_ratio_alt * -2.0 + 3.0;
         blend_ratio_alt = blend_ratio_alt * blend_ratio_alt;
         float blend_fresnel_alt = blend_factor_alt * blend_ratio_alt;
         
         float final_blend_alt = blend_fresnel_alt * blended_roughness_alt;
-        float ssr_term_alt = ssrIntensity * cb1[253].y - final_blend_alt;
+        float ssr_term_alt = shadowMaskIntensity * cb1[253].y - final_blend_alt;
         float final_ssr_alt = cb1[265].z * ssr_term_alt + final_blend_alt;
         
         float ssr_clamped_alt = -cb1[265].x + final_ssr_alt;
@@ -466,7 +466,7 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
     {
         uint lightIndex_base = lightLoopCounter << 3;
         uint lightDataIndex = lightIndex_base | 7;
-        uint lightTypeMask = (uint)shadingModelBitfields.y & ((asuint(cb2[lightDataIndex].w) << 5) & 224);
+        uint lightTypeMask = (uint)(intShadingModelID & -16) & ((asuint(cb2[lightDataIndex].w) << 5) & 224);
         
         if (lightTypeMask != 0)
         {
@@ -487,7 +487,9 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
                 float shadowFactor = saturate(shadowInvRange * shadowKernelTerm);
                 float shadowFresnel = (shadowFactor * -2.0 + 3.0) * (shadowFactor * shadowFactor);
                 shadowFactor = min(1.0, shadowFresnel);
-                float3 shadowColor_base = cb2[lightIndex_base + 6].xyz * foggedLighting.xyz;
+                
+                float3 shadowColor_base = cb2[lightIndex_base + 6].xyz * diffuseIBLBase.xyz;
+                
                 float3 shadowLerp = baseColor * cb2[lightIndex_base + 5].xyz - shadowColor_base;
                 float3 shadowColor = shadowFactor * shadowLerp + shadowColor_base;
                 shadowColor = cb2[lightDataIndex].xxx * shadowColor;
@@ -666,7 +668,6 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
     
     return finalColor;
 }
-
             ENDCG
         }
     }
