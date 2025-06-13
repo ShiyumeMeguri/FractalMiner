@@ -91,18 +91,17 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
 {
     float4 screenUV = fragmentInput.uv;
 
-    float4 gbufferNormalSample_raw = tex2Dlod(_IN1, float4(screenUV.xy, 0, 0)).wxyz;
-    float perObjectData = gbufferNormalSample_raw.x;
-    float3 gbuffer_normal = gbufferNormalSample_raw.yzw;
+    float4 tex1 = tex2Dlod(_IN1, float4(screenUV.xy, 0, 0)).wxyz;
+    float perObjectData = tex1.x;
+    float3 gbuffer_normal = tex1.yzw;
     
-    float4 materialParams_and_Temp_sampler = tex2Dlod(_IN2, float4(screenUV.xy, 0, 0));
-    float3 msr = materialParams_and_Temp_sampler.xyz;
-    float shadingModelID_raw = materialParams_and_Temp_sampler.w;
+    float4 tex2 = tex2Dlod(_IN2, float4(screenUV.xy, 0, 0)).xyzw;
+    float3 msr = tex2.xyz;
+    float shadingModelID_raw = tex2.w;
     
     float3 baseColor = tex2Dlod(_IN3, float4(screenUV.xy, 0, 0)).xyz;
     
-    float4 customDataA_and_Temp;
-    customDataA_and_Temp.xyz = tex2Dlod(_IN4, float4(screenUV.xy, 0, 0)).yxz;
+    float3 tex4 = tex2Dlod(_IN4, float4(screenUV.xy, 0, 0)).yxz;
     
     float depth = tex2Dlod(_IN0, float4(screenUV.xy, 0, 0)).x;
     
@@ -156,7 +155,7 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
         worldNormal = worldNormal * worldNormalLengthRsqrt;
 
         initialLighting = msr * msr;
-        hairShadowingFactor = customDataA_and_Temp.z;
+        hairShadowingFactor = tex4.z;
     }
     else
     {
@@ -179,8 +178,7 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
         worldNormal = final_gbuffer_normal * 2.0 - 1.0;
         initialLighting = float3(0.0, 0.0, 0.0);
         perObjectData = 0.0;
-        customDataA_and_Temp.xyz = 0;
-        hairShadowingFactor = 0.0;
+        tex4.xy = 0;
     }
     
     float worldNormalLengthRsqrt = rsqrt(dot(worldNormal, worldNormal));
@@ -253,7 +251,7 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
         maskResult = perObjectMask.y ? 0.0 : maskResult;
         maskResult = perObjectMask.x ? 1.0 : maskResult;
         
-        float customData_rounded = round(255.0 * customDataA_and_Temp.x);
+        float customData_rounded = round(255.0 * tex4.x);
         uint4 customDataMasks = (uint4)((uint)customData_rounded) & uint4(15, 240, 240, 15);
         
         float fresnelTerm_IBL = saturate(final_gbuffer_normal.z + final_gbuffer_normal.z);
@@ -546,7 +544,7 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
     {
         float isSubsurfaceProfileModel = (temp_int_shading_id == 1) ? 1.0 : 0.0;
         
-        float scatterRadius = isSubsurfaceProfileModel ? customDataA_and_Temp.z : customDataA_and_Temp.y;
+        float scatterRadius = isSubsurfaceProfileModel ? tex4.z : tex4.y;
         
         float3 viewVec = cb1[67].xyz - worldPos;
         float viewVecLengthInv = rsqrt(dot(viewVec, viewVec));
