@@ -120,13 +120,12 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
 
     float shadingModelID_rounded = round(255.0 * shadingModelID_raw);
     uint uint_shadingModelID_rounded = (uint)shadingModelID_rounded;
-    int intShadingModelID = (int)((float)uint_shadingModelID_rounded);
+    int intShadingModelID = (int)(float)uint_shadingModelID_rounded;
     int2 shadingModelBitfields = int2(intShadingModelID & 15, intShadingModelID & -16);
     
     float isNotClothShadingModel = (shadingModelBitfields.x != 12) ? 1.0 : 0.0;
     float3 specialShadingModelFlags = (shadingModelBitfields.xxx == int3(13, 14, 15)) ? 1.0 : 0.0;
-    float isSpecialModel_yz = (int)specialShadingModelFlags.y | (int)specialShadingModelFlags.z;
-    float isAnySpecialModel = (int)isSpecialModel_yz | (int)specialShadingModelFlags.x;
+    float isAnySpecialModel = any(specialShadingModelFlags) ? 1.0 : 0.0;
     float shadingModelOverride = isNotClothShadingModel ? isAnySpecialModel : -1.0;
 
     float3 worldNormal;
@@ -157,28 +156,24 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
     else
     {
         float isClearCoatModel = (shadingModelBitfields.x == 10) ? 1.0 : 0.0;
-        if (isClearCoatModel != 0.0)
-        {
-            float3 saturated_msr = saturate(msr);
-            float3 scaled_msr = float3(16777215.0, 65535.0, 255.0) * saturated_msr;
-            uint3 rounded_msr = (uint3)round(scaled_msr);
-            
-            uint packed_val_x = (rounded_msr.x & 0xFF0000) + (rounded_msr.y & 0xFF00) + rounded_msr.z;
 
-            float packed_depth_float = 5.96046519e-08 * (float)packed_val_x;
-            float linear_depth_temp = packed_depth_float * cb1[65].x + cb1[65].y;
-            float linear_depth_p1 = packed_depth_float * cb1[65].z - cb1[65].w;
-            float linear_depth_p2 = 1.0 / linear_depth_p1;
-            float final_packed_depth = linear_depth_temp + linear_depth_p2;
-            
-            depth = final_packed_depth;
-        }
+        float3 saturated_msr = saturate(msr);
+        float3 scaled_msr = float3(16777215.0, 65535.0, 255.0) * saturated_msr;
+        uint3 rounded_msr = (uint3)round(scaled_msr);
+        
+        uint packed_val_x = (rounded_msr.x & 0xFF0000) + (rounded_msr.y & 0xFF00) + rounded_msr.z;
+
+        float packed_depth_float = 0.0 * (float)packed_val_x;
+        float linear_depth_temp = packed_depth_float * cb1[65].x + cb1[65].y;
+        float linear_depth_p1 = packed_depth_float * cb1[65].z - cb1[65].w;
+        float linear_depth_p2 = 1.0 / linear_depth_p1;
+        float final_packed_depth = linear_depth_temp + linear_depth_p2;
+        
+        depth = (isClearCoatModel != 0.0) ? final_packed_depth : depth;
 
         worldNormal = gbuffer_normal * 2.0 - 1.0;
         initialLighting = float3(0.0, 0.0, 0.0);
-        specialShadingModelFlags = float3(0.0, 0.0, 0.0);
         perObjectData = 0.0;
-        gbuffer_normal.z = 0.0; 
         customDataA_and_Temp.xy = float2(0.0, 0.0);
         hairShadowingFactor = 0.0;
     }
@@ -364,10 +359,7 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
         float3 final_ibl_spec_temp = final_ibl_spec - lightLoopTempA_resolved;
         final_ibl_spec = luma_fresnel * final_ibl_spec_temp + lightLoopTempA_resolved;
         
-        float3 occluded_term = 1.0 - finalGIColor * hsv_modulated_color;
-        float3 occluded_ibl_spec_base = lerp(hsv_modulated_ibl_spec_base, occluded_term, maskResult.xxx);
-
-        indirectLightingResult = final_ibl_spec * occluded_ibl_spec_base;
+        indirectLightingResult = final_ibl_spec;
     }
     else
     {
@@ -565,7 +557,7 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
         tangentToWorld[2] = cb1[22].xyz;
         float3 worldNormalFromTangent = mul(normalizedWorldNormal, tangentToWorld);
         
-        bool useStaticLighting = (asint(cb0[0].w) > 0);
+        bool useStaticLighting = ((float)asint(cb0[0].w) > 0.5f);
         viewVec = useStaticLighting ? float3(0.0, 0.0, 0.0) : viewVec;
         float3 lightDir = useStaticLighting ? float3(cb0[0].y, cb0[0].z, 0.5) : cb1[264].xyz;
         float3 sssNormal = useStaticLighting ? worldNormalFromTangent : normalizedWorldNormal;
