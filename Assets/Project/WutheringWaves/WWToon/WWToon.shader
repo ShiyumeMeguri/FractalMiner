@@ -90,588 +90,632 @@ Shader "Custom/WWToon"
 float4 frag (VertexToFragment fragmentInput) : SV_Target
 {
     float4 screenUV = float4(fragmentInput.uv.xy, 0.0, 0.0);
+    
+    float4 finalColor = float4(0.0, 0.0, 0.0, 0.0);
 
-    float4 gbufferNormalSample_raw = tex2Dlod(_IN1, float4(screenUV.xy, 0, 0)).wxyz;
-    float perObjectData = gbufferNormalSample_raw.x;
-    float3 gbuffer_normal = gbufferNormalSample_raw.yzw;
-    
-    float4 materialParams_and_Temp = tex2Dlod(_IN2, float4(screenUV.xy, 0, 0));
-    float3 msr = materialParams_and_Temp.xyz;
-    float shadingModelID_raw = materialParams_and_Temp.w;
-    
-    float3 baseColor = tex2Dlod(_IN3, float4(screenUV.xy, 0, 0)).xyz;
-    
+    float4 gbufferData_and_Temp;
+    float4 materialParams_and_Lighting;
+    float4 baseColor_and_Depth;
     float4 customDataA_and_Temp;
+    float4 shadingInfo_and_Temp;
+    float4 shadingModelFlags_and_Temp;
+    float4 worldNormal_and_WorldPos;
+    float4 lightingTempA;
+    float4 lightingTempB;
+    float4 lightingTempC;
+    float4 accumulatedLightColor;
+    float4 lightLoopTempA;
+    float4 lightLoopTempB;
+    float4 lightLoopTempC;
+    float4 lightLoopTempD;
+    float4 lightLoopTempE;
+    float4 lightLoopTempF;
+
+    gbufferData_and_Temp.xyzw = tex2Dlod(_IN1, float4(screenUV.xy, 0, 0)).wxyz;
+    materialParams_and_Lighting.xyzw = tex2Dlod(_IN2, float4(screenUV.xy, 0, 0)).xyzw;
+    baseColor_and_Depth.xyz = tex2Dlod(_IN3, float4(screenUV.xy, 0, 0)).xyz;
     customDataA_and_Temp.xyz = tex2Dlod(_IN4, float4(screenUV.xy, 0, 0)).yxz;
-    
-    float depth = tex2Dlod(_IN0, float4(screenUV.xy, 0, 0)).x;
-    
-    customDataA_and_Temp.w = depth * cb1[65].x + cb1[65].y;
-    float linearizedDepth_part1 = depth * cb1[65].z - cb1[65].w;
-    float linearizedDepth_part2 = 1.0 / linearizedDepth_part1;
-    depth = customDataA_and_Temp.w + linearizedDepth_part2;
-    
-    float2 tileCoords = cb1[138].xy * screenUV.xy;
-    tileCoords = (uint2)tileCoords;
-    float cb158 = (uint)cb1[158].x;
-    float tileCoordsSum = (int)tileCoords.y + (int)tileCoords.x;
-    cb158 = (int)cb158 + (int)tileCoordsSum;
-    float isOddPixel = (int)cb158 & 1;
 
-    float shadingModelID_rounded = round(255.0 * shadingModelID_raw);
-    uint uintShadingModelID = (uint)shadingModelID_rounded;
-    int2 shadingModelBitfields = (int2)uintShadingModelID & int2(15, -16);
+    baseColor_and_Depth.w = tex2Dlod(_IN0, float4(screenUV.xy, 0, 0)).x;
+    customDataA_and_Temp.w = baseColor_and_Depth.w * cb1[65].x + cb1[65].y;
+    baseColor_and_Depth.w = baseColor_and_Depth.w * cb1[65].z + -cb1[65].w;
+    baseColor_and_Depth.w = 1.0 / baseColor_and_Depth.w;
+    baseColor_and_Depth.w = customDataA_and_Temp.w + baseColor_and_Depth.w;
     
-    float isNotClothShadingModel = (shadingModelBitfields.x != 12) ? 1.0 : 0.0;
-    float3 specialShadingModelFlags = (shadingModelBitfields.xxx == int3(13, 14, 15)) ? 1.0 : 0.0;
-    float isSpecialModel_yz = (int)specialShadingModelFlags.y | (int)specialShadingModelFlags.z;
-    float isAnySpecialModel = (int)isSpecialModel_yz | (int)specialShadingModelFlags.x;
-    float shadingModelOverride = isNotClothShadingModel ? isAnySpecialModel : -1.0;
+    shadingInfo_and_Temp.xy = cb1[138].xy * screenUV.xy;
+    shadingInfo_and_Temp.xy = (uint2)shadingInfo_and_Temp.xy;
+    customDataA_and_Temp.w = (uint)cb1[158].x;
+    shadingInfo_and_Temp.x = (int)shadingInfo_and_Temp.y + (int)shadingInfo_and_Temp.x;
+    customDataA_and_Temp.w = (int)customDataA_and_Temp.w + (int)shadingInfo_and_Temp.x;
+    customDataA_and_Temp.w = (int)customDataA_and_Temp.w & 1;
 
-    float3 worldNormal;
-    float3 initialLighting;
-    float hairShadowingFactor = 0.0;
+    materialParams_and_Lighting.w = round(255.0 * materialParams_and_Lighting.w);
+    shadingInfo_and_Temp.xy = (int2)((uint)materialParams_and_Lighting.w) & int2(15, -16);
     
-    if (shadingModelOverride != 0.0)
+    materialParams_and_Lighting.w = ((int)shadingInfo_and_Temp.x != 12) ? 1.0 : 0.0;
+    shadingModelFlags_and_Temp.xyz = ((int3)shadingInfo_and_Temp.xxx == int3(13, 14, 15)) ? float3(1.0, 1.0, 1.0) : float3(0.0, 0.0, 0.0);
+    shadingInfo_and_Temp.z = (int)shadingModelFlags_and_Temp.z | (int)shadingModelFlags_and_Temp.y;
+    shadingInfo_and_Temp.z = (int)shadingInfo_and_Temp.z | (int)shadingModelFlags_and_Temp.x;
+    materialParams_and_Lighting.w = materialParams_and_Lighting.w ? shadingInfo_and_Temp.z : -1.0;
+    
+    if (materialParams_and_Lighting.w != 0.0)
     {
-        float unused_replicated_logic_1 = (specialShadingModelFlags.x != 0.0) ? 13.0 : 12.0;
-        float2 unused_replicated_logic_2 = (specialShadingModelFlags.y != 0.0 || specialShadingModelFlags.z != 0.0) ? float2(1.0, 1.0) : float2(0.0, 0.0);
-        
-        float2 encodedNormal = gbuffer_normal.xy * 2.0 - 1.0;
-        float encodedNormalAbsSum = dot(float2(1.0, 1.0), abs(encodedNormal));
-        float worldNormalZ_unpacked = 1.0 - encodedNormalAbsSum;
-        float worldNormalZ_clamped = max(0.0, worldNormalZ_unpacked);
-        float2 lightingSign = (encodedNormal >= float2(0.0, 0.0)) ? float2(1.0, 1.0) : float2(0.0, 0.0);
-        float2 lightingOffset = lightingSign ? float2(0.5, 0.5) : float2(-0.5, -0.5);
-        lightingOffset = lightingOffset * worldNormalZ_clamped;
-        float2 worldNormalXY_unpacked = lightingOffset * -2.0 + encodedNormal;
-        worldNormal = float3(worldNormalXY_unpacked.x, worldNormalXY_unpacked.y, worldNormalZ_unpacked);
-        float worldNormalLengthInv = rsqrt(dot(worldNormal, worldNormal));
-        worldNormal = worldNormal * worldNormalLengthInv;
+        shadingInfo_and_Temp.x = shadingModelFlags_and_Temp.x ? 13.0 : 12.0;
+        shadingModelFlags_and_Temp.xz = shadingModelFlags_and_Temp.yz ? float2(1.0, 1.0) : float2(0.0, 0.0);
 
-        initialLighting = msr * msr;
-        hairShadowingFactor = customDataA_and_Temp.z;
+        shadingInfo_and_Temp.zw = gbufferData_and_Temp.yz * 2.0 - 1.0;
+        materialParams_and_Lighting.w = dot(float2(1.0, 1.0), abs(shadingInfo_and_Temp.zw));
+        worldNormal_and_WorldPos.z = 1.0 - materialParams_and_Lighting.w;
+        materialParams_and_Lighting.w = max(0.0, -worldNormal_and_WorldPos.z);
+        
+        lightingTempA.xy = (shadingInfo_and_Temp.zw >= float2(0.0, 0.0)) ? float2(1.0, 1.0) : float2(0.0, 0.0);
+        lightingTempA.xy = lightingTempA.xy ? float2(0.5, 0.5) : float2(-0.5, -0.5);
+        lightingTempA.xy = lightingTempA.xy * materialParams_and_Lighting.ww;
+        worldNormal_and_WorldPos.xy = lightingTempA.xy * -2.0 + shadingInfo_and_Temp.zw;
+        
+        materialParams_and_Lighting.w = dot(worldNormal_and_WorldPos.xyz, worldNormal_and_WorldPos.xyz);
+        materialParams_and_Lighting.w = rsqrt(materialParams_and_Lighting.w);
+        worldNormal_and_WorldPos.xyz = worldNormal_and_WorldPos.xyz * materialParams_and_Lighting.www;
+        
+        lightingTempA.xyz = materialParams_and_Lighting.xyz * materialParams_and_Lighting.xyz;
+        shadingModelFlags_and_Temp.y = customDataA_and_Temp.z;
     }
     else
     {
-        float isClearCoatModel = (shadingModelBitfields.x == 10) ? 1.0 : 0.0;
-        if (isClearCoatModel != 0.0)
-        {
-            float3 saturated_msr = saturate(msr);
-            float3 scaled_msr = float3(16777215.0, 65535.0, 255.0) * saturated_msr;
-            uint3 rounded_msr = (uint3)round(scaled_msr);
-            
-            uint packed_val_y = rounded_msr.y;
-            uint packed_val_z = rounded_msr.z;
-            packed_val_y = ((packed_val_z) & 0xff) | (packed_val_y & ~0xff);
-            
-            uint packed_val_x = rounded_msr.x;
-            packed_val_x = ((packed_val_y) & 0xffff) | (packed_val_x & ~0xffff);
-
-            float packed_depth_float = 5.96046519e-08 * (float)packed_val_x;
-            float linear_depth_temp = packed_depth_float * cb1[65].x + cb1[65].y;
-            float linear_depth_p1 = packed_depth_float * cb1[65].z - cb1[65].w;
-            float linear_depth_p2 = 1.0 / linear_depth_p1;
-            float final_packed_depth = linear_depth_temp + linear_depth_p2;
-            
-            depth = final_packed_depth;
-        }
-
-        worldNormal = gbuffer_normal * 2.0 - 1.0;
-        initialLighting = float3(0.0, 0.0, 0.0);
-        specialShadingModelFlags = float3(0.0, 0.0, 0.0);
-        perObjectData = 0.0;
-        gbufferNormalSample_raw.x = 0.0;
+        materialParams_and_Lighting.w = ((int)shadingInfo_and_Temp.x == 10) ? 1.0 : 0.0;
+        float3 clearCoatTemp = saturate(materialParams_and_Lighting.xyz);
+        clearCoatTemp = round(float3(16777215.0, 65535.0, 255.0) * clearCoatTemp);
+        uint3 clearCoatUint = (uint3)clearCoatTemp;
+        
+        clearCoatUint.y = (clearCoatUint.z & 0xff) | (clearCoatUint.y & ~0xff);
+        clearCoatUint.x = (clearCoatUint.y & 0xffff) | (clearCoatUint.x & ~0xffff);
+        
+        float packed_depth_float = 5.96046519e-08 * (float)clearCoatUint.x;
+        float linear_depth_temp = packed_depth_float * cb1[65].x + cb1[65].y;
+        float linear_depth_p1 = packed_depth_float * cb1[65].z - cb1[65].w;
+        float final_packed_depth = linear_depth_temp + (1.0 / linear_depth_p1);
+        
+        baseColor_and_Depth.w = materialParams_and_Lighting.w ? final_packed_depth : baseColor_and_Depth.w;
+        
+        worldNormal_and_WorldPos.xyz = gbufferData_and_Temp.yzw * 2.0 - 1.0;
+        lightingTempA.xyz = float3(0.0, 0.0, 0.0);
+        shadingModelFlags_and_Temp.xyz = float3(0.0, 0.0, 0.0);
+        gbufferData_and_Temp.xw = float2(0.0, 0.0);
         customDataA_and_Temp.xy = float2(0.0, 0.0);
     }
     
-    float worldNormalLengthRsqrt = rsqrt(dot(worldNormal, worldNormal));
-    float3 normalizedWorldNormal = worldNormal * worldNormalLengthRsqrt;
-
-    float isShadingModel_5 = (shadingModelBitfields.x == 5) ? 1.0 : 0.0;
-    float isShadingModel_13 = (shadingModelBitfields.x == 13) ? 1.0 : 0.0;
+    gbufferData_and_Temp.y = dot(worldNormal_and_WorldPos.xyz, worldNormal_and_WorldPos.xyz);
+    gbufferData_and_Temp.y = rsqrt(gbufferData_and_Temp.y);
+    materialParams_and_Lighting.xyz = worldNormal_and_WorldPos.xyz * gbufferData_and_Temp.yyy;
     
-    float hasValidFogData = (0.0 < cb1[162].y) ? 1.0 : 0.0;
-    float hasVolumetricFog = (0.0 < cb1[220].z) ? 1.0 : 0.0;
-    float useVolumetricFog = hasValidFogData ? hasVolumetricFog : 0.0;
-    float useDitheredLodTransition = (0.0 != cb1[162].y) ? 1.0 : 0.0;
+    gbufferData_and_Temp.yz = ((int2)shadingInfo_and_Temp.xx == int2(5, 13)) ? float2(1.0, 1.0) : float2(0.0, 0.0);
+    materialParams_and_Lighting.w = (0.0 < cb1[162].y) ? 1.0 : 0.0;
+    shadingInfo_and_Temp.z = (0.0 < cb1[220].z) ? 1.0 : 0.0;
+    materialParams_and_Lighting.w = materialParams_and_Lighting.w ? shadingInfo_and_Temp.z : 0.0;
+    shadingInfo_and_Temp.z = (0.0 != cb1[162].y) ? 1.0 : 0.0;
     
-    float3 processedBaseColor = useDitheredLodTransition ? float3(1.0, 1.0, 1.0) : baseColor;
-    float useOddPixelResult = isOddPixel ? 1.0 : 0.0;
-    processedBaseColor = useVolumetricFog ? useOddPixelResult.xxx : processedBaseColor;
-    baseColor = (worldNormalLengthRsqrt > 0.0) ? processedBaseColor : baseColor;
+    worldNormal_and_WorldPos.xyz = shadingInfo_and_Temp.zzz ? float3(1.0, 1.0, 1.0) : baseColor_and_Depth.xyz;
+    customDataA_and_Temp.w = customDataA_and_Temp.w ? 1.0 : 0.0;
+    worldNormal_and_WorldPos.xyz = materialParams_and_Lighting.www ? customDataA_and_Temp.www : worldNormal_and_WorldPos.xyz;
+    baseColor_and_Depth.xyz = gbufferData_and_Temp.yyy > 0.0 ? worldNormal_and_WorldPos.xyz : baseColor_and_Depth.xyz;
     
-    float aoFactor = tex2Dlod(_IN9, float4(0.0, 0.0, 0.0, 0.0)).x;
-
-    float3 worldPos = depth * cb1[50].xyz;
-    worldPos = (useDitheredLodTransition * cb1[48].xyz) + worldPos;
-    worldPos = cb1[51].xyz + worldPos;
-
-    float2 ssrParams = tex2Dlod(_IN5, float4(screenUV.xy, 0, 0)).xz;
-    float2 ssrParamsSq = ssrParams * ssrParams;
-    float ssrIntensity = ssrParamsSq.x * ssrParamsSq.y;
-
-    float ssrTerm_preBlend = cb1[253].y * ssrIntensity;
-
-    float3 indirectLightingResult;
-    float3 diffuseIBLBase;
+    gbufferData_and_Temp.y = tex2Dlod(_IN9, float4(0.0, 0.0, 0.0, 0.0)).x;
+    
+    shadingInfo_and_Temp.zw = screenUV.zw * baseColor_and_Depth.ww;
+    worldNormal_and_WorldPos.xyz = cb1[49].xyz * shadingInfo_and_Temp.www;
+    worldNormal_and_WorldPos.xyz = shadingInfo_and_Temp.zzz * cb1[48].xyz + worldNormal_and_WorldPos.xyz;
+    worldNormal_and_WorldPos.xyz = baseColor_and_Depth.www * cb1[50].xyz + worldNormal_and_WorldPos.xyz;
+    worldNormal_and_WorldPos.xyz = cb1[51].xyz + worldNormal_and_WorldPos.xyz;
+    
+    shadingInfo_and_Temp.zw = tex2Dlod(_IN5, float4(screenUV.xy, 0, 0)).xz;
+    shadingInfo_and_Temp.zw = shadingInfo_and_Temp.zw * shadingInfo_and_Temp.zw;
+    materialParams_and_Lighting.w = shadingInfo_and_Temp.z * shadingInfo_and_Temp.w;
+    customDataA_and_Temp.w = cb1[253].y * materialParams_and_Lighting.w;
     
     if (cb1[255].x != 0.0)
     {
-        float3 accumulatedGIBounceColor = float3(0.0, 0.0, 0.0);
-        float giRadius = 0.0;
-        float giTotalWeight = 0.0;
-        float giAngleCounter = 0.0;
+        lightingTempB.xyz = float3(0.0, 0.0, 0.0);
+        shadingInfo_and_Temp.z = 0.0;
+        shadingInfo_and_Temp.w = 0.0;
+        shadingModelFlags_and_Temp.w = 0.0;
+        worldNormal_and_WorldPos.w = 0.0;
         
-        for (int i = 0; i < 3; ++i)
+        while (true)
         {
-            float sampleRadius = 0.000833333295 + giRadius;
-            float3 currentLoopColor = accumulatedGIBounceColor;
-            float currentSampleAngle = giAngleCounter;
+            if (((int)shadingInfo_and_Temp.z >= 3)) break;
+
+            shadingInfo_and_Temp.w = 0.000833333295 + shadingInfo_and_Temp.w;
+            lightingTempC.xyz = lightingTempB.xyz;
+            lightingTempA.w = shadingModelFlags_and_Temp.w;
+            lightingTempB.w = worldNormal_and_WorldPos.w;
+            lightingTempC.w = 0.0;
             
-            for (int j = 0; j < 3; ++j)
+            while (true)
             {
-                currentSampleAngle = 1.0 + currentSampleAngle;
-                float angle_rad = 2.09439516 * currentSampleAngle;
-                float sin_a, cos_a;
-                sincos(angle_rad, sin_a, cos_a);
-                float2 sampleUV_offset = float2(cos_a, sin_a) * sampleRadius;
-                float2 sampleUV = screenUV.xy + sampleUV_offset;
-                float3 giSampleColor = tex2D(_IN7, sampleUV).xyz;
+                if (((int)lightingTempC.w >= 3)) break;
                 
-                currentLoopColor = giSampleColor * sampleRadius + currentLoopColor;
-                giTotalWeight = giTotalWeight + sampleRadius;
+                lightingTempA.w = 1.0 + lightingTempA.w;
+                float angle_rad = 2.09439516 * lightingTempA.w;
+                sincos(angle_rad, accumulatedLightColor.x, lightLoopTempA.x);
+                lightLoopTempA.xy = float2(lightLoopTempA.x, accumulatedLightColor.x) * shadingInfo_and_Temp.w + screenUV.xy;
+                accumulatedLightColor.xyz = tex2D(_IN7, lightLoopTempA.xy).xyz;
+                
+                lightingTempC.xyz = accumulatedLightColor.xyz * shadingInfo_and_Temp.www + lightingTempC.xyz;
+                lightingTempB.w = lightingTempB.w + shadingInfo_and_Temp.w;
+                lightingTempC.w = (int)lightingTempC.w + 1;
             }
-            accumulatedGIBounceColor = currentLoopColor;
-            giAngleCounter = 0.620000005 + currentSampleAngle;
-            giRadius = sampleRadius;
+            
+            lightingTempB.xyz = lightingTempC.xyz;
+            worldNormal_and_WorldPos.w = lightingTempB.w;
+            shadingModelFlags_and_Temp.w = 0.620000005 + lightingTempA.w;
+            shadingInfo_and_Temp.z = (int)shadingInfo_and_Temp.z + 1;
         }
-        
-        float3 finalGIColor = accumulatedGIBounceColor / giTotalWeight;
 
-        float3 perObjectMask_high = (float3(0.644999981, 0.312000006, 0.978999972) < perObjectData.xxx) ? 1.0 : 0.0;
-        float3 perObjectMask_low = (perObjectData.xxx < float3(0.685000002, 0.351999998, 1.02100003)) ? 1.0 : 0.0;
-        float3 perObjectMask = perObjectMask_high ? perObjectMask_low : 0.0;
-        float maskResult = perObjectMask.z ? 1.0 : 0.0;
-        maskResult = perObjectMask.y ? 0.0 : maskResult;
-        maskResult = perObjectMask.x ? 1.0 : maskResult;
-        
-        float isMaskYorZ = (int)perObjectMask.y | (int)perObjectMask.z;
-        float specularMask = (perObjectMask.x != 0.0) ? 0.0 : isMaskYorZ;
+        lightingTempB.xyz = lightingTempB.xyz / worldNormal_and_WorldPos.www;
 
-        float customData_rounded = round(255.0 * customDataA_and_Temp.x);
-        uint4 customDataMasks = (uint4)((uint)customData_rounded) & uint4(15, 240, 240, 15);
-        
-        float fresnelTerm_IBL = saturate(gbuffer_normal.z + gbuffer_normal.z);
-        float fresnel_factor1_IBL = fresnelTerm_IBL * -2.0 + 3.0;
-        fresnelTerm_IBL = fresnelTerm_IBL * fresnelTerm_IBL;
-        float roughness_from_normal = fresnel_factor1_IBL * fresnelTerm_IBL;
+        lightingTempC.xyz = (float3(0.644999981, 0.312000006, 0.978999972) < gbufferData_and_Temp.xxx) ? float3(1.0, 1.0, 1.0) : float3(0.0, 0.0, 0.0);
+        accumulatedLightColor.xyz = (gbufferData_and_Temp.xxx < float3(0.685000002, 0.351999998, 1.02100003)) ? float3(1.0, 1.0, 1.0) : float3(0.0, 0.0, 0.0);
+        lightingTempC.xyz = lightingTempC.xyz ? accumulatedLightColor.xyz : float3(0.0, 0.0, 0.0);
 
-        float roughness_term = saturate(gbuffer_normal.z * 2.0 - 0.5 * 2.0);
-        float roughness_factor = roughness_term * -2.0 + 3.0;
-        roughness_term = roughness_term * roughness_term;
-        float roughness_final = roughness_factor * roughness_term;
-        
-        float3 color_diff = cb1[262].xyz - cb1[261].xyz;
-        float luma = dot(abs(color_diff), float3(0.300000012, 0.589999974, 0.109999999));
-        float luma_scaled = min(1.0, 10.0 * luma);
-        float luma_factor = luma_scaled * -2.0 + 3.0;
-        luma_scaled = luma_scaled * luma_scaled;
-        float luma_fresnel = luma_factor * luma_scaled;
-        
-        float blended_roughness = luma_fresnel * roughness_final;
-        
-        float blend_range = cb1[265].y - cb1[265].x;
-        float blend_inv_range = 1.0 / blend_range;
-        float blend_val = ssrTerm_preBlend - cb1[265].x;
-        float blend_ratio = saturate(blend_val * blend_inv_range);
-        float blend_factor = blend_ratio * -2.0 + 3.0;
-        blend_ratio = blend_ratio * blend_ratio;
-        float blend_fresnel = blend_factor * blend_ratio;
-        
-        float final_blend = blend_fresnel * blended_roughness;
-        float ssr_term = ssrTerm_preBlend - final_blend;
-        float final_ssr = cb1[265].z * ssr_term + final_blend;
-        
-        float ssr_clamped = -cb1[265].x + final_ssr;
-        float ssr_ratio = saturate(ssr_clamped * blend_inv_range);
-        float ssr_factor = ssr_ratio * -2.0 + 3.0;
-        ssr_ratio = ssr_ratio * ssr_ratio;
-        float ssr_fresnel = ssr_factor * ssr_ratio;
-        blended_roughness = ssr_fresnel * blended_roughness;
-        
-        float combined_roughness = roughness_final * luma_fresnel - blended_roughness;
-        combined_roughness = cb1[265].z * combined_roughness + blended_roughness;
-        
-        float final_spec_occlusion = cb1[260].y * (final_ssr - 1.0) + 1.0;
-        float spec_ao_combined = aoFactor * combined_roughness - final_spec_occlusion;
-        final_spec_occlusion = specialShadingModelFlags.x * spec_ao_combined + final_spec_occlusion;
-        
-        float spec_ao_combined_2 = aoFactor * combined_roughness - combined_roughness;
-        float accumulatedLightColor_x = specialShadingModelFlags.x * spec_ao_combined_2 + combined_roughness;
-        
-        float3 hsv_modulated_color;
-        {
-            float hsv_check = (finalGIColor.y >= finalGIColor.z) ? 1.0 : 0.0;
-            float2 hsv_prep1 = finalGIColor.zy;
-            float4 hsv_consts1 = float4(-1.0, 0.666666687, 1.0, -1.0);
-            float4 hsv_interp1 = hsv_check * (-hsv_prep1.xyxy + finalGIColor.yzyy) + float4(hsv_prep1.x, hsv_prep1.y, hsv_consts1.z, hsv_consts1.w);
-            float hsv_check2 = (finalGIColor.x >= hsv_interp1.x) ? 1.0 : 0.0;
-            float4 hsv_prep2 = float4(hsv_interp1.x, hsv_interp1.y, hsv_interp1.w, finalGIColor.x);
-            float4 hsv_interp2 = hsv_check2 * (hsv_prep2.wyxz - hsv_prep2.xyzw) + hsv_prep2;
-            float hsv_V_minus_min = hsv_interp2.x - min(hsv_interp2.w, hsv_interp2.y);
-            float hsv_V_minus_min_plus_delta = hsv_interp2.w - hsv_interp2.y;
-            float hsv_H = hsv_interp2.z + hsv_V_minus_min_plus_delta / (hsv_V_minus_min * 6.0 + 0.00100000005);
-            float hsv_S = hsv_V_minus_min / (hsv_interp2.x + 0.00100000005);
-            float4 customDataMasks_shifted = (float4)customDataMasks * float4(0.0400000028, 0.0027450982, 0.00392156886, 0.0666666701) + float4(0.400000006, 0.400000006, 1.0, 0.5);
-            float custom_mask_z_check = (customDataMasks.z >= 2.54999971) ? 1.0 : 0.0;
-            float custom_mask_x = custom_mask_z_check * (customDataMasks_shifted.y - customDataMasks_shifted.x) + customDataMasks_shifted.x;
-            hsv_S = min(0.349999994, custom_mask_x * hsv_S);
-            float hsv_S_clamped = max(0.0, hsv_S);
-            float3 hsv_frac_H = frac(float3(1.0, 0.666666687, 0.333333343) + hsv_H.xxx);
-            float3 hsv_remap_H = saturate(abs(hsv_frac_H * 6.0 - 3.0) - 1.0);
-            float3 hsv_to_rgb_base = hsv_remap_H - 1.0;
-            float3 hsv_to_rgb_interp = hsv_S_clamped * hsv_to_rgb_base + 1.0;
-            float3 base_hsv_rgb = hsv_to_rgb_interp * (hsv_S_clamped + 1.0);
-            float3 lerp_factor_1 = hsv_to_rgb_interp * hsv_S_clamped - 1.0;
-            lerp_factor_1 = lerp_factor_1 * 0.600000024 + 1.0;
-            float3 lerp_factor_2 = -hsv_to_rgb_interp * hsv_S_clamped + lerp_factor_1;
-            float3 final_hsv_rgb_1 = maskResult * lerp_factor_2 + base_hsv_rgb;
-            float3 final_hsv_rgb_2 = (final_hsv_rgb_1 - baseColor) * 0.850000024 + baseColor;
-            float3 hsv_blend_factor = customDataMasks_shifted.z * final_hsv_rgb_2 - final_hsv_rgb_1;
-            float3 final_hsv_rgb_3 = custom_mask_z_check * hsv_blend_factor + final_hsv_rgb_1;
-            hsv_modulated_color = (-1.0 + final_hsv_rgb_3) * customDataMasks_shifted.w + 1.0;
-        }
-        
-        float3 indirect_spec_base = 0.200000003 * cb1[261].xyz;
-        float3 indirect_spec_add = cb1[262].xyz * 0.5 - indirect_spec_base;
-        indirect_spec_base = final_spec_occlusion * indirect_spec_add + indirect_spec_base;
-        indirect_spec_base = cb1[260].xxx * indirect_spec_base;
-        indirect_spec_base = indirect_spec_base * baseColor;
-        
-        float3 indirect_spec_lit = indirect_spec_base * initialLighting;
-        float3 indirect_diffuse_lit = cb1[261].xyz * baseColor;
-        float ibl_factor = roughness_from_normal * 0.300000012 + 0.699999988;
-        diffuseIBLBase = indirect_diffuse_lit * ibl_factor;
-        
-        float3 ibl_spec_base_plus_diffuse = diffuseIBLBase + indirect_spec_lit;
-        float3 hsv_modulated_ibl_spec_base = ibl_spec_base_plus_diffuse * hsv_modulated_color;
-        
-        float3 ibl_diffuse_add = baseColor * cb1[262].xyz - diffuseIBLBase;
-        float3 ibl_diffuse_lerp = ibl_diffuse_add * 0.400000006 + diffuseIBLBase;
-        
-        float3 ibl_spec_occluded = diffuseIBLBase * hsv_modulated_color;
-        float3 ibl_diffuse_occluded = (ibl_diffuse_lerp * hsv_modulated_color) - ibl_spec_occluded;
-        float3 ibl_diffuse_final = accumulatedLightColor_x * ibl_diffuse_occluded + ibl_spec_occluded;
-        
-        float3 lightLoopTempA_resolved = indirect_spec_lit + ibl_diffuse_final;
+        gbufferData_and_Temp.x = lightingTempC.z ? 1.0 : 0.0;
+        gbufferData_and_Temp.x = lightingTempC.y ? 0.0 : gbufferData_and_Temp.x;
+        gbufferData_and_Temp.x = lightingTempC.x ? 1.0 : gbufferData_and_Temp.x;
 
-        float3 ibl_spec_lerp = (initialLighting * hsv_modulated_color) - hsv_modulated_ibl_spec_base;
-        float3 final_ibl_spec = accumulatedLightColor_x * ibl_spec_lerp + hsv_modulated_ibl_spec_base;
+        shadingInfo_and_Temp.z = (int)lightingTempC.y | (int)lightingTempC.z;
+        shadingInfo_and_Temp.z = asfloat(asuint(shadingInfo_and_Temp.z) & 0x3f800000);
+        shadingInfo_and_Temp.z = lightingTempC.x ? 0.0 : shadingInfo_and_Temp.z;
         
-        float occlusion_from_bent_normal = tex2Dlod(_IN8, float4(screenUV.xy, 0, 0)).x;
-        occlusion_from_bent_normal = specularMask * (occlusion_from_bent_normal - 1.0) + 1.0;
+        customDataA_and_Temp.x = round(255.0 * customDataA_and_Temp.x);
+        lightingTempC.xyzw = (uint4)((int4)((uint)customDataA_and_Temp.xxxx) & int4(15, 240, 240, 15));
         
-        float3 final_ibl_spec_temp = final_ibl_spec - lightLoopTempA_resolved;
-        final_ibl_spec = luma_fresnel * final_ibl_spec_temp + lightLoopTempA_resolved;
+        customDataA_and_Temp.x = saturate(gbufferData_and_Temp.w + gbufferData_and_Temp.w);
+        shadingInfo_and_Temp.w = customDataA_and_Temp.x * -2.0 + 3.0;
+        customDataA_and_Temp.x = customDataA_and_Temp.x * customDataA_and_Temp.x;
+        customDataA_and_Temp.x = shadingInfo_and_Temp.w * customDataA_and_Temp.x;
         
-        float3 ibl_unoccluded = float3(1.0, 1.0, 1.0) - hsv_modulated_ibl_spec_base;
-        float3 occluded_ibl_spec_base = occlusion_from_bent_normal * ibl_unoccluded + hsv_modulated_ibl_spec_base;
+        shadingInfo_and_Temp.w = saturate((gbufferData_and_Temp.w - 0.5) * 2.0);
+        shadingModelFlags_and_Temp.w = shadingInfo_and_Temp.w * -2.0 + 3.0;
+        shadingInfo_and_Temp.w = shadingInfo_and_Temp.w * shadingInfo_and_Temp.w;
+        shadingInfo_and_Temp.w = shadingModelFlags_and_Temp.w * shadingInfo_and_Temp.w;
         
-        indirectLightingResult = final_ibl_spec * occluded_ibl_spec_base;
+        accumulatedLightColor.xyz = cb1[262].xyz - cb1[261].xyz;
+        shadingModelFlags_and_Temp.w = dot(abs(accumulatedLightColor.xyz), float3(0.300000012, 0.589999974, 0.109999999));
+        shadingModelFlags_and_Temp.w = min(1.0, 10.0 * shadingModelFlags_and_Temp.w);
+        worldNormal_and_WorldPos.w = shadingModelFlags_and_Temp.w * -2.0 + 3.0;
+        shadingModelFlags_and_Temp.w = shadingModelFlags_and_Temp.w * shadingModelFlags_and_Temp.w;
+        shadingModelFlags_and_Temp.w = worldNormal_and_WorldPos.w * shadingModelFlags_and_Temp.w;
+        
+        worldNormal_and_WorldPos.w = shadingModelFlags_and_Temp.w * shadingInfo_and_Temp.w;
+        
+        lightingTempA.w = 1.0 / (cb1[265].y - cb1[265].x);
+        lightingTempB.w = customDataA_and_Temp.w - cb1[265].x;
+        lightingTempB.w = saturate(lightingTempB.w * lightingTempA.w);
+        accumulatedLightColor.x = lightingTempB.w * -2.0 + 3.0;
+        lightingTempB.w = lightingTempB.w * lightingTempB.w;
+        lightingTempB.w = accumulatedLightColor.x * lightingTempB.w;
+        lightingTempB.w = lightingTempB.w * worldNormal_and_WorldPos.w;
+        
+        accumulatedLightColor.x = customDataA_and_Temp.w - lightingTempB.w;
+        lightingTempB.w = cb1[265].z * accumulatedLightColor.x + lightingTempB.w;
+        
+        accumulatedLightColor.x = -cb1[265].x + lightingTempB.w;
+        lightingTempA.w = saturate(accumulatedLightColor.x * lightingTempA.w);
+        accumulatedLightColor.x = lightingTempA.w * -2.0 + 3.0;
+        lightingTempA.w = lightingTempA.w * lightingTempA.w;
+        lightingTempA.w = accumulatedLightColor.x * lightingTempA.w;
+        
+        worldNormal_and_WorldPos.w = lightingTempA.w * worldNormal_and_WorldPos.w;
+        shadingInfo_and_Temp.w = shadingInfo_and_Temp.w * shadingModelFlags_and_Temp.w - worldNormal_and_WorldPos.w;
+        shadingInfo_and_Temp.w = cb1[265].z * shadingInfo_and_Temp.w + worldNormal_and_WorldPos.w;
+        
+        shadingModelFlags_and_Temp.w = cb1[260].y * (lightingTempB.w - 1.0) + 1.0;
+        worldNormal_and_WorldPos.w = customDataA_and_Temp.x * shadingInfo_and_Temp.w - shadingModelFlags_and_Temp.w;
+        shadingModelFlags_and_Temp.w = shadingModelFlags_and_Temp.x * worldNormal_and_WorldPos.w + shadingModelFlags_and_Temp.w;
+        
+        worldNormal_and_WorldPos.w = customDataA_and_Temp.x * shadingInfo_and_Temp.w - shadingInfo_and_Temp.w;
+        accumulatedLightColor.x = shadingModelFlags_and_Temp.x * worldNormal_and_WorldPos.w + shadingInfo_and_Temp.w;
+        
+        shadingInfo_and_Temp.w = (lightingTempB.y >= lightingTempB.z) ? 1.0 : 0.0;
+        lightLoopTempA.xy = lightingTempB.zy;
+        lightLoopTempA.zw = float2(-1.0, 0.666666687);
+        lightLoopTempB.xy = -lightLoopTempA.xy + lightingTempB.yz;
+        lightLoopTempB.zw = float2(1.0, -1.0);
+        lightLoopTempA.xyzw = shadingInfo_and_Temp.wwww * lightLoopTempB.xyzw + lightLoopTempA.xyzw;
+        
+        shadingInfo_and_Temp.w = (lightingTempB.x >= lightLoopTempA.x) ? 1.0 : 0.0;
+        lightLoopTempB.xyz = lightLoopTempA.xyw;
+        lightLoopTempB.w = lightingTempB.x;
+        lightLoopTempA.xyw = lightLoopTempB.wyx;
+        lightLoopTempA.xyzw = lightLoopTempA.xyzw - lightLoopTempB.xyzw;
+        lightLoopTempA.xyzw = shadingInfo_and_Temp.wwww * lightLoopTempA.xyzw + lightLoopTempB.xyzw;
+        
+        shadingInfo_and_Temp.w = lightLoopTempA.x - min(lightLoopTempA.w, lightLoopTempA.y);
+        worldNormal_and_WorldPos.w = (lightLoopTempA.w - lightLoopTempA.y) / (shadingInfo_and_Temp.w * 6.0 + 0.00100000005);
+        worldNormal_and_WorldPos.w = lightLoopTempA.z + worldNormal_and_WorldPos.w;
+        shadingInfo_and_Temp.w = shadingInfo_and_Temp.w / (lightLoopTempA.x + 0.00100000005);
+
+        lightLoopTempA.xyzw = (float4)lightingTempC.xyzw * float4(0.0400000028, 0.0027450982, 0.00392156886, 0.0666666701) + float4(0.400000006, 0.400000006, 1.0, 0.5);
+        lightingTempB.w = (lightingTempC.z >= 2.54999971) ? 1.0 : 0.0;
+        lightingTempC.x = lightingTempB.w * (lightLoopTempA.y - lightLoopTempA.x) + lightLoopTempA.x;
+        shadingInfo_and_Temp.w = min(0.349999994, lightingTempC.x * shadingInfo_and_Temp.w);
+        lightingTempC.x = max(0.0, shadingInfo_and_Temp.w);
+
+        lightingTempC.yzw = frac(float3(1.0, 0.666666687, 0.333333343) + abs(worldNormal_and_WorldPos.www));
+        lightingTempC.yzw = saturate(abs(lightingTempC.yzw * 6.0 - 3.0) - 1.0);
+        lightingTempC.yzw = lightingTempC.yzw - 1.0;
+        lightingTempC.xyz = lightingTempC.xxx * lightingTempC.yzw + 1.0;
+
+        shadingInfo_and_Temp.w = 1.0 + shadingInfo_and_Temp.w;
+        lightLoopTempB.xyz = lightingTempC.xyz * shadingInfo_and_Temp.www;
+        lightLoopTempC.xyz = lightingTempC.xyz * shadingInfo_and_Temp.www - 1.0;
+        lightLoopTempC.xyz = lightLoopTempC.xyz * 0.600000024 + 1.0;
+        lightingTempC.xyz = -lightingTempC.xyz * shadingInfo_and_Temp.www + lightLoopTempC.xyz;
+        lightingTempC.xyz = gbufferData_and_Temp.xxx * lightingTempC.xyz + lightLoopTempB.xyz;
+        lightLoopTempB.xyz = (lightingTempC.xyz - baseColor_and_Depth.xyz) * 0.850000024 + baseColor_and_Depth.xyz;
+        lightLoopTempA.xyz = lightLoopTempA.zzz * lightLoopTempB.xyz - lightingTempC.xyz;
+        lightingTempC.xyz = lightingTempB.www * lightLoopTempA.xyz + lightingTempC.xyz;
+        lightingTempC.xyz = (lightingTempC.xyz - 1.0) * lightLoopTempA.www + 1.0;
+        
+        lightLoopTempA.xyz = 0.200000003 * cb1[261].xyz;
+        lightLoopTempB.xyz = cb1[262].xyz * 0.5 - lightLoopTempA.xyz;
+        lightLoopTempA.xyz = shadingModelFlags_and_Temp.www * lightLoopTempB.xyz + lightLoopTempA.xyz;
+        lightLoopTempA.xyz = cb1[260].xxx * lightLoopTempA.xyz;
+        lightLoopTempA.xyz = lightLoopTempA.xyz * baseColor_and_Depth.xyz;
+        lightLoopTempB.xyz = lightLoopTempA.xyz * lightingTempA.xyz;
+        lightLoopTempC.xyz = cb1[261].xyz * baseColor_and_Depth.xyz;
+        gbufferData_and_Temp.x = customDataA_and_Temp.x * 0.300000012 + 0.699999988;
+        lightLoopTempD.xyz = lightLoopTempC.xyz * gbufferData_and_Temp.xxx;
+        lightLoopTempE.xyz = cb1[262].xyz * baseColor_and_Depth.xyz;
+        lightLoopTempB.xyz = lightLoopTempC.xyz * gbufferData_and_Temp.xxx + lightLoopTempB.xyz;
+        lightLoopTempC.xyz = baseColor_and_Depth.xyz * cb1[262].xyz - lightLoopTempD.xyz;
+        lightLoopTempC.xyz = lightLoopTempC.xyz * 0.400000006 + lightLoopTempD.xyz;
+        lightLoopTempF.xyz = lightLoopTempD.xyz * lightingTempC.xyz;
+        lightLoopTempC.xyz = lightLoopTempC.xyz * lightingTempC.xyz - lightLoopTempF.xyz;
+        lightLoopTempC.xyz = accumulatedLightColor.xxx * lightLoopTempC.xyz + lightLoopTempF.xyz;
+        lightLoopTempA.xyz = lightLoopTempA.xyz * lightingTempA.xyz + lightLoopTempC.xyz;
+        lightLoopTempB.xyz = lightLoopTempB.xyz * lightingTempC.xyz;
+        lightLoopTempC.xyz = lightLoopTempE.xyz * lightLoopTempA.www;
+        lightingTempC.xyz = lightLoopTempC.xyz * lightingTempC.xyz - lightLoopTempB.xyz;
+        lightingTempC.xyz = accumulatedLightColor.xxx * lightingTempC.xyz + lightLoopTempB.xyz;
+
+        gbufferData_and_Temp.x = tex2Dlod(_IN8, float4(screenUV.xy, 0, 0)).x;
+        gbufferData_and_Temp.x = shadingInfo_and_Temp.z * (gbufferData_and_Temp.x - 1.0) + 1.0;
+        
+        lightingTempC.xyz = lightingTempC.xyz - lightLoopTempA.xyz;
+        lightingTempC.xyz = shadingModelFlags_and_Temp.www * lightingTempC.xyz + lightLoopTempA.xyz;
+        
+        lightLoopTempA.xyz = 1.0 - lightLoopTempB.xyz;
+        lightingTempB.xyz = gbufferData_and_Temp.xxx * lightLoopTempA.xyz + lightLoopTempB.xyz;
+        lightingTempB.xyz = lightingTempC.xyz * lightingTempB.xyz;
     }
     else
     {
-        float fresnelTerm_NdotV_alt = saturate(gbuffer_normal.z + gbuffer_normal.z);
-        float fresnel_factor1_alt = fresnelTerm_NdotV_alt * -2.0 + 3.0;
-        fresnelTerm_NdotV_alt = fresnelTerm_NdotV_alt * fresnelTerm_NdotV_alt;
-        float fresnel_NdotV_alt = fresnel_factor1_alt * fresnelTerm_NdotV_alt;
+        gbufferData_and_Temp.x = saturate(gbufferData_and_Temp.w + gbufferData_and_Temp.w);
+        customDataA_and_Temp.x = gbufferData_and_Temp.x * -2.0 + 3.0;
+        gbufferData_and_Temp.x = gbufferData_and_Temp.x * gbufferData_and_Temp.x;
+        gbufferData_and_Temp.x = customDataA_and_Temp.x * gbufferData_and_Temp.x;
         
-        float roughness_term_alt = saturate(gbuffer_normal.z * 2.0 - 1.0);
-        float specularMask_alt = roughness_term_alt * -2.0 + 3.0;
-        roughness_term_alt = roughness_term_alt * roughness_term_alt;
-        float roughness_final_alt = specularMask_alt * roughness_term_alt;
+        customDataA_and_Temp.x = saturate((gbufferData_and_Temp.w - 0.5) * 2.0);
+        shadingInfo_and_Temp.z = customDataA_and_Temp.x * -2.0 + 3.0;
+        customDataA_and_Temp.x = customDataA_and_Temp.x * customDataA_and_Temp.x;
+        customDataA_and_Temp.x = shadingInfo_and_Temp.z * customDataA_and_Temp.x;
+
+        lightingTempC.xyz = cb1[262].xyz - cb1[261].xyz;
+        shadingInfo_and_Temp.z = dot(abs(lightingTempC.xyz), float3(0.300000012, 0.589999974, 0.109999999));
+        shadingInfo_and_Temp.z = min(1.0, 10.0 * shadingInfo_and_Temp.z);
+        shadingInfo_and_Temp.w = shadingInfo_and_Temp.z * -2.0 + 3.0;
+        shadingInfo_and_Temp.z = shadingInfo_and_Temp.z * shadingInfo_and_Temp.z;
+        shadingInfo_and_Temp.z = shadingInfo_and_Temp.w * shadingInfo_and_Temp.z;
         
-        float3 color_diff_alt = cb1[262].xyz - cb1[261].xyz;
-        float luma_alt = dot(abs(color_diff_alt), float3(0.300000012, 0.589999974, 0.109999999));
-        luma_alt = min(1.0, 10.0 * luma_alt);
-        float luma_factor_alt = luma_alt * -2.0 + 3.0;
-        luma_alt = luma_alt * luma_alt;
-        float luma_fresnel_alt = luma_factor_alt * luma_alt;
+        shadingInfo_and_Temp.w = shadingInfo_and_Temp.z * customDataA_and_Temp.x;
+
+        shadingModelFlags_and_Temp.w = 1.0 / (cb1[265].y - cb1[265].x);
+        worldNormal_and_WorldPos.w = materialParams_and_Lighting.w * cb1[253].y - cb1[265].x;
+        worldNormal_and_WorldPos.w = saturate(worldNormal_and_WorldPos.w * shadingModelFlags_and_Temp.w);
+        lightingTempA.w = worldNormal_and_WorldPos.w * -2.0 + 3.0;
+        worldNormal_and_WorldPos.w = worldNormal_and_WorldPos.w * worldNormal_and_WorldPos.w;
+        worldNormal_and_WorldPos.w = lightingTempA.w * worldNormal_and_WorldPos.w;
+        worldNormal_and_WorldPos.w = worldNormal_and_WorldPos.w * shadingInfo_and_Temp.w;
+
+        materialParams_and_Lighting.w = materialParams_and_Lighting.w * cb1[253].y - worldNormal_and_WorldPos.w;
+        materialParams_and_Lighting.w = cb1[265].z * materialParams_and_Lighting.w + worldNormal_and_WorldPos.w;
         
-        float blended_roughness_alt = luma_fresnel_alt * roughness_final_alt;
+        worldNormal_and_WorldPos.w = -cb1[265].x + materialParams_and_Lighting.w;
+        shadingModelFlags_and_Temp.w = saturate(worldNormal_and_WorldPos.w * shadingModelFlags_and_Temp.w);
+        worldNormal_and_WorldPos.w = shadingModelFlags_and_Temp.w * -2.0 + 3.0;
+        shadingModelFlags_and_Temp.w = shadingModelFlags_and_Temp.w * shadingModelFlags_and_Temp.w;
+        shadingModelFlags_and_Temp.w = worldNormal_and_WorldPos.w * shadingModelFlags_and_Temp.w;
         
-        float blend_range_alt = cb1[265].y - cb1[265].x;
-        float blend_inv_range_alt = 1.0 / blend_range_alt;
-        float blend_val_alt = ssrIntensity * cb1[253].y - cb1[265].x;
-        float blend_ratio_alt = saturate(blend_val_alt * blend_inv_range_alt);
-        float blend_factor_alt = blend_ratio_alt * -2.0 + 3.0;
-        blend_ratio_alt = blend_ratio_alt * blend_ratio_alt;
-        float blend_fresnel_alt = blend_factor_alt * blend_ratio_alt;
+        shadingInfo_and_Temp.w = shadingModelFlags_and_Temp.w * shadingInfo_and_Temp.w;
         
-        float final_blend_alt = blend_fresnel_alt * blended_roughness_alt;
-        float ssr_term_alt = ssrIntensity * cb1[253].y - final_blend_alt;
-        float final_ssr_alt = cb1[265].z * ssr_term_alt + final_blend_alt;
+        customDataA_and_Temp.x = customDataA_and_Temp.x * shadingInfo_and_Temp.z - shadingInfo_and_Temp.w;
+        customDataA_and_Temp.x = cb1[265].z * customDataA_and_Temp.x + shadingInfo_and_Temp.w;
         
-        float ssr_clamped_alt = -cb1[265].x + final_ssr_alt;
-        float ssr_ratio_alt = saturate(ssr_clamped_alt * blend_inv_range_alt);
-        float ssr_factor_alt = ssr_ratio_alt * -2.0 + 3.0;
-        ssr_ratio_alt = ssr_ratio_alt * ssr_ratio_alt;
-        float ssr_fresnel_alt = ssr_factor_alt * ssr_ratio_alt;
-        blended_roughness_alt = ssr_fresnel_alt * blended_roughness_alt;
+        materialParams_and_Lighting.w = cb1[260].y * (materialParams_and_Lighting.w - 1.0) + 1.0;
         
-        float combined_roughness_alt = roughness_final_alt * luma_fresnel_alt - blended_roughness_alt;
-        combined_roughness_alt = cb1[265].z * combined_roughness_alt + blended_roughness_alt;
+        shadingInfo_and_Temp.w = customDataA_and_Temp.w * customDataA_and_Temp.x - materialParams_and_Lighting.w;
+        materialParams_and_Lighting.w = shadingModelFlags_and_Temp.x * shadingInfo_and_Temp.w + materialParams_and_Lighting.w;
         
-        float final_spec_occlusion_alt = cb1[260].y * (final_ssr_alt - 1.0) + 1.0;
-        float spec_ao_combined_alt = aoFactor * combined_roughness_alt - final_spec_occlusion_alt;
-        final_spec_occlusion_alt = specialShadingModelFlags.x * spec_ao_combined_alt + final_spec_occlusion_alt;
+        shadingInfo_and_Temp.w = customDataA_and_Temp.w * customDataA_and_Temp.x - customDataA_and_Temp.x;
+        accumulatedLightColor.x = shadingModelFlags_and_Temp.x * shadingInfo_and_Temp.w + customDataA_and_Temp.x;
         
-        float spec_ao_combined_2_alt = aoFactor * combined_roughness_alt - combined_roughness_alt;
-        float accumulatedLightColor_x_alt = specialShadingModelFlags.x * spec_ao_combined_2_alt + combined_roughness_alt;
+        shadingModelFlags_and_Temp.xyw = 0.200000003 * cb1[261].xyz;
+        lightingTempC.xyz = cb1[262].xyz * 0.5 - shadingModelFlags_and_Temp.xyw;
+        shadingModelFlags_and_Temp.xyw = materialParams_and_Lighting.www * lightingTempC.xyz + shadingModelFlags_and_Temp.xyw;
+        shadingModelFlags_and_Temp.xyw = cb1[260].xxx * shadingModelFlags_and_Temp.xyw;
+        shadingModelFlags_and_Temp.xyw = shadingModelFlags_and_Temp.xyw * baseColor_and_Depth.xyz;
         
-        float3 indirect_spec_base_alt = 0.200000003 * cb1[261].xyz;
-        float3 indirect_spec_add_alt = cb1[262].xyz * 0.5 - indirect_spec_base_alt;
-        indirect_spec_base_alt = final_spec_occlusion_alt * indirect_spec_add_alt + indirect_spec_base_alt;
-        indirect_spec_base_alt = cb1[260].xxx * indirect_spec_base_alt;
-        indirect_spec_base_alt = indirect_spec_base_alt * baseColor;
+        lightingTempC.xyz = shadingModelFlags_and_Temp.xyw * lightingTempA.xyz;
+        lightLoopTempA.xyz = cb1[261].xyz * baseColor_and_Depth.xyz;
+        gbufferData_and_Temp.x = gbufferData_and_Temp.x * 0.300000012 + 0.699999988;
+        lightLoopTempD.xyz = lightLoopTempA.xyz * gbufferData_and_Temp.xxx;
+        lightLoopTempA.xyz = lightLoopTempD.xyz + lightingTempC.xyz;
+        lightingTempC.xyz = lightingTempC.xyz * shadingInfo_and_Temp.zzz + lightLoopTempA.xyz;
         
-        float3 indirect_spec_lit_alt = indirect_spec_base_alt * initialLighting;
-        float3 indirect_diffuse_lit_alt = cb1[261].xyz * baseColor;
-        float ibl_factor_alt = fresnel_NdotV_alt * 0.300000012 + 0.699999988;
+        lightLoopTempA.xyz = baseColor_and_Depth.xyz * cb1[262].xyz - lightLoopTempD.xyz;
+        lightLoopTempA.xyz = lightLoopTempA.xyz * accumulatedLightColor.xxx;
+        lightLoopTempA.xyz = lightLoopTempA.xyz * 0.400000006 + lightLoopTempD.xyz;
         
-        diffuseIBLBase = indirect_diffuse_lit_alt * ibl_factor_alt;
+        shadingModelFlags_and_Temp.xyw = shadingModelFlags_and_Temp.xyw * lightingTempA.xyz + lightLoopTempA.xyz;
         
-        float3 temp_spec_plus_diffuse_base = diffuseIBLBase + indirect_spec_lit_alt;
-        float3 temp_lighting_C = luma_fresnel_alt * indirect_spec_lit_alt + temp_spec_plus_diffuse_base;
+        lightLoopTempA.xyz = baseColor_and_Depth.xyz * cb1[262].xyz - lightingTempC.xyz;
+        lightingTempC.xyz = accumulatedLightColor.xxx * lightLoopTempA.xyz + lightingTempC.xyz;
         
-        float3 temp_diffuse_add = baseColor * cb1[262].xyz - diffuseIBLBase;
-        temp_diffuse_add = temp_diffuse_add * accumulatedLightColor_x_alt;
-        float3 temp_diffuse_final = temp_diffuse_add * 0.400000006 + diffuseIBLBase;
-        
-        float3 temp_shading_model_flags = indirect_spec_lit_alt + temp_diffuse_final;
-        
-        float3 temp_reuse_var = baseColor * cb1[262].xyz - temp_lighting_C;
-        temp_lighting_C = accumulatedLightColor_x_alt * temp_reuse_var + temp_lighting_C;
-        temp_lighting_C = temp_lighting_C - temp_shading_model_flags;
-        
-        indirectLightingResult = final_spec_occlusion_alt * temp_lighting_C + temp_shading_model_flags;
+        lightingTempC.xyz = lightingTempC.xyz - shadingModelFlags_and_Temp.xyw;
+        lightingTempB.xyz = materialParams_and_Lighting.www * lightingTempC.xyz + shadingModelFlags_and_Temp.xyw;
     }
-
-    float subsurf_scatter_term = saturate(10.000001 * (gbuffer_normal.z - 0.400000006));
-    float subsurf_fresnel_factor = subsurf_scatter_term * -2.0 + 3.0;
-    subsurf_scatter_term = subsurf_scatter_term * subsurf_scatter_term;
-    float subsurf_fresnel = subsurf_fresnel_factor * subsurf_scatter_term;
-
-    float3 preLoopLighting_IBL = indirectLightingResult * 0.5 + cb1[261].xyz;
-    preLoopLighting_IBL = preLoopLighting_IBL * baseColor;
-    float3 preLoopLighting_NonIBL = cb1[261].xyz * baseColor;
-    float3 chosenPreLoopLighting = (cb1[255].x != 0.0) ? preLoopLighting_IBL : preLoopLighting_NonIBL;
-
-    float3 finalDiffuse = isShadingModel_5 ? chosenPreLoopLighting : diffuseIBLBase;
-    float3 finalSpecular = isShadingModel_5 ? chosenPreLoopLighting : indirectLightingResult;
     
-    float finalSubsurfTerm = isShadingModel_5 ? 0.0 : subsurf_fresnel;
-    float finalSubsurfScatter = isShadingModel_5 ? 0.0 : subsurf_scatter_term;
+    gbufferData_and_Temp.x = saturate(10.000001 * (gbufferData_and_Temp.w - 0.400000006));
+    gbufferData_and_Temp.w = gbufferData_and_Temp.x * -2.0 + 3.0;
+    gbufferData_and_Temp.x = gbufferData_and_Temp.x * gbufferData_and_Temp.x;
+    accumulatedLightColor.y = gbufferData_and_Temp.w * gbufferData_and_Temp.x;
     
-    float3 foggedLighting = (subsurf_fresnel * (cb1[264].xyz + cb1[264].xyz)) - cb1[264].xyz;
-    float3 lightAccumulator = float3(0.0, 0.0, 0.0);
-    float lightLoopFalloff = 1.0;
+    shadingModelFlags_and_Temp.xyw = lightingTempB.xyz * 0.5 + cb1[261].xyz;
+    shadingModelFlags_and_Temp.xyw = shadingModelFlags_and_Temp.xyw * baseColor_and_Depth.xyz;
+    lightingTempC.xyz = cb1[261].xyz * baseColor_and_Depth.xyz;
+    shadingModelFlags_and_Temp.xyw = cb1[255].xxx ? shadingModelFlags_and_Temp.xyw : lightingTempC.xyz;
     
-    uint lightLoopCounter = 0;
+    lightingTempC.xyz = gbufferData_and_Temp.zzz ? shadingModelFlags_and_Temp.xyw : lightLoopTempD.xyz;
+    shadingModelFlags_and_Temp.xyw = gbufferData_and_Temp.zzz ? shadingModelFlags_and_Temp.xyw : lightingTempB.xyz;
+    
+    gbufferData_and_Temp.xw = gbufferData_and_Temp.zz ? float2(0.0, 0.0) : accumulatedLightColor.xy;
+    
+    lightingTempB.xyz = (cb1[264].xyz + cb1[264].xyz) * gbufferData_and_Temp.xxx - cb1[264].xyz;
+    accumulatedLightColor.xyz = float3(0.0, 0.0, 0.0);
+    materialParams_and_Lighting.w = 1.0;
+    customDataA_and_Temp.x = 0;
+    
     uint numLights = asuint(cb2[128].x);
-    
-    while (lightLoopCounter < numLights)
+    while ((uint)customDataA_and_Temp.x < numLights)
     {
-        uint lightIndex_base = lightLoopCounter << 3;
-        uint lightDataIndex = lightIndex_base | 7;
-        uint lightTypeMask = (uint)shadingModelBitfields.y & (((uint)cb2[lightDataIndex].w << 5) & 0xffffffe0);
+        uint lightIndex_base = (uint)customDataA_and_Temp.x << 3;
+        shadingInfo_and_Temp.z = lightIndex_base | 7;
+        
+        uint lightDataFlags = asuint(cb2[shadingInfo_and_Temp.z].w);
+        uint lightTypeMask = (asuint(shadingInfo_and_Temp.y)) & ((lightDataFlags << 5) & 0xffffffe0);
         
         if (lightTypeMask != 0)
         {
-            float3 lightPos = cb2[lightIndex_base + 0].xyz - worldPos;
-            float lightRadiusSq_inv = cb2[lightIndex_base + 0].w * cb2[lightIndex_base + 0].w;
-            float distToLightSq = dot(lightPos, lightPos);
-            float lightAttenuation = distToLightSq * lightRadiusSq_inv;
+            lightLoopTempA.xyz = cb2[lightIndex_base + 0].xyz - worldNormal_and_WorldPos.xyz;
+            worldNormal_and_WorldPos.w = cb2[lightIndex_base + 0].w * cb2[lightIndex_base + 0].w;
+            lightingTempA.w = dot(lightLoopTempA.xyz, lightLoopTempA.xyz);
+            worldNormal_and_WorldPos.w = lightingTempA.w * worldNormal_and_WorldPos.w;
             
-            if (1.0 >= lightAttenuation)
+            if (1.0 >= worldNormal_and_WorldPos.w)
             {
-                float lightAttenFactor = saturate(lightAttenuation * 2.5 - 1.5);
-                float lightAttenFresnel = (lightAttenFactor * -2.0 + 3.0) * (-lightAttenFactor * lightAttenFactor) + 1.0;
-                float rsqrtDistToLight = rsqrt(distToLightSq);
-                float3 lightVec = lightPos * rsqrtDistToLight;
-                float NdotL = dot(normalizedWorldNormal, lightVec);
-                float shadowKernelTerm = (NdotL + 1.0) * 0.5 - (cb2[lightIndex_base + 5].w * 0.939999998);
-                float shadowInvRange = 1.0 / (cb2[lightIndex_base + 5].w * 0.0600000024);
-                float shadowFactor = saturate(shadowInvRange * shadowKernelTerm);
-                float shadowFresnel = (shadowFactor * -2.0 + 3.0) * (shadowFactor * shadowFactor);
-                shadowFactor = min(1.0, shadowFresnel);
-                float3 shadowColor = cb2[lightIndex_base + 6].xyz * foggedLighting.xyz;
-                float3 shadowLerp = baseColor * cb2[lightIndex_base + 5].xyz - shadowColor;
-                shadowColor = shadowFactor * shadowLerp + shadowColor;
-                shadowColor = cb2[lightDataIndex].xxx * shadowColor;
+                uint lightIndex_1 = lightIndex_base | 1;
+                uint lightIndex_2 = lightIndex_base | 2;
+                uint lightIndex_3 = lightIndex_base | 3;
+                uint lightIndex_4 = lightIndex_base | 4;
+                uint lightIndex_5 = lightIndex_base | 5;
+                uint lightIndex_6 = lightIndex_base | 6;
+
+                lightingTempB.w = saturate(worldNormal_and_WorldPos.w * 2.5 - 1.5);
+                worldNormal_and_WorldPos.w = (lightingTempB.w * -2.0 + 3.0) * (-lightingTempB.w * lightingTempB.w) + 1.0;
                 
-                float currentLightFalloff = distToLightSq * cb2[lightIndex_base + 4].x + cb2[lightIndex_base + 4].y;
-                currentLightFalloff = 1.0 / (9.99999975e-05 + currentLightFalloff);
-                currentLightFalloff = (currentLightFalloff - 1.0) * cb2[lightIndex_base + 4].z;
-                currentLightFalloff = min(1.0, currentLightFalloff * currentLightFalloff);
+                lightingTempA.w = rsqrt(lightingTempA.w);
+                lightLoopTempD.xyz = lightLoopTempA.xyz * lightingTempA.www;
                 
-                uint lightFlags = asuint(cb2[lightIndex_base + 1].w) >> 16;
+                lightingTempA.w = dot(materialParams_and_Lighting.xyz, lightLoopTempD.xyz);
+                lightingTempA.w = (lightingTempA.w + 1.0) * 0.5 - (cb2[lightIndex_5].w * 0.939999998);
+                lightingTempB.w = 1.0 / (cb2[lightIndex_5].w * 0.0600000024);
+                lightingTempA.w = saturate(lightingTempB.w * lightingTempA.w);
+                lightingTempB.w = lightingTempA.w * -2.0 + 3.0;
+                lightingTempA.w = lightingTempA.w * lightingTempA.w;
+                lightingTempA.w = min(1.0, lightingTempB.w * lightingTempA.w);
+
+                lightLoopTempE.xyz = cb2[lightIndex_6].xyz * lightingTempC.xyz;
+                lightLoopTempC.xzw = baseColor_and_Depth.xyz * cb2[lightIndex_5].xyz - lightLoopTempE.xyz;
+                lightLoopTempC.xzw = lightingTempA.www * lightLoopTempC.xzw + lightLoopTempE.xyz;
+                lightLoopTempC.xzw = cb2[shadingInfo_and_Temp.z].xxx * lightLoopTempC.xzw;
+
+                shadingInfo_and_Temp.w = dot(lightLoopTempA.xyz, lightLoopTempA.xyz);
+                shadingInfo_and_Temp.w = shadingInfo_and_Temp.w * cb2[lightIndex_4].x + cb2[lightIndex_4].y;
+                shadingInfo_and_Temp.w = 1.0 / (9.99999975e-05 + shadingInfo_and_Temp.w);
+                shadingInfo_and_Temp.w = (shadingInfo_and_Temp.w - 1.0) * cb2[lightIndex_4].z;
+                shadingInfo_and_Temp.w = min(1.0, shadingInfo_and_Temp.w * shadingInfo_and_Temp.w);
+                
+                uint lightFlags = asuint(cb2[lightIndex_1].w) >> 16;
                 if (lightFlags == 2)
                 {
-                    float spotFactor = dot(lightVec, cb2[lightIndex_base + 1].xyz);
-                    spotFactor = saturate(cb2[lightIndex_base + 2].y * (spotFactor - cb2[lightIndex_base + 2].x));
-                    spotFactor = spotFactor * spotFactor * spotFactor * spotFactor;
-                    currentLightFalloff = spotFactor * currentLightFalloff;
+                    lightingTempB.w = dot(lightLoopTempD.xyz, cb2[lightIndex_1].xyz);
+                    lightingTempB.w = saturate(cb2[lightIndex_2].y * (lightingTempB.w - cb2[lightIndex_2].x));
+                    lightingTempB.w = lightingTempB.w * lightingTempB.w;
+                    lightingTempB.w = lightingTempB.w * lightingTempB.w;
+                    shadingInfo_and_Temp.w = lightingTempB.w * shadingInfo_and_Temp.w;
                 }
                 
-                float subsurf_final = (subsurf_fresnel * saturate(NdotL * 0.5 + 0.5)) - finalSubsurfScatter;
-                subsurf_final = cb2[lightIndex_base + 4].w * subsurf_final + finalSubsurfScatter;
-                float3 lightColor_direct_base = cb2[lightIndex_base + 3].www * shadowColor;
-                float3 lightColor_indirect = baseColor - lightColor_direct_base;
-                float3 lightColor_direct = subsurf_final * lightColor_indirect + lightColor_direct_base;
-                lightColor_direct = cb2[lightIndex_base + 3].xyz * lightColor_direct;
+                lightingTempA.w = saturate(dot(lightingTempB.xyz, lightLoopTempD.xyz) * 0.5 + 0.5);
+                lightingTempA.w = gbufferData_and_Temp.w * lightingTempA.w - gbufferData_and_Temp.x;
+                lightingTempA.w = cb2[lightIndex_4].w * lightingTempA.w + gbufferData_and_Temp.x;
+
+                lightLoopTempA.xyz = cb2[lightIndex_3].www * lightLoopTempC.xzw;
+                lightLoopTempB.xyw = -lightLoopTempC.xzw * cb2[lightIndex_3].www + baseColor_and_Depth.xyz;
+                lightLoopTempA.xyz = lightingTempA.www * lightLoopTempB.xyw + lightLoopTempA.xyz;
+                lightLoopTempA.xyz = cb2[lightIndex_3].xyz * lightLoopTempA.xyz;
                 
-                float totalLightIntensity = cb2[lightIndex_base + 3].x + cb2[lightIndex_base + 3].y + cb2[lightIndex_base + 3].z + cb2[lightDataIndex].x;
-                float lightIntensityFactor = saturate(10.0 * totalLightIntensity);
-                float visibilityTerm = cb2[lightDataIndex].y * lightIntensityFactor;
-
-                float3 finalLightColor_this_loop = (lightColor_direct + lightColor_direct_base) * currentLightFalloff;
-
-                currentLightFalloff = lightAttenFresnel - currentLightFalloff;
-                currentLightFalloff = cb2[lightIndex_base + 6].w * currentLightFalloff + currentLightFalloff;
-                lightAccumulator = finalLightColor_this_loop * lightLoopFalloff + lightAccumulator;
-                visibilityTerm = 1.0 - (currentLightFalloff * visibilityTerm);
-                lightLoopFalloff = visibilityTerm * lightLoopFalloff;
+                lightingTempA.w = cb2[lightIndex_3].x + cb2[lightIndex_3].y + cb2[lightIndex_3].z + cb2[shadingInfo_and_Temp.z].x;
+                lightingTempA.w = saturate(10.0 * lightingTempA.w);
+                shadingInfo_and_Temp.z = cb2[shadingInfo_and_Temp.z].y * lightingTempA.w;
+                
+                lightLoopTempB.xyz = lightLoopTempC.xzw * shadingInfo_and_Temp.www;
+                lightLoopTempA.xyz = lightLoopTempA.xyz * shadingInfo_and_Temp.www + lightLoopTempB.xyz;
+                
+                worldNormal_and_WorldPos.w = worldNormal_and_WorldPos.w - shadingInfo_and_Temp.w;
+                shadingInfo_and_Temp.w = cb2[lightIndex_6].w * worldNormal_and_WorldPos.w + shadingInfo_and_Temp.w;
+                
+                accumulatedLightColor.xyz = lightLoopTempA.xyz * materialParams_and_Lighting.www + accumulatedLightColor.xyz;
+                shadingInfo_and_Temp.z = -shadingInfo_and_Temp.w * shadingInfo_and_Temp.z + 1.0;
+                materialParams_and_Lighting.w = shadingInfo_and_Temp.z * materialParams_and_Lighting.w;
             }
         }
-        lightLoopCounter = lightLoopCounter + 1;
+        customDataA_and_Temp.x = (int)customDataA_and_Temp.x + 1;
     }
     
-    float3 preSssLighting = lightLoopFalloff * finalSpecular + lightAccumulator;
+    shadingInfo_and_Temp.yzw = materialParams_and_Lighting.www * shadingModelFlags_and_Temp.xyw + accumulatedLightColor.xyz;
+    gbufferData_and_Temp.x = ((int)shadingInfo_and_Temp.x != 13) ? 1.0 : 0.0;
     
-    float3 sssColor = float3(0.0, 0.0, 0.0);
-    float reprojected_fresnel = finalSubsurfTerm;
-    
-    float isNotEyeShadingModel = (shadingModelBitfields.x != 13) ? 1.0 : 0.0;
-    if (isNotEyeShadingModel != 0.0)
+    if (gbufferData_and_Temp.x != 0.0)
     {
-        float isSubsurfaceProfileModel = (shadingModelBitfields.x == 1) ? 1.0 : 0.0;
+        gbufferData_and_Temp.x = ((int)shadingInfo_and_Temp.x == 1) ? 1.0 : 0.0;
+        gbufferData_and_Temp.x = gbufferData_and_Temp.x ? customDataA_and_Temp.z : customDataA_and_Temp.y;
         
-        float scatterRadius = isSubsurfaceProfileModel ? customDataA_and_Temp.z : customDataA_and_Temp.y;
+        customDataA_and_Temp.xyz = cb1[67].xyz - worldNormal_and_WorldPos.xyz;
+        gbufferData_and_Temp.w = rsqrt(dot(customDataA_and_Temp.xyz, customDataA_and_Temp.xyz));
+        customDataA_and_Temp.xyz = customDataA_and_Temp.xyz * gbufferData_and_Temp.www;
         
-        float3 viewVec = cb1[67].xyz - worldPos;
-        float viewVecLengthInv = rsqrt(dot(viewVec, viewVec));
-        viewVec = viewVec * viewVecLengthInv;
-        float scatterRadiusClamped = saturate(scatterRadius - 0.100000001);
-        scatterRadius = saturate(10.0 * scatterRadius);
-        float scatterPower = scatterRadiusClamped * 2000.0 + 50.0;
-        float scatterKernelSize = scatterRadiusClamped + scatterRadiusClamped;
-        scatterRadius = cb0[0].x * scatterRadius;
-        scatterRadius = scatterRadius * 0.800000012 + scatterKernelSize;
-        float3x3 tangentToWorld = float3x3(cb1[20].xyz, cb1[21].xyz, cb1[22].xyz);
-        float3 worldNormalFromTangent = mul(normalizedWorldNormal, tangentToWorld);
+        gbufferData_and_Temp.w = saturate(gbufferData_and_Temp.x - 0.100000001);
+        gbufferData_and_Temp.x = saturate(10.0 * gbufferData_and_Temp.x);
         
-        bool useStaticLighting = (asint(cb0[0].w) > 0);
-        viewVec = useStaticLighting ? float3(0.0, 0.0, 0.0) : viewVec;
-        float3 lightDir = useStaticLighting ? float3(cb0[0].yz, 0.5) : cb1[264].xyz;
-        worldNormalFromTangent = useStaticLighting ? worldNormalFromTangent : normalizedWorldNormal;
+        materialParams_and_Lighting.w = gbufferData_and_Temp.w * 2000.0 + 50.0;
+        shadingInfo_and_Temp.x = gbufferData_and_Temp.w + gbufferData_and_Temp.w;
+        gbufferData_and_Temp.x = cb0[0].x * gbufferData_and_Temp.x;
+        gbufferData_and_Temp.x = gbufferData_and_Temp.x * 0.800000012 + shadingInfo_and_Temp.x;
         
-        float NdotL_final = dot(lightDir, worldNormalFromTangent);
-        float NdotL_remap = saturate(5.0 * (0.200000003 + NdotL_final));
-        float NdotL_fresnel = (NdotL_remap * -2.0 + 3.0) * (NdotL_remap * NdotL_remap);
+        shadingModelFlags_and_Temp.xyw = materialParams_and_Lighting.yyy * cb1[21].xyz;
+        shadingModelFlags_and_Temp.xyw = materialParams_and_Lighting.xxx * cb1[20].xyz + shadingModelFlags_and_Temp.xyw;
+        shadingModelFlags_and_Temp.xyw = materialParams_and_Lighting.zzz * cb1[22].xyz + shadingModelFlags_and_Temp.xyw;
         
-        float3 halfVec = normalize(lightDir + viewVec);
-        float NdotH = saturate(dot(worldNormalFromTangent, halfVec));
-        float NdotH_sq = NdotH * NdotH;
-        float specTerm = (NdotH_sq * -0.800000012 + 1.0);
-        specTerm = specTerm * specTerm;
-        specTerm = 0.200000003 / (3.14159274 * specTerm);
-        specTerm = specTerm * scatterRadiusClamped;
+        shadingInfo_and_Temp.x = (asint(cb0[0].w) > 0) ? 1.0 : 0.0;
+        customDataA_and_Temp.xyz = shadingInfo_and_Temp.xxx ? float3(0.0, 0.0, 0.0) : customDataA_and_Temp.xyz;
+        worldNormal_and_WorldPos.xy = shadingInfo_and_Temp.xx ? cb0[0].yz : cb1[264].xy;
+        worldNormal_and_WorldPos.z = shadingInfo_and_Temp.x ? 0.5 : cb1[264].z;
+        materialParams_and_Lighting.xyz = shadingInfo_and_Temp.xxx ? shadingModelFlags_and_Temp.xyw : materialParams_and_Lighting.xyz;
         
-        float LdotV = dot(lightDir, viewVec);
-        float LdotV_remap = saturate((LdotV + LdotV) - 1.0 + 1.0);
-        float LdotV_fresnel = (LdotV_remap * -2.0 + 3.0) * (LdotV_remap * LdotV_remap) + 1.0;
+        shadingInfo_and_Temp.x = dot(worldNormal_and_WorldPos.xyz, materialParams_and_Lighting.xyz);
         
-        float VdotN = saturate(dot(viewVec, worldNormalFromTangent));
-        float schlick_V = max(0.0, 0.800000012 - VdotN);
-        float screen_space_subsurf_falloff = min(1.74532926, max(0.0, cb1[133].x));
-        float2 schlick_and_falloff = float2(schlick_V, screen_space_subsurf_falloff) * float2(1.5, 0.572957814);
+        lightingTempB.xy = float2(0.200000003, 1.0) + shadingInfo_and_Temp.xx;
+        shadingInfo_and_Temp.x = saturate(5.0 * lightingTempB.x);
+        shadingModelFlags_and_Temp.w = shadingInfo_and_Temp.x * -2.0 + 3.0;
+        shadingInfo_and_Temp.x = shadingInfo_and_Temp.x * shadingInfo_and_Temp.x;
+        shadingInfo_and_Temp.x = shadingModelFlags_and_Temp.w * shadingInfo_and_Temp.x;
         
-        float depth_clamped = max(0.0, depth);
-        float2 depth_remap_vals = min(float2(3000.0, 50.0), float2(depth_clamped, depth_clamped));
-        depth_remap_vals = (float2(3000.0, 50.0) - depth_remap_vals) * float2(0.00033333333, 0.0199999996);
-        float depth_falloff = depth_remap_vals.x * depth_remap_vals.x;
-        depth_falloff = depth_falloff * depth_falloff;
-        depth_falloff = depth_falloff * depth_falloff + depth_remap_vals.y;
+        lightingTempB.xzw = worldNormal_and_WorldPos.xyz + customDataA_and_Temp.xyz;
+        shadingModelFlags_and_Temp.w = rsqrt(dot(lightingTempB.xzw, lightingTempB.xzw));
+        lightingTempB.xzw = lightingTempB.xzw * shadingModelFlags_and_Temp.www;
+        shadingModelFlags_and_Temp.w = saturate(dot(materialParams_and_Lighting.xyz, lightingTempB.xzw));
+        shadingModelFlags_and_Temp.w = shadingModelFlags_and_Temp.w * shadingModelFlags_and_Temp.w;
+        shadingModelFlags_and_Temp.w = shadingModelFlags_and_Temp.w * -0.800000012 + 1.0;
+        shadingModelFlags_and_Temp.w = shadingModelFlags_and_Temp.w * shadingModelFlags_and_Temp.w;
+        shadingModelFlags_and_Temp.w = 0.200000003 / (3.14159274 * shadingModelFlags_and_Temp.w);
+        shadingModelFlags_and_Temp.w = shadingModelFlags_and_Temp.w * customDataA_and_Temp.w;
+
+        worldNormal_and_WorldPos.x = dot(worldNormal_and_WorldPos.xyz, customDataA_and_Temp.xyz);
+        worldNormal_and_WorldPos.x = saturate((worldNormal_and_WorldPos.x + worldNormal_and_WorldPos.x));
+        worldNormal_and_WorldPos.z = worldNormal_and_WorldPos.x * -2.0 + 3.0;
+        worldNormal_and_WorldPos.x = worldNormal_and_WorldPos.x * worldNormal_and_WorldPos.x;
+        worldNormal_and_WorldPos.x = worldNormal_and_WorldPos.z * worldNormal_and_WorldPos.x + 1.0;
+
+        materialParams_and_Lighting.x = max(0.0, 0.800000012 - saturate(dot(customDataA_and_Temp.xyz, materialParams_and_Lighting.xyz)));
+        materialParams_and_Lighting.y = min(1.74532926, max(0.0, cb1[133].x));
+        materialParams_and_Lighting.xy = float2(1.5, 0.572957814) * materialParams_and_Lighting.xy;
+
+        materialParams_and_Lighting.z = max(0.0, baseColor_and_Depth.w);
+        customDataA_and_Temp.xy = float2(3000.0, 50.0) - min(float2(3000.0, 50.0), materialParams_and_Lighting.zz);
+        customDataA_and_Temp.xy = float2(0.00033333333, 0.0199999996) * customDataA_and_Temp.xy;
+        materialParams_and_Lighting.z = customDataA_and_Temp.x * customDataA_and_Temp.x;
+        materialParams_and_Lighting.z = materialParams_and_Lighting.z * materialParams_and_Lighting.z;
+        materialParams_and_Lighting.z = materialParams_and_Lighting.z * materialParams_and_Lighting.z + customDataA_and_Temp.y;
         
-        float sss_profile_lerp = (depth_falloff - 1.0) * schlick_and_falloff.y + 1.0;
-        float sss_profile_final = (1.0 - sss_profile_lerp) * scatterRadiusClamped + sss_profile_lerp;
+        materialParams_and_Lighting.y = materialParams_and_Lighting.y * (materialParams_and_Lighting.z - 1.0) + 1.0;
+        materialParams_and_Lighting.y = gbufferData_and_Temp.w * (1.0 - materialParams_and_Lighting.y) + materialParams_and_Lighting.y;
+
+        materialParams_and_Lighting.z = lightingTempB.y * 0.25 + 0.5;
+        materialParams_and_Lighting.x = materialParams_and_Lighting.z * materialParams_and_Lighting.x;
+        materialParams_and_Lighting.x = materialParams_and_Lighting.x * materialParams_and_Lighting.y;
+        materialParams_and_Lighting.x = materialParams_and_Lighting.x * worldNormal_and_WorldPos.x;
+        materialParams_and_Lighting.x = 0.00999999978 * materialParams_and_Lighting.x;
         
-        float schlick_final = (NdotL_final * 0.25 + 0.5) * schlick_and_falloff.x;
-        schlick_final = schlick_final * sss_profile_final;
-        schlick_final = schlick_final * LdotV_fresnel;
-        schlick_final = 0.00999999978 * schlick_final;
+        customDataA_and_Temp.xy = materialParams_and_Lighting.xy * materialParams_and_Lighting.xy + 9.99999975e-05;
+        materialParams_and_Lighting.z = rsqrt(dot(customDataA_and_Temp.xy, float2(1.0, 1.0)));
+        customDataA_and_Temp.xy = materialParams_and_Lighting.xy * materialParams_and_Lighting.zz;
+        customDataA_and_Temp.xy = customDataA_and_Temp.xy * gbufferData_and_Temp.xx;
         
-        float2 worldNormalXY_sq_plus_eps = worldNormalFromTangent.xy * worldNormalFromTangent.xy + 9.99999975e-05;
-        float rsqrt_normal_xy = rsqrt(dot(worldNormalXY_sq_plus_eps, float2(1.0, 1.0)));
-        float2 normal_xy_normalized = worldNormalFromTangent.xy * rsqrt_normal_xy;
-        normal_xy_normalized = normal_xy_normalized * scatterRadius;
+        customDataA_and_Temp.z = customDataA_and_Temp.y * materialParams_and_Lighting.x;
+        materialParams_and_Lighting.y = -0.5;
+        materialParams_and_Lighting.xy = customDataA_and_Temp.xz * materialParams_and_Lighting.xy;
         
-        float sss_lobe_y = schlick_final * normal_xy_normalized.y;
-        float2 sss_lobes = float2(sss_lobe_y, -0.5) * float2(normal_xy_normalized.x, sss_lobe_y);
+        customDataA_and_Temp.xy = screenUV.xy * cb1[138].xy - cb1[134].xy;
+        materialParams_and_Lighting.xy = customDataA_and_Temp.xy * cb1[135].zw + materialParams_and_Lighting.xy;
+        materialParams_and_Lighting.xy = materialParams_and_Lighting.xy * cb1[135].xy + cb1[134].xy;
+        materialParams_and_Lighting.xy = cb1[138].zw * materialParams_and_Lighting.xy;
         
-        float2 uv_offset = (screenUV.xy * cb1[138].xy - cb1[134].xy) * cb1[135].zw + sss_lobes;
-        float2 final_uv = (uv_offset * cb1[135].xy + cb1[134].xy) * cb1[138].zw;
+        float reprojectedDepth = tex2D(_IN6, materialParams_and_Lighting.xy).x;
+        float reprojectedViewDepth = reprojectedDepth * cb1[65].x + cb1[65].y;
+        reprojectedDepth = 1.0 / (reprojectedDepth * cb1[65].z - cb1[65].w);
+        reprojectedViewDepth = reprojectedViewDepth + reprojectedDepth;
         
-        float reprojectedDepth_raw = tex2D(_IN6, final_uv).x;
-        float reprojectedViewDepth_temp = reprojectedDepth_raw * cb1[65].x + cb1[65].y;
-        reprojectedDepth_raw = 1.0 / (reprojectedDepth_raw * cb1[65].z - cb1[65].w);
-        float reprojectedViewDepth = reprojectedViewDepth_temp + reprojectedDepth_raw;
+        reprojectedDepth = max(9.99999975e-05, reprojectedViewDepth - baseColor_and_Depth.w);
+        gbufferData_and_Temp.w = saturate((reprojectedDepth - gbufferData_and_Temp.w * 1000.0) / materialParams_and_Lighting.w);
+        reprojectedDepth = gbufferData_and_Temp.w * -2.0 + 3.0;
+        gbufferData_and_Temp.w = gbufferData_and_Temp.w * gbufferData_and_Temp.w;
+        gbufferData_and_Temp.w = min(1.0, reprojectedDepth * gbufferData_and_Temp.w);
         
-        float depth_diff = max(9.99999975e-05, reprojectedViewDepth - depth);
-        float reprojected_falloff = saturate((depth_diff - scatterRadiusClamped * 1000.0) / scatterPower);
-        float reprojected_fresnel_temp = (reprojected_falloff * -2.0 + 3.0) * (reprojected_falloff * reprojected_falloff);
-        reprojected_fresnel = min(1.0, reprojected_fresnel_temp);
+        materialParams_and_Lighting.x = dot(cb1[263].xyz, float3(0.300000012, 0.589999974, 0.109999999));
+        materialParams_and_Lighting.yzw = cb1[263].xyz - materialParams_and_Lighting.xxx;
+        materialParams_and_Lighting.xyz = materialParams_and_Lighting.yzw * 0.75 + materialParams_and_Lighting.xxx;
+        customDataA_and_Temp.xyz = cb1[263].xyz - materialParams_and_Lighting.xyz;
+        materialParams_and_Lighting.xyz = gbufferData_and_Temp.www * customDataA_and_Temp.xyz + materialParams_and_Lighting.xyz;
+        materialParams_and_Lighting.xyz = materialParams_and_Lighting.xyz * gbufferData_and_Temp.xxx;
+        materialParams_and_Lighting.xyz = 0.100000001 * materialParams_and_Lighting.xyz;
         
-        float ambient_luma = dot(cb1[263].xyz, float3(0.300000012, 0.589999974, 0.109999999));
-        float3 ambient_color = (cb1[263].xyz - ambient_luma) * 0.75 + ambient_luma;
-        ambient_color = reprojected_fresnel * (cb1[263].xyz - ambient_color) + ambient_color;
-        ambient_color = ambient_color * scatterRadius;
-        ambient_color = ambient_color * 0.100000001;
-        float3 ambient_base = (1.0 + baseColor) * ambient_color;
-        float3 spec_highlight_mask = saturate((baseColor * 1.20000005) - 1.0);
-        float3 spec_highlight_factor = (spec_highlight_mask * -2.0 + 3.0) * (spec_highlight_mask * spec_highlight_mask);
-        spec_highlight_factor = spec_highlight_factor * 14.0 + 1.0;
-        ambient_color = spec_highlight_factor * ambient_color;
-        ambient_color = (ambient_color * baseColor) - ambient_base;
-        ambient_color = cb1[260].zzz * ambient_color + ambient_base;
-        ambient_color = ambient_color * reprojected_fresnel;
+        customDataA_and_Temp.xyz = (1.0 + baseColor_and_Depth.xyz) * materialParams_and_Lighting.xyz;
+        shadingModelFlags_and_Temp.xyw = saturate(baseColor_and_Depth.xyz * 1.20000005 - 1.0);
+        worldNormal_and_WorldPos.xyz = shadingModelFlags_and_Temp.xyw * -2.0 + 3.0;
+        shadingModelFlags_and_Temp.xyw = shadingModelFlags_and_Temp.xyw * shadingModelFlags_and_Temp.xyw;
+        shadingModelFlags_and_Temp.xyw = worldNormal_and_WorldPos.xyz * shadingModelFlags_and_Temp.xyw;
+        shadingModelFlags_and_Temp.xyw = shadingModelFlags_and_Temp.xyw * 14.0 + 1.0;
         
-        float fog_factor = 0.000199999995 * (5000.0 - min(5000.0, max(0.0, depth - 10000.0)));
-        ambient_color = fog_factor * ambient_color;
-        sssColor = cb0[1].xyz * ambient_color;
+        materialParams_and_Lighting.xyz = shadingModelFlags_and_Temp.xyw * materialParams_and_Lighting.xyz;
+        materialParams_and_Lighting.xyz = materialParams_and_Lighting.xyz * baseColor_and_Depth.xyz - customDataA_and_Temp.xyz;
+        materialParams_and_Lighting.xyz = cb1[260].zzz * materialParams_and_Lighting.xyz + customDataA_and_Temp.xyz;
+        materialParams_and_Lighting.xyz = materialParams_and_Lighting.xyz * gbufferData_and_Temp.www;
+        
+        gbufferData_and_Temp.x = 0.000199999995 * (5000.0 - min(5000.0, max(0.0, baseColor_and_Depth.w - 10000.0)));
+        materialParams_and_Lighting.xyz = gbufferData_and_Temp.xxx * materialParams_and_Lighting.xyz;
+        materialParams_and_Lighting.xyz = cb0[1].xyz * materialParams_and_Lighting.xyz;
+    }
+    else
+    {
+        materialParams_and_Lighting.xyz = float3(0.0, 0.0, 0.0);
     }
     
-    float3 baseLighting = preSssLighting * initialLighting;
-    baseLighting = cb1[263].xyz * baseLighting;
-    baseLighting = (baseLighting * 0.5) - preSssLighting;
-    baseLighting = reprojected_fresnel * baseLighting + preSssLighting;
+    gbufferData_and_Temp.x = (shadingModelFlags_and_Temp.z != 0.0) ? 1.0 : 0.0;
     
-    float3 finalCompositedColor = preSssLighting + sssColor;
-
-    finalCompositedColor = (specialShadingModelFlags.z != 0.0) ? baseLighting : finalCompositedColor;
-
-    float3 finalColorXYZ = isShadingModel_5 ? preSssLighting : finalCompositedColor;
+    baseColor_and_Depth.xyz = shadingInfo_and_Temp.yzw * lightingTempA.xyz;
+    baseColor_and_Depth.xyz = cb1[263].xyz * baseColor_and_Depth.xyz;
+    baseColor_and_Depth.xyz = baseColor_and_Depth.xyz * 0.5 - shadingInfo_and_Temp.yzw;
+    baseColor_and_Depth.xyz = gbufferData_and_Temp.www * baseColor_and_Depth.xyz + shadingInfo_and_Temp.yzw;
     
-    finalColorXYZ = finalColorXYZ / aoFactor;
+    materialParams_and_Lighting.xyz = shadingInfo_and_Temp.yzw + materialParams_and_Lighting.xyz;
+    materialParams_and_Lighting.xyz = gbufferData_and_Temp.xxx ? baseColor_and_Depth.xyz : materialParams_and_Lighting.xyz;
     
-    finalColorXYZ = min(float3(0.0, 0.0, 0.0), -finalColorXYZ);
+    gbufferData_and_Temp.xzw = gbufferData_and_Temp.zzz ? shadingInfo_and_Temp.yzw : materialParams_and_Lighting.xyz;
     
-    float4 finalColor;
-    finalColor.xyz = -finalColorXYZ;
-    finalColor.w = 0.0;
+    gbufferData_and_Temp.xyz = gbufferData_and_Temp.xzw / gbufferData_and_Temp.yyy;
+    gbufferData_and_Temp.xyz = min(float3(0.0, 0.0, 0.0), -gbufferData_and_Temp.xyz);
     
+    finalColor.xyz = -gbufferData_and_Temp.xyz;
     return finalColor;
 }
             ENDCG

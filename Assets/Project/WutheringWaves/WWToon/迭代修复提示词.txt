@@ -24,588 +24,632 @@
 A:float4 frag (VertexToFragment fragmentInput) : SV_Target
 {
     float4 screenUV = float4(fragmentInput.uv.xy, 0.0, 0.0);
+    
+    float4 finalColor = float4(0.0, 0.0, 0.0, 0.0);
 
-    float4 gbufferNormalSample_raw = tex2Dlod(_IN1, float4(screenUV.xy, 0, 0)).wxyz;
-    float perObjectData = gbufferNormalSample_raw.x;
-    float3 gbuffer_normal = gbufferNormalSample_raw.yzw;
-    
-    float4 materialParams_and_Temp = tex2Dlod(_IN2, float4(screenUV.xy, 0, 0));
-    float3 msr = materialParams_and_Temp.xyz;
-    float shadingModelID_raw = materialParams_and_Temp.w;
-    
-    float3 baseColor = tex2Dlod(_IN3, float4(screenUV.xy, 0, 0)).xyz;
-    
+    float4 gbufferData_and_Temp;
+    float4 materialParams_and_Lighting;
+    float4 baseColor_and_Depth;
     float4 customDataA_and_Temp;
+    float4 shadingInfo_and_Temp;
+    float4 shadingModelFlags_and_Temp;
+    float4 worldNormal_and_WorldPos;
+    float4 lightingTempA;
+    float4 lightingTempB;
+    float4 lightingTempC;
+    float4 accumulatedLightColor;
+    float4 lightLoopTempA;
+    float4 lightLoopTempB;
+    float4 lightLoopTempC;
+    float4 lightLoopTempD;
+    float4 lightLoopTempE;
+    float4 lightLoopTempF;
+
+    gbufferData_and_Temp.xyzw = tex2Dlod(_IN1, float4(screenUV.xy, 0, 0)).wxyz;
+    materialParams_and_Lighting.xyzw = tex2Dlod(_IN2, float4(screenUV.xy, 0, 0)).xyzw;
+    baseColor_and_Depth.xyz = tex2Dlod(_IN3, float4(screenUV.xy, 0, 0)).xyz;
     customDataA_and_Temp.xyz = tex2Dlod(_IN4, float4(screenUV.xy, 0, 0)).yxz;
-    
-    float depth = tex2Dlod(_IN0, float4(screenUV.xy, 0, 0)).x;
-    
-    customDataA_and_Temp.w = depth * cb1[65].x + cb1[65].y;
-    float linearizedDepth_part1 = depth * cb1[65].z - cb1[65].w;
-    float linearizedDepth_part2 = 1.0 / linearizedDepth_part1;
-    depth = customDataA_and_Temp.w + linearizedDepth_part2;
-    
-    float2 tileCoords = cb1[138].xy * screenUV.xy;
-    tileCoords = (uint2)tileCoords;
-    float cb158 = (uint)cb1[158].x;
-    float tileCoordsSum = (int)tileCoords.y + (int)tileCoords.x;
-    cb158 = (int)cb158 + (int)tileCoordsSum;
-    float isOddPixel = (int)cb158 & 1;
 
-    float shadingModelID_rounded = round(255.0 * shadingModelID_raw);
-    uint uintShadingModelID = (uint)shadingModelID_rounded;
-    int2 shadingModelBitfields = (int2)uintShadingModelID & int2(15, -16);
+    baseColor_and_Depth.w = tex2Dlod(_IN0, float4(screenUV.xy, 0, 0)).x;
+    customDataA_and_Temp.w = baseColor_and_Depth.w * cb1[65].x + cb1[65].y;
+    baseColor_and_Depth.w = baseColor_and_Depth.w * cb1[65].z + -cb1[65].w;
+    baseColor_and_Depth.w = 1.0 / baseColor_and_Depth.w;
+    baseColor_and_Depth.w = customDataA_and_Temp.w + baseColor_and_Depth.w;
     
-    float isNotClothShadingModel = (shadingModelBitfields.x != 12) ? 1.0 : 0.0;
-    float3 specialShadingModelFlags = (shadingModelBitfields.xxx == int3(13, 14, 15)) ? 1.0 : 0.0;
-    float isSpecialModel_yz = (int)specialShadingModelFlags.y | (int)specialShadingModelFlags.z;
-    float isAnySpecialModel = (int)isSpecialModel_yz | (int)specialShadingModelFlags.x;
-    float shadingModelOverride = isNotClothShadingModel ? isAnySpecialModel : -1.0;
+    shadingInfo_and_Temp.xy = cb1[138].xy * screenUV.xy;
+    shadingInfo_and_Temp.xy = (uint2)shadingInfo_and_Temp.xy;
+    customDataA_and_Temp.w = (uint)cb1[158].x;
+    shadingInfo_and_Temp.x = (int)shadingInfo_and_Temp.y + (int)shadingInfo_and_Temp.x;
+    customDataA_and_Temp.w = (int)customDataA_and_Temp.w + (int)shadingInfo_and_Temp.x;
+    customDataA_and_Temp.w = (int)customDataA_and_Temp.w & 1;
 
-    float3 worldNormal;
-    float3 initialLighting;
-    float hairShadowingFactor = 0.0;
+    materialParams_and_Lighting.w = round(255.0 * materialParams_and_Lighting.w);
+    shadingInfo_and_Temp.xy = (int2)((uint)materialParams_and_Lighting.w) & int2(15, -16);
     
-    if (shadingModelOverride != 0.0)
+    materialParams_and_Lighting.w = ((int)shadingInfo_and_Temp.x != 12) ? 1.0 : 0.0;
+    shadingModelFlags_and_Temp.xyz = ((int3)shadingInfo_and_Temp.xxx == int3(13, 14, 15)) ? float3(1.0, 1.0, 1.0) : float3(0.0, 0.0, 0.0);
+    shadingInfo_and_Temp.z = (int)shadingModelFlags_and_Temp.z | (int)shadingModelFlags_and_Temp.y;
+    shadingInfo_and_Temp.z = (int)shadingInfo_and_Temp.z | (int)shadingModelFlags_and_Temp.x;
+    materialParams_and_Lighting.w = materialParams_and_Lighting.w ? shadingInfo_and_Temp.z : -1.0;
+    
+    if (materialParams_and_Lighting.w != 0.0)
     {
-        float unused_replicated_logic_1 = (specialShadingModelFlags.x != 0.0) ? 13.0 : 12.0;
-        float2 unused_replicated_logic_2 = (specialShadingModelFlags.y != 0.0 || specialShadingModelFlags.z != 0.0) ? float2(1.0, 1.0) : float2(0.0, 0.0);
-        
-        float2 encodedNormal = gbuffer_normal.xy * 2.0 - 1.0;
-        float encodedNormalAbsSum = dot(float2(1.0, 1.0), abs(encodedNormal));
-        float worldNormalZ_unpacked = 1.0 - encodedNormalAbsSum;
-        float worldNormalZ_clamped = max(0.0, worldNormalZ_unpacked);
-        float2 lightingSign = (encodedNormal >= float2(0.0, 0.0)) ? float2(1.0, 1.0) : float2(0.0, 0.0);
-        float2 lightingOffset = lightingSign ? float2(0.5, 0.5) : float2(-0.5, -0.5);
-        lightingOffset = lightingOffset * worldNormalZ_clamped;
-        float2 worldNormalXY_unpacked = lightingOffset * -2.0 + encodedNormal;
-        worldNormal = float3(worldNormalXY_unpacked.x, worldNormalXY_unpacked.y, worldNormalZ_unpacked);
-        float worldNormalLengthInv = rsqrt(dot(worldNormal, worldNormal));
-        worldNormal = worldNormal * worldNormalLengthInv;
+        shadingInfo_and_Temp.x = shadingModelFlags_and_Temp.x ? 13.0 : 12.0;
+        shadingModelFlags_and_Temp.xz = shadingModelFlags_and_Temp.yz ? float2(1.0, 1.0) : float2(0.0, 0.0);
 
-        initialLighting = msr * msr;
-        hairShadowingFactor = customDataA_and_Temp.z;
+        shadingInfo_and_Temp.zw = gbufferData_and_Temp.yz * 2.0 - 1.0;
+        materialParams_and_Lighting.w = dot(float2(1.0, 1.0), abs(shadingInfo_and_Temp.zw));
+        worldNormal_and_WorldPos.z = 1.0 - materialParams_and_Lighting.w;
+        materialParams_and_Lighting.w = max(0.0, -worldNormal_and_WorldPos.z);
+        
+        lightingTempA.xy = (shadingInfo_and_Temp.zw >= float2(0.0, 0.0)) ? float2(1.0, 1.0) : float2(0.0, 0.0);
+        lightingTempA.xy = lightingTempA.xy ? float2(0.5, 0.5) : float2(-0.5, -0.5);
+        lightingTempA.xy = lightingTempA.xy * materialParams_and_Lighting.ww;
+        worldNormal_and_WorldPos.xy = lightingTempA.xy * -2.0 + shadingInfo_and_Temp.zw;
+        
+        materialParams_and_Lighting.w = dot(worldNormal_and_WorldPos.xyz, worldNormal_and_WorldPos.xyz);
+        materialParams_and_Lighting.w = rsqrt(materialParams_and_Lighting.w);
+        worldNormal_and_WorldPos.xyz = worldNormal_and_WorldPos.xyz * materialParams_and_Lighting.www;
+        
+        lightingTempA.xyz = materialParams_and_Lighting.xyz * materialParams_and_Lighting.xyz;
+        shadingModelFlags_and_Temp.y = customDataA_and_Temp.z;
     }
     else
     {
-        float isClearCoatModel = (shadingModelBitfields.x == 10) ? 1.0 : 0.0;
-        if (isClearCoatModel != 0.0)
-        {
-            float3 saturated_msr = saturate(msr);
-            float3 scaled_msr = float3(16777215.0, 65535.0, 255.0) * saturated_msr;
-            uint3 rounded_msr = (uint3)round(scaled_msr);
-            
-            uint packed_val_y = rounded_msr.y;
-            uint packed_val_z = rounded_msr.z;
-            packed_val_y = ((packed_val_z) & 0xff) | (packed_val_y & ~0xff);
-            
-            uint packed_val_x = rounded_msr.x;
-            packed_val_x = ((packed_val_y) & 0xffff) | (packed_val_x & ~0xffff);
-
-            float packed_depth_float = 5.96046519e-08 * (float)packed_val_x;
-            float linear_depth_temp = packed_depth_float * cb1[65].x + cb1[65].y;
-            float linear_depth_p1 = packed_depth_float * cb1[65].z - cb1[65].w;
-            float linear_depth_p2 = 1.0 / linear_depth_p1;
-            float final_packed_depth = linear_depth_temp + linear_depth_p2;
-            
-            depth = final_packed_depth;
-        }
-
-        worldNormal = gbuffer_normal * 2.0 - 1.0;
-        initialLighting = float3(0.0, 0.0, 0.0);
-        specialShadingModelFlags = float3(0.0, 0.0, 0.0);
-        perObjectData = 0.0;
-        gbufferNormalSample_raw.x = 0.0;
+        materialParams_and_Lighting.w = ((int)shadingInfo_and_Temp.x == 10) ? 1.0 : 0.0;
+        float3 clearCoatTemp = saturate(materialParams_and_Lighting.xyz);
+        clearCoatTemp = round(float3(16777215.0, 65535.0, 255.0) * clearCoatTemp);
+        uint3 clearCoatUint = (uint3)clearCoatTemp;
+        
+        clearCoatUint.y = (clearCoatUint.z & 0xff) | (clearCoatUint.y & ~0xff);
+        clearCoatUint.x = (clearCoatUint.y & 0xffff) | (clearCoatUint.x & ~0xffff);
+        
+        float packed_depth_float = 5.96046519e-08 * (float)clearCoatUint.x;
+        float linear_depth_temp = packed_depth_float * cb1[65].x + cb1[65].y;
+        float linear_depth_p1 = packed_depth_float * cb1[65].z - cb1[65].w;
+        float final_packed_depth = linear_depth_temp + (1.0 / linear_depth_p1);
+        
+        baseColor_and_Depth.w = materialParams_and_Lighting.w ? final_packed_depth : baseColor_and_Depth.w;
+        
+        worldNormal_and_WorldPos.xyz = gbufferData_and_Temp.yzw * 2.0 - 1.0;
+        lightingTempA.xyz = float3(0.0, 0.0, 0.0);
+        shadingModelFlags_and_Temp.xyz = float3(0.0, 0.0, 0.0);
+        gbufferData_and_Temp.xw = float2(0.0, 0.0);
         customDataA_and_Temp.xy = float2(0.0, 0.0);
     }
     
-    float worldNormalLengthRsqrt = rsqrt(dot(worldNormal, worldNormal));
-    float3 normalizedWorldNormal = worldNormal * worldNormalLengthRsqrt;
-
-    float isShadingModel_5 = (shadingModelBitfields.x == 5) ? 1.0 : 0.0;
-    float isShadingModel_13 = (shadingModelBitfields.x == 13) ? 1.0 : 0.0;
+    gbufferData_and_Temp.y = dot(worldNormal_and_WorldPos.xyz, worldNormal_and_WorldPos.xyz);
+    gbufferData_and_Temp.y = rsqrt(gbufferData_and_Temp.y);
+    materialParams_and_Lighting.xyz = worldNormal_and_WorldPos.xyz * gbufferData_and_Temp.yyy;
     
-    float hasValidFogData = (0.0 < cb1[162].y) ? 1.0 : 0.0;
-    float hasVolumetricFog = (0.0 < cb1[220].z) ? 1.0 : 0.0;
-    float useVolumetricFog = hasValidFogData ? hasVolumetricFog : 0.0;
-    float useDitheredLodTransition = (0.0 != cb1[162].y) ? 1.0 : 0.0;
+    gbufferData_and_Temp.yz = ((int2)shadingInfo_and_Temp.xx == int2(5, 13)) ? float2(1.0, 1.0) : float2(0.0, 0.0);
+    materialParams_and_Lighting.w = (0.0 < cb1[162].y) ? 1.0 : 0.0;
+    shadingInfo_and_Temp.z = (0.0 < cb1[220].z) ? 1.0 : 0.0;
+    materialParams_and_Lighting.w = materialParams_and_Lighting.w ? shadingInfo_and_Temp.z : 0.0;
+    shadingInfo_and_Temp.z = (0.0 != cb1[162].y) ? 1.0 : 0.0;
     
-    float3 processedBaseColor = useDitheredLodTransition ? float3(1.0, 1.0, 1.0) : baseColor;
-    float useOddPixelResult = isOddPixel ? 1.0 : 0.0;
-    processedBaseColor = useVolumetricFog ? useOddPixelResult.xxx : processedBaseColor;
-    baseColor = (worldNormalLengthRsqrt > 0.0) ? processedBaseColor : baseColor;
+    worldNormal_and_WorldPos.xyz = shadingInfo_and_Temp.zzz ? float3(1.0, 1.0, 1.0) : baseColor_and_Depth.xyz;
+    customDataA_and_Temp.w = customDataA_and_Temp.w ? 1.0 : 0.0;
+    worldNormal_and_WorldPos.xyz = materialParams_and_Lighting.www ? customDataA_and_Temp.www : worldNormal_and_WorldPos.xyz;
+    baseColor_and_Depth.xyz = gbufferData_and_Temp.yyy > 0.0 ? worldNormal_and_WorldPos.xyz : baseColor_and_Depth.xyz;
     
-    float aoFactor = tex2Dlod(_IN9, float4(0.0, 0.0, 0.0, 0.0)).x;
-
-    float3 worldPos = depth * cb1[50].xyz;
-    worldPos = (useDitheredLodTransition * cb1[48].xyz) + worldPos;
-    worldPos = cb1[51].xyz + worldPos;
-
-    float2 ssrParams = tex2Dlod(_IN5, float4(screenUV.xy, 0, 0)).xz;
-    float2 ssrParamsSq = ssrParams * ssrParams;
-    float ssrIntensity = ssrParamsSq.x * ssrParamsSq.y;
-
-    float ssrTerm_preBlend = cb1[253].y * ssrIntensity;
-
-    float3 indirectLightingResult;
-    float3 diffuseIBLBase;
+    gbufferData_and_Temp.y = tex2Dlod(_IN9, float4(0.0, 0.0, 0.0, 0.0)).x;
+    
+    shadingInfo_and_Temp.zw = screenUV.zw * baseColor_and_Depth.ww;
+    worldNormal_and_WorldPos.xyz = cb1[49].xyz * shadingInfo_and_Temp.www;
+    worldNormal_and_WorldPos.xyz = shadingInfo_and_Temp.zzz * cb1[48].xyz + worldNormal_and_WorldPos.xyz;
+    worldNormal_and_WorldPos.xyz = baseColor_and_Depth.www * cb1[50].xyz + worldNormal_and_WorldPos.xyz;
+    worldNormal_and_WorldPos.xyz = cb1[51].xyz + worldNormal_and_WorldPos.xyz;
+    
+    shadingInfo_and_Temp.zw = tex2Dlod(_IN5, float4(screenUV.xy, 0, 0)).xz;
+    shadingInfo_and_Temp.zw = shadingInfo_and_Temp.zw * shadingInfo_and_Temp.zw;
+    materialParams_and_Lighting.w = shadingInfo_and_Temp.z * shadingInfo_and_Temp.w;
+    customDataA_and_Temp.w = cb1[253].y * materialParams_and_Lighting.w;
     
     if (cb1[255].x != 0.0)
     {
-        float3 accumulatedGIBounceColor = float3(0.0, 0.0, 0.0);
-        float giRadius = 0.0;
-        float giTotalWeight = 0.0;
-        float giAngleCounter = 0.0;
+        lightingTempB.xyz = float3(0.0, 0.0, 0.0);
+        shadingInfo_and_Temp.z = 0.0;
+        shadingInfo_and_Temp.w = 0.0;
+        shadingModelFlags_and_Temp.w = 0.0;
+        worldNormal_and_WorldPos.w = 0.0;
         
-        for (int i = 0; i < 3; ++i)
+        while (true)
         {
-            float sampleRadius = 0.000833333295 + giRadius;
-            float3 currentLoopColor = accumulatedGIBounceColor;
-            float currentSampleAngle = giAngleCounter;
+            if (((int)shadingInfo_and_Temp.z >= 3)) break;
+
+            shadingInfo_and_Temp.w = 0.000833333295 + shadingInfo_and_Temp.w;
+            lightingTempC.xyz = lightingTempB.xyz;
+            lightingTempA.w = shadingModelFlags_and_Temp.w;
+            lightingTempB.w = worldNormal_and_WorldPos.w;
+            lightingTempC.w = 0.0;
             
-            for (int j = 0; j < 3; ++j)
+            while (true)
             {
-                currentSampleAngle = 1.0 + currentSampleAngle;
-                float angle_rad = 2.09439516 * currentSampleAngle;
-                float sin_a, cos_a;
-                sincos(angle_rad, sin_a, cos_a);
-                float2 sampleUV_offset = float2(cos_a, sin_a) * sampleRadius;
-                float2 sampleUV = screenUV.xy + sampleUV_offset;
-                float3 giSampleColor = tex2D(_IN7, sampleUV).xyz;
+                if (((int)lightingTempC.w >= 3)) break;
                 
-                currentLoopColor = giSampleColor * sampleRadius + currentLoopColor;
-                giTotalWeight = giTotalWeight + sampleRadius;
+                lightingTempA.w = 1.0 + lightingTempA.w;
+                float angle_rad = 2.09439516 * lightingTempA.w;
+                sincos(angle_rad, accumulatedLightColor.x, lightLoopTempA.x);
+                lightLoopTempA.xy = float2(lightLoopTempA.x, accumulatedLightColor.x) * shadingInfo_and_Temp.w + screenUV.xy;
+                accumulatedLightColor.xyz = tex2D(_IN7, lightLoopTempA.xy).xyz;
+                
+                lightingTempC.xyz = accumulatedLightColor.xyz * shadingInfo_and_Temp.www + lightingTempC.xyz;
+                lightingTempB.w = lightingTempB.w + shadingInfo_and_Temp.w;
+                lightingTempC.w = (int)lightingTempC.w + 1;
             }
-            accumulatedGIBounceColor = currentLoopColor;
-            giAngleCounter = 0.620000005 + currentSampleAngle;
-            giRadius = sampleRadius;
+            
+            lightingTempB.xyz = lightingTempC.xyz;
+            worldNormal_and_WorldPos.w = lightingTempB.w;
+            shadingModelFlags_and_Temp.w = 0.620000005 + lightingTempA.w;
+            shadingInfo_and_Temp.z = (int)shadingInfo_and_Temp.z + 1;
         }
-        
-        float3 finalGIColor = accumulatedGIBounceColor / giTotalWeight;
 
-        float3 perObjectMask_high = (float3(0.644999981, 0.312000006, 0.978999972) < perObjectData.xxx) ? 1.0 : 0.0;
-        float3 perObjectMask_low = (perObjectData.xxx < float3(0.685000002, 0.351999998, 1.02100003)) ? 1.0 : 0.0;
-        float3 perObjectMask = perObjectMask_high ? perObjectMask_low : 0.0;
-        float maskResult = perObjectMask.z ? 1.0 : 0.0;
-        maskResult = perObjectMask.y ? 0.0 : maskResult;
-        maskResult = perObjectMask.x ? 1.0 : maskResult;
-        
-        float isMaskYorZ = (int)perObjectMask.y | (int)perObjectMask.z;
-        float specularMask = (perObjectMask.x != 0.0) ? 0.0 : isMaskYorZ;
+        lightingTempB.xyz = lightingTempB.xyz / worldNormal_and_WorldPos.www;
 
-        float customData_rounded = round(255.0 * customDataA_and_Temp.x);
-        uint4 customDataMasks = (uint4)((uint)customData_rounded) & uint4(15, 240, 240, 15);
-        
-        float fresnelTerm_IBL = saturate(gbuffer_normal.z + gbuffer_normal.z);
-        float fresnel_factor1_IBL = fresnelTerm_IBL * -2.0 + 3.0;
-        fresnelTerm_IBL = fresnelTerm_IBL * fresnelTerm_IBL;
-        float roughness_from_normal = fresnel_factor1_IBL * fresnelTerm_IBL;
+        lightingTempC.xyz = (float3(0.644999981, 0.312000006, 0.978999972) < gbufferData_and_Temp.xxx) ? float3(1.0, 1.0, 1.0) : float3(0.0, 0.0, 0.0);
+        accumulatedLightColor.xyz = (gbufferData_and_Temp.xxx < float3(0.685000002, 0.351999998, 1.02100003)) ? float3(1.0, 1.0, 1.0) : float3(0.0, 0.0, 0.0);
+        lightingTempC.xyz = lightingTempC.xyz ? accumulatedLightColor.xyz : float3(0.0, 0.0, 0.0);
 
-        float roughness_term = saturate(gbuffer_normal.z * 2.0 - 0.5 * 2.0);
-        float roughness_factor = roughness_term * -2.0 + 3.0;
-        roughness_term = roughness_term * roughness_term;
-        float roughness_final = roughness_factor * roughness_term;
-        
-        float3 color_diff = cb1[262].xyz - cb1[261].xyz;
-        float luma = dot(abs(color_diff), float3(0.300000012, 0.589999974, 0.109999999));
-        float luma_scaled = min(1.0, 10.0 * luma);
-        float luma_factor = luma_scaled * -2.0 + 3.0;
-        luma_scaled = luma_scaled * luma_scaled;
-        float luma_fresnel = luma_factor * luma_scaled;
-        
-        float blended_roughness = luma_fresnel * roughness_final;
-        
-        float blend_range = cb1[265].y - cb1[265].x;
-        float blend_inv_range = 1.0 / blend_range;
-        float blend_val = ssrTerm_preBlend - cb1[265].x;
-        float blend_ratio = saturate(blend_val * blend_inv_range);
-        float blend_factor = blend_ratio * -2.0 + 3.0;
-        blend_ratio = blend_ratio * blend_ratio;
-        float blend_fresnel = blend_factor * blend_ratio;
-        
-        float final_blend = blend_fresnel * blended_roughness;
-        float ssr_term = ssrTerm_preBlend - final_blend;
-        float final_ssr = cb1[265].z * ssr_term + final_blend;
-        
-        float ssr_clamped = -cb1[265].x + final_ssr;
-        float ssr_ratio = saturate(ssr_clamped * blend_inv_range);
-        float ssr_factor = ssr_ratio * -2.0 + 3.0;
-        ssr_ratio = ssr_ratio * ssr_ratio;
-        float ssr_fresnel = ssr_factor * ssr_ratio;
-        blended_roughness = ssr_fresnel * blended_roughness;
-        
-        float combined_roughness = roughness_final * luma_fresnel - blended_roughness;
-        combined_roughness = cb1[265].z * combined_roughness + blended_roughness;
-        
-        float final_spec_occlusion = cb1[260].y * (final_ssr - 1.0) + 1.0;
-        float spec_ao_combined = aoFactor * combined_roughness - final_spec_occlusion;
-        final_spec_occlusion = specialShadingModelFlags.x * spec_ao_combined + final_spec_occlusion;
-        
-        float spec_ao_combined_2 = aoFactor * combined_roughness - combined_roughness;
-        float accumulatedLightColor_x = specialShadingModelFlags.x * spec_ao_combined_2 + combined_roughness;
-        
-        float3 hsv_modulated_color;
-        {
-            float hsv_check = (finalGIColor.y >= finalGIColor.z) ? 1.0 : 0.0;
-            float2 hsv_prep1 = finalGIColor.zy;
-            float4 hsv_consts1 = float4(-1.0, 0.666666687, 1.0, -1.0);
-            float4 hsv_interp1 = hsv_check * (-hsv_prep1.xyxy + finalGIColor.yzyy) + float4(hsv_prep1.x, hsv_prep1.y, hsv_consts1.z, hsv_consts1.w);
-            float hsv_check2 = (finalGIColor.x >= hsv_interp1.x) ? 1.0 : 0.0;
-            float4 hsv_prep2 = float4(hsv_interp1.x, hsv_interp1.y, hsv_interp1.w, finalGIColor.x);
-            float4 hsv_interp2 = hsv_check2 * (hsv_prep2.wyxz - hsv_prep2.xyzw) + hsv_prep2;
-            float hsv_V_minus_min = hsv_interp2.x - min(hsv_interp2.w, hsv_interp2.y);
-            float hsv_V_minus_min_plus_delta = hsv_interp2.w - hsv_interp2.y;
-            float hsv_H = hsv_interp2.z + hsv_V_minus_min_plus_delta / (hsv_V_minus_min * 6.0 + 0.00100000005);
-            float hsv_S = hsv_V_minus_min / (hsv_interp2.x + 0.00100000005);
-            float4 customDataMasks_shifted = (float4)customDataMasks * float4(0.0400000028, 0.0027450982, 0.00392156886, 0.0666666701) + float4(0.400000006, 0.400000006, 1.0, 0.5);
-            float custom_mask_z_check = (customDataMasks.z >= 2.54999971) ? 1.0 : 0.0;
-            float custom_mask_x = custom_mask_z_check * (customDataMasks_shifted.y - customDataMasks_shifted.x) + customDataMasks_shifted.x;
-            hsv_S = min(0.349999994, custom_mask_x * hsv_S);
-            float hsv_S_clamped = max(0.0, hsv_S);
-            float3 hsv_frac_H = frac(float3(1.0, 0.666666687, 0.333333343) + hsv_H.xxx);
-            float3 hsv_remap_H = saturate(abs(hsv_frac_H * 6.0 - 3.0) - 1.0);
-            float3 hsv_to_rgb_base = hsv_remap_H - 1.0;
-            float3 hsv_to_rgb_interp = hsv_S_clamped * hsv_to_rgb_base + 1.0;
-            float3 base_hsv_rgb = hsv_to_rgb_interp * (hsv_S_clamped + 1.0);
-            float3 lerp_factor_1 = hsv_to_rgb_interp * hsv_S_clamped - 1.0;
-            lerp_factor_1 = lerp_factor_1 * 0.600000024 + 1.0;
-            float3 lerp_factor_2 = -hsv_to_rgb_interp * hsv_S_clamped + lerp_factor_1;
-            float3 final_hsv_rgb_1 = maskResult * lerp_factor_2 + base_hsv_rgb;
-            float3 final_hsv_rgb_2 = (final_hsv_rgb_1 - baseColor) * 0.850000024 + baseColor;
-            float3 hsv_blend_factor = customDataMasks_shifted.z * final_hsv_rgb_2 - final_hsv_rgb_1;
-            float3 final_hsv_rgb_3 = custom_mask_z_check * hsv_blend_factor + final_hsv_rgb_1;
-            hsv_modulated_color = (-1.0 + final_hsv_rgb_3) * customDataMasks_shifted.w + 1.0;
-        }
-        
-        float3 indirect_spec_base = 0.200000003 * cb1[261].xyz;
-        float3 indirect_spec_add = cb1[262].xyz * 0.5 - indirect_spec_base;
-        indirect_spec_base = final_spec_occlusion * indirect_spec_add + indirect_spec_base;
-        indirect_spec_base = cb1[260].xxx * indirect_spec_base;
-        indirect_spec_base = indirect_spec_base * baseColor;
-        
-        float3 indirect_spec_lit = indirect_spec_base * initialLighting;
-        float3 indirect_diffuse_lit = cb1[261].xyz * baseColor;
-        float ibl_factor = roughness_from_normal * 0.300000012 + 0.699999988;
-        diffuseIBLBase = indirect_diffuse_lit * ibl_factor;
-        
-        float3 ibl_spec_base_plus_diffuse = diffuseIBLBase + indirect_spec_lit;
-        float3 hsv_modulated_ibl_spec_base = ibl_spec_base_plus_diffuse * hsv_modulated_color;
-        
-        float3 ibl_diffuse_add = baseColor * cb1[262].xyz - diffuseIBLBase;
-        float3 ibl_diffuse_lerp = ibl_diffuse_add * 0.400000006 + diffuseIBLBase;
-        
-        float3 ibl_spec_occluded = diffuseIBLBase * hsv_modulated_color;
-        float3 ibl_diffuse_occluded = (ibl_diffuse_lerp * hsv_modulated_color) - ibl_spec_occluded;
-        float3 ibl_diffuse_final = accumulatedLightColor_x * ibl_diffuse_occluded + ibl_spec_occluded;
-        
-        float3 lightLoopTempA_resolved = indirect_spec_lit + ibl_diffuse_final;
+        gbufferData_and_Temp.x = lightingTempC.z ? 1.0 : 0.0;
+        gbufferData_and_Temp.x = lightingTempC.y ? 0.0 : gbufferData_and_Temp.x;
+        gbufferData_and_Temp.x = lightingTempC.x ? 1.0 : gbufferData_and_Temp.x;
 
-        float3 ibl_spec_lerp = (initialLighting * hsv_modulated_color) - hsv_modulated_ibl_spec_base;
-        float3 final_ibl_spec = accumulatedLightColor_x * ibl_spec_lerp + hsv_modulated_ibl_spec_base;
+        shadingInfo_and_Temp.z = (int)lightingTempC.y | (int)lightingTempC.z;
+        shadingInfo_and_Temp.z = asfloat(asuint(shadingInfo_and_Temp.z) & 0x3f800000);
+        shadingInfo_and_Temp.z = lightingTempC.x ? 0.0 : shadingInfo_and_Temp.z;
         
-        float occlusion_from_bent_normal = tex2Dlod(_IN8, float4(screenUV.xy, 0, 0)).x;
-        occlusion_from_bent_normal = specularMask * (occlusion_from_bent_normal - 1.0) + 1.0;
+        customDataA_and_Temp.x = round(255.0 * customDataA_and_Temp.x);
+        lightingTempC.xyzw = (uint4)((int4)((uint)customDataA_and_Temp.xxxx) & int4(15, 240, 240, 15));
         
-        float3 final_ibl_spec_temp = final_ibl_spec - lightLoopTempA_resolved;
-        final_ibl_spec = luma_fresnel * final_ibl_spec_temp + lightLoopTempA_resolved;
+        customDataA_and_Temp.x = saturate(gbufferData_and_Temp.w + gbufferData_and_Temp.w);
+        shadingInfo_and_Temp.w = customDataA_and_Temp.x * -2.0 + 3.0;
+        customDataA_and_Temp.x = customDataA_and_Temp.x * customDataA_and_Temp.x;
+        customDataA_and_Temp.x = shadingInfo_and_Temp.w * customDataA_and_Temp.x;
         
-        float3 ibl_unoccluded = float3(1.0, 1.0, 1.0) - hsv_modulated_ibl_spec_base;
-        float3 occluded_ibl_spec_base = occlusion_from_bent_normal * ibl_unoccluded + hsv_modulated_ibl_spec_base;
+        shadingInfo_and_Temp.w = saturate((gbufferData_and_Temp.w - 0.5) * 2.0);
+        shadingModelFlags_and_Temp.w = shadingInfo_and_Temp.w * -2.0 + 3.0;
+        shadingInfo_and_Temp.w = shadingInfo_and_Temp.w * shadingInfo_and_Temp.w;
+        shadingInfo_and_Temp.w = shadingModelFlags_and_Temp.w * shadingInfo_and_Temp.w;
         
-        indirectLightingResult = final_ibl_spec * occluded_ibl_spec_base;
+        accumulatedLightColor.xyz = cb1[262].xyz - cb1[261].xyz;
+        shadingModelFlags_and_Temp.w = dot(abs(accumulatedLightColor.xyz), float3(0.300000012, 0.589999974, 0.109999999));
+        shadingModelFlags_and_Temp.w = min(1.0, 10.0 * shadingModelFlags_and_Temp.w);
+        worldNormal_and_WorldPos.w = shadingModelFlags_and_Temp.w * -2.0 + 3.0;
+        shadingModelFlags_and_Temp.w = shadingModelFlags_and_Temp.w * shadingModelFlags_and_Temp.w;
+        shadingModelFlags_and_Temp.w = worldNormal_and_WorldPos.w * shadingModelFlags_and_Temp.w;
+        
+        worldNormal_and_WorldPos.w = shadingModelFlags_and_Temp.w * shadingInfo_and_Temp.w;
+        
+        lightingTempA.w = 1.0 / (cb1[265].y - cb1[265].x);
+        lightingTempB.w = customDataA_and_Temp.w - cb1[265].x;
+        lightingTempB.w = saturate(lightingTempB.w * lightingTempA.w);
+        accumulatedLightColor.x = lightingTempB.w * -2.0 + 3.0;
+        lightingTempB.w = lightingTempB.w * lightingTempB.w;
+        lightingTempB.w = accumulatedLightColor.x * lightingTempB.w;
+        lightingTempB.w = lightingTempB.w * worldNormal_and_WorldPos.w;
+        
+        accumulatedLightColor.x = customDataA_and_Temp.w - lightingTempB.w;
+        lightingTempB.w = cb1[265].z * accumulatedLightColor.x + lightingTempB.w;
+        
+        accumulatedLightColor.x = -cb1[265].x + lightingTempB.w;
+        lightingTempA.w = saturate(accumulatedLightColor.x * lightingTempA.w);
+        accumulatedLightColor.x = lightingTempA.w * -2.0 + 3.0;
+        lightingTempA.w = lightingTempA.w * lightingTempA.w;
+        lightingTempA.w = accumulatedLightColor.x * lightingTempA.w;
+        
+        worldNormal_and_WorldPos.w = lightingTempA.w * worldNormal_and_WorldPos.w;
+        shadingInfo_and_Temp.w = shadingInfo_and_Temp.w * shadingModelFlags_and_Temp.w - worldNormal_and_WorldPos.w;
+        shadingInfo_and_Temp.w = cb1[265].z * shadingInfo_and_Temp.w + worldNormal_and_WorldPos.w;
+        
+        shadingModelFlags_and_Temp.w = cb1[260].y * (lightingTempB.w - 1.0) + 1.0;
+        worldNormal_and_WorldPos.w = customDataA_and_Temp.x * shadingInfo_and_Temp.w - shadingModelFlags_and_Temp.w;
+        shadingModelFlags_and_Temp.w = shadingModelFlags_and_Temp.x * worldNormal_and_WorldPos.w + shadingModelFlags_and_Temp.w;
+        
+        worldNormal_and_WorldPos.w = customDataA_and_Temp.x * shadingInfo_and_Temp.w - shadingInfo_and_Temp.w;
+        accumulatedLightColor.x = shadingModelFlags_and_Temp.x * worldNormal_and_WorldPos.w + shadingInfo_and_Temp.w;
+        
+        shadingInfo_and_Temp.w = (lightingTempB.y >= lightingTempB.z) ? 1.0 : 0.0;
+        lightLoopTempA.xy = lightingTempB.zy;
+        lightLoopTempA.zw = float2(-1.0, 0.666666687);
+        lightLoopTempB.xy = -lightLoopTempA.xy + lightingTempB.yz;
+        lightLoopTempB.zw = float2(1.0, -1.0);
+        lightLoopTempA.xyzw = shadingInfo_and_Temp.wwww * lightLoopTempB.xyzw + lightLoopTempA.xyzw;
+        
+        shadingInfo_and_Temp.w = (lightingTempB.x >= lightLoopTempA.x) ? 1.0 : 0.0;
+        lightLoopTempB.xyz = lightLoopTempA.xyw;
+        lightLoopTempB.w = lightingTempB.x;
+        lightLoopTempA.xyw = lightLoopTempB.wyx;
+        lightLoopTempA.xyzw = lightLoopTempA.xyzw - lightLoopTempB.xyzw;
+        lightLoopTempA.xyzw = shadingInfo_and_Temp.wwww * lightLoopTempA.xyzw + lightLoopTempB.xyzw;
+        
+        shadingInfo_and_Temp.w = lightLoopTempA.x - min(lightLoopTempA.w, lightLoopTempA.y);
+        worldNormal_and_WorldPos.w = (lightLoopTempA.w - lightLoopTempA.y) / (shadingInfo_and_Temp.w * 6.0 + 0.00100000005);
+        worldNormal_and_WorldPos.w = lightLoopTempA.z + worldNormal_and_WorldPos.w;
+        shadingInfo_and_Temp.w = shadingInfo_and_Temp.w / (lightLoopTempA.x + 0.00100000005);
+
+        lightLoopTempA.xyzw = (float4)lightingTempC.xyzw * float4(0.0400000028, 0.0027450982, 0.00392156886, 0.0666666701) + float4(0.400000006, 0.400000006, 1.0, 0.5);
+        lightingTempB.w = (lightingTempC.z >= 2.54999971) ? 1.0 : 0.0;
+        lightingTempC.x = lightingTempB.w * (lightLoopTempA.y - lightLoopTempA.x) + lightLoopTempA.x;
+        shadingInfo_and_Temp.w = min(0.349999994, lightingTempC.x * shadingInfo_and_Temp.w);
+        lightingTempC.x = max(0.0, shadingInfo_and_Temp.w);
+
+        lightingTempC.yzw = frac(float3(1.0, 0.666666687, 0.333333343) + abs(worldNormal_and_WorldPos.www));
+        lightingTempC.yzw = saturate(abs(lightingTempC.yzw * 6.0 - 3.0) - 1.0);
+        lightingTempC.yzw = lightingTempC.yzw - 1.0;
+        lightingTempC.xyz = lightingTempC.xxx * lightingTempC.yzw + 1.0;
+
+        shadingInfo_and_Temp.w = 1.0 + shadingInfo_and_Temp.w;
+        lightLoopTempB.xyz = lightingTempC.xyz * shadingInfo_and_Temp.www;
+        lightLoopTempC.xyz = lightingTempC.xyz * shadingInfo_and_Temp.www - 1.0;
+        lightLoopTempC.xyz = lightLoopTempC.xyz * 0.600000024 + 1.0;
+        lightingTempC.xyz = -lightingTempC.xyz * shadingInfo_and_Temp.www + lightLoopTempC.xyz;
+        lightingTempC.xyz = gbufferData_and_Temp.xxx * lightingTempC.xyz + lightLoopTempB.xyz;
+        lightLoopTempB.xyz = (lightingTempC.xyz - baseColor_and_Depth.xyz) * 0.850000024 + baseColor_and_Depth.xyz;
+        lightLoopTempA.xyz = lightLoopTempA.zzz * lightLoopTempB.xyz - lightingTempC.xyz;
+        lightingTempC.xyz = lightingTempB.www * lightLoopTempA.xyz + lightingTempC.xyz;
+        lightingTempC.xyz = (lightingTempC.xyz - 1.0) * lightLoopTempA.www + 1.0;
+        
+        lightLoopTempA.xyz = 0.200000003 * cb1[261].xyz;
+        lightLoopTempB.xyz = cb1[262].xyz * 0.5 - lightLoopTempA.xyz;
+        lightLoopTempA.xyz = shadingModelFlags_and_Temp.www * lightLoopTempB.xyz + lightLoopTempA.xyz;
+        lightLoopTempA.xyz = cb1[260].xxx * lightLoopTempA.xyz;
+        lightLoopTempA.xyz = lightLoopTempA.xyz * baseColor_and_Depth.xyz;
+        lightLoopTempB.xyz = lightLoopTempA.xyz * lightingTempA.xyz;
+        lightLoopTempC.xyz = cb1[261].xyz * baseColor_and_Depth.xyz;
+        gbufferData_and_Temp.x = customDataA_and_Temp.x * 0.300000012 + 0.699999988;
+        lightLoopTempD.xyz = lightLoopTempC.xyz * gbufferData_and_Temp.xxx;
+        lightLoopTempE.xyz = cb1[262].xyz * baseColor_and_Depth.xyz;
+        lightLoopTempB.xyz = lightLoopTempC.xyz * gbufferData_and_Temp.xxx + lightLoopTempB.xyz;
+        lightLoopTempC.xyz = baseColor_and_Depth.xyz * cb1[262].xyz - lightLoopTempD.xyz;
+        lightLoopTempC.xyz = lightLoopTempC.xyz * 0.400000006 + lightLoopTempD.xyz;
+        lightLoopTempF.xyz = lightLoopTempD.xyz * lightingTempC.xyz;
+        lightLoopTempC.xyz = lightLoopTempC.xyz * lightingTempC.xyz - lightLoopTempF.xyz;
+        lightLoopTempC.xyz = accumulatedLightColor.xxx * lightLoopTempC.xyz + lightLoopTempF.xyz;
+        lightLoopTempA.xyz = lightLoopTempA.xyz * lightingTempA.xyz + lightLoopTempC.xyz;
+        lightLoopTempB.xyz = lightLoopTempB.xyz * lightingTempC.xyz;
+        lightLoopTempC.xyz = lightLoopTempE.xyz * lightLoopTempA.www;
+        lightingTempC.xyz = lightLoopTempC.xyz * lightingTempC.xyz - lightLoopTempB.xyz;
+        lightingTempC.xyz = accumulatedLightColor.xxx * lightingTempC.xyz + lightLoopTempB.xyz;
+
+        gbufferData_and_Temp.x = tex2Dlod(_IN8, float4(screenUV.xy, 0, 0)).x;
+        gbufferData_and_Temp.x = shadingInfo_and_Temp.z * (gbufferData_and_Temp.x - 1.0) + 1.0;
+        
+        lightingTempC.xyz = lightingTempC.xyz - lightLoopTempA.xyz;
+        lightingTempC.xyz = shadingModelFlags_and_Temp.www * lightingTempC.xyz + lightLoopTempA.xyz;
+        
+        lightLoopTempA.xyz = 1.0 - lightLoopTempB.xyz;
+        lightingTempB.xyz = gbufferData_and_Temp.xxx * lightLoopTempA.xyz + lightLoopTempB.xyz;
+        lightingTempB.xyz = lightingTempC.xyz * lightingTempB.xyz;
     }
     else
     {
-        float fresnelTerm_NdotV_alt = saturate(gbuffer_normal.z + gbuffer_normal.z);
-        float fresnel_factor1_alt = fresnelTerm_NdotV_alt * -2.0 + 3.0;
-        fresnelTerm_NdotV_alt = fresnelTerm_NdotV_alt * fresnelTerm_NdotV_alt;
-        float fresnel_NdotV_alt = fresnel_factor1_alt * fresnelTerm_NdotV_alt;
+        gbufferData_and_Temp.x = saturate(gbufferData_and_Temp.w + gbufferData_and_Temp.w);
+        customDataA_and_Temp.x = gbufferData_and_Temp.x * -2.0 + 3.0;
+        gbufferData_and_Temp.x = gbufferData_and_Temp.x * gbufferData_and_Temp.x;
+        gbufferData_and_Temp.x = customDataA_and_Temp.x * gbufferData_and_Temp.x;
         
-        float roughness_term_alt = saturate(gbuffer_normal.z * 2.0 - 1.0);
-        float specularMask_alt = roughness_term_alt * -2.0 + 3.0;
-        roughness_term_alt = roughness_term_alt * roughness_term_alt;
-        float roughness_final_alt = specularMask_alt * roughness_term_alt;
+        customDataA_and_Temp.x = saturate((gbufferData_and_Temp.w - 0.5) * 2.0);
+        shadingInfo_and_Temp.z = customDataA_and_Temp.x * -2.0 + 3.0;
+        customDataA_and_Temp.x = customDataA_and_Temp.x * customDataA_and_Temp.x;
+        customDataA_and_Temp.x = shadingInfo_and_Temp.z * customDataA_and_Temp.x;
+
+        lightingTempC.xyz = cb1[262].xyz - cb1[261].xyz;
+        shadingInfo_and_Temp.z = dot(abs(lightingTempC.xyz), float3(0.300000012, 0.589999974, 0.109999999));
+        shadingInfo_and_Temp.z = min(1.0, 10.0 * shadingInfo_and_Temp.z);
+        shadingInfo_and_Temp.w = shadingInfo_and_Temp.z * -2.0 + 3.0;
+        shadingInfo_and_Temp.z = shadingInfo_and_Temp.z * shadingInfo_and_Temp.z;
+        shadingInfo_and_Temp.z = shadingInfo_and_Temp.w * shadingInfo_and_Temp.z;
         
-        float3 color_diff_alt = cb1[262].xyz - cb1[261].xyz;
-        float luma_alt = dot(abs(color_diff_alt), float3(0.300000012, 0.589999974, 0.109999999));
-        luma_alt = min(1.0, 10.0 * luma_alt);
-        float luma_factor_alt = luma_alt * -2.0 + 3.0;
-        luma_alt = luma_alt * luma_alt;
-        float luma_fresnel_alt = luma_factor_alt * luma_alt;
+        shadingInfo_and_Temp.w = shadingInfo_and_Temp.z * customDataA_and_Temp.x;
+
+        shadingModelFlags_and_Temp.w = 1.0 / (cb1[265].y - cb1[265].x);
+        worldNormal_and_WorldPos.w = materialParams_and_Lighting.w * cb1[253].y - cb1[265].x;
+        worldNormal_and_WorldPos.w = saturate(worldNormal_and_WorldPos.w * shadingModelFlags_and_Temp.w);
+        lightingTempA.w = worldNormal_and_WorldPos.w * -2.0 + 3.0;
+        worldNormal_and_WorldPos.w = worldNormal_and_WorldPos.w * worldNormal_and_WorldPos.w;
+        worldNormal_and_WorldPos.w = lightingTempA.w * worldNormal_and_WorldPos.w;
+        worldNormal_and_WorldPos.w = worldNormal_and_WorldPos.w * shadingInfo_and_Temp.w;
+
+        materialParams_and_Lighting.w = materialParams_and_Lighting.w * cb1[253].y - worldNormal_and_WorldPos.w;
+        materialParams_and_Lighting.w = cb1[265].z * materialParams_and_Lighting.w + worldNormal_and_WorldPos.w;
         
-        float blended_roughness_alt = luma_fresnel_alt * roughness_final_alt;
+        worldNormal_and_WorldPos.w = -cb1[265].x + materialParams_and_Lighting.w;
+        shadingModelFlags_and_Temp.w = saturate(worldNormal_and_WorldPos.w * shadingModelFlags_and_Temp.w);
+        worldNormal_and_WorldPos.w = shadingModelFlags_and_Temp.w * -2.0 + 3.0;
+        shadingModelFlags_and_Temp.w = shadingModelFlags_and_Temp.w * shadingModelFlags_and_Temp.w;
+        shadingModelFlags_and_Temp.w = worldNormal_and_WorldPos.w * shadingModelFlags_and_Temp.w;
         
-        float blend_range_alt = cb1[265].y - cb1[265].x;
-        float blend_inv_range_alt = 1.0 / blend_range_alt;
-        float blend_val_alt = ssrIntensity * cb1[253].y - cb1[265].x;
-        float blend_ratio_alt = saturate(blend_val_alt * blend_inv_range_alt);
-        float blend_factor_alt = blend_ratio_alt * -2.0 + 3.0;
-        blend_ratio_alt = blend_ratio_alt * blend_ratio_alt;
-        float blend_fresnel_alt = blend_factor_alt * blend_ratio_alt;
+        shadingInfo_and_Temp.w = shadingModelFlags_and_Temp.w * shadingInfo_and_Temp.w;
         
-        float final_blend_alt = blend_fresnel_alt * blended_roughness_alt;
-        float ssr_term_alt = ssrIntensity * cb1[253].y - final_blend_alt;
-        float final_ssr_alt = cb1[265].z * ssr_term_alt + final_blend_alt;
+        customDataA_and_Temp.x = customDataA_and_Temp.x * shadingInfo_and_Temp.z - shadingInfo_and_Temp.w;
+        customDataA_and_Temp.x = cb1[265].z * customDataA_and_Temp.x + shadingInfo_and_Temp.w;
         
-        float ssr_clamped_alt = -cb1[265].x + final_ssr_alt;
-        float ssr_ratio_alt = saturate(ssr_clamped_alt * blend_inv_range_alt);
-        float ssr_factor_alt = ssr_ratio_alt * -2.0 + 3.0;
-        ssr_ratio_alt = ssr_ratio_alt * ssr_ratio_alt;
-        float ssr_fresnel_alt = ssr_factor_alt * ssr_ratio_alt;
-        blended_roughness_alt = ssr_fresnel_alt * blended_roughness_alt;
+        materialParams_and_Lighting.w = cb1[260].y * (materialParams_and_Lighting.w - 1.0) + 1.0;
         
-        float combined_roughness_alt = roughness_final_alt * luma_fresnel_alt - blended_roughness_alt;
-        combined_roughness_alt = cb1[265].z * combined_roughness_alt + blended_roughness_alt;
+        shadingInfo_and_Temp.w = customDataA_and_Temp.w * customDataA_and_Temp.x - materialParams_and_Lighting.w;
+        materialParams_and_Lighting.w = shadingModelFlags_and_Temp.x * shadingInfo_and_Temp.w + materialParams_and_Lighting.w;
         
-        float final_spec_occlusion_alt = cb1[260].y * (final_ssr_alt - 1.0) + 1.0;
-        float spec_ao_combined_alt = aoFactor * combined_roughness_alt - final_spec_occlusion_alt;
-        final_spec_occlusion_alt = specialShadingModelFlags.x * spec_ao_combined_alt + final_spec_occlusion_alt;
+        shadingInfo_and_Temp.w = customDataA_and_Temp.w * customDataA_and_Temp.x - customDataA_and_Temp.x;
+        accumulatedLightColor.x = shadingModelFlags_and_Temp.x * shadingInfo_and_Temp.w + customDataA_and_Temp.x;
         
-        float spec_ao_combined_2_alt = aoFactor * combined_roughness_alt - combined_roughness_alt;
-        float accumulatedLightColor_x_alt = specialShadingModelFlags.x * spec_ao_combined_2_alt + combined_roughness_alt;
+        shadingModelFlags_and_Temp.xyw = 0.200000003 * cb1[261].xyz;
+        lightingTempC.xyz = cb1[262].xyz * 0.5 - shadingModelFlags_and_Temp.xyw;
+        shadingModelFlags_and_Temp.xyw = materialParams_and_Lighting.www * lightingTempC.xyz + shadingModelFlags_and_Temp.xyw;
+        shadingModelFlags_and_Temp.xyw = cb1[260].xxx * shadingModelFlags_and_Temp.xyw;
+        shadingModelFlags_and_Temp.xyw = shadingModelFlags_and_Temp.xyw * baseColor_and_Depth.xyz;
         
-        float3 indirect_spec_base_alt = 0.200000003 * cb1[261].xyz;
-        float3 indirect_spec_add_alt = cb1[262].xyz * 0.5 - indirect_spec_base_alt;
-        indirect_spec_base_alt = final_spec_occlusion_alt * indirect_spec_add_alt + indirect_spec_base_alt;
-        indirect_spec_base_alt = cb1[260].xxx * indirect_spec_base_alt;
-        indirect_spec_base_alt = indirect_spec_base_alt * baseColor;
+        lightingTempC.xyz = shadingModelFlags_and_Temp.xyw * lightingTempA.xyz;
+        lightLoopTempA.xyz = cb1[261].xyz * baseColor_and_Depth.xyz;
+        gbufferData_and_Temp.x = gbufferData_and_Temp.x * 0.300000012 + 0.699999988;
+        lightLoopTempD.xyz = lightLoopTempA.xyz * gbufferData_and_Temp.xxx;
+        lightLoopTempA.xyz = lightLoopTempD.xyz + lightingTempC.xyz;
+        lightingTempC.xyz = lightingTempC.xyz * shadingInfo_and_Temp.zzz + lightLoopTempA.xyz;
         
-        float3 indirect_spec_lit_alt = indirect_spec_base_alt * initialLighting;
-        float3 indirect_diffuse_lit_alt = cb1[261].xyz * baseColor;
-        float ibl_factor_alt = fresnel_NdotV_alt * 0.300000012 + 0.699999988;
+        lightLoopTempA.xyz = baseColor_and_Depth.xyz * cb1[262].xyz - lightLoopTempD.xyz;
+        lightLoopTempA.xyz = lightLoopTempA.xyz * accumulatedLightColor.xxx;
+        lightLoopTempA.xyz = lightLoopTempA.xyz * 0.400000006 + lightLoopTempD.xyz;
         
-        diffuseIBLBase = indirect_diffuse_lit_alt * ibl_factor_alt;
+        shadingModelFlags_and_Temp.xyw = shadingModelFlags_and_Temp.xyw * lightingTempA.xyz + lightLoopTempA.xyz;
         
-        float3 temp_spec_plus_diffuse_base = diffuseIBLBase + indirect_spec_lit_alt;
-        float3 temp_lighting_C = luma_fresnel_alt * indirect_spec_lit_alt + temp_spec_plus_diffuse_base;
+        lightLoopTempA.xyz = baseColor_and_Depth.xyz * cb1[262].xyz - lightingTempC.xyz;
+        lightingTempC.xyz = accumulatedLightColor.xxx * lightLoopTempA.xyz + lightingTempC.xyz;
         
-        float3 temp_diffuse_add = baseColor * cb1[262].xyz - diffuseIBLBase;
-        temp_diffuse_add = temp_diffuse_add * accumulatedLightColor_x_alt;
-        float3 temp_diffuse_final = temp_diffuse_add * 0.400000006 + diffuseIBLBase;
-        
-        float3 temp_shading_model_flags = indirect_spec_lit_alt + temp_diffuse_final;
-        
-        float3 temp_reuse_var = baseColor * cb1[262].xyz - temp_lighting_C;
-        temp_lighting_C = accumulatedLightColor_x_alt * temp_reuse_var + temp_lighting_C;
-        temp_lighting_C = temp_lighting_C - temp_shading_model_flags;
-        
-        indirectLightingResult = final_spec_occlusion_alt * temp_lighting_C + temp_shading_model_flags;
+        lightingTempC.xyz = lightingTempC.xyz - shadingModelFlags_and_Temp.xyw;
+        lightingTempB.xyz = materialParams_and_Lighting.www * lightingTempC.xyz + shadingModelFlags_and_Temp.xyw;
     }
-
-    float subsurf_scatter_term = saturate(10.000001 * (gbuffer_normal.z - 0.400000006));
-    float subsurf_fresnel_factor = subsurf_scatter_term * -2.0 + 3.0;
-    subsurf_scatter_term = subsurf_scatter_term * subsurf_scatter_term;
-    float subsurf_fresnel = subsurf_fresnel_factor * subsurf_scatter_term;
-
-    float3 preLoopLighting_IBL = indirectLightingResult * 0.5 + cb1[261].xyz;
-    preLoopLighting_IBL = preLoopLighting_IBL * baseColor;
-    float3 preLoopLighting_NonIBL = cb1[261].xyz * baseColor;
-    float3 chosenPreLoopLighting = (cb1[255].x != 0.0) ? preLoopLighting_IBL : preLoopLighting_NonIBL;
-
-    float3 finalDiffuse = isShadingModel_5 ? chosenPreLoopLighting : diffuseIBLBase;
-    float3 finalSpecular = isShadingModel_5 ? chosenPreLoopLighting : indirectLightingResult;
     
-    float finalSubsurfTerm = isShadingModel_5 ? 0.0 : subsurf_fresnel;
-    float finalSubsurfScatter = isShadingModel_5 ? 0.0 : subsurf_scatter_term;
+    gbufferData_and_Temp.x = saturate(10.000001 * (gbufferData_and_Temp.w - 0.400000006));
+    gbufferData_and_Temp.w = gbufferData_and_Temp.x * -2.0 + 3.0;
+    gbufferData_and_Temp.x = gbufferData_and_Temp.x * gbufferData_and_Temp.x;
+    accumulatedLightColor.y = gbufferData_and_Temp.w * gbufferData_and_Temp.x;
     
-    float3 foggedLighting = (subsurf_fresnel * (cb1[264].xyz + cb1[264].xyz)) - cb1[264].xyz;
-    float3 lightAccumulator = float3(0.0, 0.0, 0.0);
-    float lightLoopFalloff = 1.0;
+    shadingModelFlags_and_Temp.xyw = lightingTempB.xyz * 0.5 + cb1[261].xyz;
+    shadingModelFlags_and_Temp.xyw = shadingModelFlags_and_Temp.xyw * baseColor_and_Depth.xyz;
+    lightingTempC.xyz = cb1[261].xyz * baseColor_and_Depth.xyz;
+    shadingModelFlags_and_Temp.xyw = cb1[255].xxx ? shadingModelFlags_and_Temp.xyw : lightingTempC.xyz;
     
-    uint lightLoopCounter = 0;
+    lightingTempC.xyz = gbufferData_and_Temp.zzz ? shadingModelFlags_and_Temp.xyw : lightLoopTempD.xyz;
+    shadingModelFlags_and_Temp.xyw = gbufferData_and_Temp.zzz ? shadingModelFlags_and_Temp.xyw : lightingTempB.xyz;
+    
+    gbufferData_and_Temp.xw = gbufferData_and_Temp.zz ? float2(0.0, 0.0) : accumulatedLightColor.xy;
+    
+    lightingTempB.xyz = (cb1[264].xyz + cb1[264].xyz) * gbufferData_and_Temp.xxx - cb1[264].xyz;
+    accumulatedLightColor.xyz = float3(0.0, 0.0, 0.0);
+    materialParams_and_Lighting.w = 1.0;
+    customDataA_and_Temp.x = 0;
+    
     uint numLights = asuint(cb2[128].x);
-    
-    while (lightLoopCounter < numLights)
+    while ((uint)customDataA_and_Temp.x < numLights)
     {
-        uint lightIndex_base = lightLoopCounter << 3;
-        uint lightDataIndex = lightIndex_base | 7;
-        uint lightTypeMask = (uint)shadingModelBitfields.y & (((uint)cb2[lightDataIndex].w << 5) & 0xffffffe0);
+        uint lightIndex_base = (uint)customDataA_and_Temp.x << 3;
+        shadingInfo_and_Temp.z = lightIndex_base | 7;
+        
+        uint lightDataFlags = asuint(cb2[shadingInfo_and_Temp.z].w);
+        uint lightTypeMask = (asuint(shadingInfo_and_Temp.y)) & ((lightDataFlags << 5) & 0xffffffe0);
         
         if (lightTypeMask != 0)
         {
-            float3 lightPos = cb2[lightIndex_base + 0].xyz - worldPos;
-            float lightRadiusSq_inv = cb2[lightIndex_base + 0].w * cb2[lightIndex_base + 0].w;
-            float distToLightSq = dot(lightPos, lightPos);
-            float lightAttenuation = distToLightSq * lightRadiusSq_inv;
+            lightLoopTempA.xyz = cb2[lightIndex_base + 0].xyz - worldNormal_and_WorldPos.xyz;
+            worldNormal_and_WorldPos.w = cb2[lightIndex_base + 0].w * cb2[lightIndex_base + 0].w;
+            lightingTempA.w = dot(lightLoopTempA.xyz, lightLoopTempA.xyz);
+            worldNormal_and_WorldPos.w = lightingTempA.w * worldNormal_and_WorldPos.w;
             
-            if (1.0 >= lightAttenuation)
+            if (1.0 >= worldNormal_and_WorldPos.w)
             {
-                float lightAttenFactor = saturate(lightAttenuation * 2.5 - 1.5);
-                float lightAttenFresnel = (lightAttenFactor * -2.0 + 3.0) * (-lightAttenFactor * lightAttenFactor) + 1.0;
-                float rsqrtDistToLight = rsqrt(distToLightSq);
-                float3 lightVec = lightPos * rsqrtDistToLight;
-                float NdotL = dot(normalizedWorldNormal, lightVec);
-                float shadowKernelTerm = (NdotL + 1.0) * 0.5 - (cb2[lightIndex_base + 5].w * 0.939999998);
-                float shadowInvRange = 1.0 / (cb2[lightIndex_base + 5].w * 0.0600000024);
-                float shadowFactor = saturate(shadowInvRange * shadowKernelTerm);
-                float shadowFresnel = (shadowFactor * -2.0 + 3.0) * (shadowFactor * shadowFactor);
-                shadowFactor = min(1.0, shadowFresnel);
-                float3 shadowColor = cb2[lightIndex_base + 6].xyz * foggedLighting.xyz;
-                float3 shadowLerp = baseColor * cb2[lightIndex_base + 5].xyz - shadowColor;
-                shadowColor = shadowFactor * shadowLerp + shadowColor;
-                shadowColor = cb2[lightDataIndex].xxx * shadowColor;
+                uint lightIndex_1 = lightIndex_base | 1;
+                uint lightIndex_2 = lightIndex_base | 2;
+                uint lightIndex_3 = lightIndex_base | 3;
+                uint lightIndex_4 = lightIndex_base | 4;
+                uint lightIndex_5 = lightIndex_base | 5;
+                uint lightIndex_6 = lightIndex_base | 6;
+
+                lightingTempB.w = saturate(worldNormal_and_WorldPos.w * 2.5 - 1.5);
+                worldNormal_and_WorldPos.w = (lightingTempB.w * -2.0 + 3.0) * (-lightingTempB.w * lightingTempB.w) + 1.0;
                 
-                float currentLightFalloff = distToLightSq * cb2[lightIndex_base + 4].x + cb2[lightIndex_base + 4].y;
-                currentLightFalloff = 1.0 / (9.99999975e-05 + currentLightFalloff);
-                currentLightFalloff = (currentLightFalloff - 1.0) * cb2[lightIndex_base + 4].z;
-                currentLightFalloff = min(1.0, currentLightFalloff * currentLightFalloff);
+                lightingTempA.w = rsqrt(lightingTempA.w);
+                lightLoopTempD.xyz = lightLoopTempA.xyz * lightingTempA.www;
                 
-                uint lightFlags = asuint(cb2[lightIndex_base + 1].w) >> 16;
+                lightingTempA.w = dot(materialParams_and_Lighting.xyz, lightLoopTempD.xyz);
+                lightingTempA.w = (lightingTempA.w + 1.0) * 0.5 - (cb2[lightIndex_5].w * 0.939999998);
+                lightingTempB.w = 1.0 / (cb2[lightIndex_5].w * 0.0600000024);
+                lightingTempA.w = saturate(lightingTempB.w * lightingTempA.w);
+                lightingTempB.w = lightingTempA.w * -2.0 + 3.0;
+                lightingTempA.w = lightingTempA.w * lightingTempA.w;
+                lightingTempA.w = min(1.0, lightingTempB.w * lightingTempA.w);
+
+                lightLoopTempE.xyz = cb2[lightIndex_6].xyz * lightingTempC.xyz;
+                lightLoopTempC.xzw = baseColor_and_Depth.xyz * cb2[lightIndex_5].xyz - lightLoopTempE.xyz;
+                lightLoopTempC.xzw = lightingTempA.www * lightLoopTempC.xzw + lightLoopTempE.xyz;
+                lightLoopTempC.xzw = cb2[shadingInfo_and_Temp.z].xxx * lightLoopTempC.xzw;
+
+                shadingInfo_and_Temp.w = dot(lightLoopTempA.xyz, lightLoopTempA.xyz);
+                shadingInfo_and_Temp.w = shadingInfo_and_Temp.w * cb2[lightIndex_4].x + cb2[lightIndex_4].y;
+                shadingInfo_and_Temp.w = 1.0 / (9.99999975e-05 + shadingInfo_and_Temp.w);
+                shadingInfo_and_Temp.w = (shadingInfo_and_Temp.w - 1.0) * cb2[lightIndex_4].z;
+                shadingInfo_and_Temp.w = min(1.0, shadingInfo_and_Temp.w * shadingInfo_and_Temp.w);
+                
+                uint lightFlags = asuint(cb2[lightIndex_1].w) >> 16;
                 if (lightFlags == 2)
                 {
-                    float spotFactor = dot(lightVec, cb2[lightIndex_base + 1].xyz);
-                    spotFactor = saturate(cb2[lightIndex_base + 2].y * (spotFactor - cb2[lightIndex_base + 2].x));
-                    spotFactor = spotFactor * spotFactor * spotFactor * spotFactor;
-                    currentLightFalloff = spotFactor * currentLightFalloff;
+                    lightingTempB.w = dot(lightLoopTempD.xyz, cb2[lightIndex_1].xyz);
+                    lightingTempB.w = saturate(cb2[lightIndex_2].y * (lightingTempB.w - cb2[lightIndex_2].x));
+                    lightingTempB.w = lightingTempB.w * lightingTempB.w;
+                    lightingTempB.w = lightingTempB.w * lightingTempB.w;
+                    shadingInfo_and_Temp.w = lightingTempB.w * shadingInfo_and_Temp.w;
                 }
                 
-                float subsurf_final = (subsurf_fresnel * saturate(NdotL * 0.5 + 0.5)) - finalSubsurfScatter;
-                subsurf_final = cb2[lightIndex_base + 4].w * subsurf_final + finalSubsurfScatter;
-                float3 lightColor_direct_base = cb2[lightIndex_base + 3].www * shadowColor;
-                float3 lightColor_indirect = baseColor - lightColor_direct_base;
-                float3 lightColor_direct = subsurf_final * lightColor_indirect + lightColor_direct_base;
-                lightColor_direct = cb2[lightIndex_base + 3].xyz * lightColor_direct;
+                lightingTempA.w = saturate(dot(lightingTempB.xyz, lightLoopTempD.xyz) * 0.5 + 0.5);
+                lightingTempA.w = gbufferData_and_Temp.w * lightingTempA.w - gbufferData_and_Temp.x;
+                lightingTempA.w = cb2[lightIndex_4].w * lightingTempA.w + gbufferData_and_Temp.x;
+
+                lightLoopTempA.xyz = cb2[lightIndex_3].www * lightLoopTempC.xzw;
+                lightLoopTempB.xyw = -lightLoopTempC.xzw * cb2[lightIndex_3].www + baseColor_and_Depth.xyz;
+                lightLoopTempA.xyz = lightingTempA.www * lightLoopTempB.xyw + lightLoopTempA.xyz;
+                lightLoopTempA.xyz = cb2[lightIndex_3].xyz * lightLoopTempA.xyz;
                 
-                float totalLightIntensity = cb2[lightIndex_base + 3].x + cb2[lightIndex_base + 3].y + cb2[lightIndex_base + 3].z + cb2[lightDataIndex].x;
-                float lightIntensityFactor = saturate(10.0 * totalLightIntensity);
-                float visibilityTerm = cb2[lightDataIndex].y * lightIntensityFactor;
-
-                float3 finalLightColor_this_loop = (lightColor_direct + lightColor_direct_base) * currentLightFalloff;
-
-                currentLightFalloff = lightAttenFresnel - currentLightFalloff;
-                currentLightFalloff = cb2[lightIndex_base + 6].w * currentLightFalloff + currentLightFalloff;
-                lightAccumulator = finalLightColor_this_loop * lightLoopFalloff + lightAccumulator;
-                visibilityTerm = 1.0 - (currentLightFalloff * visibilityTerm);
-                lightLoopFalloff = visibilityTerm * lightLoopFalloff;
+                lightingTempA.w = cb2[lightIndex_3].x + cb2[lightIndex_3].y + cb2[lightIndex_3].z + cb2[shadingInfo_and_Temp.z].x;
+                lightingTempA.w = saturate(10.0 * lightingTempA.w);
+                shadingInfo_and_Temp.z = cb2[shadingInfo_and_Temp.z].y * lightingTempA.w;
+                
+                lightLoopTempB.xyz = lightLoopTempC.xzw * shadingInfo_and_Temp.www;
+                lightLoopTempA.xyz = lightLoopTempA.xyz * shadingInfo_and_Temp.www + lightLoopTempB.xyz;
+                
+                worldNormal_and_WorldPos.w = worldNormal_and_WorldPos.w - shadingInfo_and_Temp.w;
+                shadingInfo_and_Temp.w = cb2[lightIndex_6].w * worldNormal_and_WorldPos.w + shadingInfo_and_Temp.w;
+                
+                accumulatedLightColor.xyz = lightLoopTempA.xyz * materialParams_and_Lighting.www + accumulatedLightColor.xyz;
+                shadingInfo_and_Temp.z = -shadingInfo_and_Temp.w * shadingInfo_and_Temp.z + 1.0;
+                materialParams_and_Lighting.w = shadingInfo_and_Temp.z * materialParams_and_Lighting.w;
             }
         }
-        lightLoopCounter = lightLoopCounter + 1;
+        customDataA_and_Temp.x = (int)customDataA_and_Temp.x + 1;
     }
     
-    float3 preSssLighting = lightLoopFalloff * finalSpecular + lightAccumulator;
+    shadingInfo_and_Temp.yzw = materialParams_and_Lighting.www * shadingModelFlags_and_Temp.xyw + accumulatedLightColor.xyz;
+    gbufferData_and_Temp.x = ((int)shadingInfo_and_Temp.x != 13) ? 1.0 : 0.0;
     
-    float3 sssColor = float3(0.0, 0.0, 0.0);
-    float reprojected_fresnel = finalSubsurfTerm;
-    
-    float isNotEyeShadingModel = (shadingModelBitfields.x != 13) ? 1.0 : 0.0;
-    if (isNotEyeShadingModel != 0.0)
+    if (gbufferData_and_Temp.x != 0.0)
     {
-        float isSubsurfaceProfileModel = (shadingModelBitfields.x == 1) ? 1.0 : 0.0;
+        gbufferData_and_Temp.x = ((int)shadingInfo_and_Temp.x == 1) ? 1.0 : 0.0;
+        gbufferData_and_Temp.x = gbufferData_and_Temp.x ? customDataA_and_Temp.z : customDataA_and_Temp.y;
         
-        float scatterRadius = isSubsurfaceProfileModel ? customDataA_and_Temp.z : customDataA_and_Temp.y;
+        customDataA_and_Temp.xyz = cb1[67].xyz - worldNormal_and_WorldPos.xyz;
+        gbufferData_and_Temp.w = rsqrt(dot(customDataA_and_Temp.xyz, customDataA_and_Temp.xyz));
+        customDataA_and_Temp.xyz = customDataA_and_Temp.xyz * gbufferData_and_Temp.www;
         
-        float3 viewVec = cb1[67].xyz - worldPos;
-        float viewVecLengthInv = rsqrt(dot(viewVec, viewVec));
-        viewVec = viewVec * viewVecLengthInv;
-        float scatterRadiusClamped = saturate(scatterRadius - 0.100000001);
-        scatterRadius = saturate(10.0 * scatterRadius);
-        float scatterPower = scatterRadiusClamped * 2000.0 + 50.0;
-        float scatterKernelSize = scatterRadiusClamped + scatterRadiusClamped;
-        scatterRadius = cb0[0].x * scatterRadius;
-        scatterRadius = scatterRadius * 0.800000012 + scatterKernelSize;
-        float3x3 tangentToWorld = float3x3(cb1[20].xyz, cb1[21].xyz, cb1[22].xyz);
-        float3 worldNormalFromTangent = mul(normalizedWorldNormal, tangentToWorld);
+        gbufferData_and_Temp.w = saturate(gbufferData_and_Temp.x - 0.100000001);
+        gbufferData_and_Temp.x = saturate(10.0 * gbufferData_and_Temp.x);
         
-        bool useStaticLighting = (asint(cb0[0].w) > 0);
-        viewVec = useStaticLighting ? float3(0.0, 0.0, 0.0) : viewVec;
-        float3 lightDir = useStaticLighting ? float3(cb0[0].yz, 0.5) : cb1[264].xyz;
-        worldNormalFromTangent = useStaticLighting ? worldNormalFromTangent : normalizedWorldNormal;
+        materialParams_and_Lighting.w = gbufferData_and_Temp.w * 2000.0 + 50.0;
+        shadingInfo_and_Temp.x = gbufferData_and_Temp.w + gbufferData_and_Temp.w;
+        gbufferData_and_Temp.x = cb0[0].x * gbufferData_and_Temp.x;
+        gbufferData_and_Temp.x = gbufferData_and_Temp.x * 0.800000012 + shadingInfo_and_Temp.x;
         
-        float NdotL_final = dot(lightDir, worldNormalFromTangent);
-        float NdotL_remap = saturate(5.0 * (0.200000003 + NdotL_final));
-        float NdotL_fresnel = (NdotL_remap * -2.0 + 3.0) * (NdotL_remap * NdotL_remap);
+        shadingModelFlags_and_Temp.xyw = materialParams_and_Lighting.yyy * cb1[21].xyz;
+        shadingModelFlags_and_Temp.xyw = materialParams_and_Lighting.xxx * cb1[20].xyz + shadingModelFlags_and_Temp.xyw;
+        shadingModelFlags_and_Temp.xyw = materialParams_and_Lighting.zzz * cb1[22].xyz + shadingModelFlags_and_Temp.xyw;
         
-        float3 halfVec = normalize(lightDir + viewVec);
-        float NdotH = saturate(dot(worldNormalFromTangent, halfVec));
-        float NdotH_sq = NdotH * NdotH;
-        float specTerm = (NdotH_sq * -0.800000012 + 1.0);
-        specTerm = specTerm * specTerm;
-        specTerm = 0.200000003 / (3.14159274 * specTerm);
-        specTerm = specTerm * scatterRadiusClamped;
+        shadingInfo_and_Temp.x = (asint(cb0[0].w) > 0) ? 1.0 : 0.0;
+        customDataA_and_Temp.xyz = shadingInfo_and_Temp.xxx ? float3(0.0, 0.0, 0.0) : customDataA_and_Temp.xyz;
+        worldNormal_and_WorldPos.xy = shadingInfo_and_Temp.xx ? cb0[0].yz : cb1[264].xy;
+        worldNormal_and_WorldPos.z = shadingInfo_and_Temp.x ? 0.5 : cb1[264].z;
+        materialParams_and_Lighting.xyz = shadingInfo_and_Temp.xxx ? shadingModelFlags_and_Temp.xyw : materialParams_and_Lighting.xyz;
         
-        float LdotV = dot(lightDir, viewVec);
-        float LdotV_remap = saturate((LdotV + LdotV) - 1.0 + 1.0);
-        float LdotV_fresnel = (LdotV_remap * -2.0 + 3.0) * (LdotV_remap * LdotV_remap) + 1.0;
+        shadingInfo_and_Temp.x = dot(worldNormal_and_WorldPos.xyz, materialParams_and_Lighting.xyz);
         
-        float VdotN = saturate(dot(viewVec, worldNormalFromTangent));
-        float schlick_V = max(0.0, 0.800000012 - VdotN);
-        float screen_space_subsurf_falloff = min(1.74532926, max(0.0, cb1[133].x));
-        float2 schlick_and_falloff = float2(schlick_V, screen_space_subsurf_falloff) * float2(1.5, 0.572957814);
+        lightingTempB.xy = float2(0.200000003, 1.0) + shadingInfo_and_Temp.xx;
+        shadingInfo_and_Temp.x = saturate(5.0 * lightingTempB.x);
+        shadingModelFlags_and_Temp.w = shadingInfo_and_Temp.x * -2.0 + 3.0;
+        shadingInfo_and_Temp.x = shadingInfo_and_Temp.x * shadingInfo_and_Temp.x;
+        shadingInfo_and_Temp.x = shadingModelFlags_and_Temp.w * shadingInfo_and_Temp.x;
         
-        float depth_clamped = max(0.0, depth);
-        float2 depth_remap_vals = min(float2(3000.0, 50.0), float2(depth_clamped, depth_clamped));
-        depth_remap_vals = (float2(3000.0, 50.0) - depth_remap_vals) * float2(0.00033333333, 0.0199999996);
-        float depth_falloff = depth_remap_vals.x * depth_remap_vals.x;
-        depth_falloff = depth_falloff * depth_falloff;
-        depth_falloff = depth_falloff * depth_falloff + depth_remap_vals.y;
+        lightingTempB.xzw = worldNormal_and_WorldPos.xyz + customDataA_and_Temp.xyz;
+        shadingModelFlags_and_Temp.w = rsqrt(dot(lightingTempB.xzw, lightingTempB.xzw));
+        lightingTempB.xzw = lightingTempB.xzw * shadingModelFlags_and_Temp.www;
+        shadingModelFlags_and_Temp.w = saturate(dot(materialParams_and_Lighting.xyz, lightingTempB.xzw));
+        shadingModelFlags_and_Temp.w = shadingModelFlags_and_Temp.w * shadingModelFlags_and_Temp.w;
+        shadingModelFlags_and_Temp.w = shadingModelFlags_and_Temp.w * -0.800000012 + 1.0;
+        shadingModelFlags_and_Temp.w = shadingModelFlags_and_Temp.w * shadingModelFlags_and_Temp.w;
+        shadingModelFlags_and_Temp.w = 0.200000003 / (3.14159274 * shadingModelFlags_and_Temp.w);
+        shadingModelFlags_and_Temp.w = shadingModelFlags_and_Temp.w * customDataA_and_Temp.w;
+
+        worldNormal_and_WorldPos.x = dot(worldNormal_and_WorldPos.xyz, customDataA_and_Temp.xyz);
+        worldNormal_and_WorldPos.x = saturate((worldNormal_and_WorldPos.x + worldNormal_and_WorldPos.x));
+        worldNormal_and_WorldPos.z = worldNormal_and_WorldPos.x * -2.0 + 3.0;
+        worldNormal_and_WorldPos.x = worldNormal_and_WorldPos.x * worldNormal_and_WorldPos.x;
+        worldNormal_and_WorldPos.x = worldNormal_and_WorldPos.z * worldNormal_and_WorldPos.x + 1.0;
+
+        materialParams_and_Lighting.x = max(0.0, 0.800000012 - saturate(dot(customDataA_and_Temp.xyz, materialParams_and_Lighting.xyz)));
+        materialParams_and_Lighting.y = min(1.74532926, max(0.0, cb1[133].x));
+        materialParams_and_Lighting.xy = float2(1.5, 0.572957814) * materialParams_and_Lighting.xy;
+
+        materialParams_and_Lighting.z = max(0.0, baseColor_and_Depth.w);
+        customDataA_and_Temp.xy = float2(3000.0, 50.0) - min(float2(3000.0, 50.0), materialParams_and_Lighting.zz);
+        customDataA_and_Temp.xy = float2(0.00033333333, 0.0199999996) * customDataA_and_Temp.xy;
+        materialParams_and_Lighting.z = customDataA_and_Temp.x * customDataA_and_Temp.x;
+        materialParams_and_Lighting.z = materialParams_and_Lighting.z * materialParams_and_Lighting.z;
+        materialParams_and_Lighting.z = materialParams_and_Lighting.z * materialParams_and_Lighting.z + customDataA_and_Temp.y;
         
-        float sss_profile_lerp = (depth_falloff - 1.0) * schlick_and_falloff.y + 1.0;
-        float sss_profile_final = (1.0 - sss_profile_lerp) * scatterRadiusClamped + sss_profile_lerp;
+        materialParams_and_Lighting.y = materialParams_and_Lighting.y * (materialParams_and_Lighting.z - 1.0) + 1.0;
+        materialParams_and_Lighting.y = gbufferData_and_Temp.w * (1.0 - materialParams_and_Lighting.y) + materialParams_and_Lighting.y;
+
+        materialParams_and_Lighting.z = lightingTempB.y * 0.25 + 0.5;
+        materialParams_and_Lighting.x = materialParams_and_Lighting.z * materialParams_and_Lighting.x;
+        materialParams_and_Lighting.x = materialParams_and_Lighting.x * materialParams_and_Lighting.y;
+        materialParams_and_Lighting.x = materialParams_and_Lighting.x * worldNormal_and_WorldPos.x;
+        materialParams_and_Lighting.x = 0.00999999978 * materialParams_and_Lighting.x;
         
-        float schlick_final = (NdotL_final * 0.25 + 0.5) * schlick_and_falloff.x;
-        schlick_final = schlick_final * sss_profile_final;
-        schlick_final = schlick_final * LdotV_fresnel;
-        schlick_final = 0.00999999978 * schlick_final;
+        customDataA_and_Temp.xy = materialParams_and_Lighting.xy * materialParams_and_Lighting.xy + 9.99999975e-05;
+        materialParams_and_Lighting.z = rsqrt(dot(customDataA_and_Temp.xy, float2(1.0, 1.0)));
+        customDataA_and_Temp.xy = materialParams_and_Lighting.xy * materialParams_and_Lighting.zz;
+        customDataA_and_Temp.xy = customDataA_and_Temp.xy * gbufferData_and_Temp.xx;
         
-        float2 worldNormalXY_sq_plus_eps = worldNormalFromTangent.xy * worldNormalFromTangent.xy + 9.99999975e-05;
-        float rsqrt_normal_xy = rsqrt(dot(worldNormalXY_sq_plus_eps, float2(1.0, 1.0)));
-        float2 normal_xy_normalized = worldNormalFromTangent.xy * rsqrt_normal_xy;
-        normal_xy_normalized = normal_xy_normalized * scatterRadius;
+        customDataA_and_Temp.z = customDataA_and_Temp.y * materialParams_and_Lighting.x;
+        materialParams_and_Lighting.y = -0.5;
+        materialParams_and_Lighting.xy = customDataA_and_Temp.xz * materialParams_and_Lighting.xy;
         
-        float sss_lobe_y = schlick_final * normal_xy_normalized.y;
-        float2 sss_lobes = float2(sss_lobe_y, -0.5) * float2(normal_xy_normalized.x, sss_lobe_y);
+        customDataA_and_Temp.xy = screenUV.xy * cb1[138].xy - cb1[134].xy;
+        materialParams_and_Lighting.xy = customDataA_and_Temp.xy * cb1[135].zw + materialParams_and_Lighting.xy;
+        materialParams_and_Lighting.xy = materialParams_and_Lighting.xy * cb1[135].xy + cb1[134].xy;
+        materialParams_and_Lighting.xy = cb1[138].zw * materialParams_and_Lighting.xy;
         
-        float2 uv_offset = (screenUV.xy * cb1[138].xy - cb1[134].xy) * cb1[135].zw + sss_lobes;
-        float2 final_uv = (uv_offset * cb1[135].xy + cb1[134].xy) * cb1[138].zw;
+        float reprojectedDepth = tex2D(_IN6, materialParams_and_Lighting.xy).x;
+        float reprojectedViewDepth = reprojectedDepth * cb1[65].x + cb1[65].y;
+        reprojectedDepth = 1.0 / (reprojectedDepth * cb1[65].z - cb1[65].w);
+        reprojectedViewDepth = reprojectedViewDepth + reprojectedDepth;
         
-        float reprojectedDepth_raw = tex2D(_IN6, final_uv).x;
-        float reprojectedViewDepth_temp = reprojectedDepth_raw * cb1[65].x + cb1[65].y;
-        reprojectedDepth_raw = 1.0 / (reprojectedDepth_raw * cb1[65].z - cb1[65].w);
-        float reprojectedViewDepth = reprojectedViewDepth_temp + reprojectedDepth_raw;
+        reprojectedDepth = max(9.99999975e-05, reprojectedViewDepth - baseColor_and_Depth.w);
+        gbufferData_and_Temp.w = saturate((reprojectedDepth - gbufferData_and_Temp.w * 1000.0) / materialParams_and_Lighting.w);
+        reprojectedDepth = gbufferData_and_Temp.w * -2.0 + 3.0;
+        gbufferData_and_Temp.w = gbufferData_and_Temp.w * gbufferData_and_Temp.w;
+        gbufferData_and_Temp.w = min(1.0, reprojectedDepth * gbufferData_and_Temp.w);
         
-        float depth_diff = max(9.99999975e-05, reprojectedViewDepth - depth);
-        float reprojected_falloff = saturate((depth_diff - scatterRadiusClamped * 1000.0) / scatterPower);
-        float reprojected_fresnel_temp = (reprojected_falloff * -2.0 + 3.0) * (reprojected_falloff * reprojected_falloff);
-        reprojected_fresnel = min(1.0, reprojected_fresnel_temp);
+        materialParams_and_Lighting.x = dot(cb1[263].xyz, float3(0.300000012, 0.589999974, 0.109999999));
+        materialParams_and_Lighting.yzw = cb1[263].xyz - materialParams_and_Lighting.xxx;
+        materialParams_and_Lighting.xyz = materialParams_and_Lighting.yzw * 0.75 + materialParams_and_Lighting.xxx;
+        customDataA_and_Temp.xyz = cb1[263].xyz - materialParams_and_Lighting.xyz;
+        materialParams_and_Lighting.xyz = gbufferData_and_Temp.www * customDataA_and_Temp.xyz + materialParams_and_Lighting.xyz;
+        materialParams_and_Lighting.xyz = materialParams_and_Lighting.xyz * gbufferData_and_Temp.xxx;
+        materialParams_and_Lighting.xyz = 0.100000001 * materialParams_and_Lighting.xyz;
         
-        float ambient_luma = dot(cb1[263].xyz, float3(0.300000012, 0.589999974, 0.109999999));
-        float3 ambient_color = (cb1[263].xyz - ambient_luma) * 0.75 + ambient_luma;
-        ambient_color = reprojected_fresnel * (cb1[263].xyz - ambient_color) + ambient_color;
-        ambient_color = ambient_color * scatterRadius;
-        ambient_color = ambient_color * 0.100000001;
-        float3 ambient_base = (1.0 + baseColor) * ambient_color;
-        float3 spec_highlight_mask = saturate((baseColor * 1.20000005) - 1.0);
-        float3 spec_highlight_factor = (spec_highlight_mask * -2.0 + 3.0) * (spec_highlight_mask * spec_highlight_mask);
-        spec_highlight_factor = spec_highlight_factor * 14.0 + 1.0;
-        ambient_color = spec_highlight_factor * ambient_color;
-        ambient_color = (ambient_color * baseColor) - ambient_base;
-        ambient_color = cb1[260].zzz * ambient_color + ambient_base;
-        ambient_color = ambient_color * reprojected_fresnel;
+        customDataA_and_Temp.xyz = (1.0 + baseColor_and_Depth.xyz) * materialParams_and_Lighting.xyz;
+        shadingModelFlags_and_Temp.xyw = saturate(baseColor_and_Depth.xyz * 1.20000005 - 1.0);
+        worldNormal_and_WorldPos.xyz = shadingModelFlags_and_Temp.xyw * -2.0 + 3.0;
+        shadingModelFlags_and_Temp.xyw = shadingModelFlags_and_Temp.xyw * shadingModelFlags_and_Temp.xyw;
+        shadingModelFlags_and_Temp.xyw = worldNormal_and_WorldPos.xyz * shadingModelFlags_and_Temp.xyw;
+        shadingModelFlags_and_Temp.xyw = shadingModelFlags_and_Temp.xyw * 14.0 + 1.0;
         
-        float fog_factor = 0.000199999995 * (5000.0 - min(5000.0, max(0.0, depth - 10000.0)));
-        ambient_color = fog_factor * ambient_color;
-        sssColor = cb0[1].xyz * ambient_color;
+        materialParams_and_Lighting.xyz = shadingModelFlags_and_Temp.xyw * materialParams_and_Lighting.xyz;
+        materialParams_and_Lighting.xyz = materialParams_and_Lighting.xyz * baseColor_and_Depth.xyz - customDataA_and_Temp.xyz;
+        materialParams_and_Lighting.xyz = cb1[260].zzz * materialParams_and_Lighting.xyz + customDataA_and_Temp.xyz;
+        materialParams_and_Lighting.xyz = materialParams_and_Lighting.xyz * gbufferData_and_Temp.www;
+        
+        gbufferData_and_Temp.x = 0.000199999995 * (5000.0 - min(5000.0, max(0.0, baseColor_and_Depth.w - 10000.0)));
+        materialParams_and_Lighting.xyz = gbufferData_and_Temp.xxx * materialParams_and_Lighting.xyz;
+        materialParams_and_Lighting.xyz = cb0[1].xyz * materialParams_and_Lighting.xyz;
+    }
+    else
+    {
+        materialParams_and_Lighting.xyz = float3(0.0, 0.0, 0.0);
     }
     
-    float3 baseLighting = preSssLighting * initialLighting;
-    baseLighting = cb1[263].xyz * baseLighting;
-    baseLighting = (baseLighting * 0.5) - preSssLighting;
-    baseLighting = reprojected_fresnel * baseLighting + preSssLighting;
+    gbufferData_and_Temp.x = (shadingModelFlags_and_Temp.z != 0.0) ? 1.0 : 0.0;
     
-    float3 finalCompositedColor = preSssLighting + sssColor;
-
-    finalCompositedColor = (specialShadingModelFlags.z != 0.0) ? baseLighting : finalCompositedColor;
-
-    float3 finalColorXYZ = isShadingModel_5 ? preSssLighting : finalCompositedColor;
+    baseColor_and_Depth.xyz = shadingInfo_and_Temp.yzw * lightingTempA.xyz;
+    baseColor_and_Depth.xyz = cb1[263].xyz * baseColor_and_Depth.xyz;
+    baseColor_and_Depth.xyz = baseColor_and_Depth.xyz * 0.5 - shadingInfo_and_Temp.yzw;
+    baseColor_and_Depth.xyz = gbufferData_and_Temp.www * baseColor_and_Depth.xyz + shadingInfo_and_Temp.yzw;
     
-    finalColorXYZ = finalColorXYZ / aoFactor;
+    materialParams_and_Lighting.xyz = shadingInfo_and_Temp.yzw + materialParams_and_Lighting.xyz;
+    materialParams_and_Lighting.xyz = gbufferData_and_Temp.xxx ? baseColor_and_Depth.xyz : materialParams_and_Lighting.xyz;
     
-    finalColorXYZ = min(float3(0.0, 0.0, 0.0), -finalColorXYZ);
+    gbufferData_and_Temp.xzw = gbufferData_and_Temp.zzz ? shadingInfo_and_Temp.yzw : materialParams_and_Lighting.xyz;
     
-    float4 finalColor;
-    finalColor.xyz = -finalColorXYZ;
-    finalColor.w = 0.0;
+    gbufferData_and_Temp.xyz = gbufferData_and_Temp.xzw / gbufferData_and_Temp.yyy;
+    gbufferData_and_Temp.xyz = min(float3(0.0, 0.0, 0.0), -gbufferData_and_Temp.xyz);
     
+    finalColor.xyz = -gbufferData_and_Temp.xyz;
     return finalColor;
 }
 B:
@@ -1211,7 +1255,7 @@ C:
       dcl_resource_structured t12, 16
       dcl_input_ps linear v0.xy
       dcl_output o0.xyzw
-      dcl_temps 18
+      dcl_temps 19
    0: sample_l r0.xyzw, v0.xyxx, t0.wxyz, s1, l(0.000000)
    1: sample_l r1.xyzw, v0.xyxx, t1.xyzw, s2, l(0.000000)
    2: sample_l r2.xyzw, v0.xyxx, t2.xyzw, s3, l(0.000000)
@@ -1238,551 +1282,564 @@ C:
   23: mul r1.w, r1.w, l(255.000000)
   24: round_ne r1.w, r1.w
   25: ftou r1.w, r1.w
-  26: and r4.x, r1.w, l(15)
-  27: ine r4.yz, r4.xxxx, l(0, 12, 13, 0)
-  28: ieq r6.xyzw, r4.xxxx, l(13, 14, 15, 5)
-  29: or r4.w, r6.z, r6.y
-  30: or r4.w, r6.x, r4.w
-  31: movc r4.y, r4.y, r4.w, l(-1)
-  32: if_nz r4.y
-  33:   and r4.yw, r6.xxxz, l(0, 0x3f800000, 0, 0x3f800000)
-  34:   mad r6.xy, r0.yzyy, l(2.000000, 2.000000, 0.000000, 0.000000), l(-1.000000, -1.000000, 0.000000, 0.000000)
-  35:   dp2 r6.z, l(1.000000, 1.000000, 0.000000, 0.000000), |r6.xyxx|
-  36:   add r7.z, -r6.z, l(1.000000)
-  37:   max r6.z, r7.z, l(0.000000)
-  38:   ge r8.xy, r6.xyxx, l(0.000000, 0.000000, 0.000000, 0.000000)
-  39:   movc r8.xy, r8.xyxx, l(0.500000,0.500000,0,0), l(-0.500000,-0.500000,0,0)
-  40:   mul r8.xy, r6.zzzz, r8.xyxx
-  41:   mad r7.xy, r8.xyxx, l(-2.000000, -2.000000, 0.000000, 0.000000), r6.xyxx
-  42:   dp3 r6.x, r7.xyzx, r7.xyzx
-  43:   rsq r6.x, r6.x
-  44:   mul r6.xyz, r6.xxxx, r7.xyzx
-  45:   mul r7.xyz, r1.xyzx, r1.xyzx
-  46: else 
-  47:   ieq r7.w, r4.x, l(10)
-  48:   if_nz r7.w
-  49:     mov_sat r1.xyz, r1.xyzx
-  50:     mul r1.xyz, r1.xyzx, l(16777215.000000, 65535.000000, 255.000000, 0.000000)
-  51:     round_ne r1.xyz, r1.xyzx
-  52:     ftou r1.xyz, r1.xyzx
-  53:     and r1.xy, r1.yxyy, l(0x0000ff00, 0x00ff0000, 0, 0)
-  54:     iadd r1.x, r1.x, r1.z
-  55:     iadd r1.x, r1.y, r1.x
-  56:     utof r1.x, r1.x
-  57:     mul r1.x, r1.x, l(0.000000)
-  58:     mad r1.y, r1.x, r5.x, r5.y
-  59:     mad r1.x, r1.x, r5.z, -r5.w
-  60:     div r1.x, l(1.000000, 1.000000, 1.000000, 1.000000), r1.x
-  61:     add r2.w, r1.x, r1.y
-  62:   endif 
-  63:   mad r6.xyz, r0.yzwy, l(2.000000, 2.000000, 2.000000, 0.000000), l(-1.000000, -1.000000, -1.000000, 0.000000)
-  64:   mov r7.xyz, l(0,0,0,0)
-  65:   mov r0.x, l(0)
-  66:   mov r3.xy, l(0,0,0,0)
-  67:   mov r4.yw, l(0,0,0,0)
-  68: endif 
-  69: dp3 r0.y, r6.xyzx, r6.xyzx
-  70: rsq r0.y, r0.y
-  71: mul r1.xyz, r0.yyyy, r6.xyzx
-  72: ld_structured r8.x, l(162), l(4), t11.xxxx
-  73: lt r0.z, l(0.000000), r8.x
-  74: ld_structured r9.x, l(220), l(8), t11.xxxx
-  75: lt r6.x, l(0.000000), r9.x
-  76: and r0.z, r0.z, r6.x
-  77: ne r6.x, r8.x, l(0.000000)
-  78: and r6.y, r6.x, l(0x3f800000)
-  79: movc r8.xyz, r6.xxxx, l(1.000000,1.000000,1.000000,0), r2.xyzx
-  80: ne r3.w, l(0.000000, 0.000000, 0.000000, 0.000000), r3.w
-  81: and r3.w, r3.w, l(0x3f800000)
-  82: movc r8.xyz, r0.zzzz, r3.wwww, r8.xyzx
-  83: lt r0.y, l(0.000000), r0.y
-  84: movc r2.xyz, r0.yyyy, r8.xyzx, r2.xyzx
-  85: sample_l r8.xyzw, l(0.000000, 0.000000, 0.000000, 0.000000), t5.xyzw, s9, l(0.000000)
-  86: ld_structured r9.xyz, l(50), l(0), t11.xyzx
-  87: mul r8.yzw, r2.wwww, r9.xxyz
-  88: ld_structured r9.xyz, l(48), l(0), t11.xyzx
-  89: mad r6.xyz, r6.yyyy, r9.xyzx, r8.yzwy
-  90: ld_structured r9.xyz, l(51), l(0), t11.xyzx
-  91: add r6.xyz, r6.xyzx, r9.xyzx
-  92: sample_l r9.xyzw, v0.xyxx, t6.xyzw, s5, l(0.000000)
-  93: mul r0.yz, r9.xxzx, r9.xxzx
-  94: mul r0.y, r0.z, r0.y
-  95: ld_structured r9.x, l(253), l(4), t11.xxxx
-  96: ld_structured r10.x, l(255), l(0), t11.xxxx
-  97: ne r0.z, r10.x, l(0.000000)
-  98: if_nz r0.z
-  99:   mov r8.yzw, l(0,0,0,0)
- 100:   mov r3.w, l(0)
- 101:   mov r7.w, l(0)
- 102:   mov r9.yz, l(0,0,0,0)
- 103:   loop 
- 104:     ige r9.w, r9.z, l(3)
- 105:     breakc_nz r9.w
- 106:     add r3.w, r3.w, l(0.000833)
- 107:     mov r10.xyz, r8.yzwy
- 108:     mov r9.w, r7.w
- 109:     mov r10.w, r9.y
- 110:     mov r11.x, l(0)
- 111:     loop 
- 112:       ige r11.y, r11.x, l(3)
- 113:       breakc_nz r11.y
- 114:       add r10.w, r10.w, l(1.000000)
- 115:       mul r11.y, r10.w, l(2.094395)
- 116:       sincos r12.x, r13.x, r11.y
- 117:       mov r13.y, r12.x
- 118:       mad r11.yz, r13.xxyx, r3.wwww, v0.xxyx
- 119:       sample r12.xyzw, r11.yzyy, t7.xyzw, s7
- 120:       mad r10.xyz, r12.xyzx, r3.wwww, r10.xyzx
- 121:       add r9.w, r3.w, r9.w
- 122:       iadd r11.x, r11.x, l(1)
- 123:     endloop 
- 124:     mov r8.yzw, r10.xxyz
- 125:     mov r7.w, r9.w
- 126:     add r9.y, r10.w, l(0.620000)
- 127:     iadd r9.z, r9.z, l(1)
- 128:   endloop 
- 129:   div r10.xyw, r8.zwzy, r7.wwww
- 130:   lt r8.yzw, l(0.000000, 0.645000, 0.312000, 0.979000), r0.xxxx
- 131:   lt r9.yzw, r0.xxxx, l(0.000000, 0.685000, 0.352000, 1.021000)
- 132:   and r8.yzw, r8.yyzw, r9.yyzw
- 133:   and r0.x, r8.w, l(0x3f800000)
- 134:   movc r0.x, r8.z, l(0), r0.x
- 135:   movc r0.x, r8.y, l(1.000000), r0.x
- 136:   or r3.w, r8.w, r8.z
- 137:   and r3.w, r3.w, l(0x3f800000)
- 138:   movc r3.w, r8.y, l(0), r3.w
- 139:   mul r3.x, r3.x, l(255.000000)
- 140:   round_ne r3.x, r3.x
- 141:   ftou r3.x, r3.x
- 142:   and r11.xyzw, r3.xxxx, l(15, 240, 240, 15)
- 143:   add r3.x, r0.w, r0.w
- 144:   mov_sat r3.x, r3.x
- 145:   mad r7.w, r3.x, l(-2.000000), l(3.000000)
- 146:   mul r3.x, r3.x, r3.x
- 147:   mul r3.x, r3.x, r7.w
- 148:   mad_sat r7.w, r0.w, l(2.000000), l(-1.000000)
- 149:   mad r8.y, r7.w, l(-2.000000), l(3.000000)
- 150:   mul r7.w, r7.w, r7.w
- 151:   mul r7.w, r7.w, r8.y
- 152:   ld_structured r12.xyz, l(262), l(0), t11.xyzx
- 153:   ld_structured r13.xyz, l(261), l(0), t11.xyzx
- 154:   add r8.yzw, r12.xxyz, -r13.xxyz
- 155:   dp3 r8.y, |r8.yzwy|, l(0.300000, 0.590000, 0.110000, 0.000000)
- 156:   mul r8.y, r8.y, l(10.000000)
- 157:   min r8.y, r8.y, l(1.000000)
- 158:   mad r8.z, r8.y, l(-2.000000), l(3.000000)
- 159:   mul r8.y, r8.y, r8.y
- 160:   mul r8.y, r8.y, r8.z
- 161:   mul r8.z, r7.w, r8.y
- 162:   ld_structured r14.xyz, l(265), l(0), t11.xyzx
- 163:   add r8.w, -r14.x, r14.y
- 164:   div r8.w, l(1.000000, 1.000000, 1.000000, 1.000000), r8.w
- 165:   ld_structured r15.x, l(265), l(0), t11.xxxx
- 166:   mad r9.y, r9.x, r0.y, -r15.x
- 167:   mul_sat r9.y, r8.w, r9.y
- 168:   mad r9.z, r9.y, l(-2.000000), l(3.000000)
- 169:   mul r9.y, r9.y, r9.y
- 170:   mul r9.y, r9.y, r9.z
- 171:   mul r9.y, r8.z, r9.y
- 172:   mad r9.z, r9.x, r0.y, -r9.y
- 173:   mad r9.y, r14.z, r9.z, r9.y
- 174:   add r9.z, r9.y, -r15.x
- 175:   mul_sat r8.w, r8.w, r9.z
- 176:   mad r9.z, r8.w, l(-2.000000), l(3.000000)
+  26: and r4.xy, r1.wwww, l(15, -16, 0, 0)
+  27: itof r4.yz, r4.xxyx
+  28: ine r1.w, r4.x, l(12)
+  29: ieq r6.xyz, r4.xxxx, l(13, 14, 15, 0)
+  30: or r4.w, r6.y, r6.z
+  31: or r4.w, r6.x, r4.w
+  32: movc r1.w, r1.w, r4.w, l(-1)
+  33: if_nz r1.w
+  34:   movc r4.y, r6.x, l(13.000000), l(12.000000)
+  35:   and r6.xy, r6.yzyy, l(0x3f800000, 0x3f800000, 0, 0)
+  36:   mad r6.zw, r0.yyyz, l(0.000000, 0.000000, 2.000000, 2.000000), l(0.000000, 0.000000, -1.000000, -1.000000)
+  37:   dp2 r1.w, l(1.000000, 1.000000, 0.000000, 0.000000), |r6.zwzz|
+  38:   add r7.z, -r1.w, l(1.000000)
+  39:   max r1.w, -r7.z, l(0.000000)
+  40:   ge r8.xy, r6.zwzz, l(0.000000, 0.000000, 0.000000, 0.000000)
+  41:   movc r8.xy, r8.xyxx, l(0.500000,0.500000,0,0), l(-0.500000,-0.500000,0,0)
+  42:   mul r8.xy, r1.wwww, r8.xyxx
+  43:   mad r7.xy, r8.xyxx, l(-2.000000, -2.000000, 0.000000, 0.000000), r6.zwzz
+  44:   dp3 r1.w, r7.xyzx, r7.xyzx
+  45:   rsq r1.w, r1.w
+  46:   mul r7.xyz, r1.wwww, r7.xyzx
+  47:   mul r8.xyz, r1.xyzx, r1.xyzx
+  48: else 
+  49:   ieq r1.w, r4.x, l(10)
+  50:   mov_sat r1.xyz, r1.xyzx
+  51:   mul r1.xyz, r1.xyzx, l(16777215.000000, 65535.000000, 255.000000, 0.000000)
+  52:   round_ne r1.xyz, r1.xyzx
+  53:   ftou r1.xyz, r1.xyzx
+  54:   and r1.xy, r1.yxyy, l(0x0000ff00, 0x00ff0000, 0, 0)
+  55:   iadd r1.x, r1.x, r1.z
+  56:   iadd r1.x, r1.y, r1.x
+  57:   utof r1.x, r1.x
+  58:   mul r1.x, r1.x, l(0.000000)
+  59:   mad r1.y, r1.x, r5.x, r5.y
+  60:   mad r1.x, r1.x, r5.z, -r5.w
+  61:   div r1.x, l(1.000000, 1.000000, 1.000000, 1.000000), r1.x
+  62:   add r1.x, r1.x, r1.y
+  63:   movc r2.w, r1.w, r1.x, r2.w
+  64:   mad r7.xyz, r0.yzwy, l(2.000000, 2.000000, 2.000000, 0.000000), l(-1.000000, -1.000000, -1.000000, 0.000000)
+  65:   mov r8.xyz, l(0,0,0,0)
+  66:   mov r0.xw, l(0,0,0,0)
+  67:   mov r3.xy, l(0,0,0,0)
+  68:   mov r6.xy, l(0,0,0,0)
+  69: endif 
+  70: dp3 r0.y, r7.xyzx, r7.xyzx
+  71: rsq r0.y, r0.y
+  72: mul r1.xyz, r0.yyyy, r7.xyzx
+  73: ftoi r0.y, r4.y
+  74: ieq r4.xy, r0.yyyy, l(5, 13, 0, 0)
+  75: ld_structured r7.x, l(162), l(4), t11.xxxx
+  76: lt r0.z, l(0.000000), r7.x
+  77: ld_structured r9.x, l(220), l(8), t11.xxxx
+  78: lt r1.w, l(0.000000), r9.x
+  79: and r0.z, r0.z, r1.w
+  80: ne r1.w, r7.x, l(0.000000)
+  81: movc r7.xyz, r1.wwww, l(1.000000,1.000000,1.000000,0), r2.xyzx
+  82: ne r1.w, l(0.000000, 0.000000, 0.000000, 0.000000), r3.w
+  83: and r1.w, r1.w, l(0x3f800000)
+  84: movc r7.xyz, r0.zzzz, r1.wwww, r7.xyzx
+  85: movc r2.xyz, r4.xxxx, r7.xyzx, r2.xyzx
+  86: sample_l r7.xyzw, l(0.000000, 0.000000, 0.000000, 0.000000), t5.xyzw, s9, l(0.000000)
+  87: ld_structured r9.xyz, l(50), l(0), t11.xyzx
+  88: ld_structured r10.xyz, l(51), l(0), t11.xyzx
+  89: mad r7.yzw, r2.wwww, r9.xxyz, r10.xxyz
+  90: sample_l r9.xyzw, v0.xyxx, t6.xyzw, s5, l(0.000000)
+  91: mul r4.xw, r9.xxxz, r9.xxxz
+  92: mul r0.z, r4.w, r4.x
+  93: ld_structured r9.x, l(253), l(4), t11.xxxx
+  94: mul r1.w, r0.z, r9.x
+  95: ld_structured r10.x, l(255), l(0), t11.xxxx
+  96: ne r3.w, r10.x, l(0.000000)
+  97: if_nz r3.w
+  98:   mov r9.yzw, l(0,0,0,0)
+  99:   mov r3.w, l(0)
+ 100:   mov r4.xw, l(0,0,0,0)
+ 101:   mov r6.z, l(0)
+ 102:   loop 
+ 103:     ftoi r6.w, r3.w
+ 104:     ige r8.w, r6.w, l(3)
+ 105:     if_nz r8.w
+ 106:       break 
+ 107:     endif 
+ 108:     add r4.x, r4.x, l(0.000833)
+ 109:     mov r10.yzw, r9.yyzw
+ 110:     mov r8.w, r4.w
+ 111:     mov r11.x, r6.z
+ 112:     mov r11.y, l(0)
+ 113:     loop 
+ 114:       ftoi r11.z, r11.y
+ 115:       ige r11.w, r11.z, l(3)
+ 116:       if_nz r11.w
+ 117:         break 
+ 118:       endif 
+ 119:       add r8.w, r8.w, l(1.000000)
+ 120:       mul r11.w, r8.w, l(2.094395)
+ 121:       sincos r12.x, r13.x, r11.w
+ 122:       mov r13.y, r12.x
+ 123:       mad r12.xy, r13.xyxx, r4.xxxx, v0.xyxx
+ 124:       sample r12.xyzw, r12.xyxx, t7.xyzw, s7
+ 125:       mad r10.yzw, r12.xxyz, r4.xxxx, r10.yyzw
+ 126:       add r11.x, r4.x, r11.x
+ 127:       iadd r11.z, r11.z, l(1)
+ 128:       itof r11.y, r11.z
+ 129:     endloop 
+ 130:     mov r9.yzw, r10.yyzw
+ 131:     mov r6.z, r11.x
+ 132:     add r4.w, r8.w, l(0.620000)
+ 133:     iadd r6.w, r6.w, l(1)
+ 134:     itof r3.w, r6.w
+ 135:   endloop 
+ 136:   div r11.xyw, r9.zwzy, r6.zzzz
+ 137:   lt r9.yzw, l(0.000000, 0.645000, 0.312000, 0.979000), r0.xxxx
+ 138:   lt r10.yzw, r0.xxxx, l(0.000000, 0.685000, 0.352000, 1.021000)
+ 139:   and r9.yzw, r9.yyzw, r10.yyzw
+ 140:   and r0.x, r9.w, l(0x3f800000)
+ 141:   movc r0.x, r9.z, l(0), r0.x
+ 142:   movc r0.x, r9.y, l(1.000000), r0.x
+ 143:   or r3.w, r9.w, r9.z
+ 144:   and r3.w, r3.w, l(0x3f800000)
+ 145:   movc r3.w, r9.y, l(0), r3.w
+ 146:   mul r3.x, r3.x, l(255.000000)
+ 147:   round_ne r3.x, r3.x
+ 148:   ftou r3.x, r3.x
+ 149:   and r12.xyzw, r3.xxxx, l(15, 240, 240, 15)
+ 150:   utof r12.xyzw, r12.xyzw
+ 151:   add_sat r3.x, r0.w, r0.w
+ 152:   mad r4.x, r3.x, l(-2.000000), l(3.000000)
+ 153:   mul r3.x, r3.x, r3.x
+ 154:   mul r3.x, r3.x, r4.x
+ 155:   add r4.x, r0.w, l(-0.500000)
+ 156:   add_sat r4.x, r4.x, r4.x
+ 157:   mad r4.w, r4.x, l(-2.000000), l(3.000000)
+ 158:   mul r4.x, r4.x, r4.x
+ 159:   mul r4.x, r4.x, r4.w
+ 160:   ld_structured r13.xyz, l(262), l(0), t11.xyzx
+ 161:   ld_structured r14.xyz, l(261), l(0), t11.xyzx
+ 162:   add r9.yzw, r13.xxyz, -r14.xxyz
+ 163:   dp3 r4.w, |r9.yzwy|, l(0.300000, 0.590000, 0.110000, 0.000000)
+ 164:   mul r4.w, r4.w, l(10.000000)
+ 165:   min r4.w, r4.w, l(1.000000)
+ 166:   mad r6.z, r4.w, l(-2.000000), l(3.000000)
+ 167:   mul r4.w, r4.w, r4.w
+ 168:   mul r4.w, r4.w, r6.z
+ 169:   mul r6.z, r4.x, r4.w
+ 170:   ld_structured r15.xyz, l(265), l(0), t11.xyzx
+ 171:   add r6.w, -r15.x, r15.y
+ 172:   div r6.w, l(1.000000, 1.000000, 1.000000, 1.000000), r6.w
+ 173:   ld_structured r16.x, l(265), l(0), t11.xxxx
+ 174:   mad r8.w, r9.x, r0.z, -r16.x
+ 175:   mul_sat r8.w, r6.w, r8.w
+ 176:   mad r9.y, r8.w, l(-2.000000), l(3.000000)
  177:   mul r8.w, r8.w, r8.w
- 178:   mul r8.w, r8.w, r9.z
- 179:   mul r8.z, r8.z, r8.w
- 180:   mad r7.w, r8.y, r7.w, -r8.z
- 181:   ld_structured r14.x, l(265), l(8), t11.xxxx
- 182:   mad r7.w, r14.x, r7.w, r8.z
- 183:   ld_structured r14.xy, l(260), l(0), t11.xyxx
- 184:   add r8.z, r9.y, l(-1.000000)
- 185:   mad r8.z, r14.y, r8.z, l(1.000000)
- 186:   mad r8.w, r8.x, r7.w, -r8.z
- 187:   mad r8.z, r4.y, r8.w, r8.z
- 188:   mad r8.w, r8.x, r7.w, -r7.w
- 189:   mad r7.w, r4.y, r8.w, r7.w
- 190:   ge r8.w, r10.x, r10.y
- 191:   and r8.w, r8.w, l(0x3f800000)
- 192:   add r9.yz, r10.xxyx, -r10.yyxy
- 193:   mad r10.xy, r8.wwww, r9.yzyy, r10.yxyy
- 194:   mov r10.z, l(-1.000000)
- 195:   ge r8.w, r10.w, r10.x
- 196:   and r8.w, r8.w, l(0x3f800000)
- 197:   add r15.xyzw, -r10.xyzw, r10.wyxz
- 198:   mad r10.xyzw, r8.wwww, r15.xyzw, r10.xyzw
- 199:   min r8.w, r10.y, r10.w
- 200:   add r8.w, -r8.w, r10.x
- 201:   add r9.y, -r10.y, r10.w
- 202:   mad r9.z, r8.w, l(6.000000), l(0.001000)
- 203:   div r9.y, r9.y, r9.z
- 204:   add r9.y, r9.y, r10.z
- 205:   add r9.z, r10.x, l(0.001000)
- 206:   div r8.w, r8.w, r9.z
- 207:   utof r10.xyzw, r11.xyzw
- 208:   mad r11.xyzw, r10.xyzw, l(0.040000, 0.002745, 0.003922, 0.066667), l(0.400000, 0.400000, 1.000000, 0.500000)
- 209:   ge r9.z, r10.z, l(2.550000)
- 210:   and r9.z, r9.z, l(0x3f800000)
- 211:   add r9.w, -r11.x, r11.y
- 212:   mad r9.w, r9.z, r9.w, r11.x
- 213:   mul r8.w, r8.w, r9.w
- 214:   min r8.w, r8.w, l(0.350000)
- 215:   max r8.w, r8.w, l(0.000000)
- 216:   add r10.xyz, r9.yyyy, l(1.000000, 0.666667, 0.333333, 0.000000)
- 217:   frc r10.xyz, r10.xyzx
- 218:   mad r10.xyz, r10.xyzx, l(6.000000, 6.000000, 6.000000, 0.000000), l(-3.000000, -3.000000, -3.000000, 0.000000)
- 219:   add_sat r10.xyz, |r10.xyzx|, l(-1.000000, -1.000000, -1.000000, 0.000000)
- 220:   add r10.xyz, r10.xyzx, l(-1.000000, -1.000000, -1.000000, 0.000000)
- 221:   mad r10.xyz, r8.wwww, r10.xyzx, l(1.000000, 1.000000, 1.000000, 0.000000)
- 222:   add r9.y, r8.w, l(1.000000)
- 223:   mul r14.yzw, r9.yyyy, r10.xxyz
- 224:   mad r15.xyz, r10.xyzx, r8.wwww, l(-1.000000, -1.000000, -1.000000, 0.000000)
- 225:   mad r15.xyz, r15.xyzx, l(0.600000, 0.600000, 0.600000, 0.000000), l(1.000000, 1.000000, 1.000000, 0.000000)
- 226:   mad r10.xyz, -r10.xyzx, r8.wwww, r15.xyzx
- 227:   mad r10.xyz, r0.xxxx, r10.xyzx, r14.yzwy
- 228:   add r14.yzw, -r2.xxyz, r10.xxyz
- 229:   mad r14.yzw, r14.yyzw, l(0.000000, 0.850000, 0.850000, 0.850000), r2.xxyz
- 230:   mad r11.xyz, r11.zzzz, r14.yzwy, -r10.xyzx
- 231:   mad r9.yzw, r9.zzzz, r11.xxyz, r10.xxyz
- 232:   add r9.yzw, r9.yyzw, l(0.000000, -1.000000, -1.000000, -1.000000)
- 233:   mad r9.yzw, r9.yyzw, r11.wwww, l(0.000000, 1.000000, 1.000000, 1.000000)
- 234:   mul r10.xyz, r13.xyzx, l(0.200000, 0.200000, 0.200000, 0.000000)
- 235:   mad r11.xyz, r12.xyzx, l(0.500000, 0.500000, 0.500000, 0.000000), -r10.xyzx
- 236:   mad r10.xyz, r8.zzzz, r11.xyzx, r10.xyzx
- 237:   mul r10.xyz, r10.xyzx, r14.xxxx
- 238:   mul r10.xyz, r2.xyzx, r10.xyzx
- 239:   mul r11.xyz, r7.xyzx, r10.xyzx
- 240:   mul r13.xyz, r2.xyzx, r13.xyzx
- 241:   mad r0.x, r3.x, l(0.300000), l(0.700000)
- 242:   mul r14.xyz, r0.xxxx, r13.xyzx
- 243:   mad r11.xyz, r13.xyzx, r0.xxxx, r11.xyzx
- 244:   mul r13.xyz, r9.yzwy, r11.xyzx
- 245:   mad r12.xyz, r2.xyzx, r12.xyzx, -r14.xyzx
- 246:   mad r12.xyz, r12.xyzx, l(0.400000, 0.400000, 0.400000, 0.000000), r14.xyzx
- 247:   mul r14.xyz, r9.yzwy, r14.xyzx
- 248:   mad r12.xyz, r12.xyzx, r9.yzwy, -r14.xyzx
- 249:   mad r12.xyz, r7.wwww, r12.xyzx, r14.xyzx
- 250:   mad r10.xyz, r10.xyzx, r7.xyzx, r12.xyzx
- 251:   mad r12.xyz, r7.xyzx, r9.yzwy, -r13.xyzx
- 252:   mad r12.xyz, r7.wwww, r12.xyzx, r13.xyzx
- 253:   sample_l r14.xyzw, v0.xyxx, t8.xyzw, s8, l(0.000000)
- 254:   add r0.x, r14.x, l(-1.000000)
- 255:   mad r0.x, r3.w, r0.x, l(1.000000)
- 256:   add r12.xyz, -r10.xyzx, r12.xyzx
- 257:   mad r8.yzw, r8.yyyy, r12.xxyz, r10.xxyz
- 258:   mad r9.yzw, -r11.xxyz, r9.yyzw, l(0.000000, 1.000000, 1.000000, 1.000000)
- 259:   mad r9.yzw, r0.xxxx, r9.yyzw, r13.xxyz
- 260:   mul r8.yzw, r8.yyzw, r9.yyzw
- 261: else 
- 262:   add r0.x, r0.w, r0.w
- 263:   mov_sat r0.x, r0.x
- 264:   mad r3.x, r0.x, l(-2.000000), l(3.000000)
- 265:   mul r0.x, r0.x, r0.x
- 266:   mul r0.x, r0.x, r3.x
- 267:   mad_sat r3.x, r0.w, l(2.000000), l(-1.000000)
- 268:   mad r3.w, r3.x, l(-2.000000), l(3.000000)
- 269:   mul r3.x, r3.x, r3.x
- 270:   mul r3.x, r3.x, r3.w
- 271:   ld_structured r10.xyz, l(262), l(0), t11.xyzx
- 272:   ld_structured r11.xyz, l(261), l(0), t11.xyzx
- 273:   add r9.yzw, r10.xxyz, -r11.xxyz
- 274:   dp3 r3.w, |r9.yzwy|, l(0.300000, 0.590000, 0.110000, 0.000000)
- 275:   mul r3.w, r3.w, l(10.000000)
- 276:   min r3.w, r3.w, l(1.000000)
- 277:   mad r7.w, r3.w, l(-2.000000), l(3.000000)
- 278:   mul r3.w, r3.w, r3.w
- 279:   mul r3.w, r3.w, r7.w
- 280:   mul r7.w, r3.x, r3.w
- 281:   ld_structured r12.xyz, l(265), l(0), t11.xyzx
- 282:   add r9.y, -r12.x, r12.y
- 283:   div r9.y, l(1.000000, 1.000000, 1.000000, 1.000000), r9.y
- 284:   ld_structured r13.x, l(265), l(0), t11.xxxx
- 285:   mad r9.z, r9.x, r0.y, -r13.x
- 286:   mul_sat r9.z, r9.y, r9.z
- 287:   mad r9.w, r9.z, l(-2.000000), l(3.000000)
- 288:   mul r9.z, r9.z, r9.z
- 289:   mul r9.z, r9.z, r9.w
- 290:   mul r9.z, r7.w, r9.z
- 291:   mad r0.y, r9.x, r0.y, -r9.z
- 292:   mad r0.y, r12.z, r0.y, r9.z
- 293:   add r9.x, r0.y, -r13.x
- 294:   mul_sat r9.x, r9.y, r9.x
- 295:   mad r9.y, r9.x, l(-2.000000), l(3.000000)
- 296:   mul r9.x, r9.x, r9.x
- 297:   mul r9.x, r9.x, r9.y
- 298:   mul r7.w, r7.w, r9.x
- 299:   mad r3.x, r3.w, r3.x, -r7.w
- 300:   ld_structured r9.x, l(265), l(8), t11.xxxx
- 301:   mad r3.x, r9.x, r3.x, r7.w
- 302:   ld_structured r9.xy, l(260), l(0), t11.xyxx
- 303:   add r0.y, r0.y, l(-1.000000)
- 304:   mad r0.y, r9.y, r0.y, l(1.000000)
- 305:   mad r7.w, r8.x, r3.x, -r0.y
- 306:   mad r0.y, r4.y, r7.w, r0.y
- 307:   mad r7.w, r8.x, r3.x, -r3.x
- 308:   mad r3.x, r4.y, r7.w, r3.x
- 309:   mul r9.yzw, r11.xxyz, l(0.000000, 0.200000, 0.200000, 0.200000)
- 310:   mad r12.xyz, r10.xyzx, l(0.500000, 0.500000, 0.500000, 0.000000), -r9.yzwy
- 311:   mad r9.yzw, r0.yyyy, r12.xxyz, r9.yyzw
- 312:   mul r9.xyz, r9.yzwy, r9.xxxx
- 313:   mul r9.xyz, r2.xyzx, r9.xyzx
- 314:   mul r12.xyz, r7.xyzx, r9.xyzx
- 315:   mul r11.xyz, r2.xyzx, r11.xyzx
- 316:   mad r0.x, r0.x, l(0.300000), l(0.700000)
- 317:   mul r13.xyz, r0.xxxx, r11.xyzx
- 318:   mad r11.xyz, r11.xyzx, r0.xxxx, r12.xyzx
- 319:   mad r11.xyz, r3.wwww, r12.xyzx, r11.xyzx
- 320:   mad r12.xyz, r2.xyzx, r10.xyzx, -r13.xyzx
- 321:   mul r12.xyz, r3.xxxx, r12.xyzx
- 322:   mad r12.xyz, r12.xyzx, l(0.400000, 0.400000, 0.400000, 0.000000), r13.xyzx
- 323:   mad r9.xyz, r9.xyzx, r7.xyzx, r12.xyzx
- 324:   mad r10.xyz, r2.xyzx, r10.xyzx, -r11.xyzx
- 325:   mad r10.xyz, r3.xxxx, r10.xyzx, r11.xyzx
- 326:   add r10.xyz, -r9.xyzx, r10.xyzx
- 327:   mad r8.yzw, r0.yyyy, r10.xxyz, r9.xxyz
- 328: endif 
- 329: add r0.x, r0.w, l(-0.400000)
- 330: mul_sat r0.x, r0.x, l(10.000001)
- 331: mad r0.y, r0.x, l(-2.000000), l(3.000000)
- 332: mul r0.x, r0.x, r0.x
- 333: mul r0.y, r0.x, r0.y
- 334: ld_structured r9.xyz, l(261), l(0), t11.xyzx
- 335: mad r10.xyz, r8.yzwy, l(0.500000, 0.500000, 0.500000, 0.000000), r9.xyzx
- 336: mul r10.xyz, r2.xyzx, r10.xyzx
- 337: mul r9.xyz, r2.xyzx, r9.xyzx
- 338: movc r9.xyz, r0.zzzz, r10.xyzx, r9.xyzx
- 339: movc r8.yzw, r6.wwww, r9.xxyz, r8.yyzw
- 340: movc r0.x, r6.w, l(0), r0.x
- 341: ld_structured r9.xyz, l(264), l(0), t11.xyzx
- 342: add r10.xyz, r9.xyzx, r9.xyzx
- 343: mad r10.xyz, r0.yyyy, r10.xyzx, -r9.xyzx
- 344: ld_structured r11.x, l(128), l(0), t12.xxxx
- 345: mov r11.yzw, l(0,0,0,0)
- 346: mov r0.zw, l(0,0,1.000000,0)
- 347: loop 
- 348:   uge r3.x, r0.w, r11.x
- 349:   breakc_nz r3.x
- 350:   ishl r3.x, r0.w, l(3)
- 351:   iadd r3.w, r3.x, l(7)
- 352:   ld_structured r12.x, r3.w, l(12), t12.xxxx
- 353:   ftou r4.y, r12.x
- 354:   ishl r4.y, r4.y, l(5)
- 355:   and r4.y, r1.w, r4.y
- 356:   if_nz r4.y
- 357:     ld_structured r12.xyzw, r3.x, l(0), t12.xyzw
- 358:     add r12.xyz, -r6.xyzx, r12.xyzx
- 359:     mul r4.y, r12.w, r12.w
- 360:     dp3 r7.w, r12.xyzx, r12.xyzx
- 361:     mul r4.y, r4.y, r7.w
- 362:     ge r9.w, l(1.000000), r4.y
- 363:     if_nz r9.w
- 364:       mad_sat r4.y, r4.y, l(2.500000), l(-1.500000)
- 365:       mad r9.w, r4.y, l(-2.000000), l(3.000000)
- 366:       mul r4.y, r4.y, -r4.y
- 367:       mad r4.y, r9.w, r4.y, l(1.000000)
- 368:       rsq r9.w, r7.w
- 369:       mul r12.xyz, r9.wwww, r12.xyzx
- 370:       dp3 r9.w, r1.xyzx, r12.xyzx
- 371:       add r10.w, r9.w, l(1.000000)
- 372:       iadd r13.xyzw, r3.xxxx, l(5, 6, 4, 1)
- 373:       ld_structured r14.xyzw, r13.x, l(0), t12.xyzw
- 374:       mul r15.xy, r14.wwww, l(0.940000, 0.060000, 0.000000, 0.000000)
- 375:       mad r10.w, r10.w, l(0.500000), -r15.x
- 376:       div r12.w, l(1.000000, 1.000000, 1.000000, 1.000000), r15.y
- 377:       mul_sat r10.w, r10.w, r12.w
- 378:       mad r12.w, r10.w, l(-2.000000), l(3.000000)
- 379:       mul r10.w, r10.w, r10.w
- 380:       mul r10.w, r10.w, r12.w
- 381:       min r10.w, r10.w, l(1.000000)
- 382:       ld_structured r15.xyzw, r13.y, l(0), t12.xyzw
- 383:       mul r15.xyz, r10.xyzx, r15.xyzx
- 384:       mad r14.xyz, r2.xyzx, r14.xyzx, -r15.xyzx
- 385:       mad r14.xyz, r10.wwww, r14.xyzx, r15.xyzx
- 386:       ld_structured r16.xy, r3.w, l(0), t12.xyxx
- 387:       mul r14.xyz, r14.xyzx, r16.xxxx
- 388:       ld_structured r17.xyzw, r13.z, l(0), t12.xyzw
- 389:       mad r7.w, r7.w, r17.x, r17.y
- 390:       add r7.w, r7.w, l(0.000100)
- 391:       div r7.w, l(1.000000, 1.000000, 1.000000, 1.000000), r7.w
- 392:       add r7.w, r7.w, l(-1.000000)
- 393:       mul r7.w, r17.z, r7.w
- 394:       mul r7.w, r7.w, r7.w
- 395:       min r7.w, r7.w, l(1.000000)
- 396:       ld_structured r13.xyzw, r13.w, l(0), t12.xyzw
- 397:       ushr r10.w, r13.w, l(16)
- 398:       ieq r10.w, r10.w, l(2)
- 399:       dp3 r12.x, r12.xyzx, r13.xyzx
- 400:       iadd r12.yz, r3.xxxx, l(0, 2, 3, 0)
- 401:       ld_structured r13.xy, r12.y, l(0), t12.xyxx
- 402:       add r3.x, r12.x, -r13.x
- 403:       mul_sat r3.x, r3.x, r13.y
- 404:       mul r3.x, r3.x, r3.x
- 405:       mul r3.x, r3.x, r3.x
- 406:       mul r3.x, r7.w, r3.x
- 407:       movc r3.x, r10.w, r3.x, r7.w
- 408:       mad_sat r7.w, r9.w, l(0.500000), l(0.500000)
- 409:       mad r7.w, r0.y, r7.w, -r0.x
- 410:       mad r7.w, r17.w, r7.w, r0.x
- 411:       ld_structured r13.xyzw, r12.z, l(0), t12.xyzw
- 412:       mul r12.xyw, r14.xyxz, r13.wwww
- 413:       mad r14.xyz, -r13.wwww, r14.xyzx, r2.xyzx
- 414:       mad r14.xyz, r7.wwww, r14.xyzx, r12.xywx
- 415:       ld_structured r17.xyz, r12.z, l(0), t12.xyzx
- 416:       add r7.w, r17.y, r17.x
- 417:       add r7.w, r17.z, r7.w
- 418:       ld_structured r17.x, r3.w, l(0), t12.xxxx
- 419:       add r3.w, r7.w, r17.x
- 420:       mul_sat r3.w, r3.w, l(10.000000)
- 421:       mul r3.w, r3.w, r16.y
- 422:       mad r12.xyz, r13.xyzx, r14.xyzx, r12.xywx
- 423:       mul r12.xyz, r3.xxxx, r12.xyzx
- 424:       add r3.x, -r3.x, r4.y
- 425:       mad r3.x, r15.w, r3.x, r3.x
- 426:       mad r11.yzw, r12.xxyz, r0.zzzz, r11.yyzw
- 427:       mad r3.x, -r3.x, r3.w, l(1.000000)
- 428:       mul r0.z, r0.z, r3.x
- 429:     endif 
- 430:   endif 
- 431:   iadd r0.w, r0.w, l(1)
- 432: endloop 
- 433: mad r0.xzw, r0.zzzz, r8.yyzw, r11.yyzw
- 434: if_nz r4.z
- 435:   ieq r1.w, r4.x, l(1)
- 436:   movc r1.w, r1.w, r3.z, r3.y
- 437:   ld_structured r3.xyz, l(67), l(0), t11.xyzx
- 438:   add r3.xyz, -r6.xyzx, r3.xyzx
- 439:   dp3 r3.w, r3.xyzx, r3.xyzx
- 440:   rsq r3.w, r3.w
- 441:   mul r3.xyz, r3.wwww, r3.xyzx
- 442:   add_sat r3.w, r1.w, l(-0.100000)
- 443:   mul_sat r1.w, r1.w, l(10.000000)
- 444:   mad r4.x, r3.w, l(2000.000000), l(50.000000)
- 445:   add r4.y, r3.w, r3.w
- 446:   ld_structured r10.xyzw, l(0), l(0), t10.yzxw
- 447:   mul r1.w, r1.w, r10.z
- 448:   mad r1.w, r1.w, l(0.800000), r4.y
- 449:   ld_structured r11.xyz, l(20), l(0), t11.xyzx
- 450:   ld_structured r12.xyz, l(21), l(0), t11.xyzx
- 451:   ld_structured r13.xyz, l(22), l(0), t11.xyzx
- 452:   mov r6.x, r11.x
- 453:   mov r6.y, r12.x
- 454:   mov r6.z, r13.x
- 455:   dp3 r6.x, r1.xyzx, r6.xyzx
- 456:   mov r14.x, r11.y
- 457:   mov r14.y, r12.y
- 458:   mov r14.z, r13.y
- 459:   dp3 r6.y, r1.xyzx, r14.xyzx
- 460:   mov r13.x, r11.z
- 461:   mov r13.y, r12.z
- 462:   dp3 r6.z, r1.xyzx, r13.xyzx
- 463:   ilt r4.y, l(0), r10.w
- 464:   movc r3.xyz, r4.yyyy, l(0,0,0,0), r3.xyzx
- 465:   mov r10.z, l(0.500000)
- 466:   movc r8.yzw, r4.yyyy, r10.xxyz, r9.xxyz
- 467:   movc r1.xyz, r4.yyyy, r6.xyzx, r1.xyzx
- 468:   dp3 r4.y, r8.yzwy, r1.xyzx
- 469:   dp3 r4.z, r8.yzwy, r3.xyzx
- 470:   add_sat r4.z, r4.z, r4.z
- 471:   mad r6.x, r4.z, l(-2.000000), l(3.000000)
- 472:   mul r4.z, r4.z, r4.z
- 473:   mad r4.z, r6.x, r4.z, l(1.000000)
- 474:   dp3_sat r1.z, r3.xyzx, r1.xyzx
- 475:   add r1.z, -r1.z, l(0.800000)
- 476:   max r3.x, r1.z, l(0.000000)
- 477:   ld_structured r9.x, l(133), l(0), t11.xxxx
- 478:   max r1.z, r9.x, l(0.000000)
- 479:   min r3.y, r1.z, l(1.745329)
- 480:   mul r3.xy, r3.xyxx, l(1.500000, 0.572958, 0.000000, 0.000000)
- 481:   max r1.z, r2.w, l(0.000000)
- 482:   min r6.xy, r1.zzzz, l(3000.000000, 50.000000, 0.000000, 0.000000)
- 483:   add r6.xy, -r6.xyxx, l(3000.000000, 50.000000, 0.000000, 0.000000)
- 484:   mul r6.xy, r6.xyxx, l(0.000333, 0.020000, 0.000000, 0.000000)
- 485:   mul r1.z, r6.x, r6.x
- 486:   mul r1.z, r1.z, r1.z
- 487:   mad r1.z, r1.z, r1.z, r6.y
- 488:   add r1.z, r1.z, l(-1.000000)
- 489:   mad r1.z, r1.z, r3.y, l(1.000000)
- 490:   add r3.y, -r1.z, l(1.000000)
- 491:   mad r1.z, r3.y, r3.w, r1.z
- 492:   mad r3.y, r4.y, l(0.250000), l(0.500000)
- 493:   mul r3.x, r3.x, r3.y
- 494:   mul r1.z, r1.z, r3.x
- 495:   mul r1.z, r4.z, r1.z
- 496:   mul r1.z, r1.z, l(0.010000)
- 497:   mad r3.xy, r1.xyxx, r1.xyxx, l(0.000100, 0.000100, 0.000000, 0.000000)
- 498:   dp2 r3.x, r3.xyxx, l(1.000000, 1.000000, 0.000000, 0.000000)
- 499:   rsq r3.x, r3.x
- 500:   mul r1.xy, r1.xyxx, r3.xxxx
- 501:   mul r9.xy, r1.wwww, r1.xyxx
- 502:   mul r9.z, r1.z, r9.y
- 503:   mov r9.w, l(-0.500000)
- 504:   mul r1.xy, r9.xzxx, r9.zwzz
- 505:   ld_structured r9.xyzw, l(138), l(0), t11.xyzw
- 506:   ld_structured r10.xy, l(134), l(0), t11.xyxx
- 507:   mad r3.xy, v0.xyxx, r9.xyxx, -r10.xyxx
- 508:   ld_structured r11.xyzw, l(135), l(0), t11.xyzw
- 509:   mad r1.xy, r3.xyxx, r11.zwzz, r1.xyxx
- 510:   mad r1.xy, r1.xyxx, r11.xyxx, r10.xyxx
- 511:   mul r1.xy, r9.zwzz, r1.xyxx
- 512:   sample r9.xyzw, r1.xyxx, t9.xyzw, s6
- 513:   mad r1.x, r9.x, r5.x, r5.y
- 514:   mad r1.y, r9.x, r5.z, -r5.w
- 515:   div r1.y, l(1.000000, 1.000000, 1.000000, 1.000000), r1.y
- 516:   add r1.x, r1.y, r1.x
- 517:   add r1.x, -r2.w, r1.x
- 518:   max r1.x, r1.x, l(0.000100)
- 519:   mad r1.x, -r3.w, l(1000.000000), r1.x
- 520:   div_sat r1.x, r1.x, r4.x
- 521:   mad r1.y, r1.x, l(-2.000000), l(3.000000)
- 522:   mul r1.x, r1.x, r1.x
- 523:   mul r1.x, r1.x, r1.y
- 524:   min r1.x, r1.x, l(1.000000)
- 525:   ld_structured r3.xyz, l(263), l(0), t11.xyzx
- 526:   dp3 r1.y, r3.xyzx, l(0.300000, 0.590000, 0.110000, 0.000000)
- 527:   add r4.xyz, -r1.yyyy, r3.xyzx
- 528:   mad r4.xyz, r4.xyzx, l(0.750000, 0.750000, 0.750000, 0.000000), r1.yyyy
- 529:   add r3.xyz, r3.xyzx, -r4.xyzx
- 530:   mad r3.xyz, r1.xxxx, r3.xyzx, r4.xyzx
- 531:   mul r1.yzw, r1.wwww, r3.xxyz
- 532:   mul r1.yzw, r1.yyzw, l(0.000000, 0.100000, 0.100000, 0.100000)
- 533:   add r3.xyz, r2.xyzx, l(1.000000, 1.000000, 1.000000, 0.000000)
- 534:   mul r3.xyz, r1.yzwy, r3.xyzx
- 535:   mad_sat r4.xyz, r2.xyzx, l(1.200000, 1.200000, 1.200000, 0.000000), l(-1.000000, -1.000000, -1.000000, 0.000000)
- 536:   mad r5.xyz, r4.xyzx, l(-2.000000, -2.000000, -2.000000, 0.000000), l(3.000000, 3.000000, 3.000000, 0.000000)
- 537:   mul r4.xyz, r4.xyzx, r4.xyzx
- 538:   mul r4.xyz, r4.xyzx, r5.xyzx
- 539:   mad r4.xyz, r4.xyzx, l(14.000000, 14.000000, 14.000000, 0.000000), l(1.000000, 1.000000, 1.000000, 0.000000)
- 540:   mul r1.yzw, r1.yyzw, r4.xxyz
- 541:   mad r1.yzw, r1.yyzw, r2.xxyz, -r3.xxyz
- 542:   ld_structured r5.x, l(260), l(8), t11.xxxx
- 543:   mad r1.yzw, r5.xxxx, r1.yyzw, r3.xxyz
- 544:   mul r1.yzw, r1.xxxx, r1.yyzw
- 545:   add r2.x, r2.w, l(-10000.000000)
- 546:   max r2.x, r2.x, l(0.000000)
- 547:   min r2.x, r2.x, l(5000.000000)
- 548:   add r2.x, -r2.x, l(5000.000000)
- 549:   mul r2.x, r2.x, l(0.000200)
- 550:   mul r1.yzw, r1.yyzw, r2.xxxx
- 551:   ld_structured r2.xyz, l(1), l(0), t10.xyzx
- 552:   mul r1.yzw, r1.yyzw, r2.xxyz
- 553: else 
- 554:   movc r1.x, r6.w, l(0), r0.y
- 555:   mov r1.yzw, l(0,0,0,0)
- 556: endif 
- 557: mul r2.xyz, r7.xyzx, r0.xzwx
- 558: ld_structured r3.xyz, l(263), l(0), t11.xyzx
- 559: mul r2.xyz, r2.xyzx, r3.xyzx
- 560: mad r2.xyz, r2.xyzx, l(0.500000, 0.500000, 0.500000, 0.000000), -r0.xzwx
- 561: mad r2.xyz, r1.xxxx, r2.xyzx, r0.xzwx
- 562: add r1.xyz, r0.xzwx, r1.yzwy
- 563: ne r0.y, r4.w, l(0.000000)
- 564: movc r1.xyz, r0.yyyy, r2.xyzx, r1.xyzx
- 565: movc r0.xyz, r6.wwww, r0.xzwx, r1.xyzx
- 566: div r0.xyz, r0.xyzx, r8.xxxx
- 567: min r0.xyz, -r0.xyzx, l(0.000000, 0.000000, 0.000000, 0.000000)
- 568: mov o0.xyz, -r0.xyzx
- 569: mov o0.w, l(0)
- 570: ret 
+ 178:   mul r8.w, r8.w, r9.y
+ 179:   mul r8.w, r6.z, r8.w
+ 180:   mad r9.y, r9.x, r0.z, -r8.w
+ 181:   mad r8.w, r15.z, r9.y, r8.w
+ 182:   add r9.y, r8.w, -r16.x
+ 183:   mul_sat r6.w, r6.w, r9.y
+ 184:   mad r9.y, r6.w, l(-2.000000), l(3.000000)
+ 185:   mul r6.w, r6.w, r6.w
+ 186:   mul r6.w, r6.w, r9.y
+ 187:   mul r6.z, r6.z, r6.w
+ 188:   mad r4.x, r4.w, r4.x, -r6.z
+ 189:   ld_structured r15.x, l(265), l(8), t11.xxxx
+ 190:   mad r4.x, r15.x, r4.x, r6.z
+ 191:   ld_structured r15.xy, l(260), l(0), t11.xyxx
+ 192:   add r4.w, r8.w, l(-1.000000)
+ 193:   mad r4.w, r15.y, r4.w, l(1.000000)
+ 194:   mad r6.z, r3.x, r4.x, -r4.w
+ 195:   mad r4.w, r6.x, r6.z, r4.w
+ 196:   mad r6.z, r3.x, r4.x, -r4.x
+ 197:   mad r16.x, r6.x, r6.z, r4.x
+ 198:   ge r4.x, r11.x, r11.y
+ 199:   and r4.x, r4.x, l(0x3f800000)
+ 200:   add r17.xy, r11.xyxx, -r11.yxyy
+ 201:   mov r17.zw, l(0,0,1.000000,-1.000000)
+ 202:   mov r18.xy, r11.yxyy
+ 203:   mov r18.zw, l(0,0,-1.000000,0.666667)
+ 204:   mad r17.xyzw, r4.xxxx, r17.xyzw, r18.xyzw
+ 205:   ge r4.x, r11.w, r17.x
+ 206:   and r4.x, r4.x, l(0x3f800000)
+ 207:   mov r11.xyz, r17.xywx
+ 208:   mov r17.xyw, r11.wywx
+ 209:   add r17.xyzw, -r11.xyzw, r17.xyzw
+ 210:   mad r11.xyzw, r4.xxxx, r17.xyzw, r11.xyzw
+ 211:   min r4.x, r11.y, r11.w
+ 212:   add r4.x, -r4.x, r11.x
+ 213:   add r6.z, -r11.y, r11.w
+ 214:   mad r6.w, r4.x, l(6.000000), l(0.001000)
+ 215:   div r6.z, r6.z, r6.w
+ 216:   add r6.z, r6.z, r11.z
+ 217:   add r6.w, r11.x, l(0.001000)
+ 218:   div r4.x, r4.x, r6.w
+ 219:   mad r11.xyzw, r12.xyzw, l(0.040000, 0.002745, 0.003922, 0.066667), l(0.400000, 0.400000, 1.000000, 0.500000)
+ 220:   ge r6.w, r12.z, l(2.550000)
+ 221:   and r6.w, r6.w, l(0x3f800000)
+ 222:   add r8.w, -r11.x, r11.y
+ 223:   mad r8.w, r6.w, r8.w, r11.x
+ 224:   mul r4.x, r4.x, r8.w
+ 225:   min r4.x, r4.x, l(0.350000)
+ 226:   max r8.w, r4.x, l(0.000000)
+ 227:   add r9.yzw, |r6.zzzz|, l(0.000000, 1.000000, 0.666667, 0.333333)
+ 228:   frc r9.yzw, r9.yyzw
+ 229:   mad r9.yzw, r9.yyzw, l(0.000000, 6.000000, 6.000000, 6.000000), l(0.000000, -3.000000, -3.000000, -3.000000)
+ 230:   add_sat r9.yzw, |r9.yyzw|, l(0.000000, -1.000000, -1.000000, -1.000000)
+ 231:   add r9.yzw, r9.yyzw, l(0.000000, -1.000000, -1.000000, -1.000000)
+ 232:   mad r9.yzw, r8.wwww, r9.yyzw, l(0.000000, 1.000000, 1.000000, 1.000000)
+ 233:   add r4.x, r4.x, l(1.000000)
+ 234:   mul r10.yzw, r4.xxxx, r9.yyzw
+ 235:   mad r12.xyz, r9.yzwy, r4.xxxx, l(-1.000000, -1.000000, -1.000000, 0.000000)
+ 236:   mad r12.xyz, r12.xyzx, l(0.600000, 0.600000, 0.600000, 0.000000), l(1.000000, 1.000000, 1.000000, 0.000000)
+ 237:   mad r9.yzw, -r9.yyzw, r4.xxxx, r12.xxyz
+ 238:   mad r9.yzw, r0.xxxx, r9.yyzw, r10.yyzw
+ 239:   add r10.yzw, -r2.xxyz, r9.yyzw
+ 240:   mad r10.yzw, r10.yyzw, l(0.000000, 0.850000, 0.850000, 0.850000), r2.xxyz
+ 241:   mad r10.yzw, r11.zzzz, r10.yyzw, -r9.yyzw
+ 242:   mad r9.yzw, r6.wwww, r10.yyzw, r9.yyzw
+ 243:   add r9.yzw, r9.yyzw, l(0.000000, -1.000000, -1.000000, -1.000000)
+ 244:   mad r9.yzw, r9.yyzw, r11.wwww, l(0.000000, 1.000000, 1.000000, 1.000000)
+ 245:   mul r10.yzw, r14.xxyz, l(0.000000, 0.200000, 0.200000, 0.200000)
+ 246:   mad r11.xyz, r13.xyzx, l(0.500000, 0.500000, 0.500000, 0.000000), -r10.yzwy
+ 247:   mad r10.yzw, r4.wwww, r11.xxyz, r10.yyzw
+ 248:   mul r10.yzw, r10.yyzw, r15.xxxx
+ 249:   mul r10.yzw, r2.xxyz, r10.yyzw
+ 250:   mul r11.xyz, r8.xyzx, r10.yzwy
+ 251:   mul r12.xyz, r2.xyzx, r14.xyzx
+ 252:   mad r0.x, r3.x, l(0.300000), l(0.700000)
+ 253:   mul r14.xyz, r0.xxxx, r12.xyzx
+ 254:   mul r15.xyz, r2.xyzx, r13.xyzx
+ 255:   mad r11.xyz, r12.xyzx, r0.xxxx, r11.xyzx
+ 256:   mad r12.xyz, r13.xyzx, r2.xyzx, -r14.xyzx
+ 257:   mad r12.xyz, r12.xyzx, l(0.400000, 0.400000, 0.400000, 0.000000), r14.xyzx
+ 258:   mul r13.xyz, r9.yzwy, r14.xyzx
+ 259:   mad r12.xyz, r12.xyzx, r9.yzwy, -r13.xyzx
+ 260:   mad r12.xyz, r16.xxxx, r12.xyzx, r13.xyzx
+ 261:   mad r10.yzw, r10.yyzw, r8.xxyz, r12.xxyz
+ 262:   mul r12.xyz, r9.yzwy, r11.xyzx
+ 263:   mul r13.xyz, r11.wwww, r15.xyzx
+ 264:   mad r13.xyz, r13.xyzx, r9.yzwy, -r12.xyzx
+ 265:   mad r13.xyz, r16.xxxx, r13.xyzx, r12.xyzx
+ 266:   sample_l r15.xyzw, v0.xyxx, t8.xyzw, s8, l(0.000000)
+ 267:   add r0.x, r15.x, l(-1.000000)
+ 268:   mad r0.x, r3.w, r0.x, l(1.000000)
+ 269:   add r13.xyz, -r10.yzwy, r13.xyzx
+ 270:   mad r10.yzw, r4.wwww, r13.xxyz, r10.yyzw
+ 271:   mad r9.yzw, -r11.xxyz, r9.yyzw, l(0.000000, 1.000000, 1.000000, 1.000000)
+ 272:   mad r9.yzw, r0.xxxx, r9.yyzw, r12.xxyz
+ 273:   mul r9.yzw, r9.yyzw, r10.yyzw
+ 274: else 
+ 275:   add_sat r0.x, r0.w, r0.w
+ 276:   mad r3.x, r0.x, l(-2.000000), l(3.000000)
+ 277:   mul r0.x, r0.x, r0.x
+ 278:   mul r0.x, r0.x, r3.x
+ 279:   add r3.x, r0.w, l(-0.500000)
+ 280:   add_sat r3.x, r3.x, r3.x
+ 281:   mad r3.w, r3.x, l(-2.000000), l(3.000000)
+ 282:   mul r3.x, r3.x, r3.x
+ 283:   mul r3.x, r3.x, r3.w
+ 284:   ld_structured r11.xyz, l(262), l(0), t11.xyzx
+ 285:   ld_structured r12.xyz, l(261), l(0), t11.xyzx
+ 286:   add r10.yzw, r11.xxyz, -r12.xxyz
+ 287:   dp3 r3.w, |r10.yzwy|, l(0.300000, 0.590000, 0.110000, 0.000000)
+ 288:   mul r3.w, r3.w, l(10.000000)
+ 289:   min r3.w, r3.w, l(1.000000)
+ 290:   mad r4.x, r3.w, l(-2.000000), l(3.000000)
+ 291:   mul r3.w, r3.w, r3.w
+ 292:   mul r3.w, r3.w, r4.x
+ 293:   mul r4.x, r3.x, r3.w
+ 294:   ld_structured r13.xyz, l(265), l(0), t11.xyzx
+ 295:   add r4.w, -r13.x, r13.y
+ 296:   div r4.w, l(1.000000, 1.000000, 1.000000, 1.000000), r4.w
+ 297:   ld_structured r15.x, l(265), l(0), t11.xxxx
+ 298:   mad r6.z, r9.x, r0.z, -r15.x
+ 299:   mul_sat r6.z, r4.w, r6.z
+ 300:   mad r6.w, r6.z, l(-2.000000), l(3.000000)
+ 301:   mul r6.z, r6.z, r6.z
+ 302:   mul r6.z, r6.z, r6.w
+ 303:   mul r6.z, r4.x, r6.z
+ 304:   mad r0.z, r9.x, r0.z, -r6.z
+ 305:   mad r0.z, r13.z, r0.z, r6.z
+ 306:   add r6.z, r0.z, -r15.x
+ 307:   mul_sat r4.w, r4.w, r6.z
+ 308:   mad r6.z, r4.w, l(-2.000000), l(3.000000)
+ 309:   mul r4.w, r4.w, r4.w
+ 310:   mul r4.w, r4.w, r6.z
+ 311:   mul r4.x, r4.x, r4.w
+ 312:   mad r3.x, r3.w, r3.x, -r4.x
+ 313:   ld_structured r13.x, l(265), l(8), t11.xxxx
+ 314:   mad r3.x, r13.x, r3.x, r4.x
+ 315:   ld_structured r13.xy, l(260), l(0), t11.xyxx
+ 316:   add r0.z, r0.z, l(-1.000000)
+ 317:   mad r0.z, r13.y, r0.z, l(1.000000)
+ 318:   mad r4.x, r1.w, r3.x, -r0.z
+ 319:   mad r0.z, r6.x, r4.x, r0.z
+ 320:   mad r1.w, r1.w, r3.x, -r3.x
+ 321:   mad r16.x, r6.x, r1.w, r3.x
+ 322:   mul r6.xzw, r12.xxyz, l(0.200000, 0.000000, 0.200000, 0.200000)
+ 323:   mad r10.yzw, r11.xxyz, l(0.000000, 0.500000, 0.500000, 0.500000), -r6.xxzw
+ 324:   mad r6.xzw, r0.zzzz, r10.yyzw, r6.xxzw
+ 325:   mul r6.xzw, r6.xxzw, r13.xxxx
+ 326:   mul r6.xzw, r2.xxyz, r6.xxzw
+ 327:   mul r10.yzw, r8.xxyz, r6.xxzw
+ 328:   mul r12.xyz, r2.xyzx, r12.xyzx
+ 329:   mad r0.x, r0.x, l(0.300000), l(0.700000)
+ 330:   mul r14.xyz, r0.xxxx, r12.xyzx
+ 331:   mad r12.xyz, r12.xyzx, r0.xxxx, r10.yzwy
+ 332:   mad r10.yzw, r10.yyzw, r3.wwww, r12.xxyz
+ 333:   mad r12.xyz, r2.xyzx, r11.xyzx, -r14.xyzx
+ 334:   mul r12.xyz, r16.xxxx, r12.xyzx
+ 335:   mad r12.xyz, r12.xyzx, l(0.400000, 0.400000, 0.400000, 0.000000), r14.xyzx
+ 336:   mad r6.xzw, r6.xxzw, r8.xxyz, r12.xxyz
+ 337:   mad r11.xyz, r2.xyzx, r11.xyzx, -r10.yzwy
+ 338:   mad r10.yzw, r16.xxxx, r11.xxyz, r10.yyzw
+ 339:   add r10.yzw, -r6.xxzw, r10.yyzw
+ 340:   mad r9.yzw, r0.zzzz, r10.yyzw, r6.xxzw
+ 341: endif 
+ 342: add r0.x, r0.w, l(-0.400000)
+ 343: mul_sat r0.x, r0.x, l(10.000001)
+ 344: mad r0.z, r0.x, l(-2.000000), l(3.000000)
+ 345: mul r0.x, r0.x, r0.x
+ 346: mul r16.y, r0.x, r0.z
+ 347: ld_structured r11.xyz, l(261), l(0), t11.xyzx
+ 348: mad r0.xzw, r9.yyzw, l(0.500000, 0.000000, 0.500000, 0.500000), r11.xxyz
+ 349: mul r0.xzw, r2.xxyz, r0.xxzw
+ 350: mul r6.xzw, r2.xxyz, r11.xxyz
+ 351: ne r1.w, l(0.000000, 0.000000, 0.000000, 0.000000), r10.x
+ 352: movc r0.xzw, r1.wwww, r0.xxzw, r6.xxzw
+ 353: movc r6.xzw, r4.yyyy, r0.xxzw, r14.xxyz
+ 354: movc r0.xzw, r4.yyyy, r0.xxzw, r9.yyzw
+ 355: movc r3.xw, r4.yyyy, l(0,0,0,0), r16.yyyx
+ 356: ld_structured r9.xyz, l(264), l(0), t11.xyzx
+ 357: add r10.xyz, r9.xyzx, r9.xyzx
+ 358: mad r10.xyz, r10.xyzx, r3.wwww, -r9.xyzx
+ 359: ld_structured r11.x, l(128), l(0), t12.xxxx
+ 360: mov r11.yzw, l(0,0,0,0)
+ 361: mov r1.w, l(1.000000)
+ 362: mov r4.x, l(0)
+ 363: loop 
+ 364:   ftou r4.w, r4.x
+ 365:   uge r8.w, r4.w, r11.x
+ 366:   breakc_nz r8.w
+ 367:   ishl r4.w, r4.w, l(3)
+ 368:   iadd r8.w, r4.w, l(7)
+ 369:   ld_structured r12.x, r8.w, l(12), t12.xxxx
+ 370:   ishl r9.w, r12.x, l(5)
+ 371:   and r9.w, r4.z, r9.w
+ 372:   if_nz r9.w
+ 373:     ld_structured r12.xyzw, r4.w, l(0), t12.xyzw
+ 374:     add r12.xyz, -r7.yzwy, r12.xyzx
+ 375:     mul r9.w, r12.w, r12.w
+ 376:     dp3 r10.w, r12.xyzx, r12.xyzx
+ 377:     mul r9.w, r9.w, r10.w
+ 378:     ge r12.w, l(1.000000), r9.w
+ 379:     if_nz r12.w
+ 380:       iadd r13.xyzw, r4.wwww, l(1, 2, 3, 4)
+ 381:       iadd r14.xy, r4.wwww, l(5, 6, 0, 0)
+ 382:       mad_sat r4.w, r9.w, l(2.500000), l(-1.500000)
+ 383:       mad r9.w, r4.w, l(-2.000000), l(3.000000)
+ 384:       mul r4.w, r4.w, -r4.w
+ 385:       mad r4.w, r9.w, r4.w, l(1.000000)
+ 386:       rsq r9.w, r10.w
+ 387:       mul r12.xyz, r9.wwww, r12.xyzx
+ 388:       dp3 r9.w, r1.xyzx, r12.xyzx
+ 389:       add r9.w, r9.w, l(1.000000)
+ 390:       ld_structured r15.xyzw, r14.x, l(0), t12.xyzw
+ 391:       mul r12.w, r15.w, l(0.940000)
+ 392:       mad r9.w, r9.w, l(0.500000), -r12.w
+ 393:       ld_structured r16.x, r14.x, l(12), t12.xxxx
+ 394:       mul r12.w, r16.x, l(0.060000)
+ 395:       div r12.w, l(1.000000, 1.000000, 1.000000, 1.000000), r12.w
+ 396:       mul_sat r9.w, r9.w, r12.w
+ 397:       mad r12.w, r9.w, l(-2.000000), l(3.000000)
+ 398:       mul r9.w, r9.w, r9.w
+ 399:       mul r9.w, r9.w, r12.w
+ 400:       min r9.w, r9.w, l(1.000000)
+ 401:       ld_structured r14.xyzw, r14.y, l(0), t12.xyzw
+ 402:       mul r14.xyz, r6.xzwx, r14.xyzx
+ 403:       mad r15.xyz, r2.xyzx, r15.xyzx, -r14.xyzx
+ 404:       mad r14.xyz, r9.wwww, r15.xyzx, r14.xyzx
+ 405:       ld_structured r15.xy, r8.w, l(0), t12.xyxx
+ 406:       mul r14.xyz, r14.xyzx, r15.xxxx
+ 407:       ld_structured r16.xyzw, r13.w, l(0), t12.xyzw
+ 408:       mad r8.w, r10.w, r16.x, r16.y
+ 409:       add r8.w, r8.w, l(0.000100)
+ 410:       div r8.w, l(1.000000, 1.000000, 1.000000, 1.000000), r8.w
+ 411:       add r8.w, r8.w, l(-1.000000)
+ 412:       mul r8.w, r16.z, r8.w
+ 413:       mul r8.w, r8.w, r8.w
+ 414:       min r8.w, r8.w, l(1.000000)
+ 415:       ld_structured r17.xyzw, r13.x, l(0), t12.xyzw
+ 416:       ushr r9.w, r17.w, l(16)
+ 417:       ieq r9.w, r9.w, l(2)
+ 418:       dp3 r10.w, r12.xyzx, r17.xyzx
+ 419:       ld_structured r17.xy, r13.y, l(0), t12.xyxx
+ 420:       add r10.w, r10.w, -r17.x
+ 421:       mul_sat r10.w, r10.w, r17.y
+ 422:       mul r10.w, r10.w, r10.w
+ 423:       mul r10.w, r10.w, r10.w
+ 424:       mul r10.w, r8.w, r10.w
+ 425:       movc r8.w, r9.w, r10.w, r8.w
+ 426:       dp3 r9.w, r10.xyzx, r12.xyzx
+ 427:       mad_sat r9.w, r9.w, l(0.500000), l(0.500000)
+ 428:       mad r9.w, r3.x, r9.w, -r3.w
+ 429:       mad r9.w, r16.w, r9.w, r3.w
+ 430:       ld_structured r12.xyzw, r13.z, l(0), t12.xyzw
+ 431:       mul r13.xyz, r14.xyzx, r12.wwww
+ 432:       mad r16.xyz, -r14.xyzx, r12.wwww, r2.xyzx
+ 433:       mad r13.xyz, r9.wwww, r16.xyzx, r13.xyzx
+ 434:       mul r13.xyz, r12.xyzx, r13.xyzx
+ 435:       add r9.w, r12.y, r12.x
+ 436:       add r9.w, r12.z, r9.w
+ 437:       add r9.w, r15.x, r9.w
+ 438:       mul_sat r9.w, r9.w, l(10.000000)
+ 439:       mul r9.w, r9.w, r15.y
+ 440:       mul r12.xyz, r8.wwww, r14.xyzx
+ 441:       mad r12.xyz, r13.xyzx, r8.wwww, r12.xyzx
+ 442:       add r4.w, r4.w, -r8.w
+ 443:       mad r4.w, r14.w, r4.w, r8.w
+ 444:       mad r11.yzw, r12.xxyz, r1.wwww, r11.yyzw
+ 445:       mad r4.w, -r4.w, r9.w, l(1.000000)
+ 446:       mul r1.w, r1.w, r4.w
+ 447:     endif 
+ 448:   endif 
+ 449:   ftoi r4.w, r4.x
+ 450:   iadd r4.w, r4.w, l(1)
+ 451:   itof r4.x, r4.w
+ 452: endloop 
+ 453: mad r0.xzw, r1.wwww, r0.xxzw, r11.yyzw
+ 454: ine r1.w, r0.y, l(13)
+ 455: if_nz r1.w
+ 456:   ieq r0.y, r0.y, l(1)
+ 457:   movc r0.y, r0.y, r3.z, r3.y
+ 458:   ld_structured r10.xyz, l(67), l(0), t11.xyzx
+ 459:   add r3.yzw, -r7.yyzw, r10.xxyz
+ 460:   dp3 r1.w, r3.yzwy, r3.yzwy
+ 461:   rsq r1.w, r1.w
+ 462:   mul r3.yzw, r1.wwww, r3.yyzw
+ 463:   add_sat r1.w, r0.y, l(-0.100000)
+ 464:   mul_sat r0.y, r0.y, l(10.000000)
+ 465:   mad r4.x, r1.w, l(2000.000000), l(50.000000)
+ 466:   add r4.z, r1.w, r1.w
+ 467:   ld_structured r10.xyzw, l(0), l(0), t10.xyzw
+ 468:   mul r0.y, r0.y, r10.x
+ 469:   mad r0.y, r0.y, l(0.800000), r4.z
+ 470:   ld_structured r11.xyz, l(21), l(0), t11.xyzx
+ 471:   mul r6.xzw, r1.yyyy, r11.xxyz
+ 472:   ld_structured r11.xyz, l(20), l(0), t11.xyzx
+ 473:   mad r6.xzw, r1.xxxx, r11.xxyz, r6.xxzw
+ 474:   ld_structured r11.xyz, l(22), l(0), t11.xyzx
+ 475:   mad r6.xzw, r1.zzzz, r11.xxyz, r6.xxzw
+ 476:   ilt r4.z, l(0), r10.w
+ 477:   movc r3.yzw, r4.zzzz, l(0,0,0,0), r3.yyzw
+ 478:   movc r10.xy, r4.zzzz, r10.yzyy, r9.xyxx
+ 479:   movc r10.z, r4.z, l(0.500000), r9.z
+ 480:   movc r1.xyz, r4.zzzz, r6.xzwx, r1.xyzx
+ 481:   dp3 r4.z, r10.xyzx, r1.xyzx
+ 482:   add r4.z, r4.z, l(1.000000)
+ 483:   dp3 r4.w, r10.xyzx, r3.yzwy
+ 484:   add_sat r4.w, r4.w, r4.w
+ 485:   mad r6.x, r4.w, l(-2.000000), l(3.000000)
+ 486:   mul r4.w, r4.w, r4.w
+ 487:   mad r4.w, r6.x, r4.w, l(1.000000)
+ 488:   dp3_sat r1.x, r3.yzwy, r1.xyzx
+ 489:   add r1.x, -r1.x, l(0.800000)
+ 490:   max r1.x, r1.x, l(0.000000)
+ 491:   ld_structured r9.x, l(133), l(0), t11.xxxx
+ 492:   max r1.z, r9.x, l(0.000000)
+ 493:   min r1.y, r1.z, l(1.745329)
+ 494:   mul r1.xy, r1.xyxx, l(1.500000, 0.572958, 0.000000, 0.000000)
+ 495:   max r1.z, r2.w, l(0.000000)
+ 496:   min r3.yz, r1.zzzz, l(0.000000, 3000.000000, 50.000000, 0.000000)
+ 497:   add r3.yz, -r3.yyzy, l(0.000000, 3000.000000, 50.000000, 0.000000)
+ 498:   mul r3.yz, r3.yyzy, l(0.000000, 0.000333, 0.020000, 0.000000)
+ 499:   mul r1.z, r3.y, r3.y
+ 500:   mul r1.z, r1.z, r1.z
+ 501:   mad r1.z, r1.z, r1.z, r3.z
+ 502:   add r1.z, r1.z, l(-1.000000)
+ 503:   mad r1.y, r1.y, r1.z, l(1.000000)
+ 504:   add r1.z, -r1.y, l(1.000000)
+ 505:   mad r9.y, r1.w, r1.z, r1.y
+ 506:   mad r1.y, r4.z, l(0.250000), l(0.500000)
+ 507:   mul r1.x, r1.x, r1.y
+ 508:   mul r1.x, r9.y, r1.x
+ 509:   mul r1.x, r4.w, r1.x
+ 510:   mul r9.x, r1.x, l(0.010000)
+ 511:   mad r1.xy, r9.xyxx, r9.xyxx, l(0.000100, 0.000100, 0.000000, 0.000000)
+ 512:   dp2 r1.x, r1.xyxx, l(1.000000, 1.000000, 0.000000, 0.000000)
+ 513:   rsq r1.x, r1.x
+ 514:   mul r1.xy, r1.xxxx, r9.xyxx
+ 515:   mul r1.xy, r0.yyyy, r1.xyxx
+ 516:   mul r1.z, r9.x, r1.y
+ 517:   mov r9.z, l(-0.500000)
+ 518:   mul r1.xy, r1.xzxx, r9.xzxx
+ 519:   ld_structured r9.xyzw, l(138), l(0), t11.xyzw
+ 520:   ld_structured r10.xy, l(134), l(0), t11.xyxx
+ 521:   mad r3.yz, v0.xxyx, r9.xxyx, -r10.xxyx
+ 522:   ld_structured r11.xyzw, l(135), l(0), t11.xyzw
+ 523:   mad r1.xy, r3.yzyy, r11.zwzz, r1.xyxx
+ 524:   mad r1.xy, r1.xyxx, r11.xyxx, r10.xyxx
+ 525:   mul r1.xy, r1.xyxx, r9.zwzz
+ 526:   sample r9.xyzw, r1.xyxx, t9.xyzw, s6
+ 527:   mad r1.x, r9.x, r5.x, r5.y
+ 528:   mad r1.y, r9.x, r5.z, -r5.w
+ 529:   div r1.y, l(1.000000, 1.000000, 1.000000, 1.000000), r1.y
+ 530:   add r1.x, r1.y, r1.x
+ 531:   add r1.x, -r2.w, r1.x
+ 532:   max r1.x, r1.x, l(0.000100)
+ 533:   mad r1.x, -r1.w, l(1000.000000), r1.x
+ 534:   div_sat r1.x, r1.x, r4.x
+ 535:   mad r1.y, r1.x, l(-2.000000), l(3.000000)
+ 536:   mul r1.x, r1.x, r1.x
+ 537:   mul r1.x, r1.x, r1.y
+ 538:   min r3.x, r1.x, l(1.000000)
+ 539:   ld_structured r1.xyz, l(263), l(0), t11.xyzx
+ 540:   dp3 r1.w, r1.xyzx, l(0.300000, 0.590000, 0.110000, 0.000000)
+ 541:   add r3.yzw, -r1.wwww, r1.xxyz
+ 542:   mad r3.yzw, r3.yyzw, l(0.000000, 0.750000, 0.750000, 0.750000), r1.wwww
+ 543:   add r1.xyz, r1.xyzx, -r3.yzwy
+ 544:   mad r1.xyz, r3.xxxx, r1.xyzx, r3.yzwy
+ 545:   mul r1.xyz, r0.yyyy, r1.xyzx
+ 546:   mul r1.xyz, r1.xyzx, l(0.100000, 0.100000, 0.100000, 0.000000)
+ 547:   add r3.yzw, r2.xxyz, l(0.000000, 1.000000, 1.000000, 1.000000)
+ 548:   mul r3.yzw, r1.xxyz, r3.yyzw
+ 549:   mad_sat r4.xzw, r2.xxyz, l(1.200000, 0.000000, 1.200000, 1.200000), l(-1.000000, 0.000000, -1.000000, -1.000000)
+ 550:   mad r5.xyz, r4.xzwx, l(-2.000000, -2.000000, -2.000000, 0.000000), l(3.000000, 3.000000, 3.000000, 0.000000)
+ 551:   mul r4.xzw, r4.xxzw, r4.xxzw
+ 552:   mul r4.xzw, r4.xxzw, r5.xxyz
+ 553:   mad r4.xzw, r4.xxzw, l(14.000000, 0.000000, 14.000000, 14.000000), l(1.000000, 0.000000, 1.000000, 1.000000)
+ 554:   mul r1.xyz, r1.xyzx, r4.xzwx
+ 555:   mad r1.xyz, r1.xyzx, r2.xyzx, -r3.yzwy
+ 556:   ld_structured r5.x, l(260), l(8), t11.xxxx
+ 557:   mad r1.xyz, r5.xxxx, r1.xyzx, r3.yzwy
+ 558:   mul r1.xyz, r3.xxxx, r1.xyzx
+ 559:   add r0.y, r2.w, l(-10000.000000)
+ 560:   max r0.y, r0.y, l(0.000000)
+ 561:   min r0.y, r0.y, l(5000.000000)
+ 562:   add r0.y, -r0.y, l(5000.000000)
+ 563:   mul r0.y, r0.y, l(0.000200)
+ 564:   mul r1.xyz, r1.xyzx, r0.yyyy
+ 565:   ld_structured r2.xyz, l(1), l(0), t10.xyzx
+ 566:   mul r1.xyz, r1.xyzx, r2.xyzx
+ 567: else 
+ 568:   mov r1.xyz, l(0,0,0,0)
+ 569: endif 
+ 570: ne r0.y, r6.y, l(0.000000)
+ 571: mul r2.xyz, r8.xyzx, r0.xzwx
+ 572: ld_structured r5.xyz, l(263), l(0), t11.xyzx
+ 573: mul r2.xyz, r2.xyzx, r5.xyzx
+ 574: mad r2.xyz, r2.xyzx, l(0.500000, 0.500000, 0.500000, 0.000000), -r0.xzwx
+ 575: mad r2.xyz, r3.xxxx, r2.xyzx, r0.xzwx
+ 576: add r1.xyz, r0.xzwx, r1.xyzx
+ 577: movc r1.xyz, r0.yyyy, r2.xyzx, r1.xyzx
+ 578: movc r0.xyz, r4.yyyy, r0.xzwx, r1.xyzx
+ 579: div r0.xyz, r0.xyzx, r7.xxxx
+ 580: min r0.xyz, -r0.xyzx, l(0.000000, 0.000000, 0.000000, 0.000000)
+ 581: mov o0.xyz, -r0.xyzx
+ 582: mov o0.w, l(0)
+ 583: ret 
 D:      ps_4_0
       dcl_globalFlags refactoringAllowed | enableRawAndStructuredBuffers
       dcl_sampler s0, mode_default
