@@ -91,6 +91,21 @@ Shader "Custom/WWToon"
             // 已知 _IN8 MSSAO 多分辨率屏幕空间AO
             // 已知 _IN9 1x1像素 控制屏幕亮度
             
+float3 UnpackNormalOctQuadEncode(float2 f)
+{
+    // NOTE: Do NOT use abs() in this line. It causes miscompilations. (UUM-62216, UUM-70600)
+    float3 n = float3(f.x, f.y, 1.0 - (f.x < 0 ? -f.x : f.x) - (f.y < 0 ? -f.y : f.y));
+
+    //float2 val = 1.0 - abs(n.yx);
+    //n.xy = (n.zz < float2(0.0, 0.0) ? (n.xy >= 0.0 ? val : -val) : n.xy);
+
+    // Optimized version of above code:
+    float t = max(-n.z, 0.0);
+    n.xy += float2(n.x >= 0.0 ? -t : t, n.y >= 0.0 ? -t : t);
+
+    return normalize(n);
+}
+
 float4 frag (VertexToFragment fragmentInput) : SV_Target
 {
     // 基于输入uv定义screenUV_ndcUV，zw分量是NDC x（clip.x / clip.w）并复制到 zw
@@ -147,16 +162,17 @@ float4 fDest = 0;
         model_low4_high4.x = isCharaHair13 ? 13 : 12;
         model13_14_15.xz = float2(isAnisotropicMetal14, isAnisotropicFabric15) ? float2(1,1) : 0;
         float2 octNormalWS = packedNormalWS_perObjectData.yz * float2(2,2) - float2(1,1);
-        shadingModelID = dot(float2(1,1), abs(octNormalWS.xy));
-        normal.z = 1 + -shadingModelID;
-        shadingModelID = max(0, -normal.z);
-        r7.xy = (octNormalWS.xy >= float2(0,0)) ? 1.0 : 0.0;
-        r7.xy = r7.xy ? float2(0.5,0.5) : float2(-0.5,-0.5);
-        r7.xy = r7.xy * shadingModelID;
-        normal.xy = r7.xy * float2(-2,-2) + octNormalWS.xy;
-        shadingModelID = dot(normal.xyz, normal.xyz);
-        shadingModelID = rsqrt(shadingModelID);
-        normal.xyz = normal.xyz * shadingModelID;
+        // shadingModelID = dot(float2(1,1), abs(octNormalWS.xy));
+        // normal.z = 1 + -shadingModelID;
+        // shadingModelID = max(0, -normal.z);
+        // r7.xy = (octNormalWS.xy >= float2(0,0)) ? 1.0 : 0.0;
+        // r7.xy = r7.xy ? float2(0.5,0.5) : float2(-0.5,-0.5);
+        // r7.xy = r7.xy * shadingModelID;
+        // normal.xy = r7.xy * float2(-2,-2) + octNormalWS.xy;
+        // shadingModelID = dot(normal.xyz, normal.xyz);
+        // shadingModelID = rsqrt(shadingModelID);
+        // normal.xyz = normal.xyz * shadingModelID;
+        normal.xyz = UnpackNormalOctQuadEncode(octNormalWS);
         msrSq = msr_shadingModelID.xyz * msr_shadingModelID.xyz;
         isAnisotropicMetal14 = customData.z;
     } else {
