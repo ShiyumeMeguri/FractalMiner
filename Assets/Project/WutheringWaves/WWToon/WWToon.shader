@@ -147,9 +147,7 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
         float2 lightingOffset = lightingSign * unpack_factor;
         float2 worldNormalXY_unpacked = lightingOffset * -2.0 + encodedNormal;
         worldNormal = float3(worldNormalXY_unpacked.x, worldNormalXY_unpacked.y, worldNormalZ_unpacked);
-        float worldNormalLengthInv = rsqrt(dot(worldNormal, worldNormal));
-        worldNormal = worldNormal * worldNormalLengthInv;
-
+        
         initialLighting = msr * msr;
         hairShadowingFactor = customDataA_and_Temp.z;
     }
@@ -171,7 +169,7 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
         
         depth = (isClearCoatModel != 0.0) ? final_packed_depth : depth;
 
-        worldNormal = gbuffer_normal * 2.0 - 1.0;
+        worldNormal = final_gbuffer_normal * 2.0 - 1.0;
         initialLighting = float3(0.0, 0.0, 0.0);
         perObjectData = 0.0;
         customDataA_and_Temp.xy = float2(0.0, 0.0);
@@ -294,10 +292,10 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
         
         float final_spec_occlusion = cb1[260].y * (final_ssr - 1.0) + 1.0;
         float spec_ao_combined = roughness_from_normal * combined_roughness - final_spec_occlusion;
-        final_spec_occlusion = specialShadingModelFlags.x * spec_ao_combined + final_spec_occlusion;
+        final_spec_occlusion = isAnySpecialModel * spec_ao_combined + final_spec_occlusion;
         
         float spec_ao_combined_2 = roughness_from_normal * combined_roughness - combined_roughness;
-        float accumulatedLightColor_x = specialShadingModelFlags.x * spec_ao_combined_2 + combined_roughness;
+        float accumulatedLightColor_x = isAnySpecialModel * spec_ao_combined_2 + combined_roughness;
         
         float3 hsv_modulated_color;
         {
@@ -406,10 +404,10 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
         
         float final_spec_occlusion_alt = cb1[260].y * (final_ssr_alt - 1.0) + 1.0;
         float spec_ao_combined_alt = fresnel_NdotV_alt * combined_roughness_alt - final_spec_occlusion_alt;
-        final_spec_occlusion_alt = specialShadingModelFlags.x * spec_ao_combined_alt + final_spec_occlusion_alt;
+        final_spec_occlusion_alt = isAnySpecialModel * spec_ao_combined_alt + final_spec_occlusion_alt;
         
         float spec_ao_combined_2_alt = fresnel_NdotV_alt * combined_roughness_alt - combined_roughness_alt;
-        float accumulatedLightColor_x_alt = specialShadingModelFlags.x * spec_ao_combined_2_alt + combined_roughness_alt;
+        float accumulatedLightColor_x_alt = isAnySpecialModel * spec_ao_combined_2_alt + combined_roughness_alt;
         
         float3 indirect_spec_base_alt = 0.200000003 * cb1[261].xyz;
         float3 indirect_spec_add_alt = cb1[262].xyz * 0.5 - indirect_spec_base_alt;
@@ -424,7 +422,7 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
         diffuseIBLBase = indirect_diffuse_lit_alt * ibl_factor_alt;
         
         float3 temp_spec_plus_diffuse_base = diffuseIBLBase + indirect_spec_lit_alt;
-        float3 temp_lighting_C = luma_fresnel_alt * indirect_spec_lit_alt + temp_spec_plus_diffuse_base;
+        float3 temp_lighting_C = luma_fresnel_alt * shadowMaskIntensity + temp_spec_plus_diffuse_base;
         
         float3 temp_diffuse_add = baseColor * cb1[262].xyz - diffuseIBLBase;
         temp_diffuse_add = temp_diffuse_add * accumulatedLightColor_x_alt;
@@ -466,7 +464,7 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
     {
         uint lightIndex_base = lightLoopCounter << 3;
         uint lightDataIndex = lightIndex_base | 7;
-        uint lightTypeMask = (uint)(intShadingModelID & -16) & ((asuint(cb2[lightDataIndex].w) << 5) & 224);
+        uint lightTypeMask = (uint)shadingModelBitfields.y & ((asuint(cb2[lightDataIndex].w) << 5) & 224);
         
         if (lightTypeMask != 0)
         {
