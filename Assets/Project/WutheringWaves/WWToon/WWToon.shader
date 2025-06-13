@@ -123,10 +123,14 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
     int intShadingModelID = (int)(float)uint_shadingModelID_rounded;
     int2 shadingModelBitfields = int2(intShadingModelID & 15, intShadingModelID & -16);
     
-    float isNotClothShadingModel = (shadingModelBitfields.x != 12) ? 1.0 : 0.0;
-    float3 specialShadingModelFlags = (shadingModelBitfields.xxx == int3(13, 14, 15)) ? 1.0 : 0.0;
-    float isAnySpecialModel = any(specialShadingModelFlags) ? 1.0 : 0.0;
-    float shadingModelOverride = isNotClothShadingModel ? isAnySpecialModel : -1.0;
+    bool bIsNotClothShadingModel = (shadingModelBitfields.x != 12);
+    bool bIsModel13 = (shadingModelBitfields.x == 13);
+    bool bIsModel14 = (shadingModelBitfields.x == 14);
+    bool bIsModel15 = (shadingModelBitfields.x == 15);
+    bool bIsAnySpecialModel = bIsModel13 || bIsModel14 || bIsModel15;
+
+    float isAnySpecialModel = bIsAnySpecialModel ? 1.0f : 0.0f;
+    float shadingModelOverride = bIsNotClothShadingModel ? isAnySpecialModel : -1.0f;
 
     float3 worldNormal;
     float3 initialLighting;
@@ -137,7 +141,7 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
 
     if (shadingModelOverride != 0.0)
     {
-        temp_shading_id_holder = (specialShadingModelFlags.x != 0.0) ? 13.0 : 12.0;
+        temp_shading_id_holder = bIsModel13 ? 13.0 : 12.0;
 
         float2 encodedNormal = gbuffer_normal.xy * 2.0 - 1.0;
         float encodedNormalAbsSum = dot(float2(1.0, 1.0), abs(encodedNormal));
@@ -148,6 +152,9 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
         float2 worldNormalXY_unpacked = lightingOffset * -2.0 + encodedNormal;
         worldNormal = float3(worldNormalXY_unpacked.x, worldNormalXY_unpacked.y, worldNormalZ_unpacked);
         
+        float worldNormalLengthRsqrt = rsqrt(dot(worldNormal, worldNormal));
+        worldNormal = worldNormal * worldNormalLengthRsqrt;
+
         initialLighting = msr * msr;
         hairShadowingFactor = customDataA_and_Temp.z;
     }
@@ -652,7 +659,7 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
     
     float3 finalCompositedColor = preSssLighting + sssColor;
 
-    finalCompositedColor = (specialShadingModelFlags.z != 0.0) ? baseLighting : finalCompositedColor;
+    finalCompositedColor = bIsModel15 ? baseLighting : finalCompositedColor;
 
     float3 finalColorXYZ = isShadingModel_5 ? preSssLighting : finalCompositedColor;
     
