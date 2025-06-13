@@ -138,7 +138,7 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
         float debug_shadingInfo_x = (specialShadingModelFlags.x != 0.0) ? 13.0 : 12.0;
         float2 debug_shadingModelFlags_xz = (specialShadingModelFlags.yz != float2(0.0, 0.0)) ? float2(1.0, 1.0) : float2(0.0, 0.0);
 
-        float2 encodedNormal = gbuffer_normal.yz * 2.0 - 1.0;
+        float2 encodedNormal = gbuffer_normal.xy * 2.0 - 1.0;
         float encodedNormalAbsSum = dot(float2(1.0, 1.0), abs(encodedNormal));
         float worldNormalZ_unpacked = 1.0 - encodedNormalAbsSum;
         float unpack_factor = max(0.0, -worldNormalZ_unpacked);
@@ -161,12 +161,11 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
             float3 scaled_msr = float3(16777215.0, 65535.0, 255.0) * saturated_msr;
             uint3 rounded_msr = (uint3)round(scaled_msr);
             
-            uint packed_val_y = (rounded_msr.y & ~0x000000FFu) | (rounded_msr.z & 0x000000FFu);
-            uint packed_val_x = (rounded_msr.x & ~0x0000FFFFu) | (packed_val_y & 0x0000FFFFu);
+            uint packed_val_x = (rounded_msr.x & 0xFFFF0000u) + (rounded_msr.y & 0xFF00u) + rounded_msr.z;
 
-            float packed_depth_float = 5.96046519e-08 * (float)packed_val_x;
-            float linear_depth_temp = packed_depth_float * cb1[65].x + cb1[65].y;
-            float linear_depth_p1 = packed_depth_float * cb1[65].z - cb1[65].w;
+            float packed_depth_raw = (float)packed_val_x * 0.0;
+            float linear_depth_temp = packed_depth_raw * cb1[65].x + cb1[65].y;
+            float linear_depth_p1 = packed_depth_raw * cb1[65].z - cb1[65].w;
             float linear_depth_p2 = 1.0 / linear_depth_p1;
             float final_packed_depth = linear_depth_temp + linear_depth_p2;
             
@@ -179,6 +178,7 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
         perObjectData = 0.0;
         final_gbuffer_normal.z = 0.0; 
         customDataA_and_Temp.xy = float2(0.0, 0.0);
+        hairShadowingFactor = 0.0;
     }
     
     float worldNormalLengthRsqrt = rsqrt(dot(worldNormal, worldNormal));
@@ -200,7 +200,6 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
     float aoFactor = tex2Dlod(_IN9, float4(0.0, 0.0, 0.0, 0.0)).x;
 
     float3 worldPos = cb1[49].xyz * 0.0;
-    worldPos = (useDitheredLodTransition * cb1[48].xyz) + worldPos;
     worldPos = (depth * cb1[50].xyz) + worldPos;
     worldPos = cb1[51].xyz + worldPos;
 
@@ -465,11 +464,11 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
     float3 preLoopLighting_NonIBL = cb1[261].xyz * baseColor;
     float3 chosenPreLoopLighting = (cb1[255].x != 0.0) ? preLoopLighting_IBL : preLoopLighting_NonIBL;
 
-    diffuseIBLBase = isShadingModel_5 ? chosenPreLoopLighting : diffuseIBLBase;
-    indirectLightingResult = isShadingModel_5 ? chosenPreLoopLighting : indirectLightingResult;
+    diffuseIBLBase = isShadingModel_13 ? chosenPreLoopLighting : diffuseIBLBase;
+    indirectLightingResult = isShadingModel_13 ? chosenPreLoopLighting : indirectLightingResult;
     
-    float finalSubsurfTerm = isShadingModel_5 ? 0.0 : subsurf_fresnel;
-    float finalSubsurfScatter = isShadingModel_5 ? 0.0 : subsurf_scatter_term;
+    float finalSubsurfTerm = isShadingModel_13 ? 0.0 : subsurf_fresnel;
+    float finalSubsurfScatter = isShadingModel_13 ? 0.0 : subsurf_scatter_term;
     
     float3 foggedLighting = (finalSubsurfTerm * (cb1[264].xyz + cb1[264].xyz)) - cb1[264].xyz;
     float3 lightAccumulator = float3(0.0, 0.0, 0.0);
@@ -646,14 +645,14 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
 
     finalCompositedColor = (specialShadingModelFlags.z != 0.0) ? baseLighting : finalCompositedColor;
 
-    float3 finalColorXYZ = isShadingModel_5 ? preSssLighting : finalCompositedColor;
+    finalCompositedColor = isShadingModel_13 ? preSssLighting : finalCompositedColor;
     
-    finalColorXYZ = finalColorXYZ / aoFactor;
+    finalCompositedColor = finalCompositedColor / aoFactor;
     
-    finalColorXYZ = min(float3(0.0, 0.0, 0.0), -finalColorXYZ);
+    finalCompositedColor = min(float3(0.0, 0.0, 0.0), -finalCompositedColor);
     
     float4 finalColor;
-    finalColor.xyz = -finalColorXYZ;
+    finalColor.xyz = -finalCompositedColor;
     finalColor.w = 0.0;
     
     return finalColor;
