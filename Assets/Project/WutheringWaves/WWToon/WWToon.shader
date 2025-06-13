@@ -108,6 +108,10 @@ float4 fDest = 0;
     float3 msr;
     float3 msrSq;
     float3 normal;
+    bool isChara12;
+    bool isCharaHair13;
+    bool isAnisotropicMetal14;
+    bool isAnisotropicFabric15;
 
     normal_perObjectData.xyzw = tex2Dlod(_IN1, float4(screenUV_ndcUV.xy, 0, 0)).wxyz;
     msr_shadingModelID.xyzw = tex2Dlod(_IN2, float4(screenUV_ndcUV.xy, 0, 0)).xyzw;
@@ -130,15 +134,18 @@ float4 fDest = 0;
     shadingModelID = 255 * msr_shadingModelID.w;
     shadingModelID = round(shadingModelID);
     shadingModelID = (uint)shadingModelID;
-    model_low4_high4.xy = (int2)shadingModelID & int2(15,-16);
-    shadingModelID = ((int)model_low4_high4.x != 12) ? 1.0 : 0.0;
+    model_low4_high4.xy = (int2)shadingModelID & int2(15,-16); // x是00001111 y是11110000 mask后的结果
+    isChara12 = ((int)model_low4_high4.x != 12) ? 1.0 : 0.0;
     model13_14_15.xyz = ((int3)model_low4_high4.xxx == int3(13,14,15)) ? 1.0 : 0.0;
-    model_low4_high4.z = (int)model13_14_15.z | (int)model13_14_15.y;
-    model_low4_high4.z = (int)model_low4_high4.z | (int)model13_14_15.x;
-    shadingModelID = shadingModelID ? model_low4_high4.z : -1;
+    isCharaHair13 = model13_14_15.x;
+    isAnisotropicMetal14 = model13_14_15.y;
+    isAnisotropicFabric15 = model13_14_15.z;
+    model_low4_high4.z = (int)isAnisotropicFabric15 | (int)isAnisotropicMetal14;
+    model_low4_high4.z = (int)model_low4_high4.z | (int)isCharaHair13;
+    shadingModelID = isChara12 ? model_low4_high4.z : -1;
     if (shadingModelID != 0) {
-        model_low4_high4.x = model13_14_15.x ? 13 : 12;
-        model13_14_15.xz = model13_14_15.yz ? float2(1,1) : 0;
+        model_low4_high4.x = isCharaHair13 ? 13 : 12;
+        model13_14_15.xz = float2(isAnisotropicMetal14, isAnisotropicFabric15) ? float2(1,1) : 0;
         model_low4_high4.zw = normal_perObjectData.yz * float2(2,2) + float2(-1,-1);
         shadingModelID = dot(float2(1,1), abs(model_low4_high4.zw));
         normal.z = 1 + -shadingModelID;
@@ -151,7 +158,7 @@ float4 fDest = 0;
         shadingModelID = rsqrt(shadingModelID);
         normal.xyz = normal.xyz * shadingModelID;
         msrSq = msr_shadingModelID.xyz * msr_shadingModelID.xyz;
-        model13_14_15.y = customData.z;
+        isAnisotropicMetal14 = customData.z;
     } else {
         shadingModelID = ((int)model_low4_high4.x == 10) ? 1.0 : 0.0;
         msr.xyz = saturate(msr_shadingModelID.xyz);
@@ -396,7 +403,7 @@ float4 fDest = 0;
         model_low4_high4.w = model13_14_15.w * model_low4_high4.w;
         customData.x = customData.x * model_low4_high4.z + -model_low4_high4.w;
         customData.x = cb1[265].z * customData.x + model_low4_high4.w;
-        model_low4_high4.z = shadingModelID * model13_14_15.y;
+        model_low4_high4.z = shadingModelID * isAnisotropicMetal14;
         model_low4_high4.z = 10 * model_low4_high4.z;
         shadingModelID = -1 + shadingModelID;
         shadingModelID = cb1[260].y * shadingModelID + 1;
@@ -658,7 +665,7 @@ float4 fDest = 0;
     } else {
         msr_shadingModelID.xyz = float3(0,0,0);
     }
-    normal_perObjectData.x = (0 != model13_14_15.z) ? 1.0 : 0.0;
+    normal_perObjectData.x = (0 != isAnisotropicFabric15) ? 1.0 : 0.0;
     albedo_alpha.xyz = model_low4_high4.yzw * msrSq;
     albedo_alpha.xyz = cb1[263].xyz * albedo_alpha.xyz;
     albedo_alpha.xyz = albedo_alpha.xyz * float3(0.5,0.5,0.5) + -model_low4_high4.yzw;
