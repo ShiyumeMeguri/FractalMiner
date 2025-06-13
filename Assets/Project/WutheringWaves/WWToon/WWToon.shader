@@ -146,14 +146,14 @@ float4 fDest = 0;
     if (shadingModelID != 0) {
         model_low4_high4.x = isCharaHair13 ? 13 : 12;
         model13_14_15.xz = float2(isAnisotropicMetal14, isAnisotropicFabric15) ? float2(1,1) : 0;
-        model_low4_high4.zw = normal_perObjectData.yz * float2(2,2) + float2(-1,-1);
-        shadingModelID = dot(float2(1,1), abs(model_low4_high4.zw));
+        normal.xy = normal_perObjectData.yz * float2(2,2) + float2(-1,-1);
+        shadingModelID = dot(float2(1,1), abs(normal.xy));
         normal.z = 1 + -shadingModelID;
         shadingModelID = max(0, -normal.z);
-        r7.xy = (model_low4_high4.zw >= float2(0,0)) ? 1.0 : 0.0;
+        r7.xy = (normal.xy >= float2(0,0)) ? 1.0 : 0.0;
         r7.xy = r7.xy ? float2(0.5,0.5) : float2(-0.5,-0.5);
         r7.xy = r7.xy * shadingModelID;
-        normal.xy = r7.xy * float2(-2,-2) + model_low4_high4.zw;
+        normal.xy = r7.xy * float2(-2,-2) + normal.xy;
         shadingModelID = dot(normal.xyz, normal.xyz);
         shadingModelID = rsqrt(shadingModelID);
         normal.xyz = normal.xyz * shadingModelID;
