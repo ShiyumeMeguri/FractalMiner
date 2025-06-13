@@ -119,7 +119,8 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
     float isOddPixel = (int)cb158 & 1;
 
     float shadingModelID_rounded = round(255.0 * shadingModelID_raw);
-    int intShadingModelID = (int)shadingModelID_rounded;
+    uint uint_shadingModelID_rounded = (uint)shadingModelID_rounded;
+    int intShadingModelID = (int)((float)uint_shadingModelID_rounded);
     int2 shadingModelBitfields = int2(intShadingModelID & 15, intShadingModelID & -16);
     
     float isNotClothShadingModel = (shadingModelBitfields.x != 12) ? 1.0 : 0.0;
@@ -133,9 +134,13 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
     float hairShadowingFactor = 0.0;
     float3 final_gbuffer_normal = gbuffer_normal; 
     
+    float temp_shading_id_holder = (float)shadingModelBitfields.x;
+
     if (shadingModelOverride != 0.0)
     {
-        float2 encodedNormal = gbuffer_normal.yz * 2.0 - 1.0;
+        temp_shading_id_holder = (specialShadingModelFlags.x != 0.0) ? 13.0 : 12.0;
+
+        float2 encodedNormal = gbuffer_normal.xy * 2.0 - 1.0;
         float encodedNormalAbsSum = dot(float2(1.0, 1.0), abs(encodedNormal));
         float worldNormalZ_unpacked = 1.0 - encodedNormalAbsSum;
         float unpack_factor = max(0.0, -worldNormalZ_unpacked);
@@ -181,9 +186,10 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
     float worldNormalLengthRsqrt = rsqrt(dot(worldNormal, worldNormal));
     float3 normalizedWorldNormal = worldNormal * worldNormalLengthRsqrt;
 
-    float isShadingModel_5 = (shadingModelBitfields.x == 5) ? 1.0 : 0.0;
-    float isShadingModel_13 = (shadingModelBitfields.x == 13) ? 1.0 : 0.0;
-    
+    int temp_int_shading_id = (int)temp_shading_id_holder;
+    float isShadingModel_5 = (temp_int_shading_id == 5) ? 1.0 : 0.0;
+    float isShadingModel_13 = (temp_int_shading_id == 13) ? 1.0 : 0.0;
+
     float hasValidFogData = (0.0 < cb1[162].y) ? 1.0 : 0.0;
     float hasVolumetricFog = (0.0 < cb1[220].z) ? 1.0 : 0.0;
     float useVolumetricFog = hasValidFogData ? hasVolumetricFog : 0.0;
@@ -192,7 +198,7 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
     float3 processedBaseColor = useDitheredLodTransition ? float3(1.0, 1.0, 1.0) : baseColor;
     float useOddPixelResult = isOddPixel ? 1.0 : 0.0;
     processedBaseColor = useVolumetricFog ? useOddPixelResult.xxx : processedBaseColor;
-    baseColor = (worldNormalLengthRsqrt > 0.0) ? processedBaseColor : baseColor;
+    baseColor = (isShadingModel_5 != 0.0) ? processedBaseColor : baseColor;
     
     float aoFactor = tex2Dlod(_IN9, float4(0.0, 0.0, 0.0, 0.0)).x;
 
@@ -320,10 +326,9 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
             float3 hsv_remap_H = saturate(abs(hsv_frac_H * 6.0 - 3.0) - 1.0);
             float3 hsv_to_rgb_base = hsv_remap_H - 1.0;
             float3 hsv_to_rgb_interp = hsv_S_clamped * hsv_to_rgb_base + 1.0;
-            float3 base_hsv_rgb = hsv_to_rgb_interp * (hsv_S + 1.0);
-            float3 lerp_factor_1 = hsv_to_rgb_interp * hsv_S_clamped - 1.0;
-            lerp_factor_1 = lerp_factor_1 * 0.600000024 + 1.0;
-            float3 lerp_factor_2 = -hsv_to_rgb_interp * hsv_S + lerp_factor_1;
+            float3 base_hsv_rgb = hsv_to_rgb_interp * (hsv_S_unclamped + 1.0);
+            float3 lerp_factor_1 = (hsv_to_rgb_interp * (hsv_S_unclamped + 1.0) - 1.0) * 0.600000024 + 1.0;
+            float3 lerp_factor_2 = -hsv_to_rgb_interp * (hsv_S_unclamped + 1.0) + lerp_factor_1;
             float3 final_hsv_rgb_1 = maskResult * lerp_factor_2 + base_hsv_rgb;
             float3 final_hsv_rgb_2 = (final_hsv_rgb_1 - baseColor) * 0.850000024 + baseColor;
             float3 hsv_blend_factor = customDataMasks_shifted.z * final_hsv_rgb_2 - final_hsv_rgb_1;
@@ -501,7 +506,7 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
                 currentLightFalloff = min(1.0, currentLightFalloff * currentLightFalloff);
                 
                 uint lightFlags = asuint(cb2[lightIndex_base + 1].w) >> 16;
-                if (lightFlags == 2)
+                if ((lightFlags & 15) == 2)
                 {
                     float spotFactor = dot(lightVec, cb2[lightIndex_base + 1].xyz);
                     spotFactor = saturate(cb2[lightIndex_base + 2].y * (spotFactor - cb2[lightIndex_base + 2].x));
@@ -537,10 +542,10 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
     float3 sssColor = float3(0.0, 0.0, 0.0);
     float reprojected_fresnel = finalSubsurfTerm;
     
-    float isNotEyeShadingModel = (shadingModelBitfields.x != 13) ? 1.0 : 0.0;
+    float isNotEyeShadingModel = (isShadingModel_13 == 0.0) ? 1.0 : 0.0;
     if (isNotEyeShadingModel != 0.0)
     {
-        float isSubsurfaceProfileModel = (shadingModelBitfields.x == 1) ? 1.0 : 0.0;
+        float isSubsurfaceProfileModel = (temp_int_shading_id == 1) ? 1.0 : 0.0;
         
         float scatterRadius = isSubsurfaceProfileModel ? customDataA_and_Temp.z : customDataA_and_Temp.y;
         
@@ -634,8 +639,8 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
         ambient_color = ambient_color * scatterRadius;
         ambient_color = ambient_color * 0.100000001;
         float3 ambient_base = (1.0 + baseColor) * ambient_color;
-        float3 spec_highlight_mask = saturate((baseColor * 1.20000005) - 1.0);
-        spec_highlight_mask = 1.0 - spec_highlight_mask;
+        float3 spec_highlight_mask_arg = (baseColor * 1.20000005) - 1.0;
+        float3 spec_highlight_mask = saturate(-spec_highlight_mask_arg);
         float3 spec_highlight_factor = (spec_highlight_mask * -2.0 + 3.0) * (spec_highlight_mask * spec_highlight_mask);
         spec_highlight_factor = spec_highlight_factor * 14.0 + 1.0;
         ambient_color = spec_highlight_factor * ambient_color;
