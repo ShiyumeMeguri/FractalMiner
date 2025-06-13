@@ -179,7 +179,7 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
         worldNormal = final_gbuffer_normal * 2.0 - 1.0;
         initialLighting = float3(0.0, 0.0, 0.0);
         perObjectData = 0.0;
-        customDataA_and_Temp.xy = float2(0.0, 0.0);
+        customDataA_and_Temp.xyz = 0;
         hairShadowingFactor = 0.0;
     }
     
