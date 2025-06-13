@@ -82,7 +82,7 @@ Shader "Custom/WWToonSrc"
             // 已知 _IN2 X是Metallic Y是Specular Z是Roughness W是ShadingModelID 
             // 已知 _IN3 是Albedo和Alpha
             // 未知 _IN4
-            // 未知 _IN5 R是阴影 G不知道 B是反光强度? A为什么和B一样
+            // 未知 _IN5 R是阴影 G不知道 B是阴影强度 A通道为什么和B一样
             // 已知 _IN6 R16深度
             // 已知 _IN7 1x1像素 全0
             // 已知 _IN8 MSSAO 多分辨率屏幕空间AO
