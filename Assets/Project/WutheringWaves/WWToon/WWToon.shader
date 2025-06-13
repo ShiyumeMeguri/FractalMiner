@@ -95,9 +95,9 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
     float perObjectData = gbufferNormalSample_raw.x;
     float3 gbuffer_normal = gbufferNormalSample_raw.yzw;
     
-    float4 materialParams_and_Temp = tex2Dlod(_IN2, float4(screenUV.xy, 0, 0));
-    float3 msr = materialParams_and_Temp.xyz;
-    float shadingModelID_raw = materialParams_and_Temp.w;
+    float4 materialParams_and_Temp_sampler = tex2Dlod(_IN2, float4(screenUV.xy, 0, 0));
+    float3 msr = materialParams_and_Temp_sampler.xyz;
+    float shadingModelID_raw = materialParams_and_Temp_sampler.w;
     
     float3 baseColor = tex2Dlod(_IN3, float4(screenUV.xy, 0, 0)).xyz;
     
@@ -106,10 +106,10 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
     
     float depth = tex2Dlod(_IN0, float4(screenUV.xy, 0, 0)).x;
     
-    customDataA_and_Temp.w = depth * cb1[65].x + cb1[65].y;
+    float temp_depth_calc = depth * cb1[65].x + cb1[65].y;
     float linearizedDepth_part1 = depth * cb1[65].z - cb1[65].w;
     float linearizedDepth_part2 = 1.0 / linearizedDepth_part1;
-    depth = customDataA_and_Temp.w + linearizedDepth_part2;
+    depth = temp_depth_calc + linearizedDepth_part2;
     
     float2 tileCoords = cb1[138].xy * screenUV.xy;
     tileCoords = (uint2)tileCoords;
@@ -131,20 +131,20 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
     float3 worldNormal;
     float3 initialLighting;
     float hairShadowingFactor = 0.0;
+    float3 final_gbuffer_normal = gbuffer_normal; 
     
     if (shadingModelOverride != 0.0)
     {
-        float unused_replicated_logic_1 = (specialShadingModelFlags.x != 0.0) ? 13.0 : 12.0;
-        bool unused_condition = (specialShadingModelFlags.y != 0.0) || (specialShadingModelFlags.z != 0.0);
-        float2 unused_replicated_logic_2 = unused_condition ? float2(1.0, 1.0) : float2(0.0, 0.0);
-        
-        float2 encodedNormal = gbuffer_normal.xy * 2.0 - 1.0;
+        float debug_shadingInfo_x = (specialShadingModelFlags.x != 0.0) ? 13.0 : 12.0;
+        float2 debug_shadingModelFlags_xz = (specialShadingModelFlags.yz != float2(0.0, 0.0)) ? float2(1.0, 1.0) : float2(0.0, 0.0);
+
+        float2 encodedNormal = gbuffer_normal.yz * 2.0 - 1.0;
         float encodedNormalAbsSum = dot(float2(1.0, 1.0), abs(encodedNormal));
         float worldNormalZ_unpacked = 1.0 - encodedNormalAbsSum;
-        float worldNormalZ_clamped = max(0.0, worldNormalZ_unpacked);
+        float unpack_factor = max(0.0, -worldNormalZ_unpacked);
         float2 lightingSign = (encodedNormal >= float2(0.0, 0.0)) ? float2(1.0, 1.0) : float2(0.0, 0.0);
-        float2 lightingOffset = lightingSign ? float2(0.5, 0.5) : float2(-0.5, -0.5);
-        lightingOffset = lightingOffset * worldNormalZ_clamped;
+        float2 lightingOffset = (lightingSign * 2.0 - 1.0) * 0.5;
+        lightingOffset = lightingOffset * unpack_factor;
         float2 worldNormalXY_unpacked = lightingOffset * -2.0 + encodedNormal;
         worldNormal = float3(worldNormalXY_unpacked.x, worldNormalXY_unpacked.y, worldNormalZ_unpacked);
         float worldNormalLengthInv = rsqrt(dot(worldNormal, worldNormal));
@@ -162,8 +162,8 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
             float3 scaled_msr = float3(16777215.0, 65535.0, 255.0) * saturated_msr;
             uint3 rounded_msr = (uint3)round(scaled_msr);
             
-            uint packed_val_y = (rounded_msr.y & ~0xFFu) | (rounded_msr.z & 0xFFu);
-            uint packed_val_x = (rounded_msr.x & ~0xFFFFu) | (packed_val_y & 0xFFFFu);
+            uint packed_val_y = (rounded_msr.y & ~0xFFFFFF00u) | (rounded_msr.z & 0xFFu);
+            uint packed_val_x = (rounded_msr.x & ~0xFFFF0000u) | (packed_val_y & 0xFFFFu);
 
             float packed_depth_float = 5.96046519e-08 * (float)packed_val_x;
             float linear_depth_temp = packed_depth_float * cb1[65].x + cb1[65].y;
@@ -178,7 +178,7 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
         initialLighting = float3(0.0, 0.0, 0.0);
         specialShadingModelFlags = float3(0.0, 0.0, 0.0);
         perObjectData = 0.0;
-        gbuffer_normal.z = 0.0;
+        final_gbuffer_normal.z = 0.0; 
         customDataA_and_Temp.xy = float2(0.0, 0.0);
     }
     
@@ -248,7 +248,7 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
 
         float3 perObjectMask_high = (float3(0.644999981, 0.312000006, 0.978999972) < perObjectData.xxx) ? 1.0 : 0.0;
         float3 perObjectMask_low = (perObjectData.xxx < float3(0.685000002, 0.351999998, 1.02100003)) ? 1.0 : 0.0;
-        float3 perObjectMask = perObjectMask_high ? perObjectMask_low : 0.0;
+        float3 perObjectMask = perObjectMask_high * perObjectMask_low;
         float maskResult = perObjectMask.z ? 1.0 : 0.0;
         maskResult = perObjectMask.y ? 0.0 : maskResult;
         maskResult = perObjectMask.x ? 1.0 : maskResult;
@@ -259,12 +259,12 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
         float customData_rounded = round(255.0 * customDataA_and_Temp.x);
         uint4 customDataMasks = (uint4)((uint)customData_rounded) & uint4(15, 240, 240, 15);
         
-        float fresnelTerm_IBL = saturate(gbuffer_normal.z + gbuffer_normal.z);
+        float fresnelTerm_IBL = saturate(final_gbuffer_normal.z + final_gbuffer_normal.z);
         float fresnel_factor1_IBL = fresnelTerm_IBL * -2.0 + 3.0;
         fresnelTerm_IBL = fresnelTerm_IBL * fresnelTerm_IBL;
         float roughness_from_normal = fresnel_factor1_IBL * fresnelTerm_IBL;
 
-        float roughness_term = saturate(gbuffer_normal.z * 2.0 - 1.0);
+        float roughness_term = saturate(final_gbuffer_normal.z * 2.0 - 0.5 * 2.0);
         float roughness_factor = roughness_term * -2.0 + 3.0;
         roughness_term = roughness_term * roughness_term;
         float roughness_final = roughness_factor * roughness_term;
@@ -301,10 +301,10 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
         combined_roughness = cb1[265].z * combined_roughness + blended_roughness;
         
         float final_spec_occlusion = cb1[260].y * (final_ssr - 1.0) + 1.0;
-        float spec_ao_combined = aoFactor * combined_roughness - final_spec_occlusion;
+        float spec_ao_combined = roughness_from_normal * combined_roughness - final_spec_occlusion;
         final_spec_occlusion = specialShadingModelFlags.x * spec_ao_combined + final_spec_occlusion;
         
-        float spec_ao_combined_2 = aoFactor * combined_roughness - combined_roughness;
+        float spec_ao_combined_2 = roughness_from_normal * combined_roughness - combined_roughness;
         float accumulatedLightColor_x = specialShadingModelFlags.x * spec_ao_combined_2 + combined_roughness;
         
         float3 hsv_modulated_color;
@@ -379,12 +379,12 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
     }
     else
     {
-        float fresnelTerm_NdotV_alt = saturate(gbuffer_normal.z + gbuffer_normal.z);
+        float fresnelTerm_NdotV_alt = saturate(final_gbuffer_normal.z + final_gbuffer_normal.z);
         float fresnel_factor1_alt = fresnelTerm_NdotV_alt * -2.0 + 3.0;
         fresnelTerm_NdotV_alt = fresnelTerm_NdotV_alt * fresnelTerm_NdotV_alt;
         float fresnel_NdotV_alt = fresnel_factor1_alt * fresnelTerm_NdotV_alt;
         
-        float roughness_term_alt = saturate(gbuffer_normal.z * 2.0 - 1.0);
+        float roughness_term_alt = saturate(final_gbuffer_normal.z * 2.0 - 1.0);
         float specularMask_alt = roughness_term_alt * -2.0 + 3.0;
         roughness_term_alt = roughness_term_alt * roughness_term_alt;
         float roughness_final_alt = specularMask_alt * roughness_term_alt;
@@ -445,16 +445,17 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
         float3 temp_diffuse_add = baseColor * cb1[262].xyz - diffuseIBLBase;
         temp_diffuse_add = temp_diffuse_add * accumulatedLightColor_x_alt;
         float3 temp_diffuse_final = temp_diffuse_add * 0.400000006 + diffuseIBLBase;
-        
-        float3 temp_shading_model_flags = indirect_spec_lit_alt + temp_diffuse_final;
-        
-        float3 temp_reuse_var = baseColor * cb1[262].xyz - temp_lighting_C;
-        temp_lighting_C = accumulatedLightColor_x_alt * temp_reuse_var + temp_lighting_C;
-        
-        indirectLightingResult = final_spec_occlusion_alt * temp_lighting_C + temp_shading_model_flags;
+
+        float3 term_B_final = indirect_spec_lit_alt + temp_diffuse_final;
+
+        float3 term_A_base = baseColor * cb1[262].xyz - temp_lighting_C;
+        float3 term_A_final = accumulatedLightColor_x_alt * term_A_base + temp_lighting_C;
+
+        float3 term_A_minus_B = term_A_final - term_B_final;
+        indirectLightingResult = final_spec_occlusion_alt * term_A_minus_B + term_B_final;
     }
 
-    float subsurf_scatter_term = saturate(10.000001 * (gbuffer_normal.z - 0.400000006));
+    float subsurf_scatter_term = saturate(10.000001 * (final_gbuffer_normal.z - 0.400000006));
     float subsurf_fresnel_factor = subsurf_scatter_term * -2.0 + 3.0;
     subsurf_scatter_term = subsurf_scatter_term * subsurf_scatter_term;
     float subsurf_fresnel = subsurf_fresnel_factor * subsurf_scatter_term;
@@ -464,13 +465,13 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
     float3 preLoopLighting_NonIBL = cb1[261].xyz * baseColor;
     float3 chosenPreLoopLighting = (cb1[255].x != 0.0) ? preLoopLighting_IBL : preLoopLighting_NonIBL;
 
-    float3 finalDiffuse = isShadingModel_5 ? chosenPreLoopLighting : diffuseIBLBase;
-    float3 finalSpecular = isShadingModel_5 ? chosenPreLoopLighting : indirectLightingResult;
+    diffuseIBLBase = isShadingModel_5 ? chosenPreLoopLighting : diffuseIBLBase;
+    indirectLightingResult = isShadingModel_5 ? chosenPreLoopLighting : indirectLightingResult;
     
     float finalSubsurfTerm = isShadingModel_5 ? 0.0 : subsurf_fresnel;
     float finalSubsurfScatter = isShadingModel_5 ? 0.0 : subsurf_scatter_term;
     
-    float3 foggedLighting = (subsurf_fresnel * (cb1[264].xyz + cb1[264].xyz)) - cb1[264].xyz;
+    float3 foggedLighting = (finalSubsurfTerm * (cb1[264].xyz + cb1[264].xyz)) - cb1[264].xyz;
     float3 lightAccumulator = float3(0.0, 0.0, 0.0);
     float lightLoopFalloff = 1.0;
     
@@ -481,7 +482,7 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
     {
         uint lightIndex_base = lightLoopCounter << 3;
         uint lightDataIndex = lightIndex_base | 7;
-        uint lightTypeMask = (uint)shadingModelBitfields.y & (((uint)cb2[lightDataIndex].w << 5) & 0xffffffe0);
+        uint lightTypeMask = (uint)shadingModelBitfields.y & (((asuint(cb2[lightDataIndex].w) << 5) & 0xffffffe0));
         
         if (lightTypeMask != 0)
         {
@@ -502,9 +503,9 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
                 float shadowFactor = saturate(shadowInvRange * shadowKernelTerm);
                 float shadowFresnel = (shadowFactor * -2.0 + 3.0) * (shadowFactor * shadowFactor);
                 shadowFactor = min(1.0, shadowFresnel);
-                float3 shadowColor = cb2[lightIndex_base + 6].xyz * foggedLighting.xyz;
-                float3 shadowLerp = baseColor * cb2[lightIndex_base + 5].xyz - shadowColor;
-                shadowColor = shadowFactor * shadowLerp + shadowColor;
+                float3 shadowColor_base = cb2[lightIndex_base + 6].xyz * foggedLighting.xyz;
+                float3 shadowLerp = baseColor * cb2[lightIndex_base + 5].xyz - shadowColor_base;
+                float3 shadowColor = shadowFactor * shadowLerp + shadowColor_base;
                 shadowColor = cb2[lightDataIndex].xxx * shadowColor;
                 
                 float currentLightFalloff = distToLightSq * cb2[lightIndex_base + 4].x + cb2[lightIndex_base + 4].y;
@@ -521,7 +522,7 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
                     currentLightFalloff = spotFactor * currentLightFalloff;
                 }
                 
-                float subsurf_final = (subsurf_fresnel * saturate(NdotL * 0.5 + 0.5)) - finalSubsurfScatter;
+                float subsurf_final = (finalSubsurfTerm * saturate(NdotL * 0.5 + 0.5)) - finalSubsurfScatter;
                 subsurf_final = cb2[lightIndex_base + 4].w * subsurf_final + finalSubsurfScatter;
                 float3 lightColor_direct_base = cb2[lightIndex_base + 3].www * shadowColor;
                 float3 lightColor_indirect = baseColor - lightColor_direct_base;
@@ -532,7 +533,7 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
                 float lightIntensityFactor = saturate(10.0 * totalLightIntensity);
                 float visibilityTerm = cb2[lightDataIndex].y * lightIntensityFactor;
 
-                float3 finalLightColor_this_loop = (lightColor_direct + lightColor_direct_base) * currentLightFalloff;
+                float3 finalLightColor_this_loop = lightColor_direct * currentLightFalloff;
 
                 currentLightFalloff = lightAttenFresnel - currentLightFalloff;
                 currentLightFalloff = cb2[lightIndex_base + 6].w * currentLightFalloff + currentLightFalloff;
@@ -544,7 +545,7 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
         lightLoopCounter = lightLoopCounter + 1;
     }
     
-    float3 preSssLighting = lightLoopFalloff * finalSpecular + lightAccumulator;
+    float3 preSssLighting = lightLoopFalloff * indirectLightingResult + lightAccumulator;
     
     float3 sssColor = float3(0.0, 0.0, 0.0);
     float reprojected_fresnel = finalSubsurfTerm;
@@ -565,20 +566,24 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
         float scatterKernelSize = scatterRadiusClamped + scatterRadiusClamped;
         scatterRadius = cb0[0].x * scatterRadius;
         scatterRadius = scatterRadius * 0.800000012 + scatterKernelSize;
-        float3x3 tangentToWorld = float3x3(cb1[20].xyz, cb1[21].xyz, cb1[22].xyz);
+        
+        float3x3 tangentToWorld;
+        tangentToWorld[0] = cb1[20].xyz;
+        tangentToWorld[1] = cb1[21].xyz;
+        tangentToWorld[2] = cb1[22].xyz;
         float3 worldNormalFromTangent = mul(normalizedWorldNormal, tangentToWorld);
         
-        bool useStaticLighting = (asint(cb0[0].w) > 0);
+        bool useStaticLighting = (asint(cb0[0].w) > 0.5);
         viewVec = useStaticLighting ? float3(0.0, 0.0, 0.0) : viewVec;
-        float3 lightDir = useStaticLighting ? float3(cb0[0].yz, 0.5) : cb1[264].xyz;
-        worldNormalFromTangent = useStaticLighting ? worldNormalFromTangent : normalizedWorldNormal;
+        float3 lightDir = useStaticLighting ? float3(cb0[0].y, cb0[0].z, 0.5) : cb1[264].xyz;
+        float3 sssNormal = useStaticLighting ? worldNormalFromTangent : normalizedWorldNormal;
         
-        float NdotL_final = dot(lightDir, worldNormalFromTangent);
+        float NdotL_final = dot(lightDir, sssNormal);
         float NdotL_remap = saturate(5.0 * (0.200000003 + NdotL_final));
         float NdotL_fresnel = (NdotL_remap * -2.0 + 3.0) * (NdotL_remap * NdotL_remap);
         
         float3 halfVec = normalize(lightDir + viewVec);
-        float NdotH = saturate(dot(worldNormalFromTangent, halfVec));
+        float NdotH = saturate(dot(sssNormal, halfVec));
         float NdotH_sq = NdotH * NdotH;
         float specTerm = (NdotH_sq * -0.800000012 + 1.0);
         specTerm = specTerm * specTerm;
@@ -589,7 +594,7 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
         float LdotV_remap = saturate((LdotV + LdotV) - 1.0 + 1.0);
         float LdotV_fresnel = (LdotV_remap * -2.0 + 3.0) * (LdotV_remap * LdotV_remap) + 1.0;
         
-        float VdotN = saturate(dot(viewVec, worldNormalFromTangent));
+        float VdotN = saturate(dot(viewVec, sssNormal));
         float schlick_V = max(0.0, 0.800000012 - VdotN);
         float screen_space_subsurf_falloff = min(1.74532926, max(0.0, cb1[133].x));
         float2 schlick_and_falloff = float2(schlick_V, screen_space_subsurf_falloff) * float2(1.5, 0.572957814);
@@ -609,9 +614,9 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
         schlick_final = schlick_final * LdotV_fresnel;
         schlick_final = 0.00999999978 * schlick_final;
         
-        float2 worldNormalXY_sq_plus_eps = worldNormalFromTangent.xy * worldNormalFromTangent.xy + 9.99999975e-05;
+        float2 worldNormalXY_sq_plus_eps = sssNormal.xy * sssNormal.xy + 9.99999975e-05;
         float rsqrt_normal_xy = rsqrt(dot(worldNormalXY_sq_plus_eps, float2(1.0, 1.0)));
-        float2 normal_xy_normalized = worldNormalFromTangent.xy * rsqrt_normal_xy;
+        float2 normal_xy_normalized = sssNormal.xy * rsqrt_normal_xy;
         normal_xy_normalized = normal_xy_normalized * scatterRadius;
         
         float sss_lobe_y_component = schlick_final * normal_xy_normalized.y;
@@ -649,7 +654,7 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
         sssColor = cb0[1].xyz * ambient_color;
     }
     
-    float3 baseLighting = preSssLighting * initialLighting;
+    float3 baseLighting = preSssLighting * initialLighting.xyz;
     baseLighting = cb1[263].xyz * baseLighting;
     baseLighting = (baseLighting * 0.5) - preSssLighting;
     baseLighting = reprojected_fresnel * baseLighting + preSssLighting;
@@ -670,6 +675,7 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
     
     return finalColor;
 }
+
             ENDCG
         }
     }
