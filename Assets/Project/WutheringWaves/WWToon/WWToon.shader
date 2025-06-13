@@ -2,7 +2,7 @@ Shader "Custom/WWToon"
 {
     Properties
     {
-        // Properties block is unchanged as requested
+        
         _IN0("IN0", 2D) = "white" {}
         _IN1("IN1", 2D) = "white" {}
         _IN2("IN2", 2D) = "white" {}
@@ -41,7 +41,6 @@ Shader "Custom/WWToon"
             sampler2D _MainTex;
             float4 _MainTex_ST;
             
-            // Texture inputs renamed based on known data
             sampler2D _IN0;
             sampler2D _IN1;
             sampler2D _IN2;
@@ -53,7 +52,7 @@ Shader "Custom/WWToon"
             sampler2D _IN8;
             sampler2D _IN9;
 
-            // Corresponding texture transform variables
+            
             float4 _IN0_ST;
             float4 _IN1_ST;
             float4 _IN2_ST;
@@ -91,43 +90,40 @@ Shader "Custom/WWToon"
 // 已修复的代码A
 float4 frag (VertexToFragment fragmentInput) : SV_Target
 {
-    // --- 1. G-Buffer 读取与初始化 ---
+    
     float4 screenUV = float4(fragmentInput.uv.xy, 0.0, 0.0);
 
-    // 声明所有逻辑变量，以匹配B中的数据流。
+    
     float3 baseColor;
     float3 gbuffer_normal; 
     float perObjectData;   
-    float3 msr; // Metallic, Specular, Roughness
+    float3 msr; 
     float shadingModelID_raw;
     float3 initial_customData;
     float depth;
     
-    // 从GBuffer中采样
     float4 gbufferNormalSample_raw = tex2Dlod(_IN1, float4(screenUV.xy, 0, 0));
-    perObjectData = gbufferNormalSample_raw.w;    // 对应 B: normalData_and_Temp.x (来自 tex.w)
-    
-    // 修复 #1: [保留] 修正了错误的法线Swizzle。
-    // B/D中: normalData_and_Temp.xyzw = tex.wxyz, 因此 normalData_and_Temp.yzw 对应 tex.xyz。
-    gbuffer_normal = gbufferNormalSample_raw.xyz; // 对应 B: normalData_and_Temp.yzw (来自 tex.xyz)
+    perObjectData = gbufferNormalSample_raw.w;    
+    gbuffer_normal = gbufferNormalSample_raw.xyz; 
 
+    
     float4 gbufferMaterialSample = tex2Dlod(_IN2, float4(screenUV.xy, 0, 0));
     msr = gbufferMaterialSample.xyz;
     shadingModelID_raw = gbufferMaterialSample.w;
 
+    
     baseColor = tex2Dlod(_IN3, float4(screenUV.xy, 0, 0)).xyz;
+    
     initial_customData = tex2Dlod(_IN4, float4(screenUV.xy, 0, 0)).yxz;
     
     depth = tex2Dlod(_IN0, float4(screenUV.xy, 0, 0)).x;
 
-    // --- 2. 深度与着色模型ID预处理 ---
-    // 线性化深度
+    
     float depthLinearizeTemp = depth * cb1[65].x + cb1[65].y;
     float linearizedDepth_part1 = depth * cb1[65].z - cb1[65].w;
     float linearizedDepth_part2 = 1.0 / linearizedDepth_part1;
     float initial_linearizedDepth = depthLinearizeTemp + linearizedDepth_part2;
     
-    // 抖动/棋盘格渲染相关的计算
     float2 tileCoords = cb1[138].xy * screenUV.xy;
     tileCoords = (uint2)tileCoords;
     float cb158 = (uint)cb1[158].x;
@@ -135,7 +131,7 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
     cb158 = (int)cb158 + (int)tileCoordsSum;
     float isOddPixel = (int)cb158 & 1;
 
-    // 解码着色模型ID和相关标志位
+    
     float shadingModelID_rounded = round(255.0 * shadingModelID_raw);
     uint uintShadingModelID = (uint)shadingModelID_rounded;
     int2 shadingModelBitfields = (int2)uintShadingModelID & int2(15,-16);
@@ -146,15 +142,17 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
     float isAnySpecialModel = (int)isSpecialModel_yz | (int)specialShadingModelFlags.x;
     float shadingModelOverride = isNotClothShadingModel ? isAnySpecialModel : -1.0;
 
-    // --- 3. 主路径选择: Standard PBR vs Cloth/Special ---
+    
     float3 worldNormal;
     float3 initialLighting;
-    // 修复: 确保变量在所有路径中都有明确的初始值, 模拟寄存器进入分支前的状态
+    
     float hairShadowingFactor = 0.0; 
-    depth = initial_linearizedDepth; // 默认使用初始深度
+    depth = initial_linearizedDepth; 
 
     if (shadingModelOverride != 0.0) {
-        // 这是B代码中的 cloth/special 模型路径 (BC5-style normal unpacking)
+        
+
+        
         float2 encodedNormal = gbuffer_normal.xy * 2.0 - 1.0;
         float encodedNormalAbsSum = dot(float2(1,1), abs(encodedNormal));
         float worldNormalZ_unpacked = 1.0 - encodedNormalAbsSum;
@@ -167,49 +165,46 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
         float worldNormalLengthInv = rsqrt(dot(worldNormal, worldNormal));
         worldNormal = worldNormal * worldNormalLengthInv;
         
-        initialLighting = msr * msr;
-        hairShadowingFactor = initial_customData.z; // 对应 B: shadingModelFlags_and_Temp.y = customDataA_and_Temp.z;
+        initialLighting = msr * msr; 
+        
+        hairShadowingFactor = initial_customData.z;
     } else {
-        // 这是B代码中的 standard PBR 路径
+        
         float isClearCoatModel = (shadingModelBitfields.x == 10) ? 1.0 : 0.0;
         if (isClearCoatModel != 0.0) {
             float3 saturated_msr = saturate(msr);
             float3 scaled_msr = float3(16777215, 65535, 255) * saturated_msr;
             uint3 rounded_msr = round(scaled_msr);
             
-            // 修复 #2: [保留] 修正了错误的位封装逻辑
             uint packed_val_x = rounded_msr.x;
             uint packed_val_y = rounded_msr.y;
             uint packed_val_z = rounded_msr.z;
-            packed_val_y = (packed_val_z & 0xff) | (packed_val_y & ~0xff);
-            packed_val_x = (packed_val_y & 0xffff) | (packed_val_x & ~0xffff);
+            packed_val_y = (packed_val_y & ~0xff) | (packed_val_z & 0xff);
+            packed_val_x = (packed_val_x & ~0xffff) | (packed_val_y & 0xffff);
 
-            float packed_depth = 5.96046519e-008 * (float)(packed_val_x);
+            float packed_depth = 5.96046519e-008 * (float)(packed_val_x); 
             float linear_depth_temp = packed_depth * cb1[65].x + cb1[65].y;
             float linear_depth_p1 = packed_depth * cb1[65].z - cb1[65].w;
             float linear_depth_p2 = 1.0 / linear_depth_p1;
             float final_packed_depth = linear_depth_temp + linear_depth_p2;
 
-            // 修复 #3: [保留] 深度值是条件性覆盖
+            
             depth = final_packed_depth;
         }
         
         worldNormal = gbuffer_normal * 2.0 - 1.0;
         initialLighting = float3(0,0,0);
         
-        // 修复: [核心] 模拟B代码中对临时寄存器的清零操作。这是最关键的逻辑等价性修复。
-        // B代码: normalData_and_Temp.xw = float2(0,0);
-        // B代码: customDataA_and_Temp.xy = float2(0,0);
-        // B代码: shadingModelFlags_and_Temp.xyz = float3(0,0,0);
-        // 这些操作清除了后续计算中会用到的值，必须在A中显式模拟。
-        perObjectData = 0.0;                          // 对应 normalData_and_Temp.x = 0
-        gbuffer_normal.z = 0.0;                       // 对应 normalData_and_Temp.w = 0 (tex.z)
-        initial_customData.xy = float2(0.0, 0.0);     // 对应 customDataA_and_Temp.xy = 0
-        hairShadowingFactor = 0.0;                    // 对应 shadingModelFlags_and_Temp.y = 0
-        // specialShadingModelFlags 已经在此路径下为(0,0,0)，无需额外清零。
+        perObjectData = 0.0;                          
+        gbuffer_normal.z = 0.0;                       
+
+        
+        initial_customData.xy = float2(0.0, 0.0);
+        
+        hairShadowingFactor = 0.0;                    
     }
 
-    // --- 4. 通用预计算 (法线，AO，世界坐标等) ---
+    
     float worldNormalLengthRsqrt = rsqrt(dot(worldNormal, worldNormal));
     float3 normalizedWorldNormal = worldNormal * worldNormalLengthRsqrt;
 
@@ -227,8 +222,7 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
     
     float aoFactor = tex2Dlod(_IN9, float4(0, 0, 0, 0)).x;
 
-    // 修复: 世界坐标计算。代码B中此部分逻辑混乱，汇编D揭示了正确的计算顺序。
-    // 代码A已正确实现，予以保留。
+    
     float3 worldPos = depth * cb1[50].xyz;
     worldPos = (useDitheredLodTransition * cb1[48].xyz) + worldPos; 
     worldPos = cb1[51].xyz + worldPos;
@@ -237,22 +231,20 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
     float2 ssrParamsSq = ssrParams * ssrParams;
     float ssrIntensity = ssrParamsSq.x * ssrParamsSq.y;
 
-    // 修复 #6: [保留] 明确定义IBL路径中使用的SSR相关项
-    // B/D中: customDataA_and_Temp.w = cb1[253].y * materialParams_and_Temp.w;
-    // 其中 materialParams_and_Temp.w 是 ssrIntensity。
-    // 我们创建一个新变量来存储这个结果，以避免在IBL路径中使用被覆盖的寄存器值。
+    
     float ssrTerm_preBlend = ssrIntensity * cb1[253].y;
 
-    // --- 5. IBL 与 非IBL 路径光照计算 ---
+    
     float3 indirectLightingResult; 
     float3 diffuseIBLBase;         
 
-    if (cb1[255].x != 0.0) { // IBL 路径
-        // GI 采样循环... (此部分逻辑复杂，保持不变)
+    if (cb1[255].x != 0.0) { 
+        
         float3 accumulatedGIBounceColor = float3(0,0,0);
         float giRadius = 0.0;
         float giTotalWeight = 0.0;
         float giLoopCount = 0.0;
+        
         for (int i = 0; i < 3; ++i) {
             float sampleRadius = 0.000833333295 + giRadius;
             float3 currentLoopColor = accumulatedGIBounceColor;
@@ -265,6 +257,7 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
                 float2 sampleUV_offset = float2(cos_a, sin_a) * sampleRadius;
                 float2 sampleUV = screenUV.xy + sampleUV_offset;
                 float3 giSampleColor = tex2D(_IN7, sampleUV).xyz;
+                
                 currentLoopColor = giSampleColor * useDitheredLodTransition + currentLoopColor;
                 giTotalWeight = giTotalWeight + sampleRadius; 
             }
@@ -274,7 +267,6 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
         }
         float3 finalGIColor = accumulatedGIBounceColor / giTotalWeight;
         
-        // Specular/Fresnel/Roughness 计算 (IBL路径)
         float3 perObjectMask_high = (float3(0.644999981,0.312000006,0.978999972) < perObjectData.xxx) ? 1.0 : 0.0;
         float3 perObjectMask_low = (perObjectData.xxx < float3(0.685000002,0.351999998,1.02100003)) ? 1.0 : 0.0;
         float3 perObjectMask = perObjectMask_high ? perObjectMask_low : 0.0;
@@ -282,22 +274,19 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
         maskResult = perObjectMask.y ? 0.0 : maskResult;
         maskResult = perObjectMask.x ? 1.0 : maskResult;
         
-        // 修复 #4: [保留] 修正了 specularMask 逻辑
-        // B: shadingInfo_and_Temp.z = lightingTempC.x ? 0 : shadingInfo_and_Temp.z;
         float isMaskYorZ = (perObjectMask.y > 0.0 || perObjectMask.z > 0.0) ? 1.0 : 0.0;
-        float specularMask = (perObjectMask.x == 0.0) ? isMaskYorZ : 0.0;
+        float specularMask = (perObjectMask.x != 0.0) ? 0.0 : isMaskYorZ;
         
         float customData_rounded = round(255.0 * initial_customData.x);
         uint4 customDataMasks = (uint4)((uint)customData_rounded) & uint4(15,240,240,15);
         
-        // 修复: 此处菲涅尔项使用 gbuffer_normal.z, 对应 B: normalData_and_Temp.w。
-        // 在标准PBR路径下，此值已被清零，但在IBL路径下保留原值。我们的修复确保了这一点。
         float fresnelTerm_IBL = saturate(gbuffer_normal.z + gbuffer_normal.z); 
         float fresnel_factor1_IBL = fresnelTerm_IBL * -2.0 + 3.0;
         fresnelTerm_IBL = fresnelTerm_IBL * fresnelTerm_IBL;
         float roughness_from_normal = fresnel_factor1_IBL * fresnelTerm_IBL;
 
-        float roughness_term = saturate(gbuffer_normal.z + gbuffer_normal.z - 1.0);
+        
+        float roughness_term = saturate(gbuffer_normal.z * 2.0 - 1.0); 
         float roughness_factor = roughness_term * -2.0 + 3.0;
         roughness_term = roughness_term * roughness_term;
         float roughness_final = roughness_factor * roughness_term;
@@ -312,7 +301,7 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
         float blended_roughness = luma_fresnel * roughness_final;
         
         float blend_range = cb1[265].y - cb1[265].x;
-        // 修复 #6 (应用): [保留] 使用新定义的 ssrTerm_preBlend
+        
         float blend_val = ssrTerm_preBlend - cb1[265].x;
         float blend_inv_range = 1.0 / blend_range;
         float blend_ratio = saturate(blend_val * blend_inv_range);
@@ -321,7 +310,6 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
         float blend_fresnel = blend_factor * blend_ratio;
         
         float final_blend = blend_fresnel * blended_roughness;
-        // 修复 #6 (应用): [保留] 使用新定义的 ssrTerm_preBlend
         float ssr_term = ssrTerm_preBlend - final_blend;
         float final_ssr = cb1[265].z * ssr_term + final_blend;
         
@@ -342,7 +330,7 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
         float spec_ao_combined_2 = aoFactor * combined_roughness - combined_roughness;
         float accumulatedLightColor_x = specialShadingModelFlags.x * spec_ao_combined_2 + combined_roughness;
 
-        // HSV 色彩操纵 (此部分逻辑复杂，保持不变)
+        
         float3 hsv_modulated_color;
         {
             float hsv_check = (finalGIColor.y >= finalGIColor.z) ? 1.0 : 0.0;
@@ -378,7 +366,7 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
             hsv_modulated_color = (-1.0 + final_hsv_rgb_3) * customDataMasks_shifted.w + 1.0;
         }
 
-        // IBL 光照合成
+        
         float3 indirect_spec_base = 0.200000003 * cb1[261].xyz;
         float3 indirect_spec_add = cb1[262].xyz * 0.5 - indirect_spec_base;
         indirect_spec_base = final_spec_occlusion * indirect_spec_add + indirect_spec_base;
@@ -416,16 +404,14 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
         
         indirectLightingResult = final_ibl_spec * occluded_ibl_spec_base;
 
-    } else { // 非IBL 路径
-        // Specular/Fresnel/Roughness 计算 (非IBL路径)
-        // 修复: 此处菲涅尔项使用 gbuffer_normal.z, 对应 B: normalData_and_Temp.w。
-        // 在此路径下，gbuffer_normal.z已被我们的修复代码清零，这与B代码的行为完全一致。
+    } else { 
+        
         float fresnelTerm_NdotV_alt = saturate(gbuffer_normal.z + gbuffer_normal.z);
         float fresnel_factor1_alt = fresnelTerm_NdotV_alt * -2.0 + 3.0;
         fresnelTerm_NdotV_alt = fresnelTerm_NdotV_alt * fresnelTerm_NdotV_alt;
         float fresnel_NdotV_alt = fresnel_factor1_alt * fresnelTerm_NdotV_alt;
         
-        float roughness_term_alt = saturate(gbuffer_normal.z + gbuffer_normal.z - 1.0);
+        float roughness_term_alt = saturate(gbuffer_normal.z * 2.0 - 1.0); 
         float specularMask_alt = roughness_term_alt * -2.0 + 3.0;
         roughness_term_alt = roughness_term_alt * roughness_term_alt;
         float roughness_final_alt = specularMask_alt * roughness_term_alt;
@@ -440,7 +426,8 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
         float blended_roughness_alt = luma_fresnel_alt * roughness_final_alt;
         
         float blend_range_alt = cb1[265].y - cb1[265].x;
-        float blend_val_alt = ssrIntensity * cb1[253].y - cb1[265].x;
+        
+        float blend_val_alt = ssrIntensity * cb1[253].y - cb1[265].x; 
         float blend_inv_range_alt = 1.0 / blend_range_alt;
         float blend_ratio_alt = saturate(blend_val_alt * blend_inv_range_alt);
         float blend_factor_alt = blend_ratio_alt * -2.0 + 3.0;
@@ -468,7 +455,7 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
         float spec_ao_combined_2_alt = aoFactor * combined_roughness_alt - combined_roughness_alt;
         float accumulatedLightColor_x_alt = specialShadingModelFlags.x * spec_ao_combined_2_alt + combined_roughness_alt;
 
-        // 非IBL光照合成
+        
         float3 indirect_spec_base_alt = 0.200000003 * cb1[261].xyz;
         float3 indirect_spec_add_alt = cb1[262].xyz * 0.5 - indirect_spec_base_alt;
         indirect_spec_base_alt = final_spec_occlusion_alt * indirect_spec_add_alt + indirect_spec_base_alt;
@@ -497,9 +484,7 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
         indirectLightingResult = final_spec_occlusion_alt * temp_lighting_C + temp_shading_model_flags;
     }
 
-    // --- 6. 最终光照选择 (Pre-LightLoop) ---
-    // 修复: 同样，此处的计算依赖于 gbuffer_normal.z (对应B: normalData_and_Temp.w),
-    // 我们的路径修复确保了它在不同路径下有正确的值(原值或0)。
+    
     float subsurf_scatter_term = saturate(10.000001 * (gbuffer_normal.z - 0.400000006));
     float subsurf_fresnel_factor = subsurf_scatter_term * -2.0 + 3.0;
     subsurf_scatter_term = subsurf_scatter_term * subsurf_scatter_term;
@@ -516,7 +501,7 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
     float finalSubsurfTerm = isShadingModel_5 ? 0.0 : subsurf_fresnel;
     float finalSubsurfScatter = isShadingModel_5 ? 0.0 : subsurf_scatter_term;
 
-    // --- 7. 动态光照循环 ---
+    
     float3 foggedLighting = (subsurf_fresnel * (cb1[264].xyz + cb1[264].xyz)) - cb1[264].xyz;
     float3 lightAccumulator = float3(0,0,0);
     float lightLoopFalloff = 1.0;
@@ -524,7 +509,6 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
     uint lightLoopCounter = 0;
     uint numLights = asuint(cb2[128].x);
     
-    // 修复 #5: [保留] 移除了无效的 [unroll] 属性
     while (lightLoopCounter < numLights) {
         uint lightIndex_base = lightLoopCounter << 3;
         uint lightDataIndex = lightIndex_base | 7;
@@ -558,7 +542,7 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
                 currentLightFalloff = min(1.0, currentLightFalloff * currentLightFalloff);
                 
                 uint lightFlags = asuint(cb2[lightIndex_base + 1].w) >> 16;
-                if (lightFlags == 2) { // Is Spot Light
+                if (lightFlags == 2) { 
                     float spotFactor = dot(lightVec, cb2[lightIndex_base + 1].xyz);
                     spotFactor = saturate(cb2[lightIndex_base + 2].y * (spotFactor - cb2[lightIndex_base + 2].x));
                     spotFactor = spotFactor * spotFactor * spotFactor * spotFactor;
@@ -588,19 +572,17 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
         lightLoopCounter = lightLoopCounter + 1;
     }
 
-    // --- 8. SSS 和最终颜色合成 ---
+    
     float3 preSssLighting = lightLoopFalloff * finalSpecular + lightAccumulator; 
     
     float3 sssColor = float3(0,0,0);
     
-    float reprojected_fresnel = finalSubsurfTerm;
+    float reprojected_fresnel = finalSubsurfTerm; 
     
     float isNotEyeShadingModel = (shadingModelBitfields.x != 13) ? 1.0 : 0.0;
     if (isNotEyeShadingModel != 0.0) {
         float isSubsurfaceProfileModel = (shadingModelBitfields.x == 1) ? 1.0 : 0.0;
         
-        // 修复: 此处 scatterRadius 依赖于 initial_customData.y/z。在标准PBR路径下，
-        // initial_customData.y 已被清零，确保了与B代码等价的逻辑。
         float scatterRadius = isSubsurfaceProfileModel ? initial_customData.z : initial_customData.y;
         
         float3 viewVec = cb1[67].xyz - worldPos;
@@ -696,7 +678,6 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
         sssColor = cb0[1].xyz * ambient_color;
     }
     
-    // --- 9. 最终颜色合成 ---
     float3 baseLighting = preSssLighting * initialLighting;
     baseLighting = cb1[263].xyz * baseLighting;
     baseLighting = (baseLighting * 0.5) - preSssLighting;
@@ -704,11 +685,12 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
     
     float3 finalCompositedColor = preSssLighting + sssColor;
 
-    float3 finalLighting = (specialShadingModelFlags.z != 0.0) ? baseLighting : finalCompositedColor;
+    finalCompositedColor = (specialShadingModelFlags.z != 0.0) ? baseLighting : finalCompositedColor;
 
-    float3 finalColorXYZ = isShadingModel_5 ? preSssLighting : finalLighting;
-
+    float3 finalColorXYZ = isShadingModel_5 ? preSssLighting : finalCompositedColor;
+    
     finalColorXYZ = finalColorXYZ / aoFactor;
+    
     finalColorXYZ = min(float3(0,0,0), -finalColorXYZ);
     
     float4 finalColor;
