@@ -95,9 +95,9 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
 
     float4 color = 0;
     
-    float4 r0,r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11,r12,r13,r14,r15,r16;
-    uint4 bitmask, uiDest;
-    float4 fDest;
+    float4 r0=0, r1=0, r2=0, r3=0, r4=0, r5=0, r6=0, r7=0, r8=0, r9=0, r10=0, r11=0, r12=0, r13=0, r14=0, r15=0, r16=0;
+    uint4 bitmask=0, uiDest=0;
+    float4 fDest=0;
 
     r0.xyzw = tex2Dlod(_IN1, float4(v0.xy, 0, 0)).wxyz;
     r1.xyzw = tex2Dlod(_IN2, float4(v0.xy, 0, 0)).xyzw;

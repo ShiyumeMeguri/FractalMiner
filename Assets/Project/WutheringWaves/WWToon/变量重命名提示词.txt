@@ -12,14 +12,13 @@ _IN7: Black1x1Texture (1x1 全0像素)
 _IN8: ScreenSpaceAOTexture (MSSAO - 多分辨率屏幕空间AO)
 _IN9: EyeAdaptationTexture (1x1 屏幕亮度控制)
 我将严格遵守您制定的黄金法则和状态感知重构算法：
-内部状态追踪 (Virtual State Mapping): 我会在我的处理逻辑中为每一个临时寄存器（如 temp）维护一个虚拟状态图，实时追踪其 .x, .y, .z, .w 分量当前对应的局部变量名。
-创建新变量 (New Logical Block): 每当一个寄存器分量被赋予一个新的逻辑值时，我会创建一个新的、根据上下文精确命名的局部变量。例如 temp.x = GBufferB.x; 会被重构为 float metallic = GBufferB.x;。
+创建新变量 (New Logical Block): 每当一个寄存器被赋予一个新的逻辑值时，我会创建一个新的、根据上下文精确命名的局部变量。例如 temp.x = GBufferB.x; 会被重构为 float metallic = GBufferB.x;但是为了保证和源码逻辑一致 必须使用完全相同维度的向量 如果一个定义有多个含义就都写上去 比如Normal_ShadingModel。 或者normal = n.yzw这种混淆会导致之后全部出错 因此只改变命名 所以即使不使用某个分量也要完全相同维度的定义局部变量 防止后续出错
 替换读取操作 (Reading a Component): 所有对临时寄存器的读取操作，都将被替换为对其当前绑定的局部变量的读取。
 动态构建矢量 (Swizzling): 像 temp.xy 这样的矢量读取，将被动态重构为 float2(metallic, roughness);。
 不合并/不改变逻辑: 绝对不合并任何代码逻辑，不改变计算顺序。
 一一对应: 重构后的代码行将与原始逻辑行一一对应，仅作变量名和声明方式的替换。
 无痕替换 (Traceless Replacement): 最终输出的代码将是完全干净的，不包含任何中间产物或调试变量。
-生成的代码应该字节级每行对应 唯一的差别就是局部变量名
+生成的代码应该字节级每行对应 唯一的差别就是局部变量名 定义时类型必须完全一致 原本是uint 就绝对不能定义为float 分量也不能搞错 
 
 float4 frag (VertexToFragment fragmentInput) : SV_Target
 {
@@ -27,10 +26,9 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
     float4 v0 = fragmentInput.uv; 
 
     float4 color = 0;
-    
-    float4 r0,r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11,r12,r13,r14,r15,r16;
-    uint4 bitmask, uiDest;
-    float4 fDest;
+    float4 r0=0, r1=0, r2=0, r3=0, r4=0, r5=0, r6=0, r7=0, r8=0, r9=0, r10=0, r11=0, r12=0, r13=0, r14=0, r15=0, r16=0;
+    uint4 bitmask=0, uiDest=0;
+    float4 fDest=0;
 
     r0.xyzw = tex2Dlod(_IN1, float4(v0.xy, 0, 0)).wxyz;
     r1.xyzw = tex2Dlod(_IN2, float4(v0.xy, 0, 0)).xyzw;
