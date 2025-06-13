@@ -119,8 +119,8 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
     float isOddPixel = (int)cb158 & 1;
 
     float shadingModelID_rounded = round(255.0 * shadingModelID_raw);
-    uint uintShadingModelID = (uint)shadingModelID_rounded;
-    int2 shadingModelBitfields = (int2)uintShadingModelID & int2(15, -16);
+    int intShadingModelID = (int)shadingModelID_rounded;
+    int2 shadingModelBitfields = int2(intShadingModelID & 15, intShadingModelID & -16);
     
     float isNotClothShadingModel = (shadingModelBitfields.x != 12) ? 1.0 : 0.0;
     float3 specialShadingModelFlags = (shadingModelBitfields.xxx == int3(13, 14, 15)) ? 1.0 : 0.0;
@@ -135,10 +135,7 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
     
     if (shadingModelOverride != 0.0)
     {
-        float debug_shadingInfo_x = (specialShadingModelFlags.x != 0.0) ? 13.0 : 12.0;
-        float2 debug_shadingModelFlags_xz = (specialShadingModelFlags.yz != float2(0.0, 0.0)) ? float2(1.0, 1.0) : float2(0.0, 0.0);
-
-        float2 encodedNormal = gbuffer_normal.xy * 2.0 - 1.0;
+        float2 encodedNormal = gbuffer_normal.yz * 2.0 - 1.0;
         float encodedNormalAbsSum = dot(float2(1.0, 1.0), abs(encodedNormal));
         float worldNormalZ_unpacked = 1.0 - encodedNormalAbsSum;
         float unpack_factor = max(0.0, -worldNormalZ_unpacked);
@@ -161,11 +158,11 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
             float3 scaled_msr = float3(16777215.0, 65535.0, 255.0) * saturated_msr;
             uint3 rounded_msr = (uint3)round(scaled_msr);
             
-            uint packed_val_x = (rounded_msr.x & 0xFFFF0000u) + (rounded_msr.y & 0xFF00u) + rounded_msr.z;
+            uint packed_val_x = (rounded_msr.x & 0xFF0000) + (rounded_msr.y & 0xFF00) + rounded_msr.z;
 
-            float packed_depth_raw = (float)packed_val_x * 0.0;
-            float linear_depth_temp = packed_depth_raw * cb1[65].x + cb1[65].y;
-            float linear_depth_p1 = packed_depth_raw * cb1[65].z - cb1[65].w;
+            float packed_depth_float = 5.96046519e-08 * (float)packed_val_x;
+            float linear_depth_temp = packed_depth_float * cb1[65].x + cb1[65].y;
+            float linear_depth_p1 = packed_depth_float * cb1[65].z - cb1[65].w;
             float linear_depth_p2 = 1.0 / linear_depth_p1;
             float final_packed_depth = linear_depth_temp + linear_depth_p2;
             
@@ -176,7 +173,7 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
         initialLighting = float3(0.0, 0.0, 0.0);
         specialShadingModelFlags = float3(0.0, 0.0, 0.0);
         perObjectData = 0.0;
-        final_gbuffer_normal.z = 0.0; 
+        gbuffer_normal.z = 0.0; 
         customDataA_and_Temp.xy = float2(0.0, 0.0);
         hairShadowingFactor = 0.0;
     }
@@ -199,9 +196,7 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
     
     float aoFactor = tex2Dlod(_IN9, float4(0.0, 0.0, 0.0, 0.0)).x;
 
-    float3 worldPos = cb1[49].xyz * 0.0;
-    worldPos = (depth * cb1[50].xyz) + worldPos;
-    worldPos = cb1[51].xyz + worldPos;
+    float3 worldPos = depth * cb1[50].xyz + cb1[51].xyz;
 
     float2 ssrParams = tex2Dlod(_IN5, float4(screenUV.xy, 0, 0)).xz;
     float2 ssrParamsSq = ssrParams * ssrParams;
@@ -252,9 +247,6 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
         maskResult = perObjectMask.y ? 0.0 : maskResult;
         maskResult = perObjectMask.x ? 1.0 : maskResult;
         
-        float isMaskYorZ = (int)perObjectMask.y | (int)perObjectMask.z;
-        float specularMask = (perObjectMask.x != 0.0) ? 0.0 : isMaskYorZ;
-
         float customData_rounded = round(255.0 * customDataA_and_Temp.x);
         uint4 customDataMasks = (uint4)((uint)customData_rounded) & uint4(15, 240, 240, 15);
         
@@ -360,20 +352,16 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
         float3 ibl_diffuse_occluded = (ibl_diffuse_lerp * hsv_modulated_color) - ibl_spec_occluded;
         float3 ibl_diffuse_final = accumulatedLightColor_x * ibl_diffuse_occluded + ibl_spec_occluded;
         
+        float3 final_ibl_spec = (initialLighting * hsv_modulated_color) - hsv_modulated_ibl_spec_base;
+        final_ibl_spec = accumulatedLightColor_x * final_ibl_spec + hsv_modulated_ibl_spec_base;
+        
         float3 lightLoopTempA_resolved = indirect_spec_lit + ibl_diffuse_final;
-
-        float3 ibl_spec_lerp = (initialLighting * hsv_modulated_color) - hsv_modulated_ibl_spec_base;
-        float3 final_ibl_spec = accumulatedLightColor_x * ibl_spec_lerp + hsv_modulated_ibl_spec_base;
-        
-        float occlusion_from_bent_normal = tex2Dlod(_IN8, float4(screenUV.xy, 0, 0)).x;
-        occlusion_from_bent_normal = specularMask * (occlusion_from_bent_normal - 1.0) + 1.0;
-        
         float3 final_ibl_spec_temp = final_ibl_spec - lightLoopTempA_resolved;
         final_ibl_spec = luma_fresnel * final_ibl_spec_temp + lightLoopTempA_resolved;
         
-        float3 ibl_unoccluded = float3(1.0, 1.0, 1.0) - hsv_modulated_ibl_spec_base;
-        float3 occluded_ibl_spec_base = occlusion_from_bent_normal * ibl_unoccluded + hsv_modulated_ibl_spec_base;
-        
+        float3 occluded_term = 1.0 - finalGIColor * hsv_modulated_color;
+        float3 occluded_ibl_spec_base = lerp(hsv_modulated_ibl_spec_base, occluded_term, maskResult.xxx);
+
         indirectLightingResult = final_ibl_spec * occluded_ibl_spec_base;
     }
     else
@@ -420,10 +408,10 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
         combined_roughness_alt = cb1[265].z * combined_roughness_alt + blended_roughness_alt;
         
         float final_spec_occlusion_alt = cb1[260].y * (final_ssr_alt - 1.0) + 1.0;
-        float spec_ao_combined_alt = aoFactor * combined_roughness_alt - final_spec_occlusion_alt;
+        float spec_ao_combined_alt = fresnel_NdotV_alt * combined_roughness_alt - final_spec_occlusion_alt;
         final_spec_occlusion_alt = specialShadingModelFlags.x * spec_ao_combined_alt + final_spec_occlusion_alt;
         
-        float spec_ao_combined_2_alt = aoFactor * combined_roughness_alt - combined_roughness_alt;
+        float spec_ao_combined_2_alt = fresnel_NdotV_alt * combined_roughness_alt - combined_roughness_alt;
         float accumulatedLightColor_x_alt = specialShadingModelFlags.x * spec_ao_combined_2_alt + combined_roughness_alt;
         
         float3 indirect_spec_base_alt = 0.200000003 * cb1[261].xyz;
@@ -464,11 +452,11 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
     float3 preLoopLighting_NonIBL = cb1[261].xyz * baseColor;
     float3 chosenPreLoopLighting = (cb1[255].x != 0.0) ? preLoopLighting_IBL : preLoopLighting_NonIBL;
 
-    diffuseIBLBase = isShadingModel_13 ? chosenPreLoopLighting : diffuseIBLBase;
-    indirectLightingResult = isShadingModel_13 ? chosenPreLoopLighting : indirectLightingResult;
+    diffuseIBLBase = isShadingModel_5 ? chosenPreLoopLighting : diffuseIBLBase;
+    indirectLightingResult = isShadingModel_5 ? chosenPreLoopLighting : indirectLightingResult;
     
-    float finalSubsurfTerm = isShadingModel_13 ? 0.0 : subsurf_fresnel;
-    float finalSubsurfScatter = isShadingModel_13 ? 0.0 : subsurf_scatter_term;
+    float finalSubsurfTerm = isShadingModel_5 ? 0.0 : subsurf_fresnel;
+    float finalSubsurfScatter = isShadingModel_5 ? 0.0 : subsurf_scatter_term;
     
     float3 foggedLighting = (finalSubsurfTerm * (cb1[264].xyz + cb1[264].xyz)) - cb1[264].xyz;
     float3 lightAccumulator = float3(0.0, 0.0, 0.0);
@@ -481,7 +469,7 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
     {
         uint lightIndex_base = lightLoopCounter << 3;
         uint lightDataIndex = lightIndex_base | 7;
-        uint lightTypeMask = (uint)shadingModelBitfields.y & (((asuint(cb2[lightDataIndex].w) << 5) & 0xffffffe0));
+        uint lightTypeMask = (uint)shadingModelBitfields.y & ((asuint(cb2[lightDataIndex].w) << 5) & 224);
         
         if (lightTypeMask != 0)
         {
@@ -493,7 +481,7 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
             if (1.0 >= lightAttenuation)
             {
                 float lightAttenFactor = saturate(lightAttenuation * 2.5 - 1.5);
-                float lightAttenFresnel = (lightAttenFactor * -2.0 + 3.0) * (-lightAttenFactor * lightAttenFactor) + 1.0;
+                float lightAttenFresnel = (lightAttenFactor * -2.0 + 3.0) * (lightAttenFactor * lightAttenFactor) * -1.0 + 1.0;
                 float rsqrtDistToLight = rsqrt(distToLightSq);
                 float3 lightVec = lightPos * rsqrtDistToLight;
                 float NdotL = dot(normalizedWorldNormal, lightVec);
@@ -534,8 +522,8 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
 
                 float3 finalLightColor_this_loop = lightColor_direct * currentLightFalloff;
 
-                currentLightFalloff = lightAttenFresnel - currentLightFalloff;
-                currentLightFalloff = cb2[lightIndex_base + 6].w * currentLightFalloff + currentLightFalloff;
+                float falloff_delta = lightAttenFresnel - currentLightFalloff;
+                currentLightFalloff = cb2[lightIndex_base + 6].w * falloff_delta + currentLightFalloff;
                 lightAccumulator = finalLightColor_this_loop * lightLoopFalloff + lightAccumulator;
                 visibilityTerm = 1.0 - (currentLightFalloff * visibilityTerm);
                 lightLoopFalloff = visibilityTerm * lightLoopFalloff;
@@ -572,29 +560,53 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
         tangentToWorld[2] = cb1[22].xyz;
         float3 worldNormalFromTangent = mul(normalizedWorldNormal, tangentToWorld);
         
-        bool useStaticLighting = (asint(cb0[0].w) > 0.5);
+        bool useStaticLighting = (asint(cb0[0].w) > 0);
         viewVec = useStaticLighting ? float3(0.0, 0.0, 0.0) : viewVec;
         float3 lightDir = useStaticLighting ? float3(cb0[0].y, cb0[0].z, 0.5) : cb1[264].xyz;
         float3 sssNormal = useStaticLighting ? worldNormalFromTangent : normalizedWorldNormal;
         
         float NdotL_final = dot(lightDir, sssNormal);
-        float NdotL_remap = saturate(5.0 * (0.200000003 + NdotL_final));
-        float NdotL_fresnel = (NdotL_remap * -2.0 + 3.0) * (NdotL_remap * NdotL_remap);
-        
-        float3 halfVec = normalize(lightDir + viewVec);
-        float NdotH = saturate(dot(sssNormal, halfVec));
-        float NdotH_sq = NdotH * NdotH;
-        float specTerm = (NdotH_sq * -0.800000012 + 1.0);
-        specTerm = specTerm * specTerm;
-        specTerm = 0.200000003 / (3.14159274 * specTerm);
-        specTerm = specTerm * scatterRadiusClamped;
-        
         float LdotV = dot(lightDir, viewVec);
         float LdotV_remap = saturate((LdotV + LdotV));
-        float LdotV_fresnel = (LdotV_remap * -2.0 + 3.0) * (LdotV_remap * LdotV_remap) + 1.0;
         
-        float schlick_final = ( (0.400000006 * lightDir.y) * (NdotL_final * 0.800000012 + 0.200000003) + (1.5 * specTerm * NdotL_final) ) * (LdotV_remap * 0.5 + 0.5);
+        float schlick_final;
+        if (useStaticLighting)
+        {
+            float wrap_diffuse = max(0.0, 0.8 - NdotL_final) * 1.5;
+            float sss_term_from_cb133 = min(1.745329, max(0.0, cb1[133].x)) * 0.572958;
 
+            float depth_falloff_base = max(0.0, depth);
+            float depth_falloff_clamped = min(depth_falloff_base, 3000.0);
+            float depth_falloff = (3000.0 - depth_falloff_clamped) * 0.000333;
+            float depth_fresnel_base = depth_falloff * depth_falloff;
+            depth_fresnel_base = depth_fresnel_base * depth_fresnel_base;
+            float depth_fresnel = depth_fresnel_base * depth_falloff + (depth_falloff * 0.02);
+            
+            float depth_lerp_base = depth_fresnel - 1.0;
+            float depth_lerp_final = sss_term_from_cb133 * depth_lerp_base + 1.0;
+            float depth_and_radius_lerp = scatterRadiusClamped * (depth_lerp_final - 1.0) + 1.0;
+
+            float LdotV_fresnel = (LdotV_remap * -2.0 + 3.0) * (LdotV_remap * LdotV_remap) + 1.0;
+            float backscatter_factor = LdotV_remap * 0.5 + 0.5;
+            
+            schlick_final = wrap_diffuse * backscatter_factor;
+            schlick_final *= depth_and_radius_lerp;
+            schlick_final *= LdotV_fresnel;
+            schlick_final *= 0.01;
+        }
+        else
+        {
+            float3 halfVec = normalize(lightDir + viewVec);
+            float NdotH = saturate(dot(sssNormal, halfVec));
+            float NdotH_sq = NdotH * NdotH;
+            float specTerm = (NdotH_sq * -0.800000012 + 1.0);
+            specTerm = specTerm * specTerm;
+            specTerm = 0.200000003 / (3.14159274 * specTerm);
+            specTerm = specTerm * scatterRadiusClamped;
+
+            schlick_final = ( (0.400000006 * lightDir.y) * (NdotL_final * 0.800000012 + 0.200000003) + (1.5 * specTerm * NdotL_final) ) * (LdotV_remap * 0.5 + 0.5);
+        }
+        
         float2 worldNormalXY_sq_plus_eps = sssNormal.xy * sssNormal.xy + 9.99999975e-05;
         float rsqrt_normal_xy = rsqrt(dot(worldNormalXY_sq_plus_eps, float2(1.0, 1.0)));
         float2 normal_xy_normalized = sssNormal.xy * rsqrt_normal_xy;
@@ -645,14 +657,14 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
 
     finalCompositedColor = (specialShadingModelFlags.z != 0.0) ? baseLighting : finalCompositedColor;
 
-    finalCompositedColor = isShadingModel_13 ? preSssLighting : finalCompositedColor;
+    float3 finalColorXYZ = isShadingModel_5 ? preSssLighting : finalCompositedColor;
     
-    finalCompositedColor = finalCompositedColor / aoFactor;
+    finalColorXYZ = finalColorXYZ / aoFactor;
     
-    finalCompositedColor = min(float3(0.0, 0.0, 0.0), -finalCompositedColor);
+    finalColorXYZ = min(float3(0.0, 0.0, 0.0), -finalColorXYZ);
     
     float4 finalColor;
-    finalColor.xyz = -finalCompositedColor;
+    finalColor.xyz = -finalColorXYZ;
     finalColor.w = 0.0;
     
     return finalColor;
