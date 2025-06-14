@@ -70,9 +70,8 @@ Shader "Custom/WWToon"
                 VertexToFragment output;
                 output.vertex = UnityObjectToClipPos(vertexInput.vertex);
                 output.uv.xy = vertexInput.uv;
-                // 计算 NDC x（clip.x / clip.w）并复制到 zw
-                float ndcX = output.vertex.x / output.vertex.w;
-                output.uv.zw = ndcX;
+                float2 ndcUV = output.vertex.xy / output.vertex.w;
+                output.uv.zw = ndcUV;
                 return output;
             }
             
@@ -216,6 +215,7 @@ float4 fDest = 0;
     albedo_alpha.xyz = packedNormalWS_perObjectData.yyy ? r6.xyz : albedo_alpha.xyz;
     packedNormalWS_perObjectData.y = tex2Dlod(_IN9, float4(0, 0, 0, 0)).x;
     model_low4_high4.zw = screenUV_ndcUV.zw * depth;
+    
     r6.xyz = cb1[49].xyz * model_low4_high4.www;
     r6.xyz = model_low4_high4.zzz * cb1[48].xyz + r6.xyz;
     r6.xyz = depth * cb1[50].xyz + r6.xyz;

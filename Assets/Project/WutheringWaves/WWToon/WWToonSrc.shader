@@ -67,9 +67,8 @@ Shader "Custom/WWToonSrc"
                 VertexToFragment output;
                 output.vertex = UnityObjectToClipPos(vertexInput.vertex);
                 output.uv.xy = vertexInput.uv;
-                // 计算 NDC x（clip.x / clip.w）并复制到 zw
-                float ndcX = output.vertex.x / output.vertex.w;
-                output.uv.zw = ndcX;
+                float2 ndcUV = output.vertex.xy / output.vertex.w;
+                output.uv.zw = ndcUV;
                 return output;
             }
             
