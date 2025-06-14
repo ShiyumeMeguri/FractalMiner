@@ -127,8 +127,8 @@ float4 fDest = 0;
     bool isCharaHair13;
     bool isAnisotropicMetal14;
     bool isAnisotropicFabric15;
-    bool isChara;
-    bool isScene;
+    bool isChara; // low 13 14 15
+    bool isScene; // low 10
 
     packedNormalWS_perObjectData.xyzw = tex2Dlod(_IN1, float4(screenUV_ndcUV.xy, 0, 0)).wxyz;
     msr_shadingModelID.xyzw = tex2Dlod(_IN2, float4(screenUV_ndcUV.xy, 0, 0)).xyzw;
