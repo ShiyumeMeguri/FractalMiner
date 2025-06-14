@@ -1,0 +1,430 @@
+给我反编译为URP可用的后处理完整流程shader 
+这个是bloom后处理的汇编代码 根据给出的cbbuffer和代码逻辑仔细分析 还原为准确无误的变量名
+已有RT
+Bloom4x
+DownBloom4x
+DownBloom8x
+DownBloom16x
+DownBloom32x
+UpBloom8x
+UpBloom16x
+UpBloom32x
+1.DownsampleBox
+输入 Src 1480x832 输出 Bloom4x
+cb0_v33 0.00034, 0.0006, 0.99899, 0.9994 528 float4 
+cb0_v34 370.00, 208.00, 0.0027, 0.00481 544 float4
+
+Texture2D<float4> t0 : register(t0);
+
+SamplerState s0_s : register(s0);
+
+cbuffer cb0 : register(b0)
+{
+  float4 cb0[35];
+}
+
+// 3Dmigoto declarations
+#define cmp -
+
+void main(
+  linear noperspective float4 v0 : TEXCOORD0,
+  out float4 o0 : SV_Target0)
+{
+  float4 r0,r1,r2;
+  uint4 bitmask, uiDest;
+  float4 fDest;
+
+  r0.xyzw = cb0[34].zwzw * float4(0.25,0.25,-0.25,0.25) + v0.xyxy;
+  r0.xyzw = max(cb0[33].xyxy, r0.xyzw);
+  r0.xyzw = min(cb0[33].zwzw, r0.xyzw);
+  r1.xyzw = t0.Sample(s0_s, r0.xy).xyzw;
+  r0.xyzw = t0.Sample(s0_s, r0.zw).xyzw;
+  r0.xyzw = r1.xyzw + r0.xyzw;
+  r1.xyzw = cb0[34].zwzw * float4(0.25,-0.25,-0.25,-0.25) + v0.xyxy;
+  r1.xyzw = max(cb0[33].xyxy, r1.xyzw);
+  r1.xyzw = min(cb0[33].zwzw, r1.xyzw);
+  r2.xyzw = t0.Sample(s0_s, r1.xy).xyzw;
+  r1.xyzw = t0.Sample(s0_s, r1.zw).xyzw;
+  r0.xyzw = r2.xyzw + r0.xyzw;
+  r0.xyzw = r0.xyzw + r1.xyzw;
+  o0.xyzw = float4(0.25,0.25,0.25,0.25) * r0.xyzw;
+  return;
+}
+
+2.Prefilter
+输入 Bloom4x 输出 DownBloom4x
+cb0_v42 0.00, 0.00, 0.35, 0.65 672 float4
+
+Texture2D<float4> t0 : register(t0);
+
+SamplerState s0_s : register(s0);
+
+cbuffer cb0 : register(b0)
+{
+  float4 cb0[43];
+}
+
+// 3Dmigoto declarations
+#define cmp -
+
+void main(
+  linear noperspective float4 v0 : TEXCOORD0,
+  out float4 o0 : SV_Target0)
+{
+  float4 r0;
+  uint4 bitmask, uiDest;
+  float4 fDest;
+
+  r0.xyz = t0.Sample(s0_s, v0.xy).xyz;
+  r0.xyz = -cb0[42].zzz + r0.xyz;
+  r0.xyz = max(float3(0,0,0), r0.xyz);
+  o0.xyz = cb0[42].www * r0.xyz;
+  o0.w = 1;
+  return;
+}
+3.BlurSmall
+输入 DownBloom4x 输出 Bloom4x
+cb0_v34 370.00, 208.00, 0.0027, 0.00481 544 float4
+cb0_v41 0.00135, 0.0024, 0.99865, 0.9976 656 float4
+cb0_v42 1.00, 0.00, 1.00, 1.00         672 float4
+
+Texture2D<float4> t0 : register(t0);
+
+SamplerState s0_s : register(s0);
+
+cbuffer cb0 : register(b0)
+{
+  float4 cb0[43];
+}
+
+// 3Dmigoto declarations
+#define cmp -
+
+void main(
+  linear noperspective float4 v0 : TEXCOORD0,
+  out float4 o0 : SV_Target0)
+{
+  float4 r0,r1,r2,r3;
+  uint4 bitmask, uiDest;
+  float4 fDest;
+
+  r0.xy = cb0[42].xy * cb0[34].zw;
+  r1.xyzw = r0.xyxy * float4(-7.15882015,-7.15882015,-5.22749805,-5.22749805) + v0.xyxy;
+  r1.xyzw = max(cb0[41].xyxy, r1.xyzw);
+  r1.xyzw = min(cb0[41].zwzw, r1.xyzw);
+  r2.xyzw = t0.Sample(s0_s, r1.zw).xyzw;
+  r1.xyzw = t0.Sample(s0_s, r1.xy).xyzw;
+  r2.xyzw = float4(0.0151298102,0.0151298102,0.0151298102,0.0151298102) * r2.xyzw;
+  r1.xyzw = r1.xyzw * float4(0.000964867824,0.000964867824,0.000964867824,0.000964867824) + r2.xyzw;
+  r2.xyzw = r0.xyxy * float4(-3.31476212,-3.31476212,-1.41741204,-1.41741204) + v0.xyxy;
+  r2.xyzw = max(cb0[41].xyxy, r2.xyzw);
+  r2.xyzw = min(cb0[41].zwzw, r2.xyzw);
+  r3.xyzw = t0.Sample(s0_s, r2.xy).xyzw;
+  r2.xyzw = t0.Sample(s0_s, r2.zw).xyzw;
+  r1.xyzw = r3.xyzw * float4(0.100958303,0.100958303,0.100958303,0.100958303) + r1.xyzw;
+  r1.xyzw = r2.xyzw * float4(0.288899988,0.288899988,0.288899988,0.288899988) + r1.xyzw;
+  r2.xyzw = r0.xyxy * float4(0.472244591,0.472244591,2.36454797,2.36454797) + v0.xyxy;
+  r2.xyzw = max(cb0[41].xyxy, r2.xyzw);
+  r2.xyzw = min(cb0[41].zwzw, r2.xyzw);
+  r3.xyzw = t0.Sample(s0_s, r2.xy).xyzw;
+  r2.xyzw = t0.Sample(s0_s, r2.zw).xyzw;
+  r1.xyzw = r3.xyzw * float4(0.356403589,0.356403589,0.356403589,0.356403589) + r1.xyzw;
+  r1.xyzw = r2.xyzw * float4(0.189770803,0.189770803,0.189770803,0.189770803) + r1.xyzw;
+  r2.xyzw = r0.xyxy * float4(4.26889801,4.26889801,6.19080782,6.19080782) + v0.xyxy;
+  r0.xy = r0.xy * float2(8,8) + v0.xy;
+  r0.xy = max(cb0[41].xy, r0.xy);
+  r0.xy = min(cb0[41].zw, r0.xy);
+  r0.xyzw = t0.Sample(s0_s, r0.xy).xyzw;
+  r2.xyzw = max(cb0[41].xyxy, r2.xyzw);
+  r2.xyzw = min(cb0[41].zwzw, r2.xyzw);
+  r3.xyzw = t0.Sample(s0_s, r2.xy).xyzw;
+  r2.xyzw = t0.Sample(s0_s, r2.zw).xyzw;
+  r1.xyzw = r3.xyzw * float4(0.0434656292,0.0434656292,0.0434656292,0.0434656292) + r1.xyzw;
+  r1.xyzw = r2.xyzw * float4(0.00425362587,0.00425362587,0.00425362587,0.00425362587) + r1.xyzw;
+  o0.xyzw = r0.xyzw * float4(0.000153239904,0.000153239904,0.000153239904,0.000153239904) + r1.xyzw;
+  return;
+}
+
+4.BlurSmall
+输入 Bloom4x 输出 DownBloom4x
+cb0_v34 370.00, 208.00, 0.0027, 0.00481 544 float4
+cb0_v41 0.00135, 0.0024, 0.99865, 0.9976 656 float4
+cb0_v42 0.00, 1.00, 0.00, 0.00         672 float4
+
+5.仅Copy 无需shader
+输入 DownBloom4x 输出 DownBloom8x
+
+6.仅Copy 无需shader
+输入 DownBloom8x 输出 DownBloom16x
+
+7.DownsampleBox
+输入 DownBloom16x 输出 DownBloom32x
+
+8.BlurSmall
+输入 DownBloom8x 输出 UpBloom8x
+cb0_v34 185.00, 104.00, 0.00541, 0.00962 544 float4
+cb0_v41 0.0027, 0.00481, 0.9973, 0.99519 656 float4
+cb0_v42 1.00, 0.00, 1.00, 1.00         672 float4
+
+9.BlurSmall
+输入 UpBloom8x 输出 DownBloom8x
+cb0_v34 185.00, 104.00, 0.00541, 0.00962 544 float4
+cb0_v41 0.0027, 0.00481, 0.9973, 0.99519 656 float4
+cb0_v42 0.00, 1.00, 0.00, 0.00         672 float4
+
+10.BlurMedium
+输入 DownBloom16x 输出 UpBloom16x
+cb0_v34 93.00, 52.00, 0.01075, 0.01923 544 float4
+cb0_v41 0.00538, 0.00962, 0.99462, 0.99038 656 float4
+cb0_v42 1.00, 0.00, 0.00, 1.14346E-42    672 float4
+
+Texture2D<float4> t0 : register(t0);
+
+SamplerState s0_s : register(s0);
+
+cbuffer cb0 : register(b0)
+{
+  float4 cb0[43];
+}
+
+// 3Dmigoto declarations
+#define cmp -
+
+void main(
+  linear noperspective float4 v0 : TEXCOORD0,
+  out float4 o0 : SV_Target0)
+{
+  float4 r0,r1,r2,r3;
+  uint4 bitmask, uiDest;
+  float4 fDest;
+
+  r0.xyzw = cb0[42].xyxy * cb0[34].zwzw;
+  r1.xyzw = r0.zwzw * float4(-14.26509,-14.26509,-12.2933798,-12.2933798) + v0.xyxy;
+  r1.xyzw = max(cb0[41].xyxy, r1.xyzw);
+  r1.xyzw = min(cb0[41].zwzw, r1.xyzw);
+  r2.xyzw = t0.Sample(s0_s, r1.zw).xyzw;
+  r1.xyzw = t0.Sample(s0_s, r1.xy).xyzw;
+  r2.xyzw = float4(0.000947096676,0.000947096676,0.000947096676,0.000947096676) * r2.xyzw;
+  r1.xyzw = r1.xyzw * float4(0.000146320002,0.000146320002,0.000146320002,0.000146320002) + r2.xyzw;
+  r2.xyzw = r0.zwzw * float4(-10.3233604,-10.3233604,-8.35486317,-8.35486317) + v0.xyxy;
+  r2.xyzw = max(cb0[41].xyxy, r2.xyzw);
+  r2.xyzw = min(cb0[41].zwzw, r2.xyzw);
+  r3.xyzw = t0.Sample(s0_s, r2.xy).xyzw;
+  r2.xyzw = t0.Sample(s0_s, r2.zw).xyzw;
+  r1.xyzw = r3.xyzw * float4(0.00464627193,0.00464627193,0.00464627193,0.00464627193) + r1.xyzw;
+  r1.xyzw = r2.xyzw * float4(0.0172795802,0.0172795802,0.0172795802,0.0172795802) + r1.xyzw;
+  r2.xyzw = r0.zwzw * float4(-6.38767719,-6.38767719,-4.42154217,-4.42154217) + v0.xyxy;
+  r2.xyzw = max(cb0[41].xyxy, r2.xyzw);
+  r2.xyzw = min(cb0[41].zwzw, r2.xyzw);
+  r3.xyzw = t0.Sample(s0_s, r2.xy).xyzw;
+  r2.xyzw = t0.Sample(s0_s, r2.zw).xyzw;
+  r1.xyzw = r3.xyzw * float4(0.0487266295,0.0487266295,0.0487266295,0.0487266295) + r1.xyzw;
+  r1.xyzw = r2.xyzw * float4(0.104202203,0.104202203,0.104202203,0.104202203) + r1.xyzw;
+  r2.xyzw = r0.zwzw * float4(-2.45616198,-2.45616198,-0.491210788,-0.491210788) + v0.xyxy;
+  r2.xyzw = max(cb0[41].xyxy, r2.xyzw);
+  r2.xyzw = min(cb0[41].zwzw, r2.xyzw);
+  r3.xyzw = t0.Sample(s0_s, r2.xy).xyzw;
+  r2.xyzw = t0.Sample(s0_s, r2.zw).xyzw;
+  r1.xyzw = r3.xyzw * float4(0.169012904,0.169012904,0.169012904,0.169012904) + r1.xyzw;
+  r1.xyzw = r2.xyzw * float4(0.207937002,0.207937002,0.207937002,0.207937002) + r1.xyzw;
+  r2.xyzw = r0.zwzw * float4(1.47365403,1.47365403,3.43877792,3.43877792) + v0.xyxy;
+  r2.xyzw = max(cb0[41].xyxy, r2.xyzw);
+  r2.xyzw = min(cb0[41].zwzw, r2.xyzw);
+  r3.xyzw = t0.Sample(s0_s, r2.xy).xyzw;
+  r2.xyzw = t0.Sample(s0_s, r2.zw).xyzw;
+  r1.xyzw = r3.xyzw * float4(0.194056496,0.194056496,0.194056496,0.194056496) + r1.xyzw;
+  r1.xyzw = r2.xyzw * float4(0.137373805,0.137373805,0.137373805,0.137373805) + r1.xyzw;
+  r2.xyzw = r0.zwzw * float4(5.40449619,5.40449619,7.37112093,7.37112093) + v0.xyxy;
+  r2.xyzw = max(cb0[41].xyxy, r2.xyzw);
+  r2.xyzw = min(cb0[41].zwzw, r2.xyzw);
+  r3.xyzw = t0.Sample(s0_s, r2.xy).xyzw;
+  r2.xyzw = t0.Sample(s0_s, r2.zw).xyzw;
+  r1.xyzw = r3.xyzw * float4(0.0737620592,0.0737620592,0.0737620592,0.0737620592) + r1.xyzw;
+  r1.xyzw = r2.xyzw * float4(0.0300378799,0.0300378799,0.0300378799,0.0300378799) + r1.xyzw;
+  r2.xyzw = r0.zwzw * float4(9.33893299,9.33893299,11.3081703,11.3081703) + v0.xyxy;
+  r0.xyzw = r0.xyzw * float4(13.2790203,13.2790203,15,15) + v0.xyxy;
+  r0.xyzw = max(cb0[41].xyxy, r0.xyzw);
+  r0.xyzw = min(cb0[41].zwzw, r0.xyzw);
+  r2.xyzw = max(cb0[41].xyxy, r2.xyzw);
+  r2.xyzw = min(cb0[41].zwzw, r2.xyzw);
+  r3.xyzw = t0.Sample(s0_s, r2.xy).xyzw;
+  r2.xyzw = t0.Sample(s0_s, r2.zw).xyzw;
+  r1.xyzw = r3.xyzw * float4(0.00927573629,0.00927573629,0.00927573629,0.00927573629) + r1.xyzw;
+  r1.xyzw = r2.xyzw * float4(0.00217165402,0.00217165402,0.00217165402,0.00217165402) + r1.xyzw;
+  r2.xyzw = t0.Sample(s0_s, r0.xy).xyzw;
+  r0.xyzw = t0.Sample(s0_s, r0.zw).xyzw;
+  r1.xyzw = r2.xyzw * float4(0.000385392312,0.000385392312,0.000385392312,0.000385392312) + r1.xyzw;
+  o0.xyzw = r0.xyzw * float4(3.87885193e-005,3.87885193e-005,3.87885193e-005,3.87885193e-005) + r1.xyzw;
+  return;
+}
+
+11.BlurMedium
+输入 UpBloom16x 输出 DownBloom16x
+cb0_v34 93.00, 52.00, 0.01075, 0.01923 544 float4
+cb0_v41 0.00538, 0.00962, 0.99462, 0.99038 656 float4
+cb0_v42 0.00, 1.00, 0.60, 1.00           672 float4
+
+12.BlurLarge
+输入 DownBloom32x 输出 UpBloom32x
+cb0_v34 47.00, 26.00, 0.02128, 0.03846 544 float4
+cb0_v41 0.01064, 0.01923, 0.98936, 0.98077 656 float4
+cb0_v42 1.00, 0.00, 0.00, 0.00           672 float4
+
+Texture2D<float4> t0 : register(t0);
+
+SamplerState s0_s : register(s0);
+
+cbuffer cb0 : register(b0)
+{
+  float4 cb0[43];
+}
+
+// 3Dmigoto declarations
+#define cmp -
+
+void main(
+  linear noperspective float4 v0 : TEXCOORD0,
+  out float4 o0 : SV_Target0)
+{
+  float4 r0,r1,r2,r3;
+  uint4 bitmask, uiDest;
+  float4 fDest;
+
+  r0.xyzw = cb0[42].xyxy * cb0[34].zwzw;
+  r1.xyzw = r0.zwzw * float4(-18.3031006,-18.3031006,-16.3224392,-16.3224392) + v0.xyxy;
+  r1.xyzw = max(cb0[41].xyxy, r1.xyzw);
+  r1.xyzw = min(cb0[41].zwzw, r1.xyzw);
+  r2.xyzw = t0.Sample(s0_s, r1.zw).xyzw;
+  r1.xyzw = t0.Sample(s0_s, r1.xy).xyzw;
+  r2.xyzw = float4(0.00039338661,0.00039338661,0.00039338661,0.00039338661) * r2.xyzw;
+  r1.xyzw = r1.xyzw * float4(8.28053671e-005,8.28053671e-005,8.28053671e-005,8.28053671e-005) + r2.xyzw;
+  r2.xyzw = r0.zwzw * float4(-14.3424101,-14.3424101,-12.3629599,-12.3629599) + v0.xyxy;
+  r2.xyzw = max(cb0[41].xyxy, r2.xyzw);
+  r2.xyzw = min(cb0[41].zwzw, r2.xyzw);
+  r3.xyzw = t0.Sample(s0_s, r2.xy).xyzw;
+  r2.xyzw = t0.Sample(s0_s, r2.zw).xyzw;
+  r1.xyzw = r3.xyzw * float4(0.00156375498,0.00156375498,0.00156375498,0.00156375498) + r1.xyzw;
+  r1.xyzw = r2.xyzw * float4(0.00520150177,0.00520150177,0.00520150177,0.00520150177) + r1.xyzw;
+  r2.xyzw = r0.zwzw * float4(-10.3840103,-10.3840103,-8.40551472,-8.40551472) + v0.xyxy;
+  r2.xyzw = max(cb0[41].xyxy, r2.xyzw);
+  r2.xyzw = min(cb0[41].zwzw, r2.xyzw);
+  r3.xyzw = t0.Sample(s0_s, r2.xy).xyzw;
+  r2.xyzw = t0.Sample(s0_s, r2.zw).xyzw;
+  r1.xyzw = r3.xyzw * float4(0.0144784302,0.0144784302,0.0144784302,0.0144784302) + r1.xyzw;
+  r1.xyzw = r2.xyzw * float4(0.0337260291,0.0337260291,0.0337260291,0.0337260291) + r1.xyzw;
+  r2.xyzw = r0.zwzw * float4(-6.42738485,-6.42738485,-4.44954205,-4.44954205) + v0.xyxy;
+  r2.xyzw = max(cb0[41].xyxy, r2.xyzw);
+  r2.xyzw = min(cb0[41].zwzw, r2.xyzw);
+  r3.xyzw = t0.Sample(s0_s, r2.xy).xyzw;
+  r2.xyzw = t0.Sample(s0_s, r2.zw).xyzw;
+  r1.xyzw = r3.xyzw * float4(0.0657470524,0.0657470524,0.0657470524,0.0657470524) + r1.xyzw;
+  r1.xyzw = r2.xyzw * float4(0.107267298,0.107267298,0.107267298,0.107267298) + r1.xyzw;
+  r2.xyzw = r0.zwzw * float4(-2.47190189,-2.47190189,-0.494374692,-0.494374692) + v0.xyxy;
+  r2.xyzw = max(cb0[41].xyxy, r2.xyzw);
+  r2.xyzw = min(cb0[41].zwzw, r2.xyzw);
+  r3.xyzw = t0.Sample(s0_s, r2.xy).xyzw;
+  r2.xyzw = t0.Sample(s0_s, r2.zw).xyzw;
+  r1.xyzw = r3.xyzw * float4(0.146469697,0.146469697,0.146469697,0.146469697) + r1.xyzw;
+  r1.xyzw = r2.xyzw * float4(0.167387903,0.167387903,0.167387903,0.167387903) + r1.xyzw;
+  r2.xyzw = r0.zwzw * float4(1.48312998,1.48312998,3.46070194,3.46070194) + v0.xyxy;
+  r2.xyzw = max(cb0[41].xyxy, r2.xyzw);
+  r2.xyzw = min(cb0[41].zwzw, r2.xyzw);
+  r3.xyzw = t0.Sample(s0_s, r2.xy).xyzw;
+  r2.xyzw = t0.Sample(s0_s, r2.zw).xyzw;
+  r1.xyzw = r3.xyzw * float4(0.160102695,0.160102695,0.160102695,0.160102695) + r1.xyzw;
+  r1.xyzw = r2.xyzw * float4(0.128165394,0.128165394,0.128165394,0.128165394) + r1.xyzw;
+  r2.xyzw = r0.zwzw * float4(5.43843317,5.43843317,7.41640902,7.41640902) + v0.xyxy;
+  r2.xyzw = max(cb0[41].xyxy, r2.xyzw);
+  r2.xyzw = min(cb0[41].zwzw, r2.xyzw);
+  r3.xyzw = t0.Sample(s0_s, r2.xy).xyzw;
+  r2.xyzw = t0.Sample(s0_s, r2.zw).xyzw;
+  r1.xyzw = r3.xyzw * float4(0.0858689398,0.0858689398,0.0858689398,0.0858689398) + r1.xyzw;
+  r1.xyzw = r2.xyzw * float4(0.0481489189,0.0481489189,0.0481489189,0.0481489189) + r1.xyzw;
+  r2.xyzw = r0.zwzw * float4(9.3947134,9.3947134,11.3734198,11.3734198) + v0.xyxy;
+  r2.xyzw = max(cb0[41].xyxy, r2.xyzw);
+  r2.xyzw = min(cb0[41].zwzw, r2.xyzw);
+  r3.xyzw = t0.Sample(s0_s, r2.xy).xyzw;
+  r2.xyzw = t0.Sample(s0_s, r2.zw).xyzw;
+  r1.xyzw = r3.xyzw * float4(0.0225949194,0.0225949194,0.0225949194,0.0225949194) + r1.xyzw;
+  r1.xyzw = r2.xyzw * float4(0.0088734962,0.0088734962,0.0088734962,0.0088734962) + r1.xyzw;
+  r2.xyzw = r0.zwzw * float4(13.3526201,13.3526201,15.3323498,15.3323498) + v0.xyxy;
+  r0.xyzw = r0.xyzw * float4(17.3126907,17.3126907,19,19) + v0.xyxy;
+  r0.xyzw = max(cb0[41].xyxy, r0.xyzw);
+  r0.xyzw = min(cb0[41].zwzw, r0.xyzw);
+  r2.xyzw = max(cb0[41].xyxy, r2.xyzw);
+  r2.xyzw = min(cb0[41].zwzw, r2.xyzw);
+  r3.xyzw = t0.Sample(s0_s, r2.xy).xyzw;
+  r2.xyzw = t0.Sample(s0_s, r2.zw).xyzw;
+  r1.xyzw = r3.xyzw * float4(0.00291622407,0.00291622407,0.00291622407,0.00291622407) + r1.xyzw;
+  r1.xyzw = r2.xyzw * float4(0.000801990274,0.000801990274,0.000801990274,0.000801990274) + r1.xyzw;
+  r2.xyzw = t0.Sample(s0_s, r0.xy).xyzw;
+  r0.xyzw = t0.Sample(s0_s, r0.zw).xyzw;
+  r1.xyzw = r2.xyzw * float4(0.000184551303,0.000184551303,0.000184551303,0.000184551303) + r1.xyzw;
+  o0.xyzw = r0.xyzw * float4(2.50982393e-005,2.50982393e-005,2.50982393e-005,2.50982393e-005) + r1.xyzw;
+  return;
+}
+
+12.BlurLarge
+输入 UpBloom32x 输出 DownBloom32x
+cb0_v34 47.00, 26.00, 0.02128, 0.03846 544 float4
+cb0_v41 0.01064, 0.01923, 0.98936, 0.98077 656 float4
+cb0_v42 0.00, 1.00, 0.00, 0.00           672 float4
+
+13.Composite
+输入 DownBloom4x DownBloom8x DownBloom16x DownBloom32x 输出 Bloom4x
+cb0_v49 0.00135, 0.0024, 0.99865, 0.9976 784 float4
+cb0_v56 0.0027, 0.00481, 0.9973, 0.99519 896 float4
+cb0_v63 0.00538, 0.00962, 0.99462, 0.99038 1008 float4
+cb0_v70 0.01064, 0.01923, 0.98936, 0.98077 1120 float4
+cb0_v71 0.30, 0.30, 0.30, 1.00           1136 float4
+
+Texture2D<float4> t3 : register(t3);
+
+Texture2D<float4> t2 : register(t2);
+
+Texture2D<float4> t1 : register(t1);
+
+Texture2D<float4> t0 : register(t0);
+
+SamplerState s3_s : register(s3);
+
+SamplerState s2_s : register(s2);
+
+SamplerState s1_s : register(s1);
+
+SamplerState s0_s : register(s0);
+
+cbuffer cb0 : register(b0)
+{
+  float4 cb0[72];
+}
+
+// 3Dmigoto declarations
+#define cmp -
+
+void main(
+  linear noperspective float4 v0 : TEXCOORD0,
+  out float4 o0 : SV_Target0)
+{
+  float4 r0,r1;
+  uint4 bitmask, uiDest;
+  float4 fDest;
+
+  r0.xy = max(cb0[56].xy, v0.xy);
+  r0.xy = min(cb0[56].zw, r0.xy);
+  r0.xyzw = t1.Sample(s1_s, r0.xy).xyzw;
+  r0.xyzw = cb0[71].yyyy * r0.xyzw;
+  r1.xy = max(cb0[49].xy, v0.xy);
+  r1.xy = min(cb0[49].zw, r1.xy);
+  r1.xyzw = t0.Sample(s0_s, r1.xy).xyzw;
+  r0.xyzw = r1.xyzw * cb0[71].xxxx + r0.xyzw;
+  r1.xy = max(cb0[63].xy, v0.xy);
+  r1.xy = min(cb0[63].zw, r1.xy);
+  r1.xyzw = t2.Sample(s2_s, r1.xy).xyzw;
+  r0.xyzw = r1.xyzw * cb0[71].zzzz + r0.xyzw;
+  r1.xy = max(cb0[70].xy, v0.xy);
+  r1.xy = min(cb0[70].zw, r1.xy);
+  r1.xyzw = t3.Sample(s3_s, r1.xy).xyzw;
+  o0.xyzw = r1.xyzw * cb0[71].wwww + r0.xyzw;
+  return;
+}
