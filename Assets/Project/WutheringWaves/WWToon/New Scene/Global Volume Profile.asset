@@ -13,25 +13,37 @@ MonoBehaviour:
   m_Name: RuriToonBloom
   m_EditorClassIdentifier: Ruri.RenderPipelines.Toon::UnityEngine.Rendering.Ruri.Toon.RuriToonBloom
   active: 0
+  <displayName>k__BackingField: 
   mode:
+    <debugId>k__BackingField: mode
     m_OverrideState: 0
     m_Value: 0
   threshold:
+    <debugId>k__BackingField: threshold
     m_OverrideState: 0
     m_Value: 0.7
   intensity:
+    <debugId>k__BackingField: intensity
     m_OverrideState: 1
     m_Value: 1.5
   blurCoeff:
+    <debugId>k__BackingField: blurCoeff
     m_OverrideState: 0
     m_Value: {x: 0.25, y: 0.25, z: 0.25, w: 0.25}
   color:
+    <debugId>k__BackingField: color
     m_OverrideState: 1
-    m_Value: {r: 1, g: 1, b: 1, a: 1}
+    m_Value:
+      r: 1
+      g: 1
+      b: 1
+      a: 1
   blurRadius:
+    <debugId>k__BackingField: blurRadius
     m_OverrideState: 0
     m_Value: 2
   downSampleScale:
+    <debugId>k__BackingField: downSampleScale
     m_OverrideState: 0
     m_Value: 0.5
 --- !u!114 &11400000
@@ -47,4 +59,29 @@ MonoBehaviour:
   m_Name: Global Volume Profile
   m_EditorClassIdentifier: Unity.RenderPipelines.Core.Runtime::UnityEngine.Rendering.VolumeProfile
   components:
-  - {fileID: -3640683707112141957}
+  - {fileID: 1972693946627150092}
+--- !u!114 &1972693946627150092
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 515e83a216261f044bcdee854fbdb3e8, type: 3}
+  m_Name: RuriBloom
+  m_EditorClassIdentifier: Ruri.RenderPipelines.Toon::UnityEngine.Rendering.Ruri.Toon.RuriBloom
+  active: 1
+  threshold:
+    m_OverrideState: 0
+    m_Value: 0.35
+  intensity:
+    m_OverrideState: 1
+    m_Value: 0.65
+  blurCoeff:
+    m_OverrideState: 0
+    m_Value: {x: 0.3, y: 0.3, z: 0.3, w: 1}
+  color:
+    m_OverrideState: 0
+    m_Value: {r: 1, g: 1, b: 1, a: 1}

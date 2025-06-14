@@ -159,6 +159,8 @@ cb0_v42 0.00, 1.00, 0.00, 0.00         672 float4
 
 7.DownsampleBox
 输入 DownBloom16x 输出 DownBloom32x
+cb0_v33 0.00538, 0.00962, 0.99462, 0.99038 528 float4
+cb0_v34 47.00, 26.00, 0.02128, 0.03846   544 float4
 
 8.BlurSmall
 输入 DownBloom8x 输出 UpBloom8x
