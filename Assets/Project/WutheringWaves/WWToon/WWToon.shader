@@ -127,6 +127,8 @@ float4 fDest = 0;
     bool isCharaHair13;
     bool isAnisotropicMetal14;
     bool isAnisotropicFabric15;
+    bool isChara;
+    bool isScene;
 
     packedNormalWS_perObjectData.xyzw = tex2Dlod(_IN1, float4(screenUV_ndcUV.xy, 0, 0)).wxyz;
     msr_shadingModelID.xyzw = tex2Dlod(_IN2, float4(screenUV_ndcUV.xy, 0, 0)).xyzw;
@@ -157,8 +159,8 @@ float4 fDest = 0;
     isAnisotropicFabric15 = model13_14_15.z;
     model_low4_high4.z = (int)isAnisotropicFabric15 | (int)isAnisotropicMetal14;
     model_low4_high4.z = (int)model_low4_high4.z | (int)isCharaHair13;
-    shadingModelID = isChara12 ? model_low4_high4.z : -1;
-    if (shadingModelID != 0) {
+    isChara = isChara12 ? model_low4_high4.z : -1;
+    if (isChara != 0) {
         model_low4_high4.x = isCharaHair13 ? 13 : 12;
         model13_14_15.xz = float2(isAnisotropicMetal14, isAnisotropicFabric15) ? float2(1,1) : 0;
         float2 octNormalWS = packedNormalWS_perObjectData.yz * float2(2,2) - float2(1,1);
@@ -175,8 +177,8 @@ float4 fDest = 0;
         normal.xyz = UnpackNormalOctQuadEncode(octNormalWS);
         msrSq = msr_shadingModelID.xyz * msr_shadingModelID.xyz;
         isAnisotropicMetal14 = customData.z;
-    } else {
-        shadingModelID = ((int)model_low4_high4.x == 10) ? 1.0 : 0.0;
+    } else { // isScene
+        isScene = ((int)model_low4_high4.x == 10) ? 1.0 : 0.0;
         msr.xyz = saturate(msr_shadingModelID.xyz);
         msr.xyz = float3(16777215,65535,255) * msr.xyz;
         msr.xyz = round(msr.xyz);
@@ -189,7 +191,7 @@ float4 fDest = 0;
         msr.x = msr.x * cb1[65].z + -cb1[65].w;
         msr.x = 1 / msr.x;
         msr.x = msr.y + msr.x;
-        depth = shadingModelID ? msr.x : depth;
+        depth = isScene ? msr.x : depth;
         normal.xyz = packedNormalWS_perObjectData.yzw * float3(2,2,2) + float3(-1,-1,-1);
         msrSq = float3(0,0,0);
         model13_14_15.xyz = float3(0,0,0);
