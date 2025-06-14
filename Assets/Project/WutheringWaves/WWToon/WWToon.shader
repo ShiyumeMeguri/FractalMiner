@@ -19,26 +19,26 @@ Shader "Custom/WWToon"
     {
         Pass
         {
-            CGPROGRAM
+            HLSLPROGRAM
 
             #pragma vertex vert
             #pragma fragment frag
             #pragma target 5.0
             //#pragma enable_d3d11_debug_symbols
             
-            #include "UnityCG.cginc"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
-            struct VertexInput
-            {
-                float4 vertex : POSITION;
-                float2 uv : TEXCOORD0;
-            };
+struct Attributes
+{
+    float4 positionOS   : POSITION;     // OS = Object Space
+    float2 uv           : TEXCOORD0;
+};
 
-            struct VertexToFragment
-            {
-                float4 uv : TEXCOORD0;
-                float4 vertex : SV_POSITION;
-            };
+struct Varyings
+{
+    float4 positionCS   : SV_POSITION;  // CS = Clip Space
+    float4 uv           : TEXCOORD0;    // 使用float4来存储 uv.xy 和 ndc.xy
+};
             
             sampler2D _IN0;
             sampler2D _IN1;
@@ -63,16 +63,25 @@ Shader "Custom/WWToon"
             float4 _IN9_ST;
             float4 _FrameJitterSeed;     // cb1[158]
             
-            float4 _ScaledScreenParams;     // cb1[138] zw不等价需要-1
+            //float4 _ScaledScreenParams;     // cb1[138] zw不等价需要-1
+            //float4 _MainLightPosition;     // cb1[138] zw不等价需要-1
 
-            VertexToFragment vert (VertexInput vertexInput)
+            Varyings vert (Attributes IN)
             {
-                VertexToFragment output;
-                output.vertex = UnityObjectToClipPos(vertexInput.vertex);
-                output.uv.xy = vertexInput.uv;
-                float2 ndcUV = output.vertex.xy / output.vertex.w;
-                output.uv.zw = ndcUV;
-                return output;
+                Varyings OUT;
+
+                // 1. 使用 URP 的标准函数进行变换
+                OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
+                
+                // 2. 传递 UV 坐标
+                OUT.uv.xy = IN.uv;
+
+                // 3. 计算 NDC 并传递
+                // 逻辑完全相同：用裁剪空间坐标的 xy 除以 w
+                float2 ndc = OUT.positionCS.xy / OUT.positionCS.w;
+                OUT.uv.zw = ndc;
+                
+                return OUT;
             }
             
             StructuredBuffer<float4> cb0;
@@ -89,23 +98,8 @@ Shader "Custom/WWToon"
             // 已知 _IN7 1x1像素 全0
             // 已知 _IN8 MSSAO 多分辨率屏幕空间AO
             // 已知 _IN9 1x1像素 控制屏幕亮度
-            
-float3 UnpackNormalOctQuadEncode(float2 f)
-{
-    // NOTE: Do NOT use abs() in this line. It causes miscompilations. (UUM-62216, UUM-70600)
-    float3 n = float3(f.x, f.y, 1.0 - (f.x < 0 ? -f.x : f.x) - (f.y < 0 ? -f.y : f.y));
-
-    //float2 val = 1.0 - abs(n.yx);
-    //n.xy = (n.zz < float2(0.0, 0.0) ? (n.xy >= 0.0 ? val : -val) : n.xy);
-
-    // Optimized version of above code:
-    float t = max(-n.z, 0.0);
-    n.xy += float2(n.x >= 0.0 ? -t : t, n.y >= 0.0 ? -t : t);
-
-    return normalize(n);
-}
-
-float4 frag (VertexToFragment fragmentInput) : SV_Target
+          
+float4 frag (Varyings fragmentInput) : SV_Target
 {
     // 基于输入uv定义screenUV_ndcUV，zw分量是NDC x（clip.x / clip.w）并复制到 zw
     float4 screenUV_ndcUV = fragmentInput.uv; 
@@ -139,6 +133,7 @@ float4 fDest = 0;
     float3 albedo_new;
     float light_intensity;
     float2 clipPos;
+    float3 posWS;
 
     packedNormalWS_perObjectData.xyzw = tex2Dlod(_IN1, float4(screenUV_ndcUV.xy, 0, 0)).wxyz;
     msr_shadingModelID.xyzw = tex2Dlod(_IN2, float4(screenUV_ndcUV.xy, 0, 0)).xyzw;
@@ -223,10 +218,10 @@ float4 fDest = 0;
     light_intensity = tex2Dlod(_IN9, float4(0, 0, 0, 0)).x;
     clipPos = screenUV_ndcUV.zw * depth;
     
-    r6.xyz = cb1[49].xyz * clipPos.y;
-    r6.xyz = clipPos.x * cb1[48].xyz + r6.xyz;
-    r6.xyz = depth * cb1[50].xyz + r6.xyz;
-    r6.xyz = cb1[51].xyz + r6.xyz;
+    posWS.xyz = cb1[49].xyz * clipPos.y;
+    posWS.xyz = clipPos.x * cb1[48].xyz + posWS.xyz;
+    posWS.xyz = depth * cb1[50].xyz + posWS.xyz;
+    posWS.xyz = cb1[51].xyz + posWS.xyz;
     model_low4_high4.zw = tex2Dlod(_IN5, float4(screenUV_ndcUV.xy, 0, 0)).xz;
     model_low4_high4.zw = model_low4_high4.zw * model_low4_high4.zw;
     shadingModelID = model_low4_high4.z * model_low4_high4.w;
@@ -489,7 +484,7 @@ float4 fDest = 0;
         continue;
         }
         model_low4_high4.w = (uint)customData.x << 3;
-        r11.xyz = cb2[model_low4_high4.w+0].xyz + -r6.xyz;
+        r11.xyz = cb2[model_low4_high4.w+0].xyz + -posWS.xyz;
         r6.w = cb2[model_low4_high4.w+0].w * cb2[model_low4_high4.w+0].w;
         r7.w = dot(r11.xyz, r11.xyz);
         r6.w = r7.w * r6.w;
@@ -567,7 +562,7 @@ float4 fDest = 0;
     if (perObjectData != 0) {
         perObjectData = ((int)model_low4_high4.x == 1) ? 1.0 : 0.0;
         perObjectData = perObjectData ? customData.z : customData.y;
-        customData.xyz = cb1[67].xyz + -r6.xyz;
+        customData.xyz = cb1[67].xyz + -posWS.xyz;
         packedNormalWS_perObjectData.w = dot(customData.xyz, customData.xyz);
         packedNormalWS_perObjectData.w = rsqrt(packedNormalWS_perObjectData.w);
         customData.xyz = customData.xyz * packedNormalWS_perObjectData.www;
@@ -707,7 +702,7 @@ float4 fDest = 0;
     color.xyz = -packedNormalWS_perObjectData.xyz;
     return color;
 }
-            ENDCG
+            ENDHLSL
         }
     }
 }
