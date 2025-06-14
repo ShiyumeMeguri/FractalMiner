@@ -138,6 +138,7 @@ float4 fDest = 0;
     bool2 isModel_5_13;
     float3 albedo_new;
     float light_intensity;
+    float2 clipPos;
 
     packedNormalWS_perObjectData.xyzw = tex2Dlod(_IN1, float4(screenUV_ndcUV.xy, 0, 0)).wxyz;
     msr_shadingModelID.xyzw = tex2Dlod(_IN2, float4(screenUV_ndcUV.xy, 0, 0)).xyzw;
@@ -220,10 +221,10 @@ float4 fDest = 0;
     albedo_new.xyz = is_unk1 ? checkerboardPattern : albedo_new.xyz;
     albedo_alpha.xyz = isModel_5_13.x ? albedo_new.xyz : albedo_alpha.xyz;
     light_intensity = tex2Dlod(_IN9, float4(0, 0, 0, 0)).x;
-    model_low4_high4.zw = screenUV_ndcUV.zw * depth;
+    clipPos = screenUV_ndcUV.zw * depth;
     
-    r6.xyz = cb1[49].xyz * model_low4_high4.www;
-    r6.xyz = model_low4_high4.zzz * cb1[48].xyz + r6.xyz;
+    r6.xyz = cb1[49].xyz * clipPos.y;
+    r6.xyz = clipPos.x * cb1[48].xyz + r6.xyz;
     r6.xyz = depth * cb1[50].xyz + r6.xyz;
     r6.xyz = cb1[51].xyz + r6.xyz;
     model_low4_high4.zw = tex2Dlod(_IN5, float4(screenUV_ndcUV.xy, 0, 0)).xz;
