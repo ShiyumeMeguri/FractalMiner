@@ -132,7 +132,9 @@ float4 fDest = 0;
     bool isScene; // low 10
     float nomalizeTemp;
     float perObjectData = 0;
+    bool is_cb1_162y;
     bool is_cb1_220z;
+    bool is_unk1;
     bool2 isModel_5_13;
 
     packedNormalWS_perObjectData.xyzw = tex2Dlod(_IN1, float4(screenUV_ndcUV.xy, 0, 0)).wxyz;
@@ -207,13 +209,13 @@ float4 fDest = 0;
     nomalizeTemp = rsqrt(nomalizeTemp);
     normal.xyz = normal.xyz * nomalizeTemp;
     isModel_5_13 = ((int2)model_low4_high4.xx == int2(5,13)) ? 1.0 : 0.0;
-    shadingModelID = (0 < cb1[162].y) ? 1.0 : 0.0;
+    is_cb1_162y = (0 < cb1[162].y) ? 1.0 : 0.0;
     is_cb1_220z = (0 < cb1[220].z) ? 1.0 : 0.0;
-    shadingModelID = shadingModelID ? is_cb1_220z : 0;
+    is_unk1 = is_cb1_162y ? is_cb1_220z : 0;
     is_cb1_220z = (0 != cb1[162].y) ? 1.0 : 0.0;
     r6.xyz = is_cb1_220z ? float3(1,1,1) : albedo_alpha.xyz;
     checkerboardPattern = checkerboardPattern ? 1 : 0;
-    r6.xyz = shadingModelID ? checkerboardPattern : r6.xyz;
+    r6.xyz = is_unk1 ? checkerboardPattern : r6.xyz;
     albedo_alpha.xyz = isModel_5_13.x ? r6.xyz : albedo_alpha.xyz;
     packedNormalWS_perObjectData.y = tex2Dlod(_IN9, float4(0, 0, 0, 0)).x;
     model_low4_high4.zw = screenUV_ndcUV.zw * depth;
