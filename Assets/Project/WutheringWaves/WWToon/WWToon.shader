@@ -82,7 +82,7 @@ Shader "Custom/WWToon"
             
             // 已知 _IN0 是深度+Stencil 
             // 已知 _IN1 XYZ是法线 A是PerObjectData
-            // 已知 _IN2 X是Metallic Y是Specular Z是Roughness W是ShadingModelID 
+            // 已知 _IN2 X是Metallic Y是Specular Z是Roughness W是ShadingModelID 场景时 X是 isScene Y不知道 Z不知道
             // 已知 _IN3 是Albedo和Alpha
             // 未知 _IN4
             // 已知 _IN5 R是阴影 G未使用 B是阴影强度 A通道为什么和B一样
@@ -122,6 +122,7 @@ float4 fDest = 0;
     float depth;
     float3 msr;
     float3 msrSq;
+    float3 sceneMask_unk_unk;
     float3 normal;
     bool isChara12;
     bool isCharaHair13;
@@ -180,19 +181,19 @@ float4 fDest = 0;
         isCharaAnisotropicMetal14 = customData.z;
     } else { // isScene
         isScene = ((int)model_low4_high4.x == 10) ? 1.0 : 0.0;
-        msr.xyz = saturate(msr_shadingModelID.xyz);
-        msr.xyz = float3(16777215,65535,255) * msr.xyz;
-        msr.xyz = round(msr.xyz);
-        msr.xyz = (uint3)msr.xyz;
-        bitmask.y = ((~(-1 << 8)) << 0) & 0xffffffff;  msr.y = (((uint)msr.z << 0) & bitmask.y) | ((uint)msr.y & ~bitmask.y);
-        bitmask.x = ((~(-1 << 16)) << 0) & 0xffffffff;  msr.x = (((uint)msr.y << 0) & bitmask.x) | ((uint)msr.x & ~bitmask.x);
-        msr.x = (uint)msr.x;
-        msr.x = 5.96046519e-008 * msr.x;
-        msr.y = msr.x * cb1[65].x + cb1[65].y;
-        msr.x = msr.x * cb1[65].z + -cb1[65].w;
-        msr.x = 1 / msr.x;
-        msr.x = msr.y + msr.x;
-        depth = isScene ? msr.x : depth;
+        sceneMask_unk_unk.xyz = saturate(msr_shadingModelID.xyz);
+        sceneMask_unk_unk.xyz = float3(16777215,65535,255) * sceneMask_unk_unk.xyz;
+        sceneMask_unk_unk.xyz = round(sceneMask_unk_unk.xyz);
+        sceneMask_unk_unk.xyz = (uint3)sceneMask_unk_unk.xyz;
+        bitmask.y = ((~(-1 << 8)) << 0) & 0xffffffff;  sceneMask_unk_unk.y = (((uint)sceneMask_unk_unk.z << 0) & bitmask.y) | ((uint)sceneMask_unk_unk.y & ~bitmask.y);
+        bitmask.x = ((~(-1 << 16)) << 0) & 0xffffffff;  sceneMask_unk_unk.x = (((uint)sceneMask_unk_unk.y << 0) & bitmask.x) | ((uint)sceneMask_unk_unk.x & ~bitmask.x);
+        sceneMask_unk_unk.x = (uint)sceneMask_unk_unk.x;
+        sceneMask_unk_unk.x = 5.96046519e-008 * sceneMask_unk_unk.x;
+        sceneMask_unk_unk.y = sceneMask_unk_unk.x * cb1[65].x + cb1[65].y;
+        sceneMask_unk_unk.x = sceneMask_unk_unk.x * cb1[65].z + -cb1[65].w;
+        sceneMask_unk_unk.x = 1 / sceneMask_unk_unk.x;
+        sceneMask_unk_unk.x = sceneMask_unk_unk.y + sceneMask_unk_unk.x;
+        depth = isScene ? sceneMask_unk_unk.x : depth;
         normal.xyz = packedNormalWS_perObjectData.yzw * float3(2,2,2) + float3(-1,-1,-1);
         msrSq = float3(0,0,0);
         model13_14_15.xyz = float3(0,0,0);
