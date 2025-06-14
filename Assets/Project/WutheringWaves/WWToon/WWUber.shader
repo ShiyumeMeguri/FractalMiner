@@ -148,161 +148,169 @@ Varyings vert (Attributes IN)
                 return OUT;
             }
 
-// 2D LUT grading
-// scaleOffset = (1 / lut_width, 1 / lut_height, lut_height - 1)
-float3 ApplyLut2D(TEXTURE2D_PARAM(tex, samplerTex), float3 uvw, float3 scaleOffset)
-{
-    // Strip format where `height = sqrt(width)`
-    uvw.z *= scaleOffset.z;
-    float shift = floor(uvw.z);
-    uvw.xy = uvw.xy * scaleOffset.z * scaleOffset.xy + scaleOffset.xy * 0.5;
-    uvw.x += shift * scaleOffset.y;
-    uvw.xyz = lerp(
-        SAMPLE_TEXTURE2D_LOD(tex, samplerTex, uvw.xy, 0.0).rgb,
-        SAMPLE_TEXTURE2D_LOD(tex, samplerTex, uvw.xy + float2(scaleOffset.y, 0.0), 0.0).rgb,
-        uvw.z - shift
-    );
-    return uvw;
-}
             //=========================================================================================
             // 片元着色器 (Fragment/Pixel Shader)
             //=========================================================================================
             float4 frag (Varyings IN) : SV_Target
             {
-                float4 o0; // 输出颜色
-                float4 r0,r1,r2,r3,r4,r5;
+                // fcb0[86] 是一个布尔标志向量，用于控制效果链中的某些步骤是否启用。
+                float4 effect_flags = fcb0[86];
+
+                // ---------------------------------------------------------------------------------
+                // 1. 生成伪随机值用于胶片颗粒 (在着色器后期应用)
+                // ---------------------------------------------------------------------------------
+                // 使用屏幕坐标和时间相关因子生成一个伪随机种子
+                float grain_seed_base = IN.texcoord2.w * 543.309998 + IN.texcoord2.z;
                 
-                // --- 开始移植反编译代码 (PS) ---
-                r0.xy = IN.texcoord3.xy * fcb0[48].xy + fcb0[48].zw;
-                r0.xy = fcb0[47].zw * r0.xy;
-                r0.z = IN.texcoord2.w * 543.309998 + IN.texcoord2.z;
-                r0.w = sin(r0.z);
-                r0.w = 493013 * r0.w;
-                r1.x = frac(r0.w);
-                r0.w = cmp(0 < fcb0[76].x);
-                r2.xy = float2(33.9900017,66.9899979) + r0.zz;
-                r2.xy = sin(r2.xy);
-                r2.xy = r2.xy * float2(493013,493013) + float2(7.17700005,14.2989998);
-                r1.yz = frac(r2.xy);
-                r1.yzw = r1.xyz + -r1.xxx;
-                r1.yzw = fcb0[76].xxx * r1.yzw + r1.xxx;
-                r1.xyz = r0.www ? r1.yzw : r1.xxx;
-                r2.yw = fcb0[96].zz * fcb0[95].xy;
-                r0.z = cmp(fcb0[96].x == 0.000000);
-                r2.xz = r0.zz ? r2.yw : fcb0[95].xy;
-                r3.xyzw = IN.texcoord3.xyxy * fcb0[92].zwzw + fcb0[92].xyxy;
-                r4.xyzw = cmp(float4(0,0,0,0) < r3.zwzw);
-                r5.xyzw = cmp(r3.zwzw < float4(0,0,0,0));
-                r4.xyzw = (int4)-r4.xyzw + (int4)r5.xyzw;
-                r4.xyzw = (int4)r4.xyzw;
-                r5.xyzw = saturate(-fcb0[95].zzzz + abs(r3.zwzw));
-                r4.xyzw = r5.xyzw * r4.xyzw;
-                r2.xyzw = -r4.ywxz * r2.ywxz + r3.ywxz;
-                r0.z = cmp(0 < fcb0[96].x);
-                r3.xy = -fcb0[96].ww * float2(0.400000006,0.200000003) + r2.xy;
-                r2.xy = r0.zz ? r3.xy : r2.xy;
-                r2.xyzw = r2.zxwy * fcb0[93].zwzw + fcb0[93].xyxy;
-                r2.xyzw = r2.xyzw * fcb0[48].xyxy + fcb0[48].zwzw;
-                r2.xyzw = fcb0[47].zwzw * r2.xyzw;
-                // [修正] 使用 tex2D 替换 .Sample
-                r3.xyz = tex2D(_BlitTexture, r0.xy).xyz;
-                r4.x = tex2D(_BlitTexture, r2.xy).x;
-                r4.y = tex2D(_BlitTexture, r2.zw).y;
-                r0.w = dot(r3.xyz, float3(0.298999995,0.587000012,0.114));
-                r0.w = -fcb0[96].y + r0.w;
-                r0.w = saturate(10 * r0.w);
-                r1.w = r0.w * -2 + 3;
-                r0.w = r0.w * r0.w;
-                r0.w = r1.w * r0.w;
-                r4.z = r3.z;
-                r2.xyz = r4.xyz + -r3.xyz;
-                r2.xyz = r0.www * r2.xyz + r3.xyz;
-                r2.xyz = r2.xyz + -r4.xyz;
-                r2.xyz = fcb0[96].xxx * r2.xyz + r4.xyz;
-                r2.xyz = r0.zzz ? r2.xyz : r4.xyz;
-                r2.xyz = fcb0[69].xyz * r2.xyz;
-                r0.xy = fcb0[68].xy * r0.xy + fcb0[68].zw;
-                r0.xy = max(fcb0[60].xy, r0.xy);
-                r0.xy = min(fcb0[60].zw, r0.xy);
-                // [修正] 使用 tex2D 替换 .Sample
-                r0.xyz = tex2D(_BloomTexture, r0.xy).xyz;
-                r0.xyz = r2.xyz * IN.texcoord1.xxx + r0.xyz;
-                r2.xy = fcb0[73].xy * float2(2,2) + IN.texcoord1.zw;
-                r2.xy = float2(-1,-1) + r2.xy;
-                r2.xy = fcb0[71].xx * r2.xy;
-                r2.xy = fcb0[71].zw * r2.xy;
-                r0.w = dot(r2.xy, r2.xy);
-                r1.w = saturate(fcb0[72].w);
-                r1.w = r1.w * 9 + 1;
-                r0.w = r0.w * r1.w + 1;
-                r0.w = rcp(r0.w);
-                r0.w = r0.w * r0.w;
-                r2.xyz = float3(1,1,1) + -fcb0[72].xyz;
-                r2.xyz = r0.www * r2.xyz + fcb0[72].xyz;
-                r0.xyz = r2.xyz * r0.xyz;
-                if (fcb0[86].y != 0) {
-                  r2.xyz = r0.xyz * float3(1.36000001,1.36000001,1.36000001) + float3(0.0469999984,0.0469999984,0.0469999984);
-                  r2.xyz = r2.xyz * r0.xyz;
-                  r3.xyz = r0.xyz * float3(0.959999979,0.959999979,0.959999979) + float3(0.560000002,0.560000002,0.560000002);
-                  r3.xyz = r0.xyz * r3.xyz + float3(0.140000001,0.140000001,0.140000001);
-                  r0.xyz = saturate(r2.xyz / r3.xyz);
-                }
-                if (fcb0[86].z != 0) {
-                  r2.xyz = float3(-0.195050001,-0.195050001,-0.195050001) + r0.xyz;
-                  r2.xyz = float3(-0.163980007,-0.163980007,-0.163980007) / r2.xyz;
-                  r2.xyz = float3(1.00495005,1.00495005,1.00495005) + r2.xyz;
-                  r3.xyz = cmp(float3(0.600000024,0.600000024,0.600000024) >= r0.xyz);
-                  r3.xyz = r3.xyz ? float3(1,1,1) : 0;
-                  r4.xyz = -r2.xyz + r0.xyz;
-                  r0.xyz = saturate(r3.xyz * r4.xyz + r2.xyz);
-                }
-                if (fcb0[86].w != 0) {
-                  r2.xyz = fcb0[37].yyy * r0.xyz;
-                  r2.xyz = fcb0[37].www * fcb0[37].zzz + r2.xyz;
-                  r3.xy = fcb0[38].xx * fcb0[38].yz;
-                  r2.xyz = r0.xyz * r2.xyz + r3.xxx;
-                  r3.xzw = r0.xyz * fcb0[37].yyy + fcb0[37].zzz;
-                  r3.xyz = r0.xyz * r3.xzw + r3.yyy;
-                  r2.xyz = r2.xyz / r3.xyz;
-                  r0.w = fcb0[38].y / fcb0[38].z;
-                  r0.xyz = saturate(r2.xyz + -r0.www);
-                }
-                r0.xyz = float3(0.00266771927,0.00266771927,0.00266771927) + r0.xyz;
-                r0.xyz = log2(r0.xyz);
-                r0.xyz = saturate(r0.xyz * float3(0.0714285746,0.0714285746,0.0714285746) + float3(0.610726953,0.610726953,0.610726953));
-                r0.xyz = r0.xyz * float3(0.96875,0.96875,0.96875) + float3(0.015625,0.015625,0.015625);
-                return r0; // 妈的脑瘫UE 用尼玛tex3D
-                // r0.xyz = tex3D(_Lut3D, r0.xyz).xyz;
-                r0.xyz = float3(1.04999995,1.04999995,1.04999995) * r0.xyz;
-                o0.w = saturate(dot(r0.xyz, float3(0.298999995,0.587000012,0.114)));
-                r0.xyz = r1.xyz * float3(0.00390625,0.00390625,0.00390625) + r0.xyz;
-                r0.xyz = float3(-0.001953125,-0.001953125,-0.001953125) + r0.xyz;
-                if (fcb0[86].x != 0) {
-                  r1.xyz = log2(r0.xyz);
-                  r1.xyz = float3(0.0126833133,0.0126833133,0.0126833133) * r1.xyz;
-                  r1.xyz = exp2(r1.xyz);
-                  r2.xyz = float3(-0.8359375,-0.8359375,-0.8359375) + r1.xyz;
-                  r2.xyz = max(float3(0,0,0), r2.xyz);
-                  r1.xyz = -r1.xyz * float3(18.6875,18.6875,18.6875) + float3(18.8515625,18.8515625,18.8515625);
-                  r1.xyz = r2.xyz / r1.xyz;
-                  r1.xyz = log2(r1.xyz);
-                  r1.xyz = float3(6.27739477,6.27739477,6.27739477) * r1.xyz;
-                  r1.xyz = exp2(r1.xyz);
-                  r1.xyz = float3(10000,10000,10000) * r1.xyz;
-                  r1.xyz = r1.xyz / fcb0[85].www;
-                  r1.xyz = max(float3(6.10351999e-005,6.10351999e-005,6.10351999e-005), r1.xyz);
-                  r2.xyz = float3(12.9200001,12.9200001,12.9200001) * r1.xyz;
-                  r1.xyz = max(float3(0.00313066994,0.00313066994,0.00313066994), r1.xyz);
-                  r1.xyz = log2(r1.xyz);
-                  r1.xyz = float3(0.416666657,0.416666657,0.416666657) * r1.xyz;
-                  r1.xyz = exp2(r1.xyz);
-                  r1.xyz = r1.xyz * float3(1.05499995,1.05499995,1.05499995) + float3(-0.0549999997,-0.0549999997,-0.0549999997);
-                  o0.xyz = min(r2.xyz, r1.xyz);
+                // 使用 sin 和大质数进行哈希，生成三个[0,1]范围的伪随机值
+                float random_val_x = frac(493013.0 * sin(grain_seed_base));
+                float2 random_seeds_yz = sin(float2(33.9900017, 66.9899979) + grain_seed_base.xx);
+                float2 random_vals_yz = frac(random_seeds_yz * 493013.0 + float2(7.17700005, 14.2989998));
+                
+                // 将随机值组合成一个向量，这代表了胶片颗粒的颜色偏移
+                // fcb0[76].x > 0 控制是否启用彩色颗粒，否则为单色颗粒
+                float3 filmGrainColorOffset = float3(random_val_x, random_vals_yz.x, random_vals_yz.y);
+                if (fcb0[76].x > 0) {
+                    filmGrainColorOffset = filmGrainColorOffset.xyz - random_val_x.xxx;
+                    filmGrainColorOffset = fcb0[76].xxx * filmGrainColorOffset + random_val_x.xxx;
                 } else {
-                  o0.xyz = r0.xyz;
+                    filmGrainColorOffset = random_val_x.xxx;
                 }
-                // --- 结束移植反编译代码 (PS) ---
-                return o0;
+                
+                // ---------------------------------------------------------------------------------
+                // 2. 色差 (Chromatic Aberration)
+                // ---------------------------------------------------------------------------------
+                // 计算原始UV
+                float2 baseUV = IN.texcoord3.xy * fcb0[48].xy + fcb0[48].zw;
+                baseUV = fcb0[47].zw * baseUV;
+
+                // 计算色差的偏移和强度
+                float2 chroma_strength = (fcb0[96].x == 0.0) ? (fcb0[96].zz * fcb0[95].xy) : fcb0[95].xy;
+                
+                // 根据与屏幕中心的距离调整色差UV偏移
+                float4 dist_coords = IN.texcoord3.xyxy * fcb0[92].zwzw + fcb0[92].xyxy;
+                float4 edge_mask = saturate(-fcb0[95].zzzz + abs(dist_coords.zwzw));
+                float4 sign_mask = (dist_coords.zwzw > 0) ? -1.0 : 1.0; // 模拟 (int)-cmp() + (int)cmp()
+                float4 dist_offset = edge_mask * sign_mask;
+                float4 chroma_offset_uv = -dist_offset.ywxz * chroma_strength.yxyx + dist_coords.ywxz;
+                
+                if (fcb0[96].x > 0) {
+                    chroma_offset_uv.xy = -fcb0[96].ww * float2(0.400000006, 0.200000003) + chroma_offset_uv.xy;
+                }
+
+                // 转换回标准UV空间
+                float4 chroma_final_uv = chroma_offset_uv.zxwy * fcb0[93].zwzw + fcb0[93].xyxy;
+                chroma_final_uv = chroma_final_uv * fcb0[48].xyxy + fcb0[48].zwzw;
+                chroma_final_uv = fcb0[47].zwzw * chroma_final_uv;
+
+                // 采样原图(B通道)和偏移后的图(R, G通道)
+                float3 baseColor = tex2D(_BlitTexture, baseUV).xyz;
+                float3 aberratedColorSample = float3(
+                    tex2D(_BlitTexture, chroma_final_uv.xy).x,
+                    tex2D(_BlitTexture, chroma_final_uv.zw).y,
+                    baseColor.z
+                );
+                
+                // 根据亮度混合原始颜色和色差颜色
+                float luma = dot(baseColor, float3(0.298999995, 0.587000012, 0.114));
+                float luma_factor = saturate(10.0 * (luma - fcb0[96].y));
+                luma_factor = luma_factor * luma_factor * (3.0 - 2.0 * luma_factor); // Smoothstep
+                float3 color_after_chroma_ab = lerp(baseColor, aberratedColorSample, luma_factor);
+                
+                // 进一步混合，由 fcb0[96].x 控制
+                float3 final_aberrated_color = lerp(aberratedColorSample, color_after_chroma_ab, fcb0[96].x);
+                if (fcb0[96].x == 0.0) {
+                    final_aberrated_color = aberratedColorSample;
+                }
+                
+                // ---------------------------------------------------------------------------------
+                // 3. 叠加辉光和应用曝光/场景颜色调整
+                // ---------------------------------------------------------------------------------
+                float3 sceneColor = fcb0[69].xyz * final_aberrated_color;
+                float2 bloomUV = fcb0[68].xy * baseUV + fcb0[68].zw;
+                bloomUV = max(fcb0[60].xy, bloomUV);
+                bloomUV = min(fcb0[60].zw, bloomUV);
+                float3 bloomColor = tex2D(_BloomTexture, bloomUV).xyz;
+                
+                // IN.texcoord1.x 可能是全局曝光/强度
+                float3 color_with_bloom = sceneColor * IN.texcoord1.xxx + bloomColor;
+
+                // ---------------------------------------------------------------------------------
+                // 4. 镜头畸变 / 暗角 (Vignette)
+                // ---------------------------------------------------------------------------------
+                float2 lens_coords = (IN.texcoord1.zw + fcb0[73].xy * 2.0) - 1.0;
+                lens_coords = fcb0[71].zw * (fcb0[71].xx * lens_coords);
+                float dist_sq = dot(lens_coords, lens_coords);
+                float vignette_intensity = saturate(fcb0[72].w) * 9.0 + 1.0;
+                float vignette_factor = rcp(dist_sq * vignette_intensity + 1.0);
+                vignette_factor *= vignette_factor;
+                
+                float3 vignette_color = lerp(fcb0[72].xyz, float3(1,1,1), vignette_factor);
+                float3 color_after_vignette = color_with_bloom * vignette_color;
+
+                float3 gradedColor = color_after_vignette;
+                
+                // ---------------------------------------------------------------------------------
+                // 5. 串联的调色/色调映射模块
+                // ---------------------------------------------------------------------------------
+                if (effect_flags.y != 0) { // Filmic Tonemapping Curve 1
+                  float3 num = gradedColor * (gradedColor * 1.36 + 0.047) + 0.14;
+                  float3 den = gradedColor * (gradedColor * 0.96 + 0.56);
+                  gradedColor = saturate(num / den);
+                }
+                if (effect_flags.z != 0) { // Contrast/Color adjustment
+                  float3 val = (float3(1.00495,1.00495,1.00495) + (-0.16398 / (gradedColor - 0.19505)));
+                  float3 mask = gradedColor <= 0.6;
+                  gradedColor = saturate(lerp(val, gradedColor, mask));
+                }
+                if (effect_flags.w != 0) { // Filmic Tonemapping Curve 2
+                  float A = fcb0[37].y; float B = fcb0[37].z; float C = fcb0[37].w; float D = fcb0[38].x; float E = fcb0[38].y; float F = fcb0[38].z;
+                  float3 num = gradedColor * (gradedColor * A + B) * C + D;
+                  float3 den = gradedColor * (gradedColor * A + B) + E;
+                  gradedColor = saturate(num / den - (E / F));
+                }
+
+                // ---------------------------------------------------------------------------------
+                // 6. 准备LUT坐标并应用 (当前代码并未实际使用LUT)
+                // ---------------------------------------------------------------------------------
+                // 转换到对数空间并映射到 [0,1]
+                float3 logColor = log2(gradedColor + 0.0026677);
+                float3 remappedColor = saturate(logColor * 0.07142857 + 0.61072695);
+                
+                // 为3D纹理采样进行边界安全处理 (1/2 texel offset for a 32^3 LUT)
+                float3 lutCoords = remappedColor * 0.96875 + 0.015625;
+                
+                float3 color_after_lut = tex3D(_Lut3D, lutCoords).xyz; 
+                color_after_lut = color_after_lut * 1.04999995;
+                
+                // 在此处添加之前计算好的胶片颗粒
+                float3 color_with_grain = color_after_lut + (filmGrainColorOffset * 0.00390625 - 0.001953125);
+                
+                // ---------------------------------------------------------------------------------
+                // 7. 最终输出变换 (如: HDR to sRGB)
+                // ---------------------------------------------------------------------------------
+                float4 finalColor;
+                finalColor.w = saturate(dot(color_after_lut, float3(0.298999995, 0.587000012, 0.114)));
+
+                if (effect_flags.x != 0) {
+                    // 这是一个非常复杂的、可能是从ACEScg到sRGB的近似转换
+                    float3 linear_hdr = color_with_grain;
+                    float3 log_val = log2(linear_hdr) * 0.0126833;
+                    float3 exp_val = exp2(log_val);
+                    float3 num_part = max(0, exp_val - 0.8359375);
+                    float3 den_part = (18.8515625 - exp_val * 18.6875);
+                    float3 normalized_hdr = max(6.10352e-05, exp2(6.27739 * log2(num_part / den_part)) * 10000.0 / fcb0[85].www);
+                    
+                    // 分段式sRGB转换
+                    float3 linear_part = normalized_hdr * 12.92;
+                    float3 gamma_part = exp2(0.416666 * log2(max(0.00313067, normalized_hdr))) * 1.055 - 0.055;
+                    
+                    finalColor.xyz = min(linear_part, gamma_part);
+                } else {
+                    finalColor.xyz = color_with_grain;
+                }
+
+                return finalColor;
             }
             ENDHLSL
         }
