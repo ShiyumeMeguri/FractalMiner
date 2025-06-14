@@ -125,9 +125,9 @@ float4 fDest = 0;
     float3 normal;
     bool isChara12;
     bool isCharaHair13;
-    bool isAnisotropicMetal14;
-    bool isAnisotropicFabric15;
-    bool isChara; // low 13 14 15
+    bool isCharaAnisotropicMetal14;
+    bool isCharaAnisotropicFabric15;
+    bool isCharaPart; // low 13 14 15
     bool isScene; // low 10
 
     packedNormalWS_perObjectData.xyzw = tex2Dlod(_IN1, float4(screenUV_ndcUV.xy, 0, 0)).wxyz;
@@ -155,14 +155,14 @@ float4 fDest = 0;
     isChara12 = ((int)model_low4_high4.x != 12) ? 1.0 : 0.0;
     model13_14_15.xyz = ((int3)model_low4_high4.xxx == int3(13,14,15)) ? 1.0 : 0.0;
     isCharaHair13 = model13_14_15.x;
-    isAnisotropicMetal14 = model13_14_15.y;
-    isAnisotropicFabric15 = model13_14_15.z;
-    model_low4_high4.z = (int)isAnisotropicFabric15 | (int)isAnisotropicMetal14;
+    isCharaAnisotropicMetal14 = model13_14_15.y;
+    isCharaAnisotropicFabric15 = model13_14_15.z;
+    model_low4_high4.z = (int)isCharaAnisotropicFabric15 | (int)isCharaAnisotropicMetal14;
     model_low4_high4.z = (int)model_low4_high4.z | (int)isCharaHair13;
-    isChara = isChara12 ? model_low4_high4.z : -1;
-    if (isChara != 0) {
+    isCharaPart = isChara12 ? model_low4_high4.z : -1;
+    if (isCharaPart != 0) {
         model_low4_high4.x = isCharaHair13 ? 13 : 12;
-        model13_14_15.xz = float2(isAnisotropicMetal14, isAnisotropicFabric15) ? float2(1,1) : 0;
+        model13_14_15.xz = float2(isCharaAnisotropicMetal14, isCharaAnisotropicFabric15) ? float2(1,1) : 0;
         float2 octNormalWS = packedNormalWS_perObjectData.yz * float2(2,2) - float2(1,1);
         // shadingModelID = dot(float2(1,1), abs(octNormalWS.xy));
         // normal.z = 1 + -shadingModelID;
@@ -176,7 +176,7 @@ float4 fDest = 0;
         // normal.xyz = normal.xyz * shadingModelID;
         normal.xyz = UnpackNormalOctQuadEncode(octNormalWS);
         msrSq = msr_shadingModelID.xyz * msr_shadingModelID.xyz;
-        isAnisotropicMetal14 = customData.z;
+        isCharaAnisotropicMetal14 = customData.z;
     } else { // isScene
         isScene = ((int)model_low4_high4.x == 10) ? 1.0 : 0.0;
         msr.xyz = saturate(msr_shadingModelID.xyz);
@@ -421,7 +421,7 @@ float4 fDest = 0;
         model_low4_high4.w = model13_14_15.w * model_low4_high4.w;
         customData.x = customData.x * model_low4_high4.z + -model_low4_high4.w;
         customData.x = cb1[265].z * customData.x + model_low4_high4.w;
-        model_low4_high4.z = shadingModelID * isAnisotropicMetal14;
+        model_low4_high4.z = shadingModelID * isCharaAnisotropicMetal14;
         model_low4_high4.z = 10 * model_low4_high4.z;
         shadingModelID = -1 + shadingModelID;
         shadingModelID = cb1[260].y * shadingModelID + 1;
@@ -683,7 +683,7 @@ float4 fDest = 0;
     } else {
         msr_shadingModelID.xyz = float3(0,0,0);
     }
-    packedNormalWS_perObjectData.x = (0 != isAnisotropicFabric15) ? 1.0 : 0.0;
+    packedNormalWS_perObjectData.x = (0 != isCharaAnisotropicFabric15) ? 1.0 : 0.0;
     albedo_alpha.xyz = model_low4_high4.yzw * msrSq;
     albedo_alpha.xyz = cb1[263].xyz * albedo_alpha.xyz;
     albedo_alpha.xyz = albedo_alpha.xyz * float3(0.5,0.5,0.5) + -model_low4_high4.yzw;
