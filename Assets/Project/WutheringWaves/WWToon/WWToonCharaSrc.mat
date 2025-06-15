@@ -20,8 +20,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: wwUber
-  m_Shader: {fileID: 4800000, guid: 2d347677c51c282438b155fd71dad5e2, type: 3}
+  m_Name: WWToonCharaSrc
+  m_Shader: {fileID: 4800000, guid: 21c460a7a5519e24982d97f482aba1d1, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -39,14 +39,6 @@ Material:
     m_TexEnvs:
     - _BaseMap:
         m_Texture: {fileID: 2800000, guid: fb9b50135c20fdc4f9a9a9234ef54a3a, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _BlitTexture:
-        m_Texture: {fileID: 2800000, guid: a3c417c67afcc5d438bee57741ad96be, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _BloomTexture:
-        m_Texture: {fileID: 2800000, guid: b3b4fb7a5ff066d4a932fb25b4be311a, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BumpMap:
@@ -107,14 +99,6 @@ Material:
         m_Offset: {x: 0, y: 0}
     - _IN9:
         m_Texture: {fileID: 2800000, guid: 8a73cb5abc393494387819153e950497, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _Lut2D:
-        m_Texture: {fileID: 2800000, guid: 054587777fbd5cb4f81d3cd06189aa68, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _Lut3D:
-        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
