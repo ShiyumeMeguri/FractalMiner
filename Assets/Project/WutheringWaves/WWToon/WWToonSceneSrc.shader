@@ -47,17 +47,28 @@ struct Varyings
 // 纹理和采样器定义 (t0-t9, s0-s2)
 // ------------------------------------------------------------
 // 对应 t0-t9
-TEXTURE2D(_IN0); SAMPLER(sampler_IN0);
-TEXTURE2D(_IN1); SAMPLER(sampler_IN1);
-TEXTURE2D(_IN2); SAMPLER(sampler_IN2);
-TEXTURE2D(_IN3); SAMPLER(sampler_IN3);
-TEXTURE2D(_IN4); SAMPLER(sampler_IN4);
-TEXTURE2D(_IN5); SAMPLER(sampler_IN5);
-TEXTURE2D(_IN6); SAMPLER(sampler_IN6);
-TEXTURE2D(_IN7); SAMPLER(sampler_IN7);
-TEXTURE2D(_IN8); SAMPLER(sampler_IN8);
-TEXTURE2D(_IN9); SAMPLER(sampler_IN9);
+            
+            sampler2D _IN0;
+            sampler2D _IN1;
+            sampler2D _IN2;
+            sampler2D _IN3;
+            sampler2D _IN4;
+            sampler2D _IN5;
+            sampler2D _IN6;
+            sampler2D _IN7;
+            sampler2D _IN8;
+            sampler2D _IN9;
 
+            float4 _IN0_ST;
+            float4 _IN1_ST;
+            float4 _IN2_ST;
+            float4 _IN3_ST;
+            float4 _IN4_ST;
+            float4 _IN5_ST;
+            float4 _IN6_ST;
+            float4 _IN7_ST;
+            float4 _IN8_ST;
+            float4 _IN9_ST;
 // 对应 cb0, cb1, cb2
 StructuredBuffer<float4> cb0;
 StructuredBuffer<float4> cb1;
@@ -79,14 +90,20 @@ Varyings vert (Attributes IN)
 
     float2 clip = IN.uv * 2.0 - 1.0;
     clip.y = -clip.y;
-    OUT.positionCS = float4(clip, 0.0, 1.0);
-    
-    // v0.xy 和 v2.xy 的数据源
-    OUT.uv.xy = IN.uv;
-    OUT.uv.zw = clip; 
+                // 1. 使用 URP 的标准函数进行变换
+                OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
+                
+                // 2. 传递 UV 坐标
+                OUT.uv.xy = IN.uv;
+
+                // 3. 计算 NDC 并传递
+                // 逻辑完全相同：用裁剪空间坐标的 xy 除以 w
+                float2 ndc = OUT.positionCS.xy / OUT.positionCS.w;
+                OUT.uv.zw = ndc;
+                
     
     // v1.xyz 的数据源
-    OUT.color = _GradientX * clip.x + _GradientY * clip.y + _ColorOffset;
+    OUT.color = clip.x* clip.y;
 
     return OUT;
 }
@@ -1466,7 +1483,6 @@ float4 frag (Varyings fragmentInput) : SV_Target
     o0.xyzw = float4(0,0,0,0);
   }
   return o0;
-}
 }
 
             ENDHLSL
