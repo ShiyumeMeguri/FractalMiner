@@ -235,7 +235,7 @@ MonoBehaviour:
     m_Bits: 1
   m_VolumeTrigger: {fileID: 0}
   m_VolumeFrameworkUpdateModeOption: 2
-  m_RenderPostProcessing: 1
+  m_RenderPostProcessing: 0
   m_Antialiasing: 0
   m_AntialiasingQuality: 2
   m_StopNaN: 0
@@ -522,6 +522,7 @@ GameObject:
   - component: {fileID: 1669550546}
   - component: {fileID: 1669550545}
   - component: {fileID: 1669550544}
+  - component: {fileID: 1669550549}
   - component: {fileID: 1669550548}
   m_Layer: 0
   m_Name: uber
@@ -638,6 +639,51 @@ MonoBehaviour:
   targetMaterial: {fileID: 2100000, guid: ea3baaae3db90de41b811d24efa195f3, type: 2}
   vertexFileSearchPattern: ubervcb*.bin
   fragmentFileSearchPattern: uberfcb*.bin
+--- !u!114 &1669550549
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1669550542}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64c44f00ef7908946b2caaf7640a3440, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LutController
+  lutGeneratorCompute: {fileID: 7200000, guid: 36606e3869e177b4cacb672aaf3c76bb, type: 3}
+  applyLutMaterial: {fileID: 2100000, guid: ea3baaae3db90de41b811d24efa195f3, type: 2}
+  TonemapperSlope: 0
+  TonemapperToe: 0.55
+  TonemapperShoulder: 0.26
+  TonemapperBlackClip: 0
+  TonemapperWhiteClip: 0.04
+  WhiteBalanceTemp: 6500
+  WhiteBalanceTint: 0
+  ColorSaturation: {r: 0.97, g: 0.97, b: 0.97, a: 1}
+  ColorContrast: {r: 1.06, g: 1.06, b: 1.06, a: 1}
+  ColorGamma: {r: 1, g: 1.01, b: 1.05, a: 1}
+  ColorGain: {r: 1, g: 1, b: 1, a: 1}
+  ColorOffset: {r: 0, g: 0, b: 0, a: 0}
+  ColorCorrectionShadowsMax: 0.09
+  ColorSaturationShadows: {r: 1, g: 1, b: 1, a: 1}
+  ColorContrastShadows: {r: 1, g: 1, b: 1, a: 1}
+  ColorGammaShadows: {r: 1, g: 1, b: 1, a: 1}
+  ColorGainShadows: {r: 1, g: 1, b: 1, a: 1}
+  ColorOffsetShadows: {r: 0, g: 0, b: 0, a: 0}
+  ColorSaturationMidtones: {r: 1, g: 1, b: 1, a: 1}
+  ColorContrastMidtones: {r: 1, g: 1, b: 1, a: 1}
+  ColorGammaMidtones: {r: 1, g: 1, b: 1, a: 1}
+  ColorGainMidtones: {r: 1, g: 1, b: 1, a: 1}
+  ColorOffsetMidtones: {r: 0, g: 0, b: 0, a: 0}
+  ColorCorrectionHighlightsMin: 0.5
+  ColorSaturationHighlights: {r: 1, g: 1, b: 1, a: 1}
+  ColorContrastHighlights: {r: 1, g: 1, b: 1, a: 1}
+  ColorGammaHighlights: {r: 1, g: 1, b: 1, a: 1}
+  ColorGainHighlights: {r: 1, g: 1, b: 1, a: 1}
+  ColorOffsetHighlights: {r: 0, g: 0, b: 0, a: 0}
+  BlueCorrection: 0.6
+  ExpandGamut: 1
 --- !u!1 &1679399238
 GameObject:
   m_ObjectHideFlags: 0
@@ -657,7 +703,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!64 &1679399239
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -789,7 +835,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1693288516}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 172515602e62fb746b5d573b38a5fe58, type: 3}
   m_Name: 

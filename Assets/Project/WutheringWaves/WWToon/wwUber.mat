@@ -110,7 +110,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Lut2D:
-        m_Texture: {fileID: 2800000, guid: ecd96ea2b67b79a459d862b5dd329235, type: 3}
+        m_Texture: {fileID: 2800000, guid: 054587777fbd5cb4f81d3cd06189aa68, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Lut3D:

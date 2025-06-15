@@ -18,17 +18,18 @@ Shader "Custom/WWUber"
             #pragma fragment frag
             #pragma target 5.0
 
+        #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Color.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+        #include "Packages/com.unity.render-pipelines.universal/Shaders/PostProcessing/Common.hlsl"
 
             // 顶点着色器的输入结构
-            struct Attributes
+            struct AttributesCus
             {
                 float4 positionOS   : POSITION;
                 float2 uv           : TEXCOORD0;
             };
-
             // 顶点到片元着色器的传递结构
-            struct Varyings
+            struct VaryingsCus
             {
                 float4 positionCS   : SV_POSITION;
                 linear noperspective float2 texcoord0  : TEXCOORD0;
@@ -39,8 +40,6 @@ Shader "Custom/WWUber"
             };
 
             // 资源声明 (使用 sampler2D/3D 传统方式)
-            sampler2D _BlitTexture;
-            float4 _BlitTexture_TexelSize;
             sampler2D _BloomTexture;
             sampler3D _Lut3D;
         TEXTURE2D(_Lut2D);
@@ -56,9 +55,9 @@ Shader "Custom/WWUber"
             //=========================================================================================
             // 顶点着色器 (Vertex Shader)
             //=========================================================================================
-Varyings vert (Attributes IN)
+VaryingsCus vert (AttributesCus IN)
             {
-                Varyings OUT;
+                VaryingsCus OUT;
 
                 // 使用Unity内置变量替换cb常量
                 // _BlitTexture_TexelSize.xy = (1/width, 1/height)
@@ -121,7 +120,7 @@ Varyings vert (Attributes IN)
 
                 // 3. 从纹理左上角采样特殊值
                 // 原始: r0.xy = tex2Dlod(_BlitTexture, float4(0, 0, 0, 0)).xw; OUT.texcoord1.xy = r0.xy;
-                OUT.texcoord1.xy = tex2Dlod(_BlitTexture, float4(0, 0, 0, 0)).xw;
+                OUT.texcoord1.xy = 1;
                 
                 // 4. 顶点位置和最后一个texcoord的计算
                 // 原始代码的这部分非常复杂，是反编译的结果。
@@ -151,7 +150,7 @@ Varyings vert (Attributes IN)
             //=========================================================================================
             // 片元着色器 (Fragment/Pixel Shader)
             //=========================================================================================
-            float4 frag (Varyings IN) : SV_Target
+            float4 frag (VaryingsCus IN) : SV_Target
             {
                 // fcb0[86] 是一个布尔标志向量，用于控制效果链中的某些步骤是否启用。
                 float4 effect_flags = fcb0[86];
@@ -204,12 +203,14 @@ Varyings vert (Attributes IN)
                 chroma_final_uv = fcb0[47].zwzw * chroma_final_uv;
 
                 // 采样原图(B通道)和偏移后的图(R, G通道)
-                float3 baseColor = tex2D(_BlitTexture, baseUV).xyz;
+                
+                float3 baseColor = SAMPLE_TEXTURE2D_X(_BlitTexture, sampler_LinearClamp, baseUV).xyz;
                 float3 aberratedColorSample = float3(
-                    tex2D(_BlitTexture, chroma_final_uv.xy).x,
-                    tex2D(_BlitTexture, chroma_final_uv.zw).y,
+                    SAMPLE_TEXTURE2D_X(_BlitTexture, sampler_LinearClamp, chroma_final_uv.xy).x,
+                    SAMPLE_TEXTURE2D_X(_BlitTexture, sampler_LinearClamp, chroma_final_uv.zw).y,
                     baseColor.z
                 );
+                
                 
                 // 根据亮度混合原始颜色和色差颜色
                 float luma = dot(baseColor, float3(0.298999995, 0.587000012, 0.114));
@@ -271,17 +272,22 @@ Varyings vert (Attributes IN)
                 }
 
                 // ---------------------------------------------------------------------------------
-                // 6. 准备LUT坐标并应用 (当前代码并未实际使用LUT)
+                // 6. 准备LUT坐标并应用
                 // ---------------------------------------------------------------------------------
-                // 转换到对数空间并映射到 [0,1]
-                float3 logColor = log2(gradedColor + 0.0026677);
-                float3 remappedColor = saturate(logColor * 0.07142857 + 0.61072695);
-                
-                // 为3D纹理采样进行边界安全处理 (1/2 texel offset for a 32^3 LUT)
-                float3 lutCoords = remappedColor * 0.96875 + 0.015625;
-                
-                float3 color_after_lut = tex3D(_Lut3D, lutCoords).xyz; 
-                color_after_lut = color_after_lut * 1.04999995;
+                    // 转换到对数空间并映射到 [0,1]
+                    float3 logColor = log2(gradedColor + 0.0026677);
+                    float3 remappedColor = saturate(logColor * 0.07142857 + 0.61072695);
+                    
+                    // 为3D纹理采样进行边界安全处理 (1/2 texel offset for a 32^3 LUT)
+                    float3 lutCoords = remappedColor * 0.96875 + 0.015625;
+                    float3 color_after_lut = lutCoords;
+                    
+                    // 应用lut3d
+                    color_after_lut = tex3D(_Lut3D, lutCoords).xyz; 
+                    
+                    
+            //color_after_lut = ApplyLut2D(TEXTURE2D_ARGS(_Lut2D, sampler_LinearClamp), lutCoords, 1);
+                 color_after_lut = color_after_lut * 1.04999995;
                 
                 // 在此处添加之前计算好的胶片颗粒
                 float3 color_with_grain = color_after_lut + (filmGrainColorOffset * 0.00390625 - 0.001953125);
