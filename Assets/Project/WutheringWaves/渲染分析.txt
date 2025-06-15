@@ -7,10 +7,66 @@
 
 
 
-Gbuffer0    R16G16B16A16_FLOAT  RGB=全局光照 A=未使用
-Gbuffer1    R10G10B10A2_UNORM   XYZ=法线  A=PerObjectData
-Gbuffer2    B8G8R8A8_TYPELESS   X是Metallic Y是Specular Z是Roughness W是ShadingModelID 
-Gbuffer3    B8G8R8A8_TYPELESS   XYZ=BaseColor   A=Alpha
+--------------------------------------------------
+0. SceneColor (GBuffer0 / RT0)
+--------------------------------------------------
+  [格式]
+    - R16G16B16A16_FLOAT
+
+  [内容] (所有模式通用)
+    - RGB: Emissive (自发光)
+    - 备注: 此阶段不包含GI，全局光照是后续Pass计算的。
+
+--------------------------------------------------
+1. GBufferA (GBuffer1 / RT1)
+--------------------------------------------------
+  [格式]
+    - R10G10B10A2_UNORM
+
+  [内容]
+    - RG: WorldNormal (世界空间法线, 八面体压缩)
+    - B:  直接光模式 (LitFunc) (看上去就是预计算的漫反射)
+    - A:  [根据模式变化]
+        => Default Lit / SSS / 植被: ToonSkinMask
+        => Toon: ToonShadowBlendFactor (但是更像是个脸部区域Mask)
+
+--------------------------------------------------
+2. GBufferB (GBuffer2 / RT2)
+--------------------------------------------------
+  [格式]
+    - B8G8R8A8_TYPELESS
+
+  [内容] (根据模式变化)
+    - [Default Lit 模式]
+        - R: Metallic (金属度)
+        - G: Specular (高光)
+        - B: Roughness (粗糙度)
+        - A: 00001111=ShadeMode 11110000=OutputMask
+    - [SSS & 植被模式]
+        - RGB: CustomDataRGB (用于SSS、植被风动等)
+        - A:   ShadeMode + OutputMask
+    - [Toon 模式]
+        - RGB: ShadowColor (卡通阴影色)
+        - A:   ShadeMode + OutputMask
+
+--------------------------------------------------
+3. GBufferC (GBuffer3 / RT3)
+--------------------------------------------------
+  [格式]
+    - B8G8R8A8_TYPELESS
+
+  [内容]
+    - RGB: BaseColor (基础颜色)
+    - A:   [根据模式变化]
+        => Default Lit / SSS / 植被: AO (环境光遮蔽)
+        => Toon: ToonSkinMask
+
 Gbuffer4    R16G16B16A16_UNORM
 Gbuffer5    R16_FLOAT           R=CSMDepth
 Gbuffer6    B8G8R8A8_TYPELESS   
+
+        植被	        地面         建筑        角色主体	    角色眉毛
+模板值	0001 0000	1010 0000	0100 0000	0000 0010	0000 0110
+
+Gbuffer写入顺序：
+角色，建筑，植被(草)，地面，天空，植被
