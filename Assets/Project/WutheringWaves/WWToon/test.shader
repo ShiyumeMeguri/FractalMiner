@@ -67,17 +67,7 @@ Shader "Custom/WWUber"
                 // 使用 SAMPLE_TEXTURE2D 宏和 URP 预定义的线性钳位采样器
                 float3 baseColor = SAMPLE_TEXTURE2D(_BlitTexture, sampler_LinearClamp, baseUV).xyz;
                 
-                // 2. 采样辉光颜色
-                float3 bloomColor = SAMPLE_TEXTURE2D(_BloomTexture, sampler_LinearClamp, baseUV).xyz;
-                
-                // 3. 应用曝光并叠加辉光
-                // 将曝光值硬编码为1.3
-                float eyeAdaptation = 1.3;
-                float3 color_with_bloom = baseColor * eyeAdaptation + bloomColor;
-
-                // 4. 返回最终颜色
-                // 按照您的要求使用 .xyzz swizzle, Alpha通道将等于Blue通道的值
-                return color_with_bloom.xyzz;
+                return baseColor.xyzz;
             }
 
             ENDHLSL
