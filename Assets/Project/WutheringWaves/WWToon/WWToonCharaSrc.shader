@@ -2,7 +2,7 @@ Shader "Custom/WWToonCharaSrc"
 {
     Properties
     {
-        // Properties block is unchanged as requested
+        
         _IN0("IN0", 2D) = "white" {}
         _IN1("IN1", 2D) = "white" {}
         _IN2("IN2", 2D) = "white" {}
@@ -19,26 +19,26 @@ Shader "Custom/WWToonCharaSrc"
     {
         Pass
         {
-            CGPROGRAM
+            HLSLPROGRAM
 
             #pragma vertex vert
             #pragma fragment frag
             #pragma target 5.0
             //#pragma enable_d3d11_debug_symbols
+            
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
-            #include "UnityCG.cginc"
+struct Attributes
+{
+    float4 positionOS   : POSITION;     // OS = Object Space
+    float2 uv           : TEXCOORD0;
+};
 
-            struct VertexInput
-            {
-                float4 vertex : POSITION;
-                float2 uv : TEXCOORD0;
-            };
-
-            struct VertexToFragment
-            {
-                float4 uv : TEXCOORD0;
-                float4 vertex : SV_POSITION;
-            };
+struct Varyings
+{
+    float4 positionCS   : SV_POSITION;  // CS = Clip Space
+    float4 uv           : TEXCOORD0;    // 使用float4来存储 uv.xy 和 ndc.xy
+};
             
             sampler2D _IN0;
             sampler2D _IN1;
@@ -61,15 +61,27 @@ Shader "Custom/WWToonCharaSrc"
             float4 _IN7_ST;
             float4 _IN8_ST;
             float4 _IN9_ST;
+            float4 _FrameJitterSeed;     // cb1[158]
+            
+            //float4 _ScaledScreenParams;     // cb1[138] zw不等价需要-1
+            //float4 _MainLightPosition;     // cb1[138] zw不等价需要-1
 
-            VertexToFragment vert (VertexInput vertexInput)
+            Varyings vert (Attributes IN)
             {
-                VertexToFragment output;
-                output.vertex = UnityObjectToClipPos(vertexInput.vertex);
-                output.uv.xy = vertexInput.uv;
-                float2 ndcUV = output.vertex.xy / output.vertex.w;
-                output.uv.zw = ndcUV;
-                return output;
+                Varyings OUT;
+
+                // 1. 使用 URP 的标准函数进行变换
+                OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
+                
+                // 2. 传递 UV 坐标
+                OUT.uv.xy = IN.uv;
+
+                // 3. 计算 NDC 并传递
+                // 逻辑完全相同：用裁剪空间坐标的 xy 除以 w
+                float2 ndc = OUT.positionCS.xy / OUT.positionCS.w;
+                OUT.uv.zw = ndc;
+                
+                return OUT;
             }
             
             StructuredBuffer<float4> cb0;
@@ -78,26 +90,26 @@ Shader "Custom/WWToonCharaSrc"
             
             // 已知 _IN0 是深度+Stencil 
             // 已知 _IN1 XYZ是法线 A是PerObjectData
-            // 已知 _IN2 X是Metallic Y是Specular Z是Roughness W是ShadingModelID 
+            // 已知 _IN2 X是Metallic Y是Specular Z是Roughness W是ShadingModelID 场景时 X是 isScene Y不知道 Z不知道
             // 已知 _IN3 是Albedo和Alpha
             // 未知 _IN4
             // 已知 _IN5 R是阴影 G未使用 B是阴影强度 A通道为什么和B一样
             // 已知 _IN6 R16深度
             // 已知 _IN7 1x1像素 全0
             // 已知 _IN8 MSSAO 多分辨率屏幕空间AO
-            // 已知 _IN9 1x1像素 控制屏幕亮度
-            
-float4 frag (VertexToFragment fragmentInput) : SV_Target
+            // 已知 _IN9 1x1像素 EyeAdaptation自动曝光
+          
+float4 frag (Varyings fragmentInput) : SV_Target
 {
     // 基于输入uv定义v0，zw分量是NDC x（clip.x / clip.w）并复制到 zw
     float4 v0 = fragmentInput.uv; 
+if(tex2Dlod(_IN4, float4(v0.xy, 0, 0)).a){discard;} // debug 模拟延迟渲染stencil
 
     float4 color = 0;
     
     float4 r0=0, r1=0, r2=0, r3=0, r4=0, r5=0, r6=0, r7=0, r8=0, r9=0, r10=0, r11=0, r12=0, r13=0, r14=0, r15=0, r16=0;
     uint4 bitmask=0, uiDest=0;
     float4 fDest=0;
-
     r0.xyzw = tex2Dlod(_IN1, float4(v0.xy, 0, 0)).wxyz;
     r1.xyzw = tex2Dlod(_IN2, float4(v0.xy, 0, 0)).xyzw;
     r2.xyz = tex2Dlod(_IN3, float4(v0.xy, 0, 0)).xyz;
@@ -657,7 +669,7 @@ float4 frag (VertexToFragment fragmentInput) : SV_Target
     color.xyz = -r0.xyz;
     return color;
 }
-            ENDCG
+            ENDHLSL
         }
     }
 }

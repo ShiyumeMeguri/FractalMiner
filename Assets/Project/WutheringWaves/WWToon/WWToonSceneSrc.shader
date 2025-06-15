@@ -19,132 +19,98 @@ Shader "Custom/WWToonSceneSrc"
     {
         Pass
         {
-            CGPROGRAM
+            HLSLPROGRAM
 
             #pragma vertex vert
             #pragma fragment frag
             #pragma target 5.0
             //#pragma enable_d3d11_debug_symbols
-
-            #include "UnityCG.cginc"
-
-            struct VertexInput
-            {
-                float4 vertex : POSITION;
-                float2 uv : TEXCOORD0;
-            };
-
-            struct VertexToFragment
-            {
-                float4 uv : TEXCOORD0;
-                float4 vertex : SV_POSITION;
-            };
             
-            sampler2D _IN0;
-            sampler2D _IN1;
-            sampler2D _IN2;
-            sampler2D _IN3;
-            sampler2D _IN4;
-            sampler2D _IN5;
-            sampler2D _IN6;
-            sampler2D _IN7;
-            sampler2D _IN8;
-            sampler2D _IN9;
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
-            float4 _IN0_ST;
-            float4 _IN1_ST;
-            float4 _IN2_ST;
-            float4 _IN3_ST;
-            float4 _IN4_ST;
-            float4 _IN5_ST;
-            float4 _IN6_ST;
-            float4 _IN7_ST;
-            float4 _IN8_ST;
-            float4 _IN9_ST;
-
-            VertexToFragment vert (VertexInput vertexInput)
-            {
-                VertexToFragment output;
-                output.vertex = UnityObjectToClipPos(vertexInput.vertex);
-                output.uv.xy = vertexInput.uv;
-                float2 ndcUV = output.vertex.xy / output.vertex.w;
-                output.uv.zw = ndcUV;
-                return output;
-            }
-            
-            StructuredBuffer<float4> cb0;
-            StructuredBuffer<float4> cb1;
-            StructuredBuffer<float4> cb2;
-            
-            // 已知 _IN0 是深度+Stencil 
-            // 已知 _IN1 XYZ是法线 A是PerObjectData
-            // 已知 _IN2 X是Metallic Y是Specular Z是Roughness W是ShadingModelID 
-            // 已知 _IN3 是Albedo和Alpha
-            // 未知 _IN4
-            // 已知 _IN5 R是阴影 G未使用 B是阴影强度 A通道为什么和B一样
-            // 已知 _IN6 R16深度
-            // 已知 _IN7 1x1像素 全0
-            // 已知 _IN8 MSSAO 多分辨率屏幕空间AO
-            // 已知 _IN9 1x1像素 控制屏幕亮度
-            
-float4 frag (VertexToFragment fragmentInput) : SV_Target
-{// ---- Created with 3Dmigoto v1.3.16 on Mon Jun 16 07:22:23 2025
-Texture2D<float4> t8 : register(t8);
-
-Texture2D<float4> t7 : register(t7);
-
-Texture2D<float4> t6 : register(t6);
-
-Texture2D<float4> t5 : register(t5);
-
-Texture2D<float4> t4 : register(t4);
-
-Texture2D<float4> t3 : register(t3);
-
-Texture2D<float4> t2 : register(t2);
-
-Texture2D<float4> t1 : register(t1);
-
-Texture2D<float4> t0 : register(t0);
-
-SamplerState s2_s : register(s2);
-
-SamplerState s1_s : register(s1);
-
-SamplerState s0_s : register(s0);
-
-cbuffer cb1 : register(b1)
+struct Attributes
 {
-  float4 cb1[18];
+    float4 positionOS   : POSITION;
+    float2 uv           : TEXCOORD0;
+};
+
+struct Varyings
+{
+    float4 positionCS   : SV_POSITION;
+    // v0 (uv.xy) 和 v2 (positionCS.xy) 都从这里获取
+    // 增加 noperspective 确保与原始 dcl_input_ps_siv linear noperspective v2.xy, position 一致
+    noperspective float4 uv : TEXCOORD0; // uv.xy = 原始 UV, uv.zw = NDC.xy
+    float3 color        : TEXCOORD1;    // v1.xyz
+};
+
+// ------------------------------------------------------------
+// 纹理和采样器定义 (t0-t9, s0-s2)
+// ------------------------------------------------------------
+// 对应 t0-t9
+TEXTURE2D(_IN0); SAMPLER(sampler_IN0);
+TEXTURE2D(_IN1); SAMPLER(sampler_IN1);
+TEXTURE2D(_IN2); SAMPLER(sampler_IN2);
+TEXTURE2D(_IN3); SAMPLER(sampler_IN3);
+TEXTURE2D(_IN4); SAMPLER(sampler_IN4);
+TEXTURE2D(_IN5); SAMPLER(sampler_IN5);
+TEXTURE2D(_IN6); SAMPLER(sampler_IN6);
+TEXTURE2D(_IN7); SAMPLER(sampler_IN7);
+TEXTURE2D(_IN8); SAMPLER(sampler_IN8);
+TEXTURE2D(_IN9); SAMPLER(sampler_IN9);
+
+// 对应 cb0, cb1, cb2
+StructuredBuffer<float4> cb0;
+StructuredBuffer<float4> cb1;
+StructuredBuffer<float4> cb2;
+
+// 全局变量，保持不变
+float4 _FrameJitterSeed;
+float3 _GradientX;
+float3 _GradientY;
+float3 _ColorOffset;
+
+
+// ------------------------------------------------------------
+//  Vertex Shader (保持原样)
+// ------------------------------------------------------------
+Varyings vert (Attributes IN)
+{
+    Varyings OUT;
+
+    float2 clip = IN.uv * 2.0 - 1.0;
+    clip.y = -clip.y;
+    OUT.positionCS = float4(clip, 0.0, 1.0);
+    
+    // v0.xy 和 v2.xy 的数据源
+    OUT.uv.xy = IN.uv;
+    OUT.uv.zw = clip; 
+    
+    // v1.xyz 的数据源
+    OUT.color = _GradientX * clip.x + _GradientY * clip.y + _ColorOffset;
+
+    return OUT;
 }
-
-cbuffer cb0 : register(b0)
+            
+float4 frag (Varyings fragmentInput) : SV_Target
 {
-  float4 cb0[270];
-}
+// 3Dmigoto declarations - adapted for Unity
+#define cmp(x) (-(x))
 
+  // Map decompiled inputs to Unity's v2f struct
+  float4 v0 = fragmentInput.uv;
+  float3 v1 = fragmentInput.color;
+  float4 v2 = fragmentInput.positionCS;
+  float4 o0; // Output variable
 
-
-
-// 3Dmigoto declarations
-#define cmp -
-
-
-void main(
-  float4 v0 : TEXCOORD0,
-  float3 v1 : TEXCOORD1,
-  float4 v2 : SV_POSITION0,
-  out float4 o0 : SV_Target0)
-{
   float4 r0,r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11,r12,r13,r14,r15,r16,r17,r18,r19,r20;
   uint4 bitmask, uiDest;
   float4 fDest;
 
-  r0.xyz = t2.SampleLevel(s1_s, v0.xy, 0).xyz;
-  r1.xyzw = t3.SampleLevel(s1_s, v0.xy, 0).xyzw;
-  r2.xyzw = t4.SampleLevel(s1_s, v0.xy, 0).wxyz;
-  r3.xyzw = t5.SampleLevel(s1_s, v0.xy, 0).xyzw;
-  r0.w = t1.SampleLevel(s1_s, v0.xy, 0).x;
+  r0.xyz = tex2D(_IN2, v0.xy).xyz;
+  r1.xyzw = tex2D(_IN3, v0.xy).xyzw;
+  r2.xyzw = tex2D(_IN4, v0.xy).wxyz;
+  r3.xyzw = tex2D(_IN5, v0.xy).xyzw;
+  r0.w = tex2D(_IN1, v0.xy).x;
   r4.x = r0.w * cb0[65].x + cb0[65].y;
   r0.w = r0.w * cb0[65].z + -cb0[65].w;
   r0.w = 1 / r0.w;
@@ -204,11 +170,10 @@ void main(
   r0.y = (int)r0.y | (int)r4.y;
   r0.x = r0.x ? r0.y : -1;
   if (r0.x != 0) {
-    o0.xyzw = float4(0,0,0,0);
-    return;
+    return float4(0,0,0,0);
   }
   if (r1.w != 0) {
-    r0.x = t6.SampleLevel(s1_s, v0.xy, 0).w;
+    r0.x = tex2D(_IN6, v0.xy).w;
     r0.yz = cb0[138].xy * v0.xy;
     r0.yz = (uint2)r0.yz;
     r1.x = (uint)cb0[158].x;
@@ -256,7 +221,7 @@ void main(
     r0.x = r0.x * 2 + -1;
     r0.x = r0.y ? r0.x : 0;
     r0.x = r3.y ? r1.z : r0.x;
-    r0.w = t7.SampleLevel(s1_s, v0.xy, 0).x;
+    r0.w = tex2D(_IN7, v0.xy).x;
     r1.z = cmp(cb1[1].z < 0);
     r3.w = max(0.00100000005, cb1[17].w);
     r3.w = saturate(r4.x / r3.w);
@@ -273,7 +238,7 @@ void main(
     r3.w = frac(r3.w);
     r3.w = 52.9829178 * r3.w;
     r3.w = frac(r3.w);
-    r14.xyz = t8.SampleLevel(s2_s, v0.xy, 0).xyz;
+    r14.xyz = tex2D(_IN8, v0.xy).xyz;
     r15.xyz = r14.xyz * r14.xyz;
     r5.y = cb0[37].y * r5.w;
     if (cb1[3].y != 0) {
@@ -323,13 +288,13 @@ void main(
       r11.w = 0.25 * abs(r5.y);
       r12.xyzw = r3.wwww * float4(0.125,0.125,0.125,0.125) + float4(0.125,0.25,0.375,0.5);
       r16.xyz = r14.xyz * r12.xxx + r15.xyw;
-      r13.w = t1.SampleLevel(s1_s, r16.xy, 0).x;
+      r13.w = tex2D(_IN1, r16.xy).x;
       r13.w = r16.z + -r13.w;
       r13.w = abs(r5.y) * 0.25 + r13.w;
       r13.w = cmp(abs(r13.w) < r11.w);
       r12.x = r13.w ? r12.x : -1;
       r16.xyz = r14.xyz * r12.yyy + r15.xyw;
-      r13.w = t1.SampleLevel(s1_s, r16.xy, 0).x;
+      r13.w = tex2D(_IN1, r16.xy).x;
       r13.w = r16.z + -r13.w;
       r13.w = abs(r5.y) * 0.25 + r13.w;
       r13.w = cmp(abs(r13.w) < r11.w);
@@ -337,7 +302,7 @@ void main(
       r13.w = r13.w ? r14.w : 0;
       r12.x = r13.w ? r12.y : r12.x;
       r16.xyz = r14.xyz * r12.zzz + r15.xyw;
-      r12.y = t1.SampleLevel(s1_s, r16.xy, 0).x;
+      r12.y = tex2D(_IN1, r16.xy).x;
       r12.y = r16.z + -r12.y;
       r12.y = abs(r5.y) * 0.25 + r12.y;
       r12.y = cmp(abs(r12.y) < r11.w);
@@ -345,7 +310,7 @@ void main(
       r12.y = r12.y ? r13.w : 0;
       r12.x = r12.y ? r12.z : r12.x;
       r16.xyz = r14.xyz * r12.www + r15.xyw;
-      r12.y = t1.SampleLevel(s1_s, r16.xy, 0).x;
+      r12.y = tex2D(_IN1, r16.xy).x;
       r12.y = r16.z + -r12.y;
       r12.y = abs(r5.y) * 0.25 + r12.y;
       r12.y = cmp(abs(r12.y) < r11.w);
@@ -354,7 +319,7 @@ void main(
       r12.x = r12.y ? r12.w : r12.x;
       r16.xyzw = r3.wwww * float4(0.125,0.125,0.125,0.125) + float4(0.625,0.75,0.875,1);
       r12.yzw = r14.xyz * r16.xxx + r15.xyw;
-      r3.w = t1.SampleLevel(s1_s, r12.yz, 0).x;
+      r3.w = tex2D(_IN1, r12.yz).x;
       r3.w = r12.w + -r3.w;
       r3.w = abs(r5.y) * 0.25 + r3.w;
       r3.w = cmp(abs(r3.w) < r11.w);
@@ -362,7 +327,7 @@ void main(
       r3.w = r3.w ? r12.y : 0;
       r3.w = r3.w ? r16.x : r12.x;
       r12.xyz = r14.xyz * r16.yyy + r15.xyw;
-      r12.x = t1.SampleLevel(s1_s, r12.xy, 0).x;
+      r12.x = tex2D(_IN1, r12.xy).x;
       r12.x = r12.z + -r12.x;
       r12.x = abs(r5.y) * 0.25 + r12.x;
       r12.x = cmp(abs(r12.x) < r11.w);
@@ -370,7 +335,7 @@ void main(
       r12.x = r12.y ? r12.x : 0;
       r3.w = r12.x ? r16.y : r3.w;
       r12.xyz = r14.xyz * r16.zzz + r15.xyw;
-      r12.x = t1.SampleLevel(s1_s, r12.xy, 0).x;
+      r12.x = tex2D(_IN1, r12.xy).x;
       r12.x = r12.z + -r12.x;
       r12.x = abs(r5.y) * 0.25 + r12.x;
       r12.x = cmp(abs(r12.x) < r11.w);
@@ -378,7 +343,7 @@ void main(
       r12.x = r12.y ? r12.x : 0;
       r3.w = r12.x ? r16.z : r3.w;
       r12.xyz = r14.xyz * r16.www + r15.xyw;
-      r12.x = t1.SampleLevel(s1_s, r12.xy, 0).x;
+      r12.x = tex2D(_IN1, r12.xy).x;
       r12.x = r12.z + -r12.x;
       r5.y = abs(r5.y) * 0.25 + r12.x;
       r5.y = cmp(abs(r5.y) < r11.w);
@@ -388,7 +353,7 @@ void main(
       r5.y = cmp(0 < r3.w);
       if (r5.y != 0) {
         r12.xy = r14.xy * r3.ww + r15.xy;
-        r5.y = t3.SampleLevel(s1_s, r12.xy, 0).w;
+        r5.y = tex2D(_IN3, r12.xy).w;
         r5.y = 255 * r5.y;
         r5.y = round(r5.y);
         r5.y = (uint)r5.y;
@@ -401,7 +366,7 @@ void main(
         if (r5.y != 0) {
           r5.y = 0;
         } else {
-          r5.y = t2.SampleLevel(s1_s, r12.xy, 0).w;
+          r5.y = tex2D(_IN2, r12.xy).w;
         }
         r5.y = 3.99900007 * r5.y;
         r5.y = (uint)r5.y;
@@ -525,8 +490,9 @@ void main(
       r5.y = -r1.z * r1.z + 1;
       r5.x = saturate(r5.x * r5.y);
       r5.y = saturate(cb1[9].z * r3.w);
-      switch (r1.w) {
-        case 1 :        case 1 :        case 1 :        case 8 :        case 9 :        r6.x = dot(r4.yzw, r12.xyz);
+      switch ((int)r1.w) {
+        case 1: case 8: case 9:
+        r6.x = dot(r4.yzw, r12.xyz);
         r7.w = dot(r4.yzw, -r13.xyz);
         r11.w = dot(-r13.xyz, r12.xyz);
         r12.w = cmp(0 < r5.x);
@@ -608,7 +574,7 @@ void main(
         if (r11.w != 0) {
           r19.x = saturate(r6.x * 0.5 + 0.5);
           r19.y = 1 + -cb0[267].w;
-          r19.xyz = t0.SampleLevel(s0_s, r19.xy, 0).xyz;
+          r19.xyz = tex2D(_IN0, r19.xy).xyz;
           r20.xyz = -r19.xyz + r14.zzz;
           r19.xyz = r1.xxx * r20.xyz + r19.xyz;
         } else {
@@ -676,7 +642,8 @@ void main(
         r18.xyz = r18.xyz * r5.www;
         r17.xyz = min(float3(5,5,5), r18.xyz);
         break;
-        case 2 :        r0.z = dot(r4.yzw, r12.xyz);
+        case 2:
+        r0.z = dot(r4.yzw, r12.xyz);
         r0.w = dot(r4.yzw, -r13.xyz);
         r5.w = dot(-r13.xyz, r12.xyz);
         r6.x = cmp(0 < r5.x);
@@ -757,7 +724,7 @@ void main(
         if (r5.w != 0) {
           r19.x = saturate(r0.z * 0.5 + 0.5);
           r19.y = 1 + -cb0[267].w;
-          r19.xyz = t0.SampleLevel(s0_s, r19.xy, 0).xyz;
+          r19.xyz = tex2D(_IN0, r19.xy).xyz;
           r20.xyz = -r19.xyz + r14.zzz;
           r19.xyz = r1.xxx * r20.xyz + r19.xyz;
         } else {
@@ -823,7 +790,8 @@ void main(
         r0.z = r0.z * r0.w + r5.w;
         r17.xyz = r0.zzz * r18.xyz;
         break;
-        case 4 :        r0.z = dot(r4.yzw, r12.xyz);
+        case 4:
+        r0.z = dot(r4.yzw, r12.xyz);
         r0.w = dot(r4.yzw, -r13.xyz);
         r5.w = dot(-r13.xyz, r12.xyz);
         r6.x = cmp(0 < r5.x);
@@ -905,7 +873,7 @@ void main(
         if (r6.x != 0) {
           r19.x = saturate(r0.z * 0.5 + 0.5);
           r19.y = 1 + -cb0[267].w;
-          r19.xyz = t0.SampleLevel(s0_s, r19.xy, 0).xyz;
+          r19.xyz = tex2D(_IN0, r19.xy).xyz;
           r20.xyz = -r19.xyz + r14.zzz;
           r19.xyz = r1.xxx * r20.xyz + r19.xyz;
         } else {
@@ -965,11 +933,13 @@ void main(
         r0.z = r0.z * r0.w;
         r17.xyz = r0.zzz * r18.xyz;
         break;
-        case 5 :        r15.xyw = float3(0,0,0);
+        case 5:
+        r15.xyw = float3(0,0,0);
         r16.xyz = float3(0,0,0);
         r17.xyz = float3(0,0,0);
         break;
-        case 6 :        r0.z = dot(r4.yzw, r12.xyz);
+        case 6:
+        r0.z = dot(r4.yzw, r12.xyz);
         r0.w = cmp(0.99000001 < r0.x);
         r5.w = dot(-r13.xyz, r12.xyz);
         r5.w = r5.w * 0.5 + 0.5;
@@ -1029,7 +999,8 @@ void main(
         r17.xyz = r18.xyz * r0.xxx;
         r16.xyz = float3(0,0,0);
         break;
-        case 7 :        r0.x = r8.w * 255 + 0.5;
+        case 7:
+        r0.x = r8.w * 255 + 0.5;
         r0.x = (uint)r0.x;
         r0.y = (int)r0.x & 1;
         if (r0.y == 0) {
@@ -1115,7 +1086,7 @@ void main(
           if (r5.w != 0) {
             r19.x = saturate(r0.y * 0.5 + 0.5);
             r19.y = 1 + -cb0[267].w;
-            r19.xyz = t0.SampleLevel(s0_s, r19.xy, 0).xyz;
+            r19.xyz = tex2D(_IN0, r19.xy).xyz;
             r20.xyz = -r19.xyz + r14.zzz;
             r19.xyz = r1.xxx * r20.xyz + r19.xyz;
           } else {
@@ -1345,23 +1316,7 @@ void main(
           r16.xyz = float3(0.5,0.5,0.5) * r0.xxx;
         }
         break;
-        case 1 :        r15.xyw = float3(0,0,0);
-        r16.xyz = float3(0,0,0);
-        r17.xyz = float3(0,0,0);
-        break;
-        case 1 :        r15.xyw = float3(0,0,0);
-        r16.xyz = float3(0,0,0);
-        r17.xyz = float3(0,0,0);
-        break;
-        case 1 :        r15.xyw = float3(0,0,0);
-        r16.xyz = float3(0,0,0);
-        r17.xyz = float3(0,0,0);
-        break;
-        case 1 :        r15.xyw = float3(0,0,0);
-        r16.xyz = float3(0,0,0);
-        r17.xyz = float3(0,0,0);
-        break;
-        default :
+        default:
         r15.xyw = float3(0,0,0);
         r16.xyz = float3(0,0,0);
         r17.xyz = float3(0,0,0);
@@ -1433,7 +1388,7 @@ void main(
       r3.x = -1 + cb0[266].z;
       r2.x = r2.x * r3.x + 1;
       r0.yz = r0.yz * r2.xx + v0.xy;
-      r0.y = t1.SampleLevel(s1_s, r0.yz, 0).x;
+      r0.y = tex2D(_IN1, r0.yz).x;
       r0.z = r0.y * cb0[65].x + cb0[65].y;
       r0.y = r0.y * cb0[65].z + -cb0[65].w;
       r0.y = 1 / r0.y;
@@ -1479,7 +1434,7 @@ void main(
           r2.x = -1 + cb0[266].z;
           r0.z = r0.z * r2.x + 1;
           r3.xy = r3.xy * r0.zz + v0.xy;
-          r0.z = t1.SampleLevel(s1_s, r3.xy, 0).x;
+          r0.z = tex2D(_IN1, r3.xy).x;
           r2.x = r0.z * cb0[65].x + cb0[65].y;
           r0.z = r0.z * cb0[65].z + -cb0[65].w;
           r0.z = 1 / r0.z;
@@ -1510,10 +1465,11 @@ void main(
   } else {
     o0.xyzw = float4(0,0,0,0);
   }
-  return;
+  return o0;
 }
 }
-            ENDCG
+
+            ENDHLSL
         }
     }
 }
