@@ -103,7 +103,7 @@ Varyings vert (Attributes IN)
                 
     
     // v1.xyz 的数据源
-    OUT.color = clip.x* clip.y;
+    OUT.color = 1;
 
     return OUT;
 }
