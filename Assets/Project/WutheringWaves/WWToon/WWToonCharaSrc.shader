@@ -89,9 +89,9 @@ struct Varyings
             StructuredBuffer<float4> cb2;
             
             // 已知 _IN0 是深度+Stencil 
-            // 已知 _IN1 XYZ是法线 A是PerObjectData
-            // 已知 _IN2 X是Metallic Y是Specular Z是Roughness W是ShadingModelID 场景时 X是 isScene Y不知道 Z不知道
-            // 已知 _IN3 是Albedo和Alpha
+            // 已知 _IN1 XY八面体压缩法线 B是diffuseFactor A是FaceSDFMask
+            // 已知 _IN2 XYZ是ShadowColor W是00001111=ShadeMode 11110000=OutputMask 
+            // 已知 _IN3 是Albedo和ToonSkinMask
             // 未知 _IN4
             // 已知 _IN5 R是阴影 G未使用 B是阴影强度 A通道为什么和B一样
             // 已知 _IN6 R16深度
