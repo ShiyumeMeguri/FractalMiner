@@ -103,7 +103,6 @@ float4 frag (Varyings fragmentInput) : SV_Target
 {
     // 基于输入uv定义v0，zw分量是NDC x（clip.x / clip.w）并复制到 zw
     float4 v0 = fragmentInput.uv; 
-if(tex2Dlod(_IN4, float4(v0.xy, 0, 0)).a){discard;} // debug 模拟延迟渲染stencil
 
     float4 color = 0;
     
