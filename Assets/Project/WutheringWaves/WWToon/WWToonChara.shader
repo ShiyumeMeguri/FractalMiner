@@ -548,8 +548,10 @@ float ShadowStrength=0;
         InTex4.x = (int)InTex4.x + 1;
     }
     r4.yzw = shadowColor_ShadeModeOutputMask.www * r5.xyw + r10.xyz;
-    SDFMask_octNormal_Diffuse.x = ((int)r4.x != 13) ? 1.0 : 0.0;
-    if (SDFMask_octNormal_Diffuse.x != 0) {
+    bool useRim = ((int)r4.x != 13) ? 1.0 : 0.0;
+    float3 rimColor;
+    float3 finalRimColor;
+    if (useRim != 0) {
         SDFMask_octNormal_Diffuse.x = ((int)r4.x == 1) ? 1.0 : 0.0;
         SDFMask_octNormal_Diffuse.x = SDFMask_octNormal_Diffuse.x ? InTex4.z : InTex4.y;
         InTex4.xyz = cb1[67].xyz + -r6.xyz;
@@ -675,16 +677,16 @@ float ShadowStrength=0;
         SDFMask_octNormal_Diffuse.x = 5000 + -SDFMask_octNormal_Diffuse.x;
         SDFMask_octNormal_Diffuse.x = 0.000199999995 * SDFMask_octNormal_Diffuse.x;
         shadowColor_ShadeModeOutputMask.xyz = SDFMask_octNormal_Diffuse.xxx * shadowColor_ShadeModeOutputMask.xyz;
-        shadowColor_ShadeModeOutputMask.xyz = cb0[1].xyz * shadowColor_ShadeModeOutputMask.xyz;
+        finalRimColor.xyz = cb0[1].xyz * shadowColor_ShadeModeOutputMask.xyz;
     } else {
-        shadowColor_ShadeModeOutputMask.xyz = float3(0,0,0);
+        finalRimColor.xyz = float3(0,0,0);
     }
     SDFMask_octNormal_Diffuse.x = (0 != r5.z) ? 1.0 : 0.0;
     albedo_ToonSkinMask.xyz = r4.yzw * r7.xyz;
     albedo_ToonSkinMask.xyz = cb1[263].xyz * albedo_ToonSkinMask.xyz;
     albedo_ToonSkinMask.xyz = albedo_ToonSkinMask.xyz * float3(0.5,0.5,0.5) + -r4.yzw;
     albedo_ToonSkinMask.xyz = SDFMask_octNormal_Diffuse.www * albedo_ToonSkinMask.xyz + r4.yzw;
-    shadowColor_ShadeModeOutputMask.xyz = r4.yzw + shadowColor_ShadeModeOutputMask.xyz;
+    shadowColor_ShadeModeOutputMask.xyz = r4.yzw + finalRimColor.xyz;
     shadowColor_ShadeModeOutputMask.xyz = SDFMask_octNormal_Diffuse.xxx ? albedo_ToonSkinMask.xyz : shadowColor_ShadeModeOutputMask.xyz;
     SDFMask_octNormal_Diffuse.xzw = SDFMask_octNormal_Diffuse.zzz ? r4.yzw : shadowColor_ShadeModeOutputMask.xyz;
     SDFMask_octNormal_Diffuse.xyz = SDFMask_octNormal_Diffuse.xzw / EyeAdaptation;
@@ -692,6 +694,7 @@ float ShadowStrength=0;
     color.xyz = -SDFMask_octNormal_Diffuse.xyz;
     return color;
 }
+
             ENDHLSL
         }
     }
