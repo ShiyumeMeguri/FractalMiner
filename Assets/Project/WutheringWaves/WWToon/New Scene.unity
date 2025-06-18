@@ -276,7 +276,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &462518758
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -289,8 +289,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8114a14b05d5df04e9e6a912728a650b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BufferToMaterial
-  vertexFileSearchPattern: ubervcb*.bin
-  fragmentFileSearchPattern: uberfcb*.bin
 --- !u!64 &462518759
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -320,7 +318,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 462518757}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -526,8 +524,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7e158c49016fd8d4da3a7300f0e97575, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BufferToMaterial
-  vertexFileSearchPattern: ubervcb*.bin
-  fragmentFileSearchPattern: uberfcb*.bin
+  vertexFileSearchPattern: CharaVCB*.bin
+  fragmentFileSearchPattern: CharaFCB*.bin
 --- !u!1 &1104583339
 GameObject:
   m_ObjectHideFlags: 0
@@ -762,7 +760,7 @@ Transform:
   m_GameObject: {fileID: 1600941379}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0.038}
+  m_LocalPosition: {x: 0, y: 0, z: -0.096}
   m_LocalScale: {x: 1.48, y: 0.832, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -780,8 +778,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7e158c49016fd8d4da3a7300f0e97575, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BufferToMaterial
-  vertexFileSearchPattern: ubervcb*.bin
-  fragmentFileSearchPattern: uberfcb*.bin
+  vertexFileSearchPattern: SceneVCB*.bin
+  fragmentFileSearchPattern: SceneFCB*.bin
 --- !u!1 &1669550542
 GameObject:
   m_ObjectHideFlags: 0
@@ -908,9 +906,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c2efbc7a6c7aa942bbc15cfead27054, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BufferToUber
-  targetMaterial: {fileID: 2100000, guid: ea3baaae3db90de41b811d24efa195f3, type: 2}
-  vertexFileSearchPattern: ubervcb*.bin
-  fragmentFileSearchPattern: uberfcb*.bin
 --- !u!114 &1669550549
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -33,6 +33,7 @@ Material:
   stringTagMap: {}
   disabledShaderPasses:
   - MOTIONVECTORS
+  - RuriSpecialGBuffer
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
