@@ -1,4 +1,4 @@
-Shader "Custom/WWToonCharaGBuffer"
+Shader "Custom/WWToonCharaGBufferSrc"
 {
     Properties
     {
