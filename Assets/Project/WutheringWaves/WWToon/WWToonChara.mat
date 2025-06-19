@@ -21,7 +21,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: WWToonChara
-  m_Shader: {fileID: 4800000, guid: 20e2dceca4de8814cbe70e4c523ca966, type: 3}
+  m_Shader: {fileID: 4800000, guid: ff1649251d054bf45804742b6a34ef74, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -29,7 +29,7 @@ Material:
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: 3000
+  m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses:
   - MOTIONVECTORS
@@ -38,12 +38,24 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
+    - _AlbedoTexture:
+        m_Texture: {fileID: 2800000, guid: a174508fcf83c414cbcac75d5ee742db, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _BaseMap:
         m_Texture: {fileID: 2800000, guid: fb9b50135c20fdc4f9a9a9234ef54a3a, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BumpMap:
         m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _CharacterMasks:
+        m_Texture: {fileID: 2800000, guid: 05969b03fac423a408210a77ffa1e6c0, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DepthStencilTexture:
+        m_Texture: {fileID: 2800000, guid: 18a207080b0f54641964eabb04c004be, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DetailAlbedoMap:
@@ -60,6 +72,38 @@ Material:
         m_Offset: {x: 0, y: 0}
     - _EmissionMap:
         m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _EyeAdaptationTex:
+        m_Texture: {fileID: 2800000, guid: d59a33d760c52a34cbc02bba6b60ad80, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _EyeAdaptationTexture:
+        m_Texture: {fileID: 2800000, guid: d59a33d760c52a34cbc02bba6b60ad80, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _GBuffer0_DepthStencil:
+        m_Texture: {fileID: 2800000, guid: 18a207080b0f54641964eabb04c004be, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _GBuffer1:
+        m_Texture: {fileID: 2800000, guid: 2f1a8c253a67352429af33b39ff78803, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _GBuffer1_NormalSDF:
+        m_Texture: {fileID: 2800000, guid: 2f1a8c253a67352429af33b39ff78803, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _GBuffer2:
+        m_Texture: {fileID: 2800000, guid: 7e7f163888d1fdd42816bfdca34137d6, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _GBuffer2_ShadowMask:
+        m_Texture: {fileID: 2800000, guid: 7e7f163888d1fdd42816bfdca34137d6, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _GBuffer3_Albedo:
+        m_Texture: {fileID: 2800000, guid: a174508fcf83c414cbcac75d5ee742db, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _IN0:
@@ -102,6 +146,10 @@ Material:
         m_Texture: {fileID: 2800000, guid: d59a33d760c52a34cbc02bba6b60ad80, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _MainShadowTexture:
+        m_Texture: {fileID: 2800000, guid: 3936b00fe70a57c44bba1fca4e9066b4, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _MainTex:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -118,8 +166,36 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _PlaceholderBlurInput:
+        m_Texture: {fileID: 2800000, guid: 51032dfc0a0581845a47da9df566a488, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _PlaceholderTexture:
+        m_Texture: {fileID: 2800000, guid: 51032dfc0a0581845a47da9df566a488, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SSAOTex:
+        m_Texture: {fileID: 2800000, guid: 85aefcab9c938df4aac95a51817eccae, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SceneDepthTexture:
+        m_Texture: {fileID: 2800000, guid: 5b9f74b57c3c33b41a0ada6e004b9222, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _ShadowStrengthTexture:
+        m_Texture: {fileID: 2800000, guid: 3936b00fe70a57c44bba1fca4e9066b4, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _SpecGlossMap:
         m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SsaoTexture:
+        m_Texture: {fileID: 2800000, guid: 85aefcab9c938df4aac95a51817eccae, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _ToonMaskTexture:
+        m_Texture: {fileID: 2800000, guid: 05969b03fac423a408210a77ffa1e6c0, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - unity_Lightmaps:
