@@ -859,7 +859,6 @@ float4 frag (Varyings fragmentInput) : SV_Target
     {
         finalRimColor = float3(0, 0, 0);
     }
-return linearEyeDepth;
     // --- 最终颜色合成 (Final Color Composition) ---
     bool isOutfit_check = (outfit_flag != 0.0f);
 
