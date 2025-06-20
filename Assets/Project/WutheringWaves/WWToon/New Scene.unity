@@ -1215,6 +1215,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Feibi
       objectReference: {fileID: 0}
+    - target: {fileID: 1328039056683430198, guid: 582bd0f8fb862d849957d4ebf59202fc, type: 3}
+      propertyPath: 'm_Materials.Array.data[3]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 07aa286040938db47a2fb50402579912, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

@@ -20,8 +20,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: WWToonCharaGbufferSrc
-  m_Shader: {fileID: 4800000, guid: b0e8ac6ef4607894398df73ce9e3321b, type: 3}
+  m_Name: WWToonCharaGbuffer
+  m_Shader: {fileID: 4800000, guid: 1fb9b29c3deb4414da898affbdb655b0, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []

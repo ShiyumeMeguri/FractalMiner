@@ -17,10 +17,12 @@ Shader "Custom/WWToonCharaGBufferSrc"
 
     SubShader
     {
+        // G-Buffer Pass for URP Deferred Rendering
         Tags
         {
             "Queue" = "Geometry+1000"
         }
+        
         Pass
         {
             HLSLPROGRAM
@@ -28,50 +30,86 @@ Shader "Custom/WWToonCharaGBufferSrc"
             #pragma vertex vert
             #pragma fragment frag
             #pragma target 5.0
-            //#pragma enable_d3d11_debug_symbols
             
+            // URP管线需要的多重编译指令
+            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS
+            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
+            #pragma multi_compile _ _ADDITIONAL_LIGHTS_VETEX _ADDITIONAL_LIGHTS
+            #pragma multi_compile _ _SHADOWS_SOFT
+
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-
-struct Attributes
-{
-    float4 positionOS   : POSITION;     // OS = Object Space
-    float2 uv           : TEXCOORD0;
-};
-
-struct Varyings
-{
-    float4 positionCS   : SV_POSITION;  // CS = Clip Space
-    float4 uv           : TEXCOORD0;    // 使用float4来存储 uv.xy 和 ndc.xy
-};
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
             
-            // 给AI的说明 我已经在这里给出的输出的准确含义 基于这个分析
-            TEXTURE2D(_IN0); SAMPLER(sampler_IN0); // XY法线 Z金属度 W不清楚
-            TEXTURE2D(_IN1); SAMPLER(sampler_IN1); // 也是一堆mask 
-            TEXTURE2D(_IN2); SAMPLER(sampler_IN2); // BaseColor A通道是mask
-            TEXTURE2D(_IN3); SAMPLER(sampler_IN3); // Matcap
-            TEXTURE2D(_IN4); SAMPLER(sampler_IN4); // Ramp SSS模拟用
-            // _IN5 到 _IN9 虽然在Properties中定义，但未在代码中使用
+            // --- 结构体定义 ---
 
-            float4 _IN0_ST;
-            float4 _IN1_ST;
-            float4 _IN2_ST;
-            float4 _IN3_ST;
-            float4 _IN4_ST;
-            float4 _IN5_ST;
-            float4 _IN6_ST;
-            float4 _IN7_ST;
-            float4 _IN8_ST;
-            float4 _IN9_ST;
-            float4 _FrameJitterSeed;     // cb1[158]
-            
-            Varyings vert (Attributes IN)
+            // 输入到顶点着色器的数据 (来自Mesh)
+            struct Attributes
             {
-                Varyings fragOutput;
-                fragOutput.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
-                fragOutput.uv.xy = IN.uv;
-                float2 ndc = fragOutput.positionCS.xy / fragOutput.positionCS.w;
-                fragOutput.uv.zw = ndc;
-                return fragOutput;
+                float4 positionOS   : POSITION;
+                float2 uv           : TEXCOORD0;
+                float3 normalOS     : NORMAL;       // 模型空间的法线
+                float4 tangentOS    : TANGENT;      // 模型空间的切线 (w分量用于计算副切线方向)
+            };
+
+            // 从顶点着色器传递到片元着色器的数据
+            struct Varyings
+            {
+                float4 positionCS   : SV_POSITION;  // 裁剪空间位置
+                float4 uv           : TEXCOORD0;    // UV坐标
+                
+                // TBN 矩阵的三个轴，在世界空间中
+                float3 normalWS     : TEXCOORD1;    // 世界空间法线
+                float3 tangentWS    : TEXCOORD2;    // 世界空间切线
+                float3 bitangentWS  : TEXCOORD3;    // 世界空间副切线
+                
+                float3 lightDirWS   : TEXCOORD4;    // 世界空间主光源方向
+                float3 viewDirWS    : TEXCOORD5;    // 世界空间视角方向
+            };
+            TEXTURE2D(_IN0); SAMPLER(sampler_IN0);
+        TEXTURE2D(_IN1); SAMPLER(sampler_IN1);
+        TEXTURE2D(_IN2); SAMPLER(sampler_IN2);
+        TEXTURE2D(_IN3); SAMPLER(sampler_IN3);
+        TEXTURE2D(_IN4); SAMPLER(sampler_IN4);
+
+        float4 _IN0_ST;
+        float4 _IN1_ST;
+        float4 _IN2_ST;
+        float4 _IN3_ST;
+        float4 _IN4_ST;
+        float4 _IN5_ST;
+        float4 _IN6_ST;
+        float4 _IN7_ST;
+        float4 _IN8_ST;
+        float4 _IN9_ST;
+            
+            // --- 顶点着色器 ---
+            Varyings vert (Attributes i)
+            {
+                Varyings o;
+
+                // 1. 转换顶点位置
+                o.positionCS = TransformObjectToHClip(i.positionOS.xyz);
+                float3 positionWS = TransformObjectToWorld(i.positionOS.xyz);
+
+                // 2. 传递UV坐标 (使用TRANSFORM_TEX宏来处理Tiling/Offset)
+                o.uv.xy = i.uv;
+                float2 ndc = o.positionCS.xy / o.positionCS.w;
+                o.uv.zw = ndc;
+
+                // 3. 计算世界空间下的法线、切线和副切线 (TBN)
+                o.normalWS = TransformObjectToWorldNormal(i.normalOS);
+                o.tangentWS = TransformObjectToWorldDir(i.tangentOS.xyz);
+                // 使用法线和切线计算副切线，并乘以tangent.w来确保正确的方向（左右手坐标系问题）
+                o.bitangentWS = cross(o.normalWS, o.tangentWS) * i.tangentOS.w;
+                
+                // 4. 获取主光源信息
+                Light mainLight = GetMainLight();
+                o.lightDirWS = mainLight.direction; // 方向是从物体指向光源
+
+                // 5. 获取世界空间的视角方向
+                o.viewDirWS = GetWorldSpaceViewDir(positionWS);
+
+                return o;
             }
             
             StructuredBuffer<float4> cb0;
@@ -92,15 +130,29 @@ struct Varyings
                 float4 o6_rimStrength_HSVPack_groundSpec_charRegion : SV_Target6;
             };
 
+// struct Varyings
+// {
+//     float4 positionCS   : SV_POSITION;  // 裁剪空间位置
+//     float4 uv           : TEXCOORD0;    // UV坐标
+//     
+//     // TBN 矩阵的三个轴，在世界空间中
+//     float3 normalWS     : TEXCOORD1;    // 世界空间法线
+//     float3 tangentWS    : TEXCOORD2;    // 世界空间切线
+//     float3 bitangentWS  : TEXCOORD3;    // 世界空间副切线
+//     
+//     float3 lightDirWS   : TEXCOORD4;    // 世界空间主光源方向
+//     float3 viewDirWS    : TEXCOORD5;    // 世界空间视角方向
+// };
 FragOutput frag (Varyings fragmentInput)
 {
     // 根据反编译代码输入调整输入结构
-    float4 v0 = fragmentInput.uv; // 您的指定映射
+    float3 v0 = fragmentInput.tangentWS; // 您的指定映射
     float4 v9 = fragmentInput.positionCS; // SV_Position -> v9
     float4 v2 = fragmentInput.uv; // TEXCOORD0 -> v2
 
     // 为缺失的、但在代码中使用的输入变量提供定义以修复语法错误
     float4 v1 = 0;
+    v1.xyz = fragmentInput.bitangentWS;
     float4 v6 = 0;
     float2 v7 = 0;
     float4 v8 = 0;
