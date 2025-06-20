@@ -541,6 +541,7 @@ FragOutput frag (Varyings fragmentInput)
   o6_rimStrength_HSVPack_groundSpec_charRegion.zw = float2(0,0);
 
   fragOutput.o0_GI = o2_ShadowColor_PackShadeMode_OutputMask;
+    fragOutput.o0_GI = pow(fragOutput.o0_GI, 5);
   return fragOutput;
 
   // 由于这是测试因此没用MRT 只能改o0预览正确性 即使这里错误也不用管

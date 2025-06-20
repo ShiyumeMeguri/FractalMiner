@@ -1,1025 +1,430 @@
-参考A的重构思路 给我重构B代码 逐步分析代码逻辑并命名 根据逻辑还原所有代码 不要改变任何逻辑 保证字节级一致 根据逻辑上下文准确含义命名
-
-A:
-float4 frag (Varyings fragmentInput) : SV_Target
+给我重构 用unity的全局变量实现等价计算 对于纯调参的非通用性cb就定义全局变量 然后在frag开始时赋值全局变量
+Shader "Custom/WWToonCharaGBuffer"
 {
-    // 基于输入uv定义v0，zw分量是NDC x（clip.x / clip.w）并复制到 zw
-    float4 v0 = fragmentInput.uv; 
-if(tex2Dlod(_IN4, float4(v0.xy, 0, 0)).a){discard;} // debug 模拟延迟渲染stencil
+    Properties
+    {
+        
+        _IN0("IN0", 2D) = "white" {}
+        _IN1("IN1", 2D) = "white" {}
+        _IN2("IN2", 2D) = "white" {}
+        _IN3("IN3", 2D) = "white" {}
+        _IN4("InTex4", 2D) = "white" {}
+        _IN5("IN5", 2D) = "white" {}
+        _IN6("IN6", 2D) = "white" {}
+        _IN7("IN7", 2D) = "white" {}
+        _IN8("IN8", 2D) = "white" {}
+        _IN9("IN9", 2D) = "white" {}
+    }
 
-    float4 color = 0;
-    
-    float4 r0=0, r1=0, r2=0, InTex4=0, r4=0, r5=0, r6=0, r7=0, r8=0, r9=0, r10=0, r11=0, r12=0, r13=0, r14=0, r15=0, r16=0;
-    uint4 bitmask=0, uiDest=0;
-    float4 fDest=0;
-    
-float4 depthStencil=0;                // _IN0：深度 + Stencil
-float4 SDFMask_octNormal_Diffuse=0;  // _IN1：XY八面体压缩法线, B=diffuseFactor, A=FaceSDFMask
-float4 shadowColor_ShadeModeOutputMask=0;  // _IN2：XYZ=ShadowColor, W=ShadeMode|OutputMask
-float4 albedo_ToonSkinMask=0;        // _IN3：Albedo 和 ToonSkinMask
-float4 unknownInput=0;               // _IN4：未知用途
-float2 shadowShadowStrength=0;       // _IN5：R=阴影, G=未使用, B=阴影强度, A=冗余B?
-float linearDepth=0;                // _IN6：R16深度
-float4 blackPixel=0;                 // _IN7：1x1黑色像素，全0
-float ssao=0;                       // _IN8：屏幕空间AO（多分辨率）
-float4 eyeAdaptation=0;             // _IN9：自动曝光（Eye Adaptation）
-float2 octNormal = 0;
-float diffuse = 0;
-float SDFMask = 0;
-float3 otherNormal = 0;
-float3 shadowColor = 0;
-float EyeAdaptation = 0;
-float shadow=0;             
-float ShadowStrength=0;             
+    SubShader
+    {
+        
+        Tags
+        {
+            "Queue" = "Geometry+1000"
+        }
+        
+        Pass
+        {
+            HLSLPROGRAM
 
-    SDFMask_octNormal_Diffuse.xyzw = tex2Dlod(_IN1, float4(v0.xy, 0, 0)).wxyz;
-        SDFMask = SDFMask_octNormal_Diffuse.x;
-        octNormal = SDFMask_octNormal_Diffuse.yz;
-        diffuse = SDFMask_octNormal_Diffuse.w;
-        otherNormal = SDFMask_octNormal_Diffuse.yzw; // 角色以外不是2维法线
-    shadowColor_ShadeModeOutputMask.xyzw = tex2Dlod(_IN2, float4(v0.xy, 0, 0)).xyzw;
-    albedo_ToonSkinMask.xyz = tex2Dlod(_IN3, float4(v0.xy, 0, 0)).xyz;
-    InTex4.xyz = tex2Dlod(_IN4, float4(v0.xy, 0, 0)).yxz;
-    albedo_ToonSkinMask.w = tex2Dlod(_IN0, float4(v0.xy, 0, 0)).x;
-    InTex4.w = albedo_ToonSkinMask.w * cb1[65].x + cb1[65].y;
-    albedo_ToonSkinMask.w = albedo_ToonSkinMask.w * cb1[65].z + -cb1[65].w;
-    albedo_ToonSkinMask.w = 1 / albedo_ToonSkinMask.w;
-    albedo_ToonSkinMask.w = InTex4.w + albedo_ToonSkinMask.w;
-    r4.xy = cb1[138].xy * v0.xy;
-    r4.xy = (uint2)r4.xy;
-    InTex4.w = (uint)cb1[158].x;
-    r4.x = (int)r4.y + (int)r4.x;
-    InTex4.w = (int)InTex4.w + (int)r4.x;
-    InTex4.w = (int)InTex4.w & 1;
-    shadowColor_ShadeModeOutputMask.w = 255 * shadowColor_ShadeModeOutputMask.w;
-    shadowColor_ShadeModeOutputMask.w = round(shadowColor_ShadeModeOutputMask.w);
-    shadowColor_ShadeModeOutputMask.w = (uint)shadowColor_ShadeModeOutputMask.w;
-    r4.xy = (int2)shadowColor_ShadeModeOutputMask.ww & int2(15,-16);
-    shadowColor_ShadeModeOutputMask.w = ((int)r4.x != 12) ? 1.0 : 0.0;
-    r5.xyz = ((int3)r4.xxx == int3(13,14,15)) ? 1.0 : 0.0;
-    r4.z = (int)r5.z | (int)r5.y;
-    r4.z = (int)r4.z | (int)r5.x;
-    shadowColor_ShadeModeOutputMask.w = shadowColor_ShadeModeOutputMask.w ? r4.z : -1;
-    if (shadowColor_ShadeModeOutputMask.w != 0) {
-        r4.x = r5.x ? 13 : 12;
-        r5.xz = r5.yz ? float2(1,1) : 0;
-        r4.zw = octNormal * float2(2,2) + float2(-1,-1);
-        shadowColor_ShadeModeOutputMask.w = dot(float2(1,1), abs(r4.zw));
-        r6.z = 1 + -shadowColor_ShadeModeOutputMask.w;
-        shadowColor_ShadeModeOutputMask.w = max(0, -r6.z);
-        r7.xy = (r4.zw >= float2(0,0)) ? 1.0 : 0.0;
-        r7.xy = r7.xy ? float2(0.5,0.5) : float2(-0.5,-0.5);
-        r7.xy = r7.xy * shadowColor_ShadeModeOutputMask.ww;
-        r6.xy = r7.xy * float2(-2,-2) + r4.zw;
-        shadowColor_ShadeModeOutputMask.w = dot(r6.xyz, r6.xyz);
-        shadowColor_ShadeModeOutputMask.w = rsqrt(shadowColor_ShadeModeOutputMask.w);
-        r6.xyz = r6.xyz * shadowColor_ShadeModeOutputMask.www;
-        shadowColor = shadowColor_ShadeModeOutputMask.xyz * shadowColor_ShadeModeOutputMask.xyz;
-        r5.y = InTex4.z;
-    } else {
-        shadowColor_ShadeModeOutputMask.w = ((int)r4.x == 10) ? 1.0 : 0.0;
-        shadowColor_ShadeModeOutputMask.xyz = saturate(shadowColor_ShadeModeOutputMask.xyz);
-        shadowColor_ShadeModeOutputMask.xyz = float3(16777215,65535,255) * shadowColor_ShadeModeOutputMask.xyz;
-        shadowColor_ShadeModeOutputMask.xyz = round(shadowColor_ShadeModeOutputMask.xyz);
-        shadowColor_ShadeModeOutputMask.xyz = (uint3)shadowColor_ShadeModeOutputMask.xyz;
-        bitmask.y = ((~(-1 << 8)) << 0) & 0xffffffff;  shadowColor_ShadeModeOutputMask.y = (((uint)shadowColor_ShadeModeOutputMask.z << 0) & bitmask.y) | ((uint)shadowColor_ShadeModeOutputMask.y & ~bitmask.y);
-        bitmask.x = ((~(-1 << 16)) << 0) & 0xffffffff;  shadowColor_ShadeModeOutputMask.x = (((uint)shadowColor_ShadeModeOutputMask.y << 0) & bitmask.x) | ((uint)shadowColor_ShadeModeOutputMask.x & ~bitmask.x);
-        shadowColor_ShadeModeOutputMask.x = (uint)shadowColor_ShadeModeOutputMask.x;
-        shadowColor_ShadeModeOutputMask.x = 5.96046519e-008 * shadowColor_ShadeModeOutputMask.x;
-        shadowColor_ShadeModeOutputMask.y = shadowColor_ShadeModeOutputMask.x * cb1[65].x + cb1[65].y;
-        shadowColor_ShadeModeOutputMask.x = shadowColor_ShadeModeOutputMask.x * cb1[65].z + -cb1[65].w;
-        shadowColor_ShadeModeOutputMask.x = 1 / shadowColor_ShadeModeOutputMask.x;
-        shadowColor_ShadeModeOutputMask.x = shadowColor_ShadeModeOutputMask.y + shadowColor_ShadeModeOutputMask.x;
-        albedo_ToonSkinMask.w = shadowColor_ShadeModeOutputMask.w ? shadowColor_ShadeModeOutputMask.x : albedo_ToonSkinMask.w;
-        r6.xyz = SDFMask_octNormal_Diffuse.yzw * float3(2,2,2) + float3(-1,-1,-1);
-        shadowColor = float3(0,0,0);
-        r5.xyz = float3(0,0,0);
-        SDFMask_octNormal_Diffuse.xw = float2(0,0);
-        InTex4.xy = float2(0,0);
-    }
-    SDFMask_octNormal_Diffuse.y = dot(r6.xyz, r6.xyz);
-    SDFMask_octNormal_Diffuse.y = rsqrt(SDFMask_octNormal_Diffuse.y);
-    shadowColor_ShadeModeOutputMask.xyz = r6.xyz * SDFMask_octNormal_Diffuse.yyy;
-    SDFMask_octNormal_Diffuse.yz = ((int2)r4.xx == int2(5,13)) ? 1.0 : 0.0;
-    shadowColor_ShadeModeOutputMask.w = (0 < cb1[162].y) ? 1.0 : 0.0;
-    r4.z = (0 < cb1[220].z) ? 1.0 : 0.0;
-    shadowColor_ShadeModeOutputMask.w = shadowColor_ShadeModeOutputMask.w ? r4.z : 0;
-    r4.z = (0 != cb1[162].y) ? 1.0 : 0.0;
-    r6.xyz = r4.zzz ? float3(1,1,1) : albedo_ToonSkinMask.xyz;
-    InTex4.w = InTex4.w ? 1 : 0;
-    r6.xyz = shadowColor_ShadeModeOutputMask.www ? InTex4.www : r6.xyz;
-    albedo_ToonSkinMask.xyz = SDFMask_octNormal_Diffuse.yyy ? r6.xyz : albedo_ToonSkinMask.xyz;
-    EyeAdaptation = tex2Dlod(_IN9, float4(0, 0, 0, 0)).x;
-    r4.zw = v0.zw * albedo_ToonSkinMask.ww;
-    r6.xyz = cb1[49].xyz * r4.www;
-    r6.xyz = r4.zzz * cb1[48].xyz + r6.xyz;
-    r6.xyz = albedo_ToonSkinMask.www * cb1[50].xyz + r6.xyz;
-    r6.xyz = cb1[51].xyz + r6.xyz;
-    shadowShadowStrength = tex2Dlod(_IN5, float4(v0.xy, 0, 0)).xz;
-    r4.zw = shadowShadowStrength * shadowShadowStrength;
-    shadow = r4.z * r4.w;
-    InTex4.w = cb1[253].y * shadow;
-    if (cb1[255].x != 0) {
-        r8.xyz = float3(0,0,0);
-        float2 unkonw01 = float2(0,0);
-        r5.w = 0;
-        r6.w = 0;
-        while (true) {
-        r7.w = ((int)unkonw01.x >= 3) ? 1.0 : 0.0;
-        if (r7.w != 0) break;
-        unkonw01.y = 0.000833333295 + unkonw01.y;
-        r9.xyz = r8.xyz;
-        r7.w = r5.w;
-        r8.w = r6.w;
-        r9.w = 0;
-        while (true) {
-            r10.x = ((int)r9.w >= 3) ? 1.0 : 0.0;
-            if (r10.x != 0) break;
-            r7.w = 1 + r7.w;
-            r10.x = 2.09439516 * r7.w;
-            sincos(r10.x, r10.x, r11.x);
-            r11.x = r11.x * unkonw01.y + v0.x;
-            r11.y = r10.x * unkonw01.y + v0.y;
-            r10.xyz = tex2D(_IN7, r11.xy).xyz;
-            r9.xyz = r10.xyz * unkonw01.y + r9.xyz;
-            r8.w = r8.w + unkonw01.y;
-            r9.w = (int)r9.w + 1;
+            #pragma vertex vert
+            #pragma fragment frag
+            #pragma target 5.0
+            
+            
+            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS
+            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
+            #pragma multi_compile _ _ADDITIONAL_LIGHTS_VETEX _ADDITIONAL_LIGHTS
+            #pragma multi_compile _ _SHADOWS_SOFT
+
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
+            
+            
+
+            
+            struct Attributes
+            {
+                float4 positionOS   : POSITION;
+                float2 uv           : TEXCOORD0;
+                float3 normalOS     : NORMAL;       
+                float4 tangentOS    : TANGENT;      
+            };
+
+            
+            struct Varyings
+            {
+                float4 positionCS   : SV_POSITION;  
+                float4 uv           : TEXCOORD0;    
+                
+                
+                float3 normalWS     : TEXCOORD1;    
+                float3 tangentWS    : TEXCOORD2;    
+                float3 bitangentWS  : TEXCOORD3;    
+                
+                float3 lightDirWS   : TEXCOORD4;    
+                float3 viewDirWS    : TEXCOORD5;    
+            };
+            
+            TEXTURE2D(_IN0); SAMPLER(sampler_IN0);
+            TEXTURE2D(_IN1); SAMPLER(sampler_IN1);
+            TEXTURE2D(_IN2); SAMPLER(sampler_IN2);
+            TEXTURE2D(_IN3); SAMPLER(sampler_IN3);
+            TEXTURE2D(_IN4); SAMPLER(sampler_IN4);
+
+            float4 _IN0_ST;
+            float4 _IN1_ST;
+            float4 _IN2_ST;
+            float4 _IN3_ST;
+            float4 _IN4_ST;
+            float4 _IN5_ST;
+            float4 _IN6_ST;
+            float4 _IN7_ST;
+            float4 _IN8_ST;
+            float4 _IN9_ST;
+            
+            
+            Varyings vert (Attributes i)
+            {
+                Varyings o;
+
+                
+                o.positionCS = TransformObjectToHClip(i.positionOS.xyz);
+                float3 positionWS = TransformObjectToWorld(i.positionOS.xyz);
+
+                
+                o.uv.xy = i.uv;
+                float2 ndc = o.positionCS.xy / o.positionCS.w;
+                o.uv.zw = ndc;
+
+                
+                o.normalWS = TransformObjectToWorldNormal(i.normalOS);
+                o.tangentWS = TransformObjectToWorldDir(i.tangentOS.xyz);
+                
+                o.bitangentWS = cross(o.normalWS, o.tangentWS) * i.tangentOS.w;
+                
+                
+                Light mainLight = GetMainLight();
+                o.lightDirWS = mainLight.direction; 
+
+                
+                o.viewDirWS = GetWorldSpaceViewDir(positionWS);
+
+                return o;
+            }
+            
+            StructuredBuffer<float4> cb0;
+            StructuredBuffer<float4> cb1;
+            StructuredBuffer<float4> cb2;
+            StructuredBuffer<float4> cb3;
+            StructuredBuffer<float4> cb4;
+            
+            
+            struct FragOutput
+            {
+                float4 o0_GI : SV_Target0;
+                float4 o1_Normal_Diffuse_FaceSDFMask : SV_Target1;
+                float4 o2_ShadowColor_PackShadeMode_OutputMask : SV_Target2;
+                float4 o3_BaseColor_ToonSkinMask : SV_Target3;
+                float4 o4 : SV_Target4;
+                float4 o5_RimDepth : SV_Target5;
+                float4 o6_rimStrength_HSVPack_groundSpec_charRegion : SV_Target6;
+            };
+
+
+
+
+FragOutput frag(Varyings fragmentInput)
+{
+    FragOutput fragOutput;
+    
+    float4 interpolatedUV = fragmentInput.uv;
+    float3 worldTangent = fragmentInput.tangentWS;
+    float3 worldBitangent = fragmentInput.bitangentWS;
+
+    
+    float4 tempVector0;
+    float3 tempVector3D_0;
+    uint tempUint0;
+    float4 tempVector1;
+    float tempScalar0;
+    float4 tempVector2;
+    float2 tempVector2D_0;
+    float3 tempVector3D_1;
+    bool4 tempBool4_0;
+    float3 tempVector3D_2;
+    bool4 tempBool4_1;
+    float4 tempVector4;
+    float3 tempVector3D_3;
+    float2 tempVector2D_1;
+    float2 tempVector2D_2;
+    float3 tempVector3D_4;
+    float tempScalar1;
+    float NdotV;
+    bool tempBool0;
+    float tempScalar2;
+    int tempInt0;
+    uint tempUint1;
+    bool tempBool1;
+    float tempScalar3;
+    float tempScalar4;
+    bool tempBool2;
+    
+    
+    
+    float4 clipSpacePosition = fragmentInput.positionCS;
+    tempVector0 = cb0[45] * clipSpacePosition.yyyy;
+    tempVector1 = cb0[44];
+    tempVector0 = clipSpacePosition.xxxx * tempVector1 + tempVector0;
+    tempVector1 = cb0[46];
+    tempVector0 = clipSpacePosition.zzzz * tempVector1 + tempVector0;
+    tempVector1 = cb0[47];
+    tempVector0 = tempVector0 + tempVector1;
+    
+    
+    float3 worldPosition = tempVector0.xyz / tempVector0.www;
+    
+    
+    tempScalar2 = dot((-worldPosition.xyz), (-worldPosition.xyz));
+    tempScalar2 = rsqrt(tempScalar2);
+    float3 viewDirectionWS = float3(tempScalar2, tempScalar2, tempScalar2) * (-worldPosition.xyz);
+
+    
+    float mipBias = cb0[149].y;
+    float normalMapSample = _IN0.SampleBias(sampler_IN0, interpolatedUV.xy, mipBias).x;
+    float unpackedNormalX = normalMapSample * 2.0 - 1.0;
+    
+    float normalPerturbationStrength = cb4[64].w;
+    unpackedNormalX = unpackedNormalX * normalPerturbationStrength;
+    
+    
+    float normalBlendFactor = cb0[144].w;
+    tempVector1.xyz = unpackedNormalX.xxx * worldTangent.xyz + worldBitangent.xyz;
+    tempVector2.x = (-normalBlendFactor) + 1.0;
+    tempVector2.xyz = tempVector2.xxx * worldBitangent.xyz;
+    tempVector1.xyz = tempVector1.xyz * float3(normalBlendFactor, normalBlendFactor, normalBlendFactor) + tempVector2.xyz;
+    
+    
+    tempScalar3 = dot(tempVector1.xyz, tempVector1.xyz);
+    tempScalar3 = rsqrt(tempScalar3);
+    float3 perturbedNormalWS = tempVector1.xyz * float3(tempScalar3, tempScalar3, tempScalar3);
+
+    
+    float2 maskSample = _IN1.SampleLevel(sampler_IN1, interpolatedUV.xy, mipBias).xy;
+    
+    
+    tempBool4_0 = maskSample.xxxx >= float4(0.0500000007, 0.300000012, 0.5, 0.899999976);
+    tempVector3D_4.x = tempBool4_0.y ? float(1.0) : 0.0; 
+    tempVector3D_4.y = tempBool4_0.z ? float(1.0) : 0.0; 
+    tempVector3D_4.z = tempBool4_0.w ? float(1.0) : 0.0; 
+    
+    tempBool4_1 = float4(0.0500000007, 0.300000012, 0.5, 0.899999976) >= maskSample.xxxx;
+    tempVector2.x = tempBool4_1.z ? float(1.0) : 0.0; 
+    tempVector2.z = tempBool4_1.w ? float(1.0) : 0.0; 
+    
+    
+    tempVector2.xz = tempVector3D_4.xy * tempVector2.xz; 
+    
+    tempScalar3 = (tempBool4_1.y) ? 0.0 : 1.0;
+    tempScalar3 = (tempBool4_0.x) ? tempScalar3 : 1.0;
+    tempScalar3 = (tempBool4_1.x) ? 1.0 : tempScalar3;
+    tempScalar3 = (-tempVector2.x) * tempScalar3 + 1.0;
+    tempScalar3 = (-tempVector2.z) * tempScalar3 + 1.0;
+    float shadeModeSelector = tempScalar3 * tempVector3D_4.z;
+    
+    
+    float3 shadeModeParams = cb4[65].xyz;
+    tempBool0 = shadeModeParams.y >= 0.5;
+    float shadeMode = (tempBool0) ? shadeModeSelector : shadeModeParams.x;
+    tempVector2.x = (-shadeMode) + 1.0;
+    float finalShadeFactor = shadeModeParams.z * tempVector2.x + shadeMode; 
+
+    
+    float shadowMapSample = _IN2.SampleBias(sampler_IN2, interpolatedUV.xy, mipBias).w;
+    NdotV = dot(perturbedNormalWS.xyz, viewDirectionWS.xyz);
+    NdotV = clamp(NdotV, 0.0, 1.0);
+
+    
+    
+    tempVector3D_1.xyz = cb3[36].xyz;
+    tempVector3D_2.xyz = cb3[17].xyz;
+    tempVector3D_2.xyz = (-tempVector3D_1.xyz) + tempVector3D_2.xyz;
+    tempScalar4 = cb4[67].y;
+    tempVector3D_2.xyz = tempVector3D_2.xyz * float3(tempScalar4, tempScalar4, tempScalar4);
+    tempScalar4 = cb4[66].w;
+    tempBool2 = tempScalar4 >= 0.5;
+    tempScalar4 = tempBool2 ? 1.0 : float(0.0);
+    tempVector3D_1.xyz = float3(tempScalar4, tempScalar4, tempScalar4) * tempVector3D_2.xyz + tempVector3D_1.xyz;
+    tempScalar4 = dot(tempVector3D_1.xyz, tempVector3D_1.xyz);
+    tempScalar4 = sqrt(tempScalar4);
+    tempVector3D_1.xyz = tempVector3D_1.xyz / float3(tempScalar4, tempScalar4, tempScalar4);
+    tempVector3D_2.xyz = cb4[8].xyz;
+    tempVector4.xyz = cb2[5].xyz;
+    tempVector3D_2.xyz = tempVector3D_2.xyz + tempVector4.xyz;
+    tempVector4 = cb1[0];
+    tempVector4.xyz = (-tempVector3D_2.xyz) + tempVector4.xyz;
+    tempScalar4 = dot(tempVector4.xyz, tempVector4.xyz);
+    tempScalar4 = sqrt(tempScalar4);
+    tempVector4.xyz = tempVector4.xyz / float3(tempScalar4, tempScalar4, tempScalar4);
+    tempVector3D_3.xyz = cb1[0].xyz;
+    tempVector3D_2.xyz = tempVector3D_2.xyz + (-tempVector3D_3.xyz);
+    tempScalar4 = dot(tempVector3D_2.xyz, tempVector3D_2.xyz);
+    tempScalar4 = sqrt(tempScalar4);
+    tempScalar4 = tempScalar4 * tempVector4.w;
+    tempScalar4 = clamp(tempScalar4, 0.0, 1.0);
+    tempVector3D_2.xyz = tempVector3D_1.xyz + (-tempVector4.xyz);
+    tempVector3D_2.xyz = float3(tempScalar4, tempScalar4, tempScalar4) * tempVector3D_2.xyz + tempVector4.xyz;
+    tempVector3D_2.xyz = (-tempVector3D_1.xyz) + tempVector3D_2.xyz;
+    tempScalar4 = cb1[1].z;
+    tempVector3D_1.xyz = float3(tempScalar4, tempScalar4, tempScalar4) * tempVector3D_2.xyz + tempVector3D_1.xyz;
+    tempScalar4 = cb2[27].y;
+    tempScalar4 = tempScalar4;
+    tempScalar4 = clamp(tempScalar4, 0.0, 1.0);
+    tempVector3D_1.xyz = float3(tempScalar4, tempScalar4, tempScalar4) * (-tempVector3D_1.xyz) + tempVector3D_1.xyz;
+    tempScalar4 = dot(tempVector3D_1.xyz, tempVector3D_1.xyz);
+    tempScalar4 = sqrt(tempScalar4);
+    float3 finalLightDirection = tempVector3D_1.xyz / float3(tempScalar4, tempScalar4, tempScalar4);
+    
+    
+    tempVector0.x = dot(finalLightDirection.xyz, viewDirectionWS.xyz);
+    tempVector2D_1.x = -abs(viewDirectionWS.z) + 1.0;
+    tempVector0.x = tempVector0.x * tempVector2D_1.x + 1.0;
+    tempVector0.x = tempVector0.x * 0.5;
+    float2 specularParams = cb4[68].xy;
+    tempScalar4 = cb4[67].w;
+    tempVector2D_1.x = (-specularParams.x) + tempScalar4;
+    tempScalar4 = cb4[68].x;
+    tempVector0.x = tempVector0.x * tempVector2D_1.x + tempScalar4;
+    tempVector2D_1.x = (-NdotV) + 1.0;
+    float finalSpecularTerm = tempVector0.x * tempVector2D_1.x + specularParams.y;
+
+    
+    float shadowMapScale = cb4[68].w;
+    float scaledShadowValue = shadowMapSample * shadowMapScale;
+    scaledShadowValue = max(scaledShadowValue, 0.0);
+    float shadowMapMax = cb4[69].x;
+    scaledShadowValue = min(scaledShadowValue, shadowMapMax);
+    float normalizedShadowValue = scaledShadowValue / shadowMapMax;
+    
+    float2 shadowRampParams = cb4[69].zz; 
+    float rampWidthInv = 1.0 / (1.0 - shadowRampParams.x);
+    tempScalar4 = normalizedShadowValue - shadowRampParams.x;
+    float rampT = tempScalar4 * rampWidthInv;
+    rampT = clamp(rampT, 0.0, 1.0);
+    
+    
+    tempScalar4 = rampT * -2.0 + 3.0;
+    rampT = rampT * rampT;
+    float smoothedRampT = rampT * tempScalar4;
+    float rampedShadow = smoothedRampT * shadowRampParams.y;
+    
+    
+    tempBool0 = 2.98023295e-08 >= rampedShadow;
+    rampedShadow = log2(rampedShadow);
+    float3 shadowPowerParams = cb4[70].xyz; 
+    rampedShadow = rampedShadow * shadowPowerParams.x;
+    rampedShadow = exp2(rampedShadow);
+    rampedShadow = rampedShadow * shadowPowerParams.y;
+    float shadowTerm = (tempBool0) ? 0.0 : rampedShadow;
+    
+    
+    float NdotL = dot(perturbedNormalWS.xyz, finalLightDirection.xyz);
+    float diffuseShadowTerm = NdotL * 0.5 + shadowTerm;
+    diffuseShadowTerm = diffuseShadowTerm + 0.5;
+
+    float compressedShadow = min(normalizedShadowValue, shadowRampParams.x);
+    compressedShadow = compressedShadow / shadowPowerParams.z;
+    
+    float clampedDiffuseShadow = max(diffuseShadowTerm, 0.0);
+    float2 remapParams = cb4[85].zz; 
+    clampedDiffuseShadow = min(clampedDiffuseShadow, remapParams.x);
+    
+    float overflowDiffuseShadow = diffuseShadowTerm - clampedDiffuseShadow;
+    float blendedShadowTerm = compressedShadow * overflowDiffuseShadow + clampedDiffuseShadow;
+    blendedShadowTerm = blendedShadowTerm + 0.5;
+    
+    float rampLookupU = (-finalSpecularTerm) + blendedShadowTerm;
+    rampLookupU = clamp(rampLookupU, 0.0, 1.0);
+
+    
+    float rampVOffset = -remapParams.y + 0.100000001; 
+    float rampVScale = cb4[85].w;
+    float rampLookupV = finalShadeFactor * rampVOffset + rampVScale;
+    
+    
+    float2 rampUV = float2(rampLookupU, rampLookupV);
+    float3 rampedColor = _IN4.SampleBias(sampler_IN4, rampUV, mipBias).xyz;
+
+    float skinMaskEnableFactor = cb3[1].w;
+    tempBool1 = skinMaskEnableFactor >= 0.0500000007;
+    float isSkinMaskEnabled = tempBool1 ? 1.0 : float(0.0);
+    float skinMaskValue = maskSample.y;
+    float finalSkinMask = isSkinMaskEnabled * skinMaskValue;
+    
+    float3 colorA = cb4[62].xyz;
+    float3 colorB = cb4[61].xyz;
+    float3 shadeFactorBlendedColor = lerp(colorA, colorB, finalShadeFactor);
+    
+    
+    float3 finalColor = lerp(shadeFactorBlendedColor, rampedColor, finalSkinMask);
+    
+    
+    float luma = dot(finalColor.xyz, float3(0.300000012, 0.589999974, 0.109999999));
+    float3 desaturatedColor = float3(luma, luma, luma);
+    float saturation = cb4[86].x;
+    float3 finalSaturatedColor = lerp(finalColor, desaturatedColor, saturation);
+    
+    
+    int branchCondition = int(cb0[249].x);
+    tempBool1 = branchCondition == 1;
+    if (tempBool1) {
+        finalSaturatedColor = finalSaturatedColor;
+        finalSaturatedColor = clamp(finalSaturatedColor, 0.0, 1.0);
+        
+        fragOutput.o0_GI.xyz = sqrt(finalSaturatedColor.xyz);
+        
+        
+        float packedDataInput = cb2[23].w;
+        tempUint1 = asuint(packedDataInput);
+        {
+            uint mask = ~(((1u << 3) - 1) << 5); 
+            
+            tempUint1 = (12u & mask) | ((tempUint1 & 7u) << 5);
         }
-        r8.xyz = r9.xyz;
-        r6.w = r8.w;
-        r5.w = 0.620000005 + r7.w;
-        unkonw01.x = (int)unkonw01.x + 1;
-        }
-        r8.xyz = r8.xyz / r6.www;
-        r9.xyz = (float3(0.644999981,0.312000006,0.978999972) < SDFMask_octNormal_Diffuse.xxx) ? 1.0 : 0.0;
-        r10.xyz = (SDFMask_octNormal_Diffuse.xxx < float3(0.685000002,0.351999998,1.02100003)) ? 1.0 : 0.0;
-        r9.xyz = r9.xyz ? r10.xyz : 0;
-        SDFMask_octNormal_Diffuse.x = r9.z ? 1.000000 : 0;
-        SDFMask_octNormal_Diffuse.x = r9.y ? 0 : SDFMask_octNormal_Diffuse.x;
-        SDFMask_octNormal_Diffuse.x = r9.x ? 1 : SDFMask_octNormal_Diffuse.x;
-        r4.z = (int)r9.y | (int)r9.z;
-        r4.z = (int)r4.z & 0x3f800000;
-        r4.z = r9.x ? 0 : r4.z;
-        InTex4.x = 255 * InTex4.x;
-        InTex4.x = round(InTex4.x);
-        InTex4.x = (uint)InTex4.x;
-        r9.xyzw = (int4)InTex4.xxxx & int4(15,240,240,15);
-        r9.xyzw = (uint4)r9.xyzw;
-        InTex4.x = saturate(diffuse + diffuse);
-        r4.w = InTex4.x * -2 + 3;
-        InTex4.x = InTex4.x * InTex4.x;
-        InTex4.x = r4.w * InTex4.x;
-        r4.w = -0.5 + diffuse;
-        r4.w = saturate(r4.w + r4.w);
-        r5.w = r4.w * -2 + 3;
-        r4.w = r4.w * r4.w;
-        r4.w = r5.w * r4.w;
-        r10.xyz = cb1[262].xyz + -cb1[261].xyz;
-        r5.w = dot(abs(r10.xyz), float3(0.300000012,0.589999974,0.109999999));
-        r5.w = 10 * r5.w;
-        r5.w = min(1, r5.w);
-        r6.w = r5.w * -2 + 3;
-        r5.w = r5.w * r5.w;
-        r5.w = r6.w * r5.w;
-        r6.w = r5.w * r4.w;
-        r7.w = cb1[265].y + -cb1[265].x;
-        r8.w = shadow * cb1[253].y + -cb1[265].x;
-        r7.w = 1 / r7.w;
-        r8.w = saturate(r8.w * r7.w);
-        r10.x = r8.w * -2 + 3;
-        r8.w = r8.w * r8.w;
-        r8.w = r10.x * r8.w;
-        r8.w = r8.w * r6.w;
-        r10.x = shadow * cb1[253].y + -r8.w;
-        r8.w = cb1[265].z * r10.x + r8.w;
-        r10.x = -cb1[265].x + r8.w;
-        r7.w = saturate(r10.x * r7.w);
-        r10.x = r7.w * -2 + 3;
-        r7.w = r7.w * r7.w;
-        r7.w = r10.x * r7.w;
-        r6.w = r7.w * r6.w;
-        r4.w = r4.w * r5.w + -r6.w;
-        r4.w = cb1[265].z * r4.w + r6.w;
-        r5.w = -1 + r8.w;
-        r5.w = cb1[260].y * r5.w + 1;
-        r6.w = InTex4.w * r4.w + -r5.w;
-        r5.w = r5.x * r6.w + r5.w;
-        r6.w = InTex4.w * r4.w + -r4.w;
-        r10.x = r5.x * r6.w + r4.w;
-        r4.w = (r8.y >= r8.z) ? 1.0 : 0.0;
-        r4.w = r4.w ? 1.000000 : 0;
-        r11.xy = r8.zy;
-        r11.zw = float2(-1,0.666666687);
-        r12.xy = -r11.xy + r8.yz;
-        r12.zw = float2(1,-1);
-        r11.xyzw = r4.wwww * r12.xyzw + r11.xyzw;
-        r4.w = (r8.x >= r11.x) ? 1.0 : 0.0;
-        r4.w = r4.w ? 1.000000 : 0;
-        r12.xyz = r11.xyw;
-        r12.w = r8.x;
-        r11.xyw = r12.wyx;
-        r11.xyzw = r11.xyzw + -r12.xyzw;
-        r11.xyzw = r4.wwww * r11.xyzw + r12.xyzw;
-        r4.w = min(r11.w, r11.y);
-        r4.w = r11.x + -r4.w;
-        r6.w = r11.w + -r11.y;
-        r7.w = r4.w * 6 + 0.00100000005;
-        r6.w = r6.w / r7.w;
-        r6.w = r11.z + r6.w;
-        r7.w = 0.00100000005 + r11.x;
-        r4.w = r4.w / r7.w;
-        r7.w = r11.x * 0.300000012 + 1;
-        r11.xyzw = r9.xyzw * float4(0.0400000028,0.0027450982,0.00392156886,0.0666666701) + float4(0.400000006,0.400000006,1,0.5);
-        r8.w = (r9.z >= 2.54999971) ? 1.0 : 0.0;
-        r8.w = r8.w ? 1.000000 : 0;
-        r9.x = r11.y + -r11.x;
-        r9.x = r8.w * r9.x + r11.x;
-        r4.w = r9.x * r4.w;
-        r4.w = min(0.349999994, r4.w);
-        r9.x = max(0, r4.w);
-        r9.yzw = float3(1,0.666666687,0.333333343) + abs(r6.www);
-        r9.yzw = frac(r9.yzw);
-        r9.yzw = r9.yzw * float3(6,6,6) + float3(-3,-3,-3);
-        r9.yzw = saturate(float3(-1,-1,-1) + abs(r9.yzw));
-        r9.yzw = float3(-1,-1,-1) + r9.yzw;
-        r9.xyz = r9.xxx * r9.yzw + float3(1,1,1);
-        r4.w = 1 + r4.w;
-        r12.xyz = r9.xyz * r4.www;
-        r13.xyz = r9.xyz * r4.www + float3(-1,-1,-1);
-        r13.xyz = r13.xyz * float3(0.600000024,0.600000024,0.600000024) + float3(1,1,1);
-        r9.xyz = -r9.xyz * r4.www + r13.xyz;
-        r9.xyz = SDFMask_octNormal_Diffuse.xxx * r9.xyz + r12.xyz;
-        r12.xyz = r9.xyz + -albedo_ToonSkinMask.xyz;
-        r12.xyz = r12.xyz * float3(0.850000024,0.850000024,0.850000024) + albedo_ToonSkinMask.xyz;
-        r11.xyz = r11.zzz * r12.xyz + -r9.xyz;
-        r9.xyz = r8.www * r11.xyz + r9.xyz;
-        r9.xyz = float3(-1,-1,-1) + r9.xyz;
-        r9.xyz = r11.www * r9.xyz + float3(1,1,1);
-        r11.xyz = float3(0.200000003,0.200000003,0.200000003) * cb1[261].xyz;
-        r12.xyz = cb1[262].xyz * float3(0.5,0.5,0.5) + -r11.xyz;
-        r11.xyz = r5.www * r12.xyz + r11.xyz;
-        r11.xyz = cb1[260].xxx * r11.xyz;
-        r11.xyz = r11.xyz * albedo_ToonSkinMask.xyz;
-        r12.xyz = r11.xyz * shadowColor;
-        r13.xyz = cb1[261].xyz * albedo_ToonSkinMask.xyz;
-        SDFMask_octNormal_Diffuse.x = InTex4.x * 0.300000012 + 0.699999988;
-        r14.xyz = r13.xyz * SDFMask_octNormal_Diffuse.xxx;
-        r15.xyz = cb1[262].xyz * albedo_ToonSkinMask.xyz;
-        r12.xyz = r13.xyz * SDFMask_octNormal_Diffuse.xxx + r12.xyz;
-        r13.xyz = albedo_ToonSkinMask.xyz * cb1[262].xyz + -r14.xyz;
-        r13.xyz = r13.xyz * float3(0.400000006,0.400000006,0.400000006) + r14.xyz;
-        r16.xyz = r14.xyz * r9.xyz;
-        r13.xyz = r13.xyz * r9.xyz + -r16.xyz;
-        r13.xyz = r10.xxx * r13.xyz + r16.xyz;
-        r11.xyz = r11.xyz * shadowColor + r13.xyz;
-        r12.xyz = r12.xyz * r9.xyz;
-        r13.xyz = r15.xyz * r7.www;
-        r9.xyz = r13.xyz * r9.xyz + -r12.xyz;
-        r9.xyz = r10.xxx * r9.xyz + r12.xyz;
-        ssao = tex2Dlod(_IN8, float4(v0.xy, 0, 0)).x;
-        ssao = -1 + ssao;
-        ssao = r4.z * ssao + 1;
-        r9.xyz = r9.xyz + -r11.xyz;
-        r9.xyz = r5.www * r9.xyz + r11.xyz;
-        r11.xyz = float3(1,1,1) + -r8.xyz;
-        r8.xyz = ssao * r11.xyz + r8.xyz;
-        r8.xyz = r9.xyz * r8.xyz;
-    } else {
-        SDFMask_octNormal_Diffuse.x = saturate(diffuse + diffuse);
-        InTex4.x = SDFMask_octNormal_Diffuse.x * -2 + 3;
-        SDFMask_octNormal_Diffuse.x = SDFMask_octNormal_Diffuse.x * SDFMask_octNormal_Diffuse.x;
-        SDFMask_octNormal_Diffuse.x = InTex4.x * SDFMask_octNormal_Diffuse.x;
-        InTex4.x = -0.5 + diffuse;
-        InTex4.x = saturate(InTex4.x + InTex4.x);
-        r4.z = InTex4.x * -2 + 3;
-        InTex4.x = InTex4.x * InTex4.x;
-        InTex4.x = r4.z * InTex4.x;
-        r9.xyz = cb1[262].xyz + -cb1[261].xyz;
-        r4.z = dot(abs(r9.xyz), float3(0.300000012,0.589999974,0.109999999));
-        r4.z = 10 * r4.z;
-        r4.z = min(1, r4.z);
-        r4.w = r4.z * -2 + 3;
-        r4.z = r4.z * r4.z;
-        r4.z = r4.w * r4.z;
-        r4.w = r4.z * InTex4.x;
-        r5.w = cb1[265].y + -cb1[265].x;
-        r6.w = shadow * cb1[253].y + -cb1[265].x;
-        r5.w = 1 / r5.w;
-        r6.w = saturate(r6.w * r5.w);
-        r7.w = r6.w * -2 + 3;
-        r6.w = r6.w * r6.w;
-        r6.w = r7.w * r6.w;
-        r6.w = r6.w * r4.w;
-        shadowColor_ShadeModeOutputMask.w = shadow * cb1[253].y + -r6.w;
-        shadowColor_ShadeModeOutputMask.w = cb1[265].z * shadowColor_ShadeModeOutputMask.w + r6.w;
-        r6.w = -cb1[265].x + shadowColor_ShadeModeOutputMask.w;
-        r5.w = saturate(r6.w * r5.w);
-        r6.w = r5.w * -2 + 3;
-        r5.w = r5.w * r5.w;
-        r5.w = r6.w * r5.w;
-        r4.w = r5.w * r4.w;
-        InTex4.x = InTex4.x * r4.z + -r4.w;
-        InTex4.x = cb1[265].z * InTex4.x + r4.w;
-        r4.z = shadowColor_ShadeModeOutputMask.w * r5.y;
-        r4.z = 10 * r4.z;
-        shadowColor_ShadeModeOutputMask.w = -1 + shadowColor_ShadeModeOutputMask.w;
-        shadowColor_ShadeModeOutputMask.w = cb1[260].y * shadowColor_ShadeModeOutputMask.w + 1;
-        r4.w = InTex4.w * InTex4.x + -shadowColor_ShadeModeOutputMask.w;
-        shadowColor_ShadeModeOutputMask.w = r5.x * r4.w + shadowColor_ShadeModeOutputMask.w;
-        r4.w = InTex4.w * InTex4.x + -InTex4.x;
-        r10.x = r5.x * r4.w + InTex4.x;
-        r5.xyw = float3(0.200000003,0.200000003,0.200000003) * cb1[261].xyz;
-        r9.xyz = cb1[262].xyz * float3(0.5,0.5,0.5) + -r5.xyw;
-        r5.xyw = shadowColor_ShadeModeOutputMask.www * r9.xyz + r5.xyw;
-        r5.xyw = cb1[260].xxx * r5.xyw;
-        r5.xyw = r5.xyw * albedo_ToonSkinMask.xyz;
-        r9.xyz = r5.xyw * shadowColor;
-        r11.xyz = cb1[261].xyz * albedo_ToonSkinMask.xyz;
-        SDFMask_octNormal_Diffuse.x = SDFMask_octNormal_Diffuse.x * 0.300000012 + 0.699999988;
-        r14.xyz = r11.xyz * SDFMask_octNormal_Diffuse.xxx;
-        r11.xyz = r11.xyz * SDFMask_octNormal_Diffuse.xxx + r9.xyz;
-        r9.xyz = r9.xyz * r4.zzz + r11.xyz;
-        r11.xyz = albedo_ToonSkinMask.xyz * cb1[262].xyz + -r14.xyz;
-        r11.xyz = r11.xyz * r10.xxx;
-        r11.xyz = r11.xyz * float3(0.400000006,0.400000006,0.400000006) + r14.xyz;
-        r5.xyw = r5.xyw * shadowColor + r11.xyz;
-        r11.xyz = albedo_ToonSkinMask.xyz * cb1[262].xyz + -r9.xyz;
-        r9.xyz = r10.xxx * r11.xyz + r9.xyz;
-        r9.xyz = r9.xyz + -r5.xyw;
-        r8.xyz = shadowColor_ShadeModeOutputMask.www * r9.xyz + r5.xyw;
+        float packedDataOutput = asfloat(tempUint1);
+        fragOutput.o0_GI.w = packedDataOutput * 0.00392156886; 
     }
-    SDFMask_octNormal_Diffuse.x = -0.400000006 + diffuse;
-    SDFMask_octNormal_Diffuse.x = saturate(10.000001 * SDFMask_octNormal_Diffuse.x);
-    SDFMask_octNormal_Diffuse.w = SDFMask_octNormal_Diffuse.x * -2 + 3;
-    SDFMask_octNormal_Diffuse.x = SDFMask_octNormal_Diffuse.x * SDFMask_octNormal_Diffuse.x;
-    r10.y = SDFMask_octNormal_Diffuse.w * SDFMask_octNormal_Diffuse.x;
-    r5.xyw = r8.xyz * float3(0.5,0.5,0.5) + cb1[261].xyz;
-    r5.xyw = r5.xyw * albedo_ToonSkinMask.xyz;
-    r9.xyz = cb1[261].xyz * albedo_ToonSkinMask.xyz;
-    r5.xyw = cb1[255].xxx ? r5.xyw : r9.xyz;
-    r9.xyz = SDFMask_octNormal_Diffuse.zzz ? r5.xyw : r14.xyz;
-    r5.xyw = SDFMask_octNormal_Diffuse.zzz ? r5.xyw : r8.xyz;
-    SDFMask_octNormal_Diffuse.xw = SDFMask_octNormal_Diffuse.zz ? float2(0,0) : r10.xy;
-    r8.xyz = cb1[264].xyz + cb1[264].xyz;
-    r8.xyz = SDFMask_octNormal_Diffuse.xxx * r8.xyz + -cb1[264].xyz;
-    r10.xyz = float3(0,0,0);
-    shadowColor_ShadeModeOutputMask.w = 1;
-    InTex4.x = 0;
-    while (true) {
-        r4.z = ((uint)InTex4.x >= asuint(cb2[128].x)) ? 1.0 : 0.0;
-        if (r4.z != 0) break;
-        bitmask.z = ((~(-1 << 29)) << 3) & 0xffffffff;  r4.z = (((uint)InTex4.x << 3) & bitmask.z) | ((uint)7 & ~bitmask.z);
-        bitmask.w = ((~(-1 << 3)) << 5) & 0xffffffff;  r4.w = (((uint)cb2[r4.z+0].w << 5) & bitmask.w) | ((uint)0 & ~bitmask.w);
-        r4.w = (int)r4.y & (int)r4.w;
-        if (r4.w == 0) {
-        r4.w = (int)InTex4.x + 1;
-        InTex4.x = r4.w;
-        continue;
+    else {
+        
+        finalSaturatedColor = finalSaturatedColor;
+        finalSaturatedColor = clamp(finalSaturatedColor, 0.0, 1.0);
+        fragOutput.o0_GI.xyz = sqrt(finalSaturatedColor.xyz);
+
+        float packedDataInput = cb2[23].w;
+        tempUint0 = asuint(packedDataInput);
+        {
+            uint mask = ~(((1u << 3) - 1) << 5);
+            tempUint0 = (12u & mask) | ((tempUint0 & 7u) << 5);
         }
-        r4.w = (uint)InTex4.x << 3;
-        r11.xyz = cb2[r4.w+0].xyz + -r6.xyz;
-        r6.w = cb2[r4.w+0].w * cb2[r4.w+0].w;
-        r7.w = dot(r11.xyz, r11.xyz);
-        r6.w = r7.w * r6.w;
-        r8.w = (1 >= r6.w) ? 1.0 : 0.0;
-        if (r8.w != 0) {
-        bitmask.x = ((~(-1 << 29)) << 3) & 0xffffffff;  r12.x = (((uint)InTex4.x << 3) & bitmask.x) | ((uint)1 & ~bitmask.x);
-        bitmask.y = ((~(-1 << 29)) << 3) & 0xffffffff;  r12.y = (((uint)InTex4.x << 3) & bitmask.y) | ((uint)2 & ~bitmask.y);
-        bitmask.z = ((~(-1 << 29)) << 3) & 0xffffffff;  r12.z = (((uint)InTex4.x << 3) & bitmask.z) | ((uint)3 & ~bitmask.z);
-        bitmask.w = ((~(-1 << 29)) << 3) & 0xffffffff;  r12.w = (((uint)InTex4.x << 3) & bitmask.w) | ((uint)4 & ~bitmask.w);
-        bitmask.x = ((~(-1 << 29)) << 3) & 0xffffffff;  r13.x = (((uint)InTex4.x << 3) & bitmask.x) | ((uint)5 & ~bitmask.x);
-        bitmask.y = ((~(-1 << 29)) << 3) & 0xffffffff;  r13.y = (((uint)InTex4.x << 3) & bitmask.y) | ((uint)6 & ~bitmask.y);
-        r6.w = saturate(r6.w * 2.5 + -1.5);
-        r8.w = r6.w * r6.w;
-        r6.w = -r6.w * 2 + 3;
-        r6.w = -r8.w * r6.w + 1;
-        r7.w = rsqrt(r7.w);
-        r14.xyz = r11.xyz * r7.www;
-        r7.w = dot(shadowColor_ShadeModeOutputMask.xyz, r14.xyz);
-        r7.w = 1 + r7.w;
-        r13.zw = cb2[r13.x+0].ww * float2(0.939999998,0.0600000024);
-        r7.w = r7.w * 0.5 + -r13.z;
-        r8.w = 1 / r13.w;
-        r7.w = saturate(r8.w * r7.w);
-        r8.w = r7.w * -2 + 3;
-        r7.w = r7.w * r7.w;
-        r7.w = r8.w * r7.w;
-        r7.w = min(1, r7.w);
-        r15.xyz = cb2[r13.y+0].xyz * r9.xyz;
-        r13.xzw = albedo_ToonSkinMask.xyz * cb2[r13.x+0].xyz + -r15.xyz;
-        r13.xzw = r7.www * r13.xzw + r15.xyz;
-        r13.xzw = cb2[r4.z+0].xxx * r13.xzw;
-        r11.xyz = cb2[r4.w+0].www * r11.xyz;
-        r4.w = dot(r11.xyz, r11.xyz);
-        r4.w = r4.w * cb2[r12.w+0].x + cb2[r12.w+0].y;
-        r4.w = 9.99999975e-005 + r4.w;
-        r4.w = 1 / r4.w;
-        r4.w = -1 + r4.w;
-        r4.w = cb2[r12.w+0].z * r4.w;
-        r4.w = r4.w * r4.w;
-        r4.w = min(1, r4.w);
-        if (4 == 0) r7.w = 0; else if (4+16 < 32) {       r7.w = (uint)cb2[r12.x+0].w << (32-(4 + 16)); r7.w = (uint)r7.w >> (32-4);      } else r7.w = (uint)cb2[r12.x+0].w >> 16;
-        r7.w = ((int)r7.w == 2) ? 1.0 : 0.0;
-        r8.w = dot(r14.xyz, cb2[r12.x+0].xyz);
-        r8.w = -cb2[r12.y+0].x + r8.w;
-        r8.w = saturate(cb2[r12.y+0].y * r8.w);
-        r8.w = r8.w * r8.w;
-        r8.w = r8.w * r8.w;
-        r8.w = r8.w * r4.w;
-        r4.w = r7.w ? r8.w : r4.w;
-        r7.w = dot(r8.xyz, r14.xyz);
-        r7.w = saturate(r7.w * 0.5 + 0.5);
-        r7.w = SDFMask_octNormal_Diffuse.w * r7.w + -SDFMask_octNormal_Diffuse.x;
-        r7.w = cb2[r12.w+0].w * r7.w + SDFMask_octNormal_Diffuse.x;
-        r11.xyz = cb2[r12.z+0].www * r9.xyz;
-        r12.xyw = -r9.xyz * cb2[r12.z+0].www + albedo_ToonSkinMask.xyz;
-        r11.xyz = r7.www * r12.xyw + r11.xyz;
-        r11.xyz = cb2[r12.z+0].xyz * r11.xyz;
-        r7.w = cb2[r12.z+0].x + cb2[r12.z+0].y;
-        r7.w = cb2[r12.z+0].z + r7.w;
-        r7.w = cb2[r4.z+0].x + r7.w;
-        r7.w = saturate(10 * r7.w);
-        r4.z = cb2[r4.z+0].y * r7.w;
-        r12.xyz = r13.xzw * r4.www;
-        r11.xyz = r11.xyz * r4.www + r12.xyz;
-        r6.w = r6.w + -r4.w;
-        r4.w = cb2[r13.y+0].w * r6.w + r4.w;
-        r10.xyz = r11.xyz * shadowColor_ShadeModeOutputMask.www + r10.xyz;
-        r4.z = -r4.w * r4.z + 1;
-        shadowColor_ShadeModeOutputMask.w = r4.z * shadowColor_ShadeModeOutputMask.w;
-        }
-        InTex4.x = (int)InTex4.x + 1;
+        float packedDataOutput = asfloat(tempUint0);
+        fragOutput.o0_GI.w = packedDataOutput * 0.00392156886;
     }
-    float3 finalColor = shadowColor_ShadeModeOutputMask.www * r5.xyw + r10.xyz;
-    bool useRim = ((int)r4.x != 13) ? 1.0 : 0.0;
-    float3 rimColor;
-    float3 finalRimColor;
-    if (useRim != 0) {
-        SDFMask_octNormal_Diffuse.x = ((int)r4.x == 1) ? 1.0 : 0.0;
-        SDFMask_octNormal_Diffuse.x = SDFMask_octNormal_Diffuse.x ? InTex4.z : InTex4.y;
-        InTex4.xyz = cb1[67].xyz + -r6.xyz;
-        SDFMask_octNormal_Diffuse.w = dot(InTex4.xyz, InTex4.xyz);
-        SDFMask_octNormal_Diffuse.w = rsqrt(SDFMask_octNormal_Diffuse.w);
-        InTex4.xyz = InTex4.xyz * SDFMask_octNormal_Diffuse.www;
-        SDFMask_octNormal_Diffuse.w = saturate(-0.100000001 + SDFMask_octNormal_Diffuse.x);
-        SDFMask_octNormal_Diffuse.x = saturate(10 * SDFMask_octNormal_Diffuse.x);
-        shadowColor_ShadeModeOutputMask.w = SDFMask_octNormal_Diffuse.w * 2000 + 50;
-        r4.x = SDFMask_octNormal_Diffuse.w + SDFMask_octNormal_Diffuse.w;
-        SDFMask_octNormal_Diffuse.x = cb0[0].x * SDFMask_octNormal_Diffuse.x;
-        SDFMask_octNormal_Diffuse.x = SDFMask_octNormal_Diffuse.x * 0.800000012 + r4.x;
-        r5.xyw = cb1[21].xyz * shadowColor_ShadeModeOutputMask.yyy;
-        r5.xyw = shadowColor_ShadeModeOutputMask.xxx * cb1[20].xyz + r5.xyw;
-        r5.xyw = shadowColor_ShadeModeOutputMask.zzz * cb1[22].xyz + r5.xyw;
-        r4.x = asint(cb0[0].w);
-        r4.x = (0.5 < r4.x) ? 1.0 : 0.0;
-        InTex4.xyz = r4.xxx ? float3(0,0,0) : InTex4.xyz;
-        r6.xy = r4.xx ? cb0[0].yz : cb1[264].xy;
-        r6.z = r4.x ? 0.5 : cb1[264].z;
-        shadowColor_ShadeModeOutputMask.xyz = r4.xxx ? r5.xyw : shadowColor_ShadeModeOutputMask.xyz;
-        r4.x = dot(r6.xyz, shadowColor_ShadeModeOutputMask.xyz);
-        r8.xy = float2(0.200000003,1) + r4.xx;
-        r4.x = 5 * r8.x;
-        r4.x = saturate(r4.x);
-        r5.w = r4.x * -2 + 3;
-        r4.x = r4.x * r4.x;
-        r4.x = r5.w * r4.x;
-        r8.xzw = r6.xyz + InTex4.xyz;
-        r5.w = dot(r8.xzw, r8.xzw);
-        r5.w = rsqrt(r5.w);
-        r8.xzw = r8.xzw * r5.www;
-        r5.w = saturate(dot(shadowColor_ShadeModeOutputMask.xyz, r8.xzw));
-        r5.w = r5.w * r5.w;
-        r5.w = r5.w * -0.800000012 + 1;
-        r5.w = r5.w * r5.w;
-        r5.w = 3.14159274 * r5.w;
-        r5.w = 0.200000003 / r5.w;
-        r5.w = r5.w * InTex4.w;
-        r6.x = dot(r6.xyz, InTex4.xyz);
-        r6.xy = float2(-0.5,1) + -r6.xx;
-        r6.x = saturate(r6.x + r6.x);
-        r6.z = r6.x * -2 + 3;
-        r6.x = r6.x * r6.x;
-        r6.x = r6.z * r6.x + 1;
-        shadowColor_ShadeModeOutputMask.x = saturate(dot(InTex4.xyz, shadowColor_ShadeModeOutputMask.xyz));
-        shadowColor_ShadeModeOutputMask.x = 0.800000012 + -shadowColor_ShadeModeOutputMask.x;
-        shadowColor_ShadeModeOutputMask.x = max(0, shadowColor_ShadeModeOutputMask.x);
-        shadowColor_ShadeModeOutputMask.y = max(0, cb1[133].x);
-        shadowColor_ShadeModeOutputMask.y = min(1.74532926, shadowColor_ShadeModeOutputMask.y);
-        shadowColor_ShadeModeOutputMask.xy = float2(1.5,0.572957814) * shadowColor_ShadeModeOutputMask.xy;
-        shadowColor_ShadeModeOutputMask.z = max(0, albedo_ToonSkinMask.w);
-        InTex4.xy = min(float2(3000,50), shadowColor_ShadeModeOutputMask.zz);
-        InTex4.xy = float2(3000,50) + -InTex4.xy;
-        InTex4.xy = float2(0.00033333333,0.0199999996) * InTex4.xy;
-        shadowColor_ShadeModeOutputMask.z = InTex4.x * InTex4.x;
-        shadowColor_ShadeModeOutputMask.z = shadowColor_ShadeModeOutputMask.z * shadowColor_ShadeModeOutputMask.z;
-        shadowColor_ShadeModeOutputMask.z = shadowColor_ShadeModeOutputMask.z * shadowColor_ShadeModeOutputMask.z + InTex4.y;
-        shadowColor_ShadeModeOutputMask.z = -1 + shadowColor_ShadeModeOutputMask.z;
-        shadowColor_ShadeModeOutputMask.y = shadowColor_ShadeModeOutputMask.y * shadowColor_ShadeModeOutputMask.z + 1;
-        shadowColor_ShadeModeOutputMask.z = 1 + -shadowColor_ShadeModeOutputMask.y;
-        shadowColor_ShadeModeOutputMask.y = SDFMask_octNormal_Diffuse.w * shadowColor_ShadeModeOutputMask.z + shadowColor_ShadeModeOutputMask.y;
-        shadowColor_ShadeModeOutputMask.z = r8.y * 0.25 + 0.5;
-        shadowColor_ShadeModeOutputMask.x = shadowColor_ShadeModeOutputMask.z * shadowColor_ShadeModeOutputMask.x;
-        shadowColor_ShadeModeOutputMask.x = shadowColor_ShadeModeOutputMask.x * shadowColor_ShadeModeOutputMask.y;
-        shadowColor_ShadeModeOutputMask.x = shadowColor_ShadeModeOutputMask.x * r6.x;
-        shadowColor_ShadeModeOutputMask.x = 0.00999999978 * shadowColor_ShadeModeOutputMask.x;
-        InTex4.xy = float2(9.99999975e-005,9.99999975e-005) + r5.xy;
-        shadowColor_ShadeModeOutputMask.z = dot(InTex4.xy, InTex4.xy);
-        shadowColor_ShadeModeOutputMask.z = rsqrt(shadowColor_ShadeModeOutputMask.z);
-        InTex4.xy = InTex4.xy * shadowColor_ShadeModeOutputMask.zz;
-        InTex4.xy = InTex4.xy * SDFMask_octNormal_Diffuse.xx;
-        InTex4.z = InTex4.y * shadowColor_ShadeModeOutputMask.x;
-        shadowColor_ShadeModeOutputMask.y = -0.5;
-        shadowColor_ShadeModeOutputMask.xy = InTex4.xz * shadowColor_ShadeModeOutputMask.xy;
-        SDFMask_octNormal_Diffuse.x = 0.400000006 * r6.y;
-        shadowColor_ShadeModeOutputMask.z = r4.x * 0.800000012 + 0.200000003;
-        InTex4.x = r5.w * r4.x;
-        InTex4.x = 1.5 * InTex4.x;
-        SDFMask_octNormal_Diffuse.x = SDFMask_octNormal_Diffuse.x * shadowColor_ShadeModeOutputMask.z + InTex4.x;
-        shadowColor_ShadeModeOutputMask.z = InTex4.w * 0.5 + 0.5;
-        SDFMask_octNormal_Diffuse.x = shadowColor_ShadeModeOutputMask.z * SDFMask_octNormal_Diffuse.x;
-        InTex4.xy = v0.xy * cb1[138].xy + -cb1[134].xy;
-        shadowColor_ShadeModeOutputMask.xy = InTex4.xy * cb1[135].zw + shadowColor_ShadeModeOutputMask.xy;
-        shadowColor_ShadeModeOutputMask.xy = shadowColor_ShadeModeOutputMask.xy * cb1[135].xy + cb1[134].xy;
-        shadowColor_ShadeModeOutputMask.xy = cb1[138].zw * shadowColor_ShadeModeOutputMask.xy;
-        linearDepth = tex2D(_IN6, shadowColor_ShadeModeOutputMask.xy).x;
-        shadowColor_ShadeModeOutputMask.y = linearDepth * cb1[65].x + cb1[65].y;
-        shadowColor_ShadeModeOutputMask.x = linearDepth * cb1[65].z + -cb1[65].w;
-        shadowColor_ShadeModeOutputMask.x = 1 / shadowColor_ShadeModeOutputMask.x;
-        shadowColor_ShadeModeOutputMask.x = shadowColor_ShadeModeOutputMask.y + shadowColor_ShadeModeOutputMask.x;
-        shadowColor_ShadeModeOutputMask.x = shadowColor_ShadeModeOutputMask.x + -albedo_ToonSkinMask.w;
-        shadowColor_ShadeModeOutputMask.x = max(9.99999975e-005, shadowColor_ShadeModeOutputMask.x);
-        SDFMask_octNormal_Diffuse.w = -SDFMask_octNormal_Diffuse.w * 1000 + shadowColor_ShadeModeOutputMask.x;
-        shadowColor_ShadeModeOutputMask.x = 1 / shadowColor_ShadeModeOutputMask.w;
-        SDFMask_octNormal_Diffuse.w = saturate(shadowColor_ShadeModeOutputMask.x * SDFMask_octNormal_Diffuse.w);
-        shadowColor_ShadeModeOutputMask.x = SDFMask_octNormal_Diffuse.w * -2 + 3;
-        SDFMask_octNormal_Diffuse.w = SDFMask_octNormal_Diffuse.w * SDFMask_octNormal_Diffuse.w;
-        SDFMask_octNormal_Diffuse.w = shadowColor_ShadeModeOutputMask.x * SDFMask_octNormal_Diffuse.w;
-        SDFMask_octNormal_Diffuse.w = min(1, SDFMask_octNormal_Diffuse.w);
-        shadowColor_ShadeModeOutputMask.x = dot(cb1[263].xyz, float3(0.300000012,0.589999974,0.109999999));
-        shadowColor_ShadeModeOutputMask.yzw = cb1[263].xyz + -shadowColor_ShadeModeOutputMask.xxx;
-        shadowColor_ShadeModeOutputMask.xyz = shadowColor_ShadeModeOutputMask.yzw * float3(0.75,0.75,0.75) + shadowColor_ShadeModeOutputMask.xxx;
-        InTex4.xyz = cb1[263].xyz + -shadowColor_ShadeModeOutputMask.xyz;
-        shadowColor_ShadeModeOutputMask.xyz = InTex4.www * InTex4.xyz + shadowColor_ShadeModeOutputMask.xyz;
-        shadowColor_ShadeModeOutputMask.xyz = shadowColor_ShadeModeOutputMask.xyz * SDFMask_octNormal_Diffuse.xxx;
-        shadowColor_ShadeModeOutputMask.xyz = float3(0.100000001,0.100000001,0.100000001) * shadowColor_ShadeModeOutputMask.xyz;
-        InTex4.xyz = float3(1,1,1) + albedo_ToonSkinMask.xyz;
-        InTex4.xyz = InTex4.xyz * shadowColor_ShadeModeOutputMask.xyz;
-        r5.xyw = albedo_ToonSkinMask.xyz * float3(1.20000005,1.20000005,1.20000005) + float3(-1,-1,-1);
-        r5.xyw = saturate(-r5.xyw);
-        r6.xyz = r5.xyw * float3(-2,-2,-2) + float3(3,3,3);
-        r5.xyw = r5.xyw * r5.xyw;
-        r5.xyw = r6.xyz * r5.xyw;
-        r5.xyw = r5.xyw * float3(14,14,14) + float3(1,1,1);
-        shadowColor_ShadeModeOutputMask.xyz = r5.xyw * shadowColor_ShadeModeOutputMask.xyz;
-        shadowColor_ShadeModeOutputMask.xyz = shadowColor_ShadeModeOutputMask.xyz * albedo_ToonSkinMask.xyz + -InTex4.xyz;
-        shadowColor_ShadeModeOutputMask.xyz = cb1[260].zzz * shadowColor_ShadeModeOutputMask.xyz + InTex4.xyz;
-        shadowColor_ShadeModeOutputMask.xyz = shadowColor_ShadeModeOutputMask.xyz * SDFMask_octNormal_Diffuse.www;
-        SDFMask_octNormal_Diffuse.x = -10000 + albedo_ToonSkinMask.w;
-        SDFMask_octNormal_Diffuse.x = max(0, SDFMask_octNormal_Diffuse.x);
-        SDFMask_octNormal_Diffuse.x = min(5000, SDFMask_octNormal_Diffuse.x);
-        SDFMask_octNormal_Diffuse.x = 5000 + -SDFMask_octNormal_Diffuse.x;
-        SDFMask_octNormal_Diffuse.x = 0.000199999995 * SDFMask_octNormal_Diffuse.x;
-        shadowColor_ShadeModeOutputMask.xyz = SDFMask_octNormal_Diffuse.xxx * shadowColor_ShadeModeOutputMask.xyz;
-        finalRimColor.xyz = cb0[1].xyz * shadowColor_ShadeModeOutputMask.xyz;
-    } else {
-        finalRimColor.xyz = float3(0,0,0);
-    }
-    SDFMask_octNormal_Diffuse.x = (0 != r5.z) ? 1.0 : 0.0;
-    albedo_ToonSkinMask.xyz = finalColor * shadowColor;
-    albedo_ToonSkinMask.xyz = cb1[263].xyz * albedo_ToonSkinMask.xyz;
-    albedo_ToonSkinMask.xyz = albedo_ToonSkinMask.xyz * float3(0.5,0.5,0.5) + -finalColor;
-    albedo_ToonSkinMask.xyz = SDFMask_octNormal_Diffuse.www * albedo_ToonSkinMask.xyz + finalColor;
-    shadowColor_ShadeModeOutputMask.xyz = finalColor + finalRimColor.xyz;
-    shadowColor_ShadeModeOutputMask.xyz = SDFMask_octNormal_Diffuse.xxx ? albedo_ToonSkinMask.xyz : shadowColor_ShadeModeOutputMask.xyz;
-    SDFMask_octNormal_Diffuse.xzw = SDFMask_octNormal_Diffuse.zzz ? finalColor : shadowColor_ShadeModeOutputMask.xyz;
-    SDFMask_octNormal_Diffuse.xyz = SDFMask_octNormal_Diffuse.xzw / EyeAdaptation;
-    SDFMask_octNormal_Diffuse.xyz = min(float3(0,0,0), -SDFMask_octNormal_Diffuse.xyz);
-    color.xyz = -SDFMask_octNormal_Diffuse.xyz;
-    return color;
+    
+    // debug用 不要删
+    fragOutput.o0_GI = pow(fragOutput.o0_GI, 5);
+    return fragOutput;
+    
+    fragOutput.o1_Normal_Diffuse_FaceSDFMask = float4(0.0, 0.0, 0.0, 0.0);
+    fragOutput.o2_ShadowColor_PackShadeMode_OutputMask = float4(0.0, 0.0, 0.0, 0.0);
+    fragOutput.o3_BaseColor_ToonSkinMask = float4(0.0, 0.0, 0.0, 0.0);
+    fragOutput.o4 = float4(0.0, 0.0, 0.0, 0.0);
+    fragOutput.o5_RimDepth = float4(0.0, 0.0, 0.0, 0.0);
+    fragOutput.o6_rimStrength_HSVPack_groundSpec_charRegion = float4(0.0, 0.0, 0.0, 0.0);
+    
+    return fragOutput;
 }
-B:
-
-// struct Varyings
-// {
-//     float4 positionCS   : SV_POSITION;  // 裁剪空间位置
-//     float4 uv           : TEXCOORD0;    // UV坐标
-//     
-//     // TBN 矩阵的三个轴，在世界空间中
-//     float3 normalWS     : TEXCOORD1;    // 世界空间法线
-//     float3 tangentWS    : TEXCOORD2;    // 世界空间切线
-//     float3 bitangentWS  : TEXCOORD3;    // 世界空间副切线
-//     
-//     float3 lightDirWS   : TEXCOORD4;    // 世界空间主光源方向
-//     float3 viewDirWS    : TEXCOORD5;    // 世界空间视角方向
-// };
-FragOutput frag (Varyings fragmentInput)
-{
-    // 根据反编译代码输入调整输入结构
-    float3 v0 = fragmentInput.tangentWS; // 您的指定映射
-    float4 v9 = fragmentInput.positionCS; // SV_Position -> v9
-    float4 v2 = fragmentInput.uv; // TEXCOORD0 -> v2
-
-    // 为缺失的、但在代码中使用的输入变量提供定义以修复语法错误
-    float4 v1 = 0;
-    v1.xyz = fragmentInput.bitangentWS;
-    float4 v6 = 0;
-    float2 v7 = 0;
-    float4 v8 = 0;
-    
-    // 声明输出结构和内部变量
-    FragOutput fragOutput = (FragOutput)0;
-    float4 o0_GI, o1_Normal_Diffuse_FaceSDFMask, o2_ShadowColor_PackShadeMode_OutputMask, o3_BaseColor_ToonSkinMask, o4, o5_RimDepth, o6_rimStrength_HSVPack_groundSpec_charRegion;
-    float4 r0,r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11,r12;
-    uint4 bitmask, uiDest;
-    float4 fDest;
-
-// ---- 移植自反编译代码 ----
-
-  r0.xyz = v1.zxy * v0.yzx;
-  r0.xyz = v1.yzx * v0.zxy + -r0.xyz;
-  r0.xyz = v1.www * r0.xyz;
-  r1.xyzw = cb0[45].xyzw * v9.yyyy;
-  r1.xyzw = v9.xxxx * cb0[44].xyzw + r1.xyzw;
-  r1.xyzw = v9.zzzz * cb0[46].xyzw + r1.xyzw;
-  r1.xyzw = cb0[47].xyzw + r1.xyzw;
-  r1.xyz = r1.xyz / r1.www;
-  r0.w = dot(-r1.xyz, -r1.xyz);
-  r0.w = rsqrt(r0.w);
-  r2.xyz = -r1.xyz * r0.www;
-  r3.xyzw = _IN0.SampleBias(sampler_IN0, v2.xy, cb0[149].y).xyzw;
-  r3.xy = r3.xy * float2(2,2) + float2(-1,-1);
-  r3.xy = cb4[64].ww * r3.xy;
-  r0.xyz = r3.yyy * r0.xyz;
-  r0.xyz = r3.xxx * v0.xyz + r0.xyz;
-  r0.xyz = v1.xyz + r0.xyz;
-  r1.w = 1 + -cb0[144].w;
-  r4.xyz = v1.xyz * r1.www;
-  r0.xyz = r0.xyz * cb0[144].www + r4.xyz;
-  r1.w = dot(r0.xyz, r0.xyz);
-  r1.w = rsqrt(r1.w);
-  r0.xyz = r1.www * r0.xyz;
-  r3.xy = _IN1.SampleLevel(sampler_IN1, v2.xy, cb0[149].y).xy;
-  r4.xyzw = (r3.xxxx >= float4(0.0500000007,0.300000012,0.5,0.899999976));
-  r4.xyzw = r4.xyzw ? float4(1,1,1,1) : 0;
-  r5.xyzw = (float4(0.0500000007,0.300000012,0.5,0.899999976) >= r3.xxxx);
-  r5.yzw = r5.yzw ? float3(1,1,1) : 0;
-  r4.yz = r5.zw * r4.yz;
-  r1.w = -r4.x * r5.y + 1;
-  r1.w = r5.x ? 1 : r1.w;
-  r1.w = -r4.y * r1.w + 1;
-  r2.w = r4.z * r1.w;
-  r1.w = -r4.z * r1.w + 1;
-  r1.w = r4.w * r1.w;
-  r3.x = (cb4[65].y >= 0.5);
-  r1.w = r3.x ? r1.w : cb4[65].x;
-  r3.x = 1 + -r1.w;
-  r1.w = cb4[65].z * r3.x + r1.w;
-  r4.xyz = float3(-1,-1,-1) + cb4[4].xyz;
-  r4.xyz = r1.www * r4.xyz + float3(1,1,1);
-  r5.xyzw = _IN2.SampleBias(sampler_IN2, v2.xy, cb0[149].y).xyzw;
-  r5.xyz = cb4[6].xyz * r5.xyz;
-  r6.xyz = r5.xyz * r4.xyz;
-  r3.x = cb4[65].w * r3.z;
-  r3.z = cb4[66].x * r3.w;
-  r4.w = saturate(dot(r0.xyz, r2.xyz));
-  r6.w = (2.98023295e-008 >= r3.z);
-  r7.x = log2(r3.z);
-  r7.x = 0.100000001 * r7.x;
-  r7.x = exp2(r7.x);
-  r6.w = r6.w ? 0 : r7.x;
-  r7.x = 1 + -r6.w;
-  r7.x = r7.x * 19.8999996 + 0.100000001;
-  r6.w = r6.w * -999 + 1000;
-  r7.y = (r3.x >= 0.850000024);
-  r7.y = r7.y ? 1.000000 : 0;
-  r7.z = cb4[66].y + -cb4[66].z;
-  r7.z = r7.y * r7.z + cb4[66].z;
-  r8.xyz = -cb3[36].xyz + cb3[17].xyz;
-  r8.xyz = cb4[67].yyy * r8.xyz;
-  r7.w = (cb4[66].w >= 0.5);
-  r7.w = r7.w ? 1.000000 : 0;
-  r8.xyz = r7.www * r8.xyz + cb3[36].xyz;
-  r7.w = dot(r8.xyz, r8.xyz);
-  r7.w = sqrt(r7.w);
-  r8.xyz = r8.xyz / r7.www;
-  r9.xyz = cb4[8].xyz + cb2[5].xyz;
-  r10.xyz = cb1[0].xyz + -r9.xyz;
-  r7.w = dot(r10.xyz, r10.xyz);
-  r7.w = sqrt(r7.w);
-  r10.xyz = r10.xyz / r7.www;
-  r9.xyz = -cb1[0].xyz + r9.xyz;
-  r7.w = dot(r9.xyz, r9.xyz);
-  r7.w = sqrt(r7.w);
-  r7.w = saturate(cb1[0].w * r7.w);
-  r9.xyz = -r10.xyz + r8.xyz;
-  r9.xyz = r7.www * r9.xyz + r10.xyz;
-  r9.xyz = r9.xyz + -r8.xyz;
-  r8.xyz = cb1[1].zzz * r9.xyz + r8.xyz;
-  r7.w = saturate(cb2[27].y);
-  r9.xy = v6.xy;
-  r9.z = v7.x;
-  r9.xyz = r9.xyz + -r8.xyz;
-  r8.xyz = r7.www * r9.xyz + r8.xyz;
-  r7.w = dot(r8.xyz, r8.xyz);
-  r7.w = sqrt(r7.w);
-  r8.xyz = r8.xyz / r7.www;
-  r2.x = dot(r8.xyz, r2.xyz);
-  r2.y = 1 + -abs(r2.z);
-  r2.x = r2.x * r2.y + 1;
-  r2.x = 0.5 * r2.x;
-  r2.y = -cb4[68].x + cb4[67].w;
-  r2.x = r2.x * r2.y + cb4[68].x;
-  r2.y = 1 + -r4.w;
-  r2.x = r2.x * r2.y + cb4[68].y;
-  r2.y = -cb4[68].z + r2.x;
-  r2.z = cb4[68].z + r2.x;
-  r4.w = cb4[68].w * r5.w;
-  r5.w = max(0, r4.w);
-  r5.w = min(cb4[69].x, r5.w);
-  r5.w = r5.w / cb4[69].x;
-  r7.w = max(cb4[69].y, r4.w);
-  r7.w = min(1, r7.w);
-  r7.w = -cb4[69].y + r7.w;
-  r9.xy = float2(1,1) + -cb4[69].yz;
-  r7.w = r7.w / r9.x;
-  r8.w = -cb4[69].z + r5.w;
-  r9.x = 1 / r9.y;
-  r8.w = saturate(r9.x * r8.w);
-  r9.x = r8.w * -2 + 3;
-  r8.w = r8.w * r8.w;
-  r8.w = r9.x * r8.w;
-  r8.w = cb4[69].w * r8.w;
-  r9.x = (2.98023295e-008 >= r8.w);
-  r8.w = log2(r8.w);
-  r8.w = cb4[70].x * r8.w;
-  r8.w = exp2(r8.w);
-  r8.w = cb4[70].y * r8.w;
-  r8.w = r9.x ? 0 : r8.w;
-  r9.x = dot(r0.xyz, r8.xyz);
-  r8.w = r9.x * 0.5 + r8.w;
-  r8.w = 0.5 + r8.w;
-  r2.z = r2.z + -r2.y;
-  r2.y = r8.w + -r2.y;
-  r2.z = 1 / r2.z;
-  r2.y = saturate(r2.y * r2.z);
-  r2.z = r2.y * -2 + 3;
-  r2.y = r2.y * r2.y;
-  r2.y = r2.z * r2.y;
-  r2.z = min(cb4[69].z, r5.w);
-  r2.z = r2.z / cb4[70].z;
-  r5.w = max(0.899999976, r2.z);
-  r5.w = min(1, r5.w);
-  r5.w = -0.899999976 + r5.w;
-  r2.y = r5.w * r2.y;
-  r5.w = (r2.y >= 0.0400000066);
-  r9.x = r5.w ? 1.000000 : 0;
-  r9.yzw = r9.xxx * r8.xyz;
-  r9.yzw = float3(2,2,0) * r9.yzw;
-  r9.yzw = r8.xyz * float3(-1,-1,1) + r9.yzw;
-  r9.yzw = -r1.xyz * r0.www + r9.yzw;
-  r10.x = dot(r9.yzw, r9.yzw);
-  r10.x = sqrt(r10.x);
-  r9.yzw = r9.yzw / r10.xxx;
-  r9.y = saturate(dot(r9.yzw, r0.xyz));
-  r8.xyz = -r1.xyz * r0.www + r8.xyz;
-  r0.w = dot(r8.xyz, r8.xyz);
-  r0.w = sqrt(r0.w);
-  r8.xyz = r8.xyz / r0.www;
-  r0.w = saturate(dot(r0.xyz, r8.xyz));
-  r0.w = r0.w + -r9.y;
-  r0.w = r7.y * r0.w + r9.y;
-  r0.w = log2(r0.w);
-  r0.w = r6.w * r0.w;
-  r0.w = exp2(r0.w);
-  r0.w = r0.w * r7.z;
-  r6.w = 2 + r7.z;
-  r0.w = r6.w * r0.w;
-  r0.w = r0.w * 0.159154937 + -0.600000024;
-  r0.w = saturate(0.833333373 * r0.w);
-  r6.w = r0.w * -2 + 3;
-  r0.w = r0.w * r0.w;
-  r0.w = r6.w * r0.w;
-  r0.w = r7.x * r0.w;
-  r6.w = r3.x * 0.5 + 0.5;
-  r8.xyz = r6.xyz * r3.xxx;
-  r6.w = 0.0799999982 * r6.w;
-  r9.yzw = r4.xyz * r5.xyz + -r6.www;
-  r9.yzw = r3.xxx * r9.yzw + r6.www;
-  r10.xyzw = r3.zzzz * float4(-1,-0.0274999999,-0.572000027,0.0219999999) + float4(1,0.0425000004,1.03999996,-0.0399999991);
-  r3.x = r10.x * r10.x;
-  r3.x = min(0.00160857651, r3.x);
-  r3.x = r3.x * r10.x + r10.y;
-  r7.xz = r3.xx * float2(-1.03999996,1.03999996) + r10.zw;
-  r3.x = saturate(50 * r9.z);
-  r3.x = r7.z * r3.x;
-  r10.xyz = r9.yzw * r7.xxx + r3.xxx;
-  r9.yzw = cb4[71].xxx * r9.yzw;
-  r11.xyz = r9.yzw * r0.www;
-  r10.xyz = cb4[71].xxx * r10.xyz;
-  r8.xyz = cb4[71].xxx * -r8.xyz + r6.xyz;
-  r11.xyz = r11.xyz * r7.yyy;
-  r11.xyz = cb4[71].yyy * r11.xyz;
-  r2.w = max(r1.w, r2.w);
-  r2.w = 1 + -r2.w;
-  r3.x = -r3.w * cb4[66].x + 1;
-  r3.x = (r3.x >= 0.00999999978);
-  r3.x = r3.x ? 1.000000 : 0;
-  r2.w = r3.x * r2.w;
-  r7.xzw = r7.www * r6.xyz;
-  r7.xzw = cb4[10].xyz * r7.xzw;
-  r7.xzw = r2.www * r11.xyz + r7.xzw;
-  r7.xzw = v7.yyy * cb4[45].xyz + r7.xzw;
-  r11.xyz = cb4[46].xyz + -r7.xzw;
-  r7.xzw = cb4[83].yyy * r11.xyz + r7.xzw;
-  r8.xyz = r9.yzw * r0.www + r8.xyz;
-  r11.xyzw = cb0[13].yzzx * r1.yyyy;
-  r11.xyzw = r1.xxxx * cb0[12].yzzx + r11.xyzw;
-  r11.xyzw = r1.zzzz * cb0[14].yzzx + r11.xyzw;
-  r11.xyzw = cb0[15].yzzx + r11.xyzw;
-  r0.w = dot(r11.xzw, r11.xzw);
-  r0.w = sqrt(r0.w);
-  r11.xyzw = r11.xyzw / r0.wwww;
-  r12.xyzw = cb0[13].zxyz * r0.yyyy;
-  r12.xyzw = r0.xxxx * cb0[12].zxyz + r12.xyzw;
-  r12.xyzw = r0.zzzz * cb0[14].zxyz + r12.xyzw;
-  r3.xw = r12.zw * r11.zw;
-  r3.xw = r11.yx * r12.yx + -r3.wx;
-  r3.xw = r3.xw * float2(0.5,0.5) + float2(0.5,0.5);
-  r11.xyzw = _IN3.SampleBias(sampler_IN3, r3.xw, cb0[149].y).xyzw;
-  r0.w = 3 * r3.z;
-  r0.w = saturate(r0.w);
-  r3.x = r11.y + -r11.x;
-  r0.w = r0.w * r3.x + r11.x;
-  r3.xz = saturate(r3.zz * float2(3,3) + float2(-1,-2));
-  r3.w = r11.z + -r0.w;
-  r0.w = r3.x * r3.w + r0.w;
-  r3.x = r11.w + -r0.w;
-  r0.w = r3.z * r3.x + r0.w;
-  r3.x = cb4[83].z + -cb4[83].w;
-  r3.x = r7.y * r3.x + cb4[83].w;
-  r3.z = r5.w ? 0 : 1;
-  r3.w = r3.x * r3.z;
-  r5.w = cb4[84].x + -cb4[83].w;
-  r5.w = r7.y * r5.w + cb4[83].w;
-  r3.x = -r3.x * r3.z + r5.w;
-  r3.x = r9.x * r3.x + r3.w;
-  r0.w = r3.x * r0.w;
-  r3.xzw = r10.xyz * r0.www + r8.xyz;
-  r3.xzw = -r4.xyz * r5.xyz + r3.xzw;
-  r3.xzw = r2.www * r3.xzw + r6.xyz;
-  r4.xyz = cb4[84].zzz * r3.xzw;
-  r0.w = max(0, r8.w);
-  r0.w = min(cb4[85].z, r0.w);
-  r2.w = r8.w + -r0.w;
-  r0.w = r2.z * r2.w + r0.w;
-  r0.w = 0.5 + r0.w;
-  r5.x = saturate(r0.w + -r2.x);
-  r0.w = 0.100000001 + -cb4[85].w;
-  r5.y = r1.w * r0.w + cb4[85].w;
-  r5.xyz = _IN4.SampleBias(sampler_IN4, r5.xy, cb0[149].y).xyz;
-  r0.w = (cb3[1].w >= 0.0500000007);
-  r0.w = r0.w ? 1.000000 : 0;
-  r0.w = r3.y * r0.w;
-  r3.xyz = -cb4[84].zzz * r3.xzw + r5.xyz;
-  r6.xyz = r4.xyz + r4.xyz;
-  r3.xyz = r0.www * r3.xyz + r6.xyz;
-  r3.xyz = r3.xyz * float3(0.5,0.5,0.5) + -r4.xyz;
-  r3.xyz = r1.www * r3.xyz + r4.xyz;
-  r2.x = dot(r3.xyz, float3(0.300000012,0.589999974,0.109999999));
-  r4.xyz = r2.xxx + -r3.xyz;
-  o3_BaseColor_ToonSkinMask.xyz = cb4[86].xxx * r4.xyz + r3.xyz;
-  r3.xyz = -cb4[62].xyz + cb4[61].xyz;
-  r3.xyz = r1.www * r3.xyz + cb4[62].xyz;
-  r4.xyz = r5.xyz + -r3.xyz;
-  r3.xyz = r0.www * r4.xyz + r3.xyz;
-  r0.w = dot(r3.xyz, float3(0.300000012,0.589999974,0.109999999));
-  r4.xyz = r0.www + -r3.xyz;
-  r3.xyz = cb4[86].xxx * r4.xyz + r3.xyz;
-  r0.w = 1 + -r2.z;
-  r0.w = -r0.w * cb4[94].y + 1;
-  r2.x = r2.y * 4.99999905 + 0.5;
-  r0.w = r2.x * r0.w;
-  r2.x = asint(cb2[26].w) & 1;
-  r2.x = (0 < (uint)r2.x);
-  r2.y = (asint(cb0[160].x) != 0);
-  r2.x = (int)r2.y | (int)r2.x;
-  if (r2.x != 0) {
-    r2.xy = -cb0[134].xy + v9.xy;
-    r2.xy = r2.xy * cb0[135].zw + float2(-0.5,-0.5);
-    r2.xy = v9.ww * r2.xy;
-    r2.zw = v9.zw;
-    r5.xyw = float3(2,-2,1);
-    r5.z = v9.w;
-    r2.xyzw = r5.xyzw * r2.xyzw;
-    r2.xyz = r2.zxy / r2.www;
-    r2.yz = -cb0[131].xy + r2.yz;
-    r4.xyz = v8.zxy / v8.www;
-    r4.yz = -cb0[131].zw + r4.yz;
-    r2.xyz = -r4.xyz + r2.xyz;
-    r5.xy = r2.yz * float2(0.249500006,0.249500006) + float2(0.499992371,0.499992371);
-    r2.y = (uint)r2.x >> 16;
-    r2.y = (uint)r2.y;
-    r2.y = r2.y * 1.52590219e-005 + 1.52590223e-006;
-    r2.x = (int)r2.x & 0x0000ffff;
-    r2.x = (uint)r2.x;
-    r2.x = r2.x * 1.52590219e-005 + 1.52590223e-006;
-    r5.zw = min(float2(1,1), r2.yx);
-    r2.x = (cb2[20].w == 0.000000);
-    r2.y = (asint(cb0[160].x) == 0);
-    r2.x = r2.y ? r2.x : 0;
-    o4.xyzw = r2.xxxx ? float4(0,0,0,0) : r5.xyzw;
-  } else {
-    o4.xyzw = float4(0,0,0,0);
-  }
-  r2.xyz = max(float3(0,0,0), r7.xzw);
-  r2.w = (0 < cb0[146].x);
-  if (r2.w != 0) {
-    r1.xyz = -cb0[70].xyz + r1.xyz;
-    r4.xyz = -cb2[5].xyz + r1.xyz;
-    r5.xyz = float3(1,1,1) + cb2[19].xyz;
-    r4.xyz = (r5.xyz < abs(r4.xyz));
-    r2.w = (int)r4.y | (int)r4.x;
-    r2.w = (int)r4.z | (int)r2.w;
-    r1.x = dot(r1.xyz, float3(0.577000022,0.577000022,0.577000022));
-    r1.x = 0.00200000009 * r1.x;
-    r1.x = frac(r1.x);
-    r1.x = (0.5 < r1.x);
-    r1.xyz = r1.xxx ? float3(0,1,1) : float3(1,1,0);
-    r2.xyz = r2.www ? r1.xyz : r2.xyz;
-  }
-  r1.x = (asint(cb0[249].x) == 1);
-  if (r1.x != 0) {
-    r1.x = dot(float3(1,1,1), abs(r0.xyz));
-    r1.xy = r0.xy / r1.xx;
-    r4.xy = float2(1,1) + -abs(r1.yx);
-    r5.xy = (r1.xy >= float2(0,0));
-    r5.xy = r5.xy ? float2(0.5,0.5) : float2(-0.5,-0.5);
-    r4.xy = r5.xy * r4.xy;
-    r1.z = (0 >= r0.z);
-    r1.z = r1.z ? 1.000000 : 0;
-    r4.xy = r4.xy * float2(2,2) + -r1.xy;
-    r1.xy = r1.zz * r4.xy + r1.xy;
-    o1_Normal_Diffuse_FaceSDFMask.xy = r1.xy * float2(0.5,0.5) + float2(0.5,0.5);
-    r3.xyz = saturate(r3.xyz);
-    o2_ShadowColor_PackShadeMode_OutputMask.xyz = sqrt(r3.xyz);
-    bitmask.x = ((~(-1 << 3)) << 5) & 0xffffffff;  r1.x = (((uint)cb2[23].w << 5) & bitmask.x) | ((uint)12 & ~bitmask.x);
-    r1.x = (uint)r1.x;
-    o2_ShadowColor_PackShadeMode_OutputMask.w = 0.00392156886 * r1.x;
-    o1_Normal_Diffuse_FaceSDFMask.z = 1;
-    o1_Normal_Diffuse_FaceSDFMask.w = r0.w;
-    o4.xyzw = float4(0,0,0,0);
-    r1.xy = float2(0,0);
-    o3_BaseColor_ToonSkinMask.w = cb4[94].z;
-  } else {
-    r1.z = (r1.w >= 0.5);
-    o1_Normal_Diffuse_FaceSDFMask.w = r1.z ? 0.666000 : 0;
-    r1.z = saturate(cb4[94].w);
-    r1.z = 255 * r1.z;
-    r1.z = round(r1.z);
-    r1.w = saturate(cb4[95].x);
-    r1.w = 15 * r1.w;
-    r1.w = round(r1.w);
-    r1.zw = (uint2)r1.zw;
-    bitmask.z = ((~(-1 << 4)) << 0) & 0xffffffff;  r1.z = (((uint)r1.w << 0) & bitmask.z) | ((uint)r1.z & ~bitmask.z);
-    r1.z = (uint)r1.z;
-    r1.y = 0.00392156886 * r1.z;
-    r1.z = dot(float3(1,1,1), abs(r0.xyz));
-    r0.xy = r0.xy / r1.zz;
-    r1.zw = float2(1,1) + -abs(r0.yx);
-    r4.xy = (r0.xy >= float2(0,0));
-    r4.xy = r4.xy ? float2(0.5,0.5) : float2(-0.5,-0.5);
-    r1.zw = r4.xy * r1.zw;
-    r0.z = (0 >= r0.z);
-    r0.z = r0.z ? 1.000000 : 0;
-    r1.zw = r1.zw * float2(2,2) + -r0.xy;
-    r0.xy = r0.zz * r1.zw + r0.xy;
-    o1_Normal_Diffuse_FaceSDFMask.xy = r0.xy * float2(0.5,0.5) + float2(0.5,0.5);
-    r3.xyz = saturate(r3.xyz);
-    o2_ShadowColor_PackShadeMode_OutputMask.xyz = sqrt(r3.xyz);
-    bitmask.x = ((~(-1 << 3)) << 5) & 0xffffffff;  r0.x = (((uint)cb2[23].w << 5) & bitmask.x) | ((uint)12 & ~bitmask.x);
-    r0.x = (uint)r0.x;
-    o2_ShadowColor_PackShadeMode_OutputMask.w = 0.00392156886 * r0.x;
-    o1_Normal_Diffuse_FaceSDFMask.z = r0.w;
-    r1.x = cb4[94].z;
-    o3_BaseColor_ToonSkinMask.w = r4.w;
-  }
-  o0_GI.xyz = r2.xyz;
-  o0_GI.w = 0;
-  o5_RimDepth.xyzw = v9.zzzz;
-  o6_rimStrength_HSVPack_groundSpec_charRegion.xy = r1.xy;
-  o6_rimStrength_HSVPack_groundSpec_charRegion.zw = float2(0,0);
-
-  fragOutput.o0_GI = o1_Normal_Diffuse_FaceSDFMask;
-  return fragOutput;
-
-  // 由于这是测试因此没用MRT 只能改o0预览正确性 即使这里错误也不用管
-  fragOutput.o0_GI = o0_GI;
-  fragOutput.o1_Normal_Diffuse_FaceSDFMask = o1_Normal_Diffuse_FaceSDFMask;
-  fragOutput.o2_ShadowColor_PackShadeMode_OutputMask = o2_ShadowColor_PackShadeMode_OutputMask;
-  fragOutput.o3_BaseColor_ToonSkinMask = o3_BaseColor_ToonSkinMask;
-  fragOutput.o4 = o4;
-  fragOutput.o5_RimDepth = o5_RimDepth;
-  fragOutput.o6_rimStrength_HSVPack_groundSpec_charRegion = o6_rimStrength_HSVPack_groundSpec_charRegion;
-  
-  return fragOutput;
+            ENDHLSL
+        }
+    }
 }
