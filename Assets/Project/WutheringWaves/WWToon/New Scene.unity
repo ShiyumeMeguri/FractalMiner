@@ -129,7 +129,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 582bd0f8fb862d849957d4ebf59202fc, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.99
+      value: 0.74
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 582bd0f8fb862d849957d4ebf59202fc, type: 3}
       propertyPath: m_LocalPosition.y
@@ -171,6 +171,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Feibi (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 1328039056683430198, guid: 582bd0f8fb862d849957d4ebf59202fc, type: 3}
+      propertyPath: 'm_Materials.Array.data[3]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 011535f1ae32eab47b08ad8de60e5a90, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

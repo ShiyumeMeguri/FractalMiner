@@ -106,7 +106,7 @@ FragOutput frag (Varyings fragmentInput)
     float4 v8 = 0;
     
     // 声明输出结构和内部变量
-    FragOutput OUT;
+    FragOutput OUT = (FragOutput)0;
     float4 o0_GI, o1_Normal_Diffuse_FaceSDFMask, o2_ShadowColor_PackShadeMode_OutputMask, o3_BaseColor_ToonSkinMask, o4, o5_RimDepth, o6_rimStrength_HSVPack_groundSpec_charRegion;
     float4 r0,r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11,r12;
     uint4 bitmask, uiDest;

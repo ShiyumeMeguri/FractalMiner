@@ -1,656 +1,429 @@
-角色与目标 (Role and Goal)
-你是一位顶级的HLSL着色器反编译与重构工程师。你的任务是将一份低可读性、基于临时寄存器（如r0, r1...）的HLSL代码，重构为一份高可读性、使用语义化局部变量且功能完全等价的代码。
-你的最终目标是将代码风格 'B' (原始、寄存器化) 转换为代码风格 'A' (人工重构后、语义化)。
-核心原则 (Core Principles)
-寄存器替换 (Register Substitution): 你的主要目标是消除所有对临时寄存器 (r[0-9]+) 的直接引用。
-语义变量的创建 (Semantic Variable Creation): 每当一个或多个寄存器分量被赋予一个具有新逻辑意义的值时，你必须创建一个新的、带有语义化名称的局部变量来存储这个值。
-上下文驱动命名 (Context-Driven Naming): 新变量的命名必须基于其计算上下文。你需要从以下信息中推断其用途：
-操作: dot(...) -> dot_product, rsqrt(...) -> inv_sqrt_..., saturate(...) -> saturated_...。
-布尔逻辑: (a > b) ? 1:0 -> is_a_greater_than_b。
-输入/常量: tex2Dlod(_IN2, ...) -> data_from_gbuffer2, ... * cb1[65].x -> value_influenced_by_cb1_65_x。结合上下文，可以推断出更具体的名字，如msr_shadingModelID或depth。
-代码流: 变量在 if (isCharaPart) 分支内创建，可以加上 chara_ 前缀。
-矢量完整性 (Vector Integrity): 当一次操作同时赋值给一个寄存器的多个分量时（如 r1.xyz = ... 或 r4.xy = ...），你应该创建一个对应维度的矢量变量（float3, float2），而不是多个独立的float变量。这保留了原始的矢量计算意图。
-绝对功能等价 (Absolute Functional Equivalence): 重构是纯粹的语法转换。绝不允许任何形式的逻辑简化、代码优化、死代码消除或计算合并。原始代码中的每一个计算步骤都必须在重构后的代码中有对应的体现。
-详细算法流程 (The Grand Algorithm)
-你必须在内部维护一个精细到分量的虚拟状态表 (Component-wise Virtual State Map)，来模拟寄存器的状态。
-初始化:
-识别代码中所有的 r[0-9]+ 寄存器。
-为每个寄存器的每个分量（.x, .y, .z, .w）在VIRTUAL_STATE_MAP中创建一个条目，初始值为 null。
-VIRTUAL_STATE_MAP = { "r0.x": null, "r0.y": null, ..., "rN.w": null }
-逐行处理代码: 对于每一行代码，判断其模式并执行相应操作：
-模式 A: 新赋值 (New Assignment)
-识别: rDest.mask = expression;
-动作:
-翻译表达式: 遍历expression，将其中的任何rSource.mask替换为VIRTUAL_STATE_MAP中对应的变量名。例如，将r2.w替换为depth。
-创建新变量:
-如果.mask是单分量（.x, .y...），则创建一个标量变量：float new_semantic_name = translated_expression;
-如果.mask是多分量（.xyz, .xy...），则创建一个矢量变量：float3 new_semantic_name = translated_expression;
-更新状态: 更新VIRTUAL_STATE_MAP。
-标量: VIRTUAL_STATE_MAP["rDest.x"] = "new_semantic_name";
-矢量: VIRTUAL_STATE_MAP["rDest.x"] = "new_semantic_name.x";, VIRTUAL_STATE_MAP["rDest.y"] = "new_semantic_name.y";, ...
-输出: 输出新创建的变量声明和赋值语句。
-模式 B: 原地修改 (In-place Modification)
-识别: rDest.mask = expression_involving_rDest.mask; (例如 r2.w = r2.w * 2 + r3.w;)
-动作:
-查找目标: 从VIRTUAL_STATE_MAP中查找rDest.mask对应的变量（例如 depth）。
-翻译表达式: 替换expression中所有寄存器引用。
-改写: 将整行改写为对已存在变量的修改。depth = depth * 2 + alpha_dynamic;
-状态: VIRTUAL_STATE_MAP中rDest.mask的映射保持不变。
-输出: 输出改写后的语句。
-模式 C: 无关代码 (Unrelated Code)
-识别: 任何不包含寄存器引用的代码行 (return color;, if(...), while(true) 等)。
-动作: 原样输出。对于 if(r1.w != 0) 这类包含寄存器的控制流语句，需先将其中的寄存器引用替换为映射的变量再输出 if(isCharaPart != 0).
-任务指令 (Your Task)
-现在，将上述强化版重构算法，无一遗漏地应用到我提供的HLSL着色器代码上。你的处理目标是代码中所有的临时寄存器 r0, r1, r2, ...。
-你的最终输出应该是一份完整、干净、高可读性且功能与原始代码100%等价的HLSL代码。
-关键约束 (Critical Constraints):
-完整性: 必须处理从头到尾的所有代码行。
-不简化: 严格禁止任何逻辑优化或代码合并。
-命名: 尽最大努力提供具有上下文语义的变量名。
-纯净输出: 你的最终回答只应包含重构后的HLSL代码。不要包含任何解释、注释或你的思考过程。
-功能对等: 最终代码在编译和执行时，其行为必须与原始代码完全一致。
-
-float4 frag (Varyings fragmentInput) : SV_Target
+角色:
+你是一名顶级的图形/渲染引擎架构师，精通HLSL编译器的底层行为和硬件优化。
+任务:
+对我提供的HLSL片段着色器进行深度重构。你的目标是将其转变为清晰、可维护的“产品级”代码，同时必须保持与原始逻辑的绝对等价性。
+核心指令 (必须严格、按顺序执行):
+绝对的逻辑一致性 (最高优先级):
+重构后的代码在编译后，其计算逻辑必须与原始代码字节级一致。
+最终输出必须与原始代码像素级一致。
+严格禁止改变代码的执行顺序、省略任何计算、或进行任何可能影响编译器内联决策的函数提取。
+变量解构与隔离协议 (单一职责原则):
+这是重构的核心。你的任务是消除变量混用，而不是简单地重命名。请遵循以下**“解包-隔离-废弃”**三步协议：
+A. 单次解包: 识别任何一个从纹理、常量缓冲区或计算结果中产生的、其内部包含多种不同逻辑数据的复合类型变量（如 float4）。将这个原始的、多用途的变量视为一个临时的“数据包”。
+B. 立即隔离: 紧接着上一步，立即将该“数据包”中的所有逻辑数据，提取到各自独立的、具有明确单一用途的标量或小维度向量变量中。新变量的命名必须精确反映其承载的唯一数据。
+C. 永久废弃: 在完成隔离后，在后续的全部代码中，必须将原始的“数据包”变量视为已废弃。所有后续的计算都必须且只能使用上一步中创建的、单一用途的独立变量。
+非规范分量访问的逻辑翻译 (关键指令):
+原始代码可能利用了HLSL对向量的非规范分量访问规则。例如，对一个二维向量 (float2) 访问其第三或第四个分量 (.z 或 .w)。这种操作在编译后通常会产生确定性的常量值（通常是0或1，具体取决于硬件和编译器）。
+规则: 在你执行“变量解构与隔离协议”的过程中，如果发现原始代码对一个低维度的“数据包”变量进行了非规范的高维度分量访问（例如，对一个float2变量应用.zzzz swizzle），你必须进行如下翻译：
+识别意图: 分析该操作的真实意图。它不是为了获取数据，而是为了生成一个由特定常量值组成的更高维度的向量。
+逻辑替换: 在重构后的代码中，不要尝试对任何已隔离的变量进行这种非规范访问（这将导致编译错误）。你必须直接用一个显式构造的、由相应常量值组成的字面量 (literal value) 来替换整个操作。
+确定常量: 根据HLSL规范，访问不存在的分量通常返回0。因此，将该操作替换为一个由0.0f组成的、维度正确的向量字面量。
+输出要求:
+提供一份完整的、遵循上述所有指令（特别是对非规范分量访问的精确逻辑翻译）重构后的HLSL代码。整个重构过程是一个确保每一步转换都保持逻辑绝对正确的系统性修复。
+FragOutput frag (Varyings fragmentInput)
 {
-    // 基于输入uv定义screenUV_ndcUV，zw分量是NDC x（clip.x / clip.w）并复制到 zw
-    float4 screenUV_ndcUV = fragmentInput.uv; 
+    // 根据反编译代码输入调整输入结构
+    float4 v0 = fragmentInput.uv; // 您的指定映射
+    float4 v9 = fragmentInput.positionCS; // SV_Position -> v9
+    float4 v2 = fragmentInput.uv; // TEXCOORD0 -> v2
 
-    float4 color = 0;
+    // 为缺失的、但在代码中使用的输入变量提供定义以修复语法错误
+    float4 v1 = 0;
+    float4 v6 = 0;
+    float2 v7 = 0;
+    float4 v8 = 0;
     
-    float4 packedNormalWS_perObjectData = 0, msr_shadingModelID = 0, albedo_alpha = 0, customData = 0, model_low4_high4 = 0, model13_14_15 = 0, r6 = 0, r7 = 0, r8 = 0, r9 = 0, r10 = 0, r11 = 0, r12 = 0, r13 = 0, r14 = 0, r15 = 0, r16 = 0;
-uint4 bitmask = 0, uiDest = 0;
-float4 fDest = 0;
-    float alpha_dynamic;
-    float checkerboardPattern;
-    float shadingModelID;
-    float depth;
-    float3 msr;
-    float3 msrSq;
-    float3 sceneMask_unk_unk;
-    uint3 sceneMask_unk_unk_mask;
-    float3 normal;
-    bool isChara12;
-    bool isCharaHair13;
-    bool isCharaAnisotropicMetal14;
-    bool isCharaAnisotropicFabric15;
-    bool isCharaPart; // low 13 14 15
-    bool isScene; // low 10
-    float nomalizeTemp;
-    float perObjectData = 0;
-    bool is_cb1_162y;
-    bool is_cb1_220z;
-    bool is_unk1;
-    bool2 isModel_5_13;
-    float3 albedo_new;
-    float eyeAdaptation;
-    float2 clipPos;
-    float3 posWS;
-    float2 shadow_shadowIntentity;
-    float shadow;
+    // 声明输出结构和内部变量
+    FragOutput OUT;
+    float4 o0_GI, o1_Normal_Diffuse_FaceSDFMask, o2_ShadowColor_PackShadeMode_OutputMask, o3_BaseColor_ToonSkinMask, o4, o5_RimDepth, o6_rimStrength_HSVPack_groundSpec_charRegion;
+    float4 r0,r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11,r12;
+    uint4 bitmask, uiDest;
+    float4 fDest;
 
-    packedNormalWS_perObjectData.xyzw = tex2Dlod(_IN1, float4(screenUV_ndcUV.xy, 0, 0)).wxyz;
-    msr_shadingModelID.xyzw = tex2Dlod(_IN2, float4(screenUV_ndcUV.xy, 0, 0)).xyzw;
-    albedo_alpha.xyz = tex2Dlod(_IN3, float4(screenUV_ndcUV.xy, 0, 0)).xyz;
-    customData.xyz = tex2Dlod(_IN4, float4(screenUV_ndcUV.xy, 0, 0)).yxz;
-    
-    depth = tex2Dlod(_IN0, float4(screenUV_ndcUV.xy, 0, 0)).x;
-    alpha_dynamic = depth * cb1[65].x + cb1[65].y;
-    depth = depth * cb1[65].z + -cb1[65].w;
-    depth = 1 / depth;
-    depth = alpha_dynamic + depth;
-    
-    uint2 uv_scaled = _ScaledScreenParams.xy * screenUV_ndcUV.xy;
-    uv_scaled = (uint2)uv_scaled.xy;
-    _FrameJitterSeed = (uint)cb1[158].x;
-    uv_scaled.x = (int)uv_scaled.y + (int)uv_scaled.x;
-    checkerboardPattern = (int)_FrameJitterSeed + (int)uv_scaled.x;
-    checkerboardPattern = (int)checkerboardPattern & 1;
-    
-    shadingModelID = 255 * msr_shadingModelID.w;
-    shadingModelID = round(shadingModelID);
-    shadingModelID = (uint)shadingModelID;
-    model_low4_high4.xy = (int2)shadingModelID & int2(15,-16); // x是00001111 y是11110000 mask后的结果
-    isChara12 = ((int)model_low4_high4.x != 12) ? 1.0 : 0.0;
-    model13_14_15.xyz = ((int3)model_low4_high4.xxx == int3(13,14,15)) ? 1.0 : 0.0;
-    isCharaHair13 = model13_14_15.x;
-    isCharaAnisotropicMetal14 = model13_14_15.y;
-    isCharaAnisotropicFabric15 = model13_14_15.z;
-    model_low4_high4.z = (int)isCharaAnisotropicFabric15 | (int)isCharaAnisotropicMetal14;
-    model_low4_high4.z = (int)model_low4_high4.z | (int)isCharaHair13;
-    isCharaPart = isChara12 ? model_low4_high4.z : -1;
-    if (isCharaPart != 0) {
-        model_low4_high4.x = isCharaHair13 ? 13 : 12;
-        model13_14_15.xz = float2(isCharaAnisotropicMetal14, isCharaAnisotropicFabric15) ? float2(1,1) : 0;
-        float2 octNormalWS = packedNormalWS_perObjectData.yz * float2(2,2) - float2(1,1);
-        shadingModelID = dot(float2(1,1), abs(octNormalWS.xy));
-        normal.z = 1 + -shadingModelID;
-        shadingModelID = max(0, -normal.z);
-        r7.xy = (octNormalWS.xy >= float2(0,0)) ? 1.0 : 0.0;
-        r7.xy = r7.xy ? float2(0.5,0.5) : float2(-0.5,-0.5);
-        r7.xy = r7.xy * shadingModelID;
-        normal.xy = r7.xy * float2(-2,-2) + octNormalWS.xy;
-        shadingModelID = dot(normal.xyz, normal.xyz);
-        shadingModelID = rsqrt(shadingModelID);
-        normal.xyz = normal.xyz * shadingModelID;
-        msrSq = msr_shadingModelID.xyz * msr_shadingModelID.xyz;
-        isCharaAnisotropicMetal14 = customData.z;
-    } else { // isScene
-        isScene = ((int)model_low4_high4.x == 10) ? 1.0 : 0.0;
-        sceneMask_unk_unk.xyz = saturate(msr_shadingModelID.xyz);
-        sceneMask_unk_unk.xyz = float3(16777215,65535,255) * sceneMask_unk_unk.xyz;
-        sceneMask_unk_unk.xyz = round(sceneMask_unk_unk.xyz);
-        sceneMask_unk_unk_mask.xyz = (uint3)sceneMask_unk_unk.xyz;
-        bitmask.y = ((~(-1 << 8)) << 0) & 0xffffffff;  sceneMask_unk_unk_mask.y = (((uint)sceneMask_unk_unk_mask.z << 0) & bitmask.y) | ((uint)sceneMask_unk_unk_mask.y & ~bitmask.y);
-        bitmask.x = ((~(-1 << 16)) << 0) & 0xffffffff;  sceneMask_unk_unk_mask.x = (((uint)sceneMask_unk_unk_mask.y << 0) & bitmask.x) | ((uint)sceneMask_unk_unk_mask.x & ~bitmask.x);
-        sceneMask_unk_unk_mask.x = (uint)sceneMask_unk_unk_mask.x;
-        sceneMask_unk_unk_mask.x = 5.96046519e-008 * sceneMask_unk_unk_mask.x;
-        sceneMask_unk_unk_mask.y = sceneMask_unk_unk_mask.x * cb1[65].x + cb1[65].y;
-        sceneMask_unk_unk_mask.x = sceneMask_unk_unk_mask.x * cb1[65].z + -cb1[65].w;
-        sceneMask_unk_unk_mask.x = 1 / sceneMask_unk_unk_mask.x;
-        sceneMask_unk_unk_mask.x = sceneMask_unk_unk_mask.y + sceneMask_unk_unk_mask.x;
-        depth = isScene ? sceneMask_unk_unk_mask.x : depth;
-        normal.xyz = packedNormalWS_perObjectData.yzw * float3(2,2,2) + float3(-1,-1,-1);
-        msrSq = float3(0,0,0);
-        model13_14_15.xyz = float3(0,0,0);
-        packedNormalWS_perObjectData.xw = float2(0,0);
-        customData.xy = float2(0,0);
-    }
-    nomalizeTemp = dot(normal.xyz, normal.xyz);
-    nomalizeTemp = rsqrt(nomalizeTemp);
-    normal.xyz = normal.xyz * nomalizeTemp;
-    isModel_5_13 = ((int2)model_low4_high4.xx == int2(5,13)) ? 1.0 : 0.0;
-    is_cb1_162y = (0 < cb1[162].y) ? 1.0 : 0.0;
-    is_cb1_220z = (0 < cb1[220].z) ? 1.0 : 0.0;
-    is_unk1 = is_cb1_162y ? is_cb1_220z : 0;
-    is_cb1_220z = (0 != cb1[162].y) ? 1.0 : 0.0;
-    albedo_new.xyz = is_cb1_220z ? float3(1,1,1) : albedo_alpha.xyz;
-    checkerboardPattern = checkerboardPattern ? 1 : 0;
-    albedo_new.xyz = is_unk1 ? checkerboardPattern : albedo_new.xyz;
-    albedo_alpha.xyz = isModel_5_13.x ? albedo_new.xyz : albedo_alpha.xyz;
-    eyeAdaptation = tex2Dlod(_IN9, float4(0, 0, 0, 0)).x;
-    clipPos = screenUV_ndcUV.zw * depth;
-    
-    posWS.xyz = cb1[49].xyz * clipPos.y;
-    posWS.xyz = clipPos.x * cb1[48].xyz + posWS.xyz;
-    posWS.xyz = depth * cb1[50].xyz + posWS.xyz;
-    posWS.xyz = cb1[51].xyz + posWS.xyz;
-    shadow_shadowIntentity = tex2Dlod(_IN5, float4(screenUV_ndcUV.xy, 0, 0)).xz;
-    shadow_shadowIntentity = shadow_shadowIntentity * shadow_shadowIntentity;
-    shadow = shadow_shadowIntentity.x * shadow_shadowIntentity.y;    
-    shadow = cb1[253].y * shadow;
-    if (cb1[255].x != 0) {
-        r8.xyz = float3(0,0,0);
-        model_low4_high4.zw = float2(0,0);
-        model13_14_15.w = 0;
-        r6.w = 0;
-        while (true) {
-        r7.w = ((int)model_low4_high4.z >= 3) ? 1.0 : 0.0;
-        if (r7.w != 0) break;
-        model_low4_high4.w = 0.000833333295 + model_low4_high4.w;
-        r9.xyz = r8.xyz;
-        r7.w = model13_14_15.w;
-        r8.w = r6.w;
-        r9.w = 0;
-        while (true) {
-            r10.x = ((int)r9.w >= 3) ? 1.0 : 0.0;
-            if (r10.x != 0) break;
-            r7.w = 1 + r7.w;
-            r10.x = 2.09439516 * r7.w;
-            sincos(r10.x, r10.x, r11.x);
-            r11.x = r11.x * model_low4_high4.w + screenUV_ndcUV.x;
-            r11.y = r10.x * model_low4_high4.w + screenUV_ndcUV.y;
-            r10.xyz = tex2D(_IN7, r11.xy).xyz;
-            r9.xyz = r10.xyz * model_low4_high4.www + r9.xyz;
-            r8.w = r8.w + model_low4_high4.w;
-            r9.w = (int)r9.w + 1;
-        }
-        r8.xyz = r9.xyz;
-        r6.w = r8.w;
-        model13_14_15.w = 0.620000005 + r7.w;
-        model_low4_high4.z = (int)model_low4_high4.z + 1;
-        }
-        r8.xyz = r8.xyz / r6.www;
-        r9.xyz = (float3(0.644999981,0.312000006,0.978999972) < perObjectData) ? 1.0 : 0.0;
-        r10.xyz = (perObjectData < float3(0.685000002,0.351999998,1.02100003)) ? 1.0 : 0.0;
-        r9.xyz = r9.xyz ? r10.xyz : 0;
-        perObjectData = r9.z ? 1.000000 : 0;
-        perObjectData = r9.y ? 0 : perObjectData;
-        perObjectData = r9.x ? 1 : perObjectData;
-        model_low4_high4.z = (int)r9.y | (int)r9.z;
-        model_low4_high4.z = (int)model_low4_high4.z & 0x3f800000;
-        model_low4_high4.z = r9.x ? 0 : model_low4_high4.z;
-        customData.x = 255 * customData.x;
-        customData.x = round(customData.x);
-        customData.x = (uint)customData.x;
-        r9.xyzw = (int4)customData.xxxx & int4(15,240,240,15);
-        r9.xyzw = (uint4)r9.xyzw;
-        customData.x = saturate(packedNormalWS_perObjectData.w + packedNormalWS_perObjectData.w);
-        model_low4_high4.w = customData.x * -2 + 3;
-        customData.x = customData.x * customData.x;
-        customData.x = model_low4_high4.w * customData.x;
-        model_low4_high4.w = -0.5 + packedNormalWS_perObjectData.w;
-        model_low4_high4.w = saturate(model_low4_high4.w + model_low4_high4.w);
-        model13_14_15.w = model_low4_high4.w * -2 + 3;
-        model_low4_high4.w = model_low4_high4.w * model_low4_high4.w;
-        model_low4_high4.w = model13_14_15.w * model_low4_high4.w;
-        r10.xyz = cb1[262].xyz + -cb1[261].xyz;
-        model13_14_15.w = dot(abs(r10.xyz), float3(0.300000012,0.589999974,0.109999999));
-        model13_14_15.w = 10 * model13_14_15.w;
-        model13_14_15.w = min(1, model13_14_15.w);
-        r6.w = model13_14_15.w * -2 + 3;
-        model13_14_15.w = model13_14_15.w * model13_14_15.w;
-        model13_14_15.w = r6.w * model13_14_15.w;
-        r6.w = model13_14_15.w * model_low4_high4.w;
-        r7.w = cb1[265].y + -cb1[265].x;
-        r8.w = shadow * cb1[253].y + -cb1[265].x;
-        r7.w = 1 / r7.w;
-        r8.w = saturate(r8.w * r7.w);
-        r10.x = r8.w * -2 + 3;
-        r8.w = r8.w * r8.w;
-        r8.w = r10.x * r8.w;
-        r8.w = r8.w * r6.w;
-        r10.x = shadow * cb1[253].y + -r8.w;
-        r8.w = cb1[265].z * r10.x + r8.w;
-        r10.x = -cb1[265].x + r8.w;
-        r7.w = saturate(r10.x * r7.w);
-        r10.x = r7.w * -2 + 3;
-        r7.w = r7.w * r7.w;
-        r7.w = r10.x * r7.w;
-        r6.w = r7.w * r6.w;
-        model_low4_high4.w = model_low4_high4.w * model13_14_15.w + -r6.w;
-        model_low4_high4.w = cb1[265].z * model_low4_high4.w + r6.w;
-        model13_14_15.w = -1 + r8.w;
-        model13_14_15.w = cb1[260].y * model13_14_15.w + 1;
-        r6.w = shadow * model_low4_high4.w + -model13_14_15.w;
-        model13_14_15.w = model13_14_15.x * r6.w + model13_14_15.w;
-        r6.w = shadow * model_low4_high4.w + -model_low4_high4.w;
-        r10.x = model13_14_15.x * r6.w + model_low4_high4.w;
-        model_low4_high4.w = (r8.y >= r8.z) ? 1.0 : 0.0;
-        model_low4_high4.w = model_low4_high4.w ? 1.000000 : 0;
-        r11.xy = r8.zy;
-        r11.zw = float2(-1,0.666666687);
-        r12.xy = -r11.xy + r8.yz;
-        r12.zw = float2(1,-1);
-        r11.xyzw = model_low4_high4.wwww * r12.xyzw + r11.xyzw;
-        model_low4_high4.w = (r8.x >= r11.x) ? 1.0 : 0.0;
-        model_low4_high4.w = model_low4_high4.w ? 1.000000 : 0;
-        r12.xyz = r11.xyw;
-        r12.w = r8.x;
-        r11.xyw = r12.wyx;
-        r11.xyzw = r11.xyzw + -r12.xyzw;
-        r11.xyzw = model_low4_high4.wwww * r11.xyzw + r12.xyzw;
-        model_low4_high4.w = min(r11.w, r11.y);
-        model_low4_high4.w = r11.x + -model_low4_high4.w;
-        r6.w = r11.w + -r11.y;
-        r7.w = model_low4_high4.w * 6 + 0.00100000005;
-        r6.w = r6.w / r7.w;
-        r6.w = r11.z + r6.w;
-        r7.w = 0.00100000005 + r11.x;
-        model_low4_high4.w = model_low4_high4.w / r7.w;
-        r7.w = r11.x * 0.300000012 + 1;
-        r11.xyzw = r9.xyzw * float4(0.0400000028,0.0027450982,0.00392156886,0.0666666701) + float4(0.400000006,0.400000006,1,0.5);
-        r8.w = (r9.z >= 2.54999971) ? 1.0 : 0.0;
-        r8.w = r8.w ? 1.000000 : 0;
-        r9.x = r11.y + -r11.x;
-        r9.x = r8.w * r9.x + r11.x;
-        model_low4_high4.w = r9.x * model_low4_high4.w;
-        model_low4_high4.w = min(0.349999994, model_low4_high4.w);
-        r9.x = max(0, model_low4_high4.w);
-        r9.yzw = float3(1,0.666666687,0.333333343) + abs(r6.www);
-        r9.yzw = frac(r9.yzw);
-        r9.yzw = r9.yzw * float3(6,6,6) + float3(-3,-3,-3);
-        r9.yzw = saturate(float3(-1,-1,-1) + abs(r9.yzw));
-        r9.yzw = float3(-1,-1,-1) + r9.yzw;
-        r9.xyz = r9.xxx * r9.yzw + float3(1,1,1);
-        model_low4_high4.w = 1 + model_low4_high4.w;
-        r12.xyz = r9.xyz * model_low4_high4.www;
-        r13.xyz = r9.xyz * model_low4_high4.www + float3(-1,-1,-1);
-        r13.xyz = r13.xyz * float3(0.600000024,0.600000024,0.600000024) + float3(1,1,1);
-        r9.xyz = -r9.xyz * model_low4_high4.www + r13.xyz;
-        r9.xyz = perObjectData * r9.xyz + r12.xyz;
-        r12.xyz = r9.xyz + -albedo_alpha.xyz;
-        r12.xyz = r12.xyz * float3(0.850000024,0.850000024,0.850000024) + albedo_alpha.xyz;
-        r11.xyz = r11.zzz * r12.xyz + -r9.xyz;
-        r9.xyz = r8.www * r11.xyz + r9.xyz;
-        r9.xyz = float3(-1,-1,-1) + r9.xyz;
-        r9.xyz = r11.www * r9.xyz + float3(1,1,1);
-        r11.xyz = float3(0.200000003,0.200000003,0.200000003) * cb1[261].xyz;
-        r12.xyz = cb1[262].xyz * float3(0.5,0.5,0.5) + -r11.xyz;
-        r11.xyz = model13_14_15.www * r12.xyz + r11.xyz;
-        r11.xyz = cb1[260].xxx * r11.xyz;
-        r11.xyz = r11.xyz * albedo_alpha.xyz;
-        r12.xyz = r11.xyz * msrSq;
-        r13.xyz = cb1[261].xyz * albedo_alpha.xyz;
-        perObjectData = customData.x * 0.300000012 + 0.699999988;
-        r14.xyz = r13.xyz * perObjectData;
-        r15.xyz = cb1[262].xyz * albedo_alpha.xyz;
-        r12.xyz = r13.xyz * perObjectData + r12.xyz;
-        r13.xyz = albedo_alpha.xyz * cb1[262].xyz + -r14.xyz;
-        r13.xyz = r13.xyz * float3(0.400000006,0.400000006,0.400000006) + r14.xyz;
-        r16.xyz = r14.xyz * r9.xyz;
-        r13.xyz = r13.xyz * r9.xyz + -r16.xyz;
-        r13.xyz = r10.xxx * r13.xyz + r16.xyz;
-        r11.xyz = r11.xyz * msrSq + r13.xyz;
-        r12.xyz = r12.xyz * r9.xyz;
-        r13.xyz = r15.xyz * r7.www;
-        r9.xyz = r13.xyz * r9.xyz + -r12.xyz;
-        r9.xyz = r10.xxx * r9.xyz + r12.xyz;
-        perObjectData = tex2Dlod(_IN8, float4(screenUV_ndcUV.xy, 0, 0)).x;
-        perObjectData = -1 + perObjectData;
-        perObjectData = model_low4_high4.z * perObjectData + 1;
-        r9.xyz = r9.xyz + -r11.xyz;
-        r9.xyz = model13_14_15.www * r9.xyz + r11.xyz;
-        r11.xyz = float3(1,1,1) + -r8.xyz;
-        r8.xyz = perObjectData * r11.xyz + r8.xyz;
-        r8.xyz = r9.xyz * r8.xyz;
-    } else {
-        perObjectData = saturate(packedNormalWS_perObjectData.w + packedNormalWS_perObjectData.w);
-        customData.x = perObjectData * -2 + 3;
-        perObjectData = perObjectData * perObjectData;
-        perObjectData = customData.x * perObjectData;
-        customData.x = -0.5 + packedNormalWS_perObjectData.w;
-        customData.x = saturate(customData.x + customData.x);
-        model_low4_high4.z = customData.x * -2 + 3;
-        customData.x = customData.x * customData.x;
-        customData.x = model_low4_high4.z * customData.x;
-        r9.xyz = cb1[262].xyz + -cb1[261].xyz;
-        model_low4_high4.z = dot(abs(r9.xyz), float3(0.300000012,0.589999974,0.109999999));
-        model_low4_high4.z = 10 * model_low4_high4.z;
-        model_low4_high4.z = min(1, model_low4_high4.z);
-        model_low4_high4.w = model_low4_high4.z * -2 + 3;
-        model_low4_high4.z = model_low4_high4.z * model_low4_high4.z;
-        model_low4_high4.z = model_low4_high4.w * model_low4_high4.z;
-        model_low4_high4.w = model_low4_high4.z * customData.x;
-        model13_14_15.w = cb1[265].y + -cb1[265].x;
-        r6.w = shadow * cb1[253].y + -cb1[265].x;
-        model13_14_15.w = 1 / model13_14_15.w;
-        r6.w = saturate(r6.w * model13_14_15.w);
-        r7.w = r6.w * -2 + 3;
-        r6.w = r6.w * r6.w;
-        r6.w = r7.w * r6.w;
-        r6.w = r6.w * model_low4_high4.w;
-        shadingModelID = shadow * cb1[253].y + -r6.w;
-        shadingModelID = cb1[265].z * shadingModelID + r6.w;
-        r6.w = -cb1[265].x + shadingModelID;
-        model13_14_15.w = saturate(r6.w * model13_14_15.w);
-        r6.w = model13_14_15.w * -2 + 3;
-        model13_14_15.w = model13_14_15.w * model13_14_15.w;
-        model13_14_15.w = r6.w * model13_14_15.w;
-        model_low4_high4.w = model13_14_15.w * model_low4_high4.w;
-        customData.x = customData.x * model_low4_high4.z + -model_low4_high4.w;
-        customData.x = cb1[265].z * customData.x + model_low4_high4.w;
-        model_low4_high4.z = shadingModelID * isCharaAnisotropicMetal14;
-        model_low4_high4.z = 10 * model_low4_high4.z;
-        shadingModelID = -1 + shadingModelID;
-        shadingModelID = cb1[260].y * shadingModelID + 1;
-        model_low4_high4.w = shadow * customData.x + -shadingModelID;
-        shadingModelID = model13_14_15.x * model_low4_high4.w + shadingModelID;
-        model_low4_high4.w = shadow * customData.x + -customData.x;
-        r10.x = model13_14_15.x * model_low4_high4.w + customData.x;
-        model13_14_15.xyw = float3(0.200000003,0.200000003,0.200000003) * cb1[261].xyz;
-        r9.xyz = cb1[262].xyz * float3(0.5,0.5,0.5) + -model13_14_15.xyw;
-        model13_14_15.xyw = shadingModelID * r9.xyz + model13_14_15.xyw;
-        model13_14_15.xyw = cb1[260].xxx * model13_14_15.xyw;
-        model13_14_15.xyw = model13_14_15.xyw * albedo_alpha.xyz;
-        r9.xyz = model13_14_15.xyw * msrSq;
-        r11.xyz = cb1[261].xyz * albedo_alpha.xyz;
-        perObjectData = perObjectData * 0.300000012 + 0.699999988;
-        r14.xyz = r11.xyz * perObjectData;
-        r11.xyz = r11.xyz * perObjectData + r9.xyz;
-        r9.xyz = r9.xyz * model_low4_high4.zzz + r11.xyz;
-        r11.xyz = albedo_alpha.xyz * cb1[262].xyz + -r14.xyz;
-        r11.xyz = r11.xyz * r10.xxx;
-        r11.xyz = r11.xyz * float3(0.400000006,0.400000006,0.400000006) + r14.xyz;
-        model13_14_15.xyw = model13_14_15.xyw * msrSq + r11.xyz;
-        r11.xyz = albedo_alpha.xyz * cb1[262].xyz + -r9.xyz;
-        r9.xyz = r10.xxx * r11.xyz + r9.xyz;
-        r9.xyz = r9.xyz + -model13_14_15.xyw;
-        r8.xyz = shadingModelID * r9.xyz + model13_14_15.xyw;
-    }
-    perObjectData = -0.400000006 + packedNormalWS_perObjectData.w;
-    perObjectData = saturate(10.000001 * perObjectData);
-    packedNormalWS_perObjectData.w = perObjectData * -2 + 3;
-    perObjectData = perObjectData * perObjectData;
-    r10.y = packedNormalWS_perObjectData.w * perObjectData;
-    model13_14_15.xyw = r8.xyz * float3(0.5,0.5,0.5) + cb1[261].xyz;
-    model13_14_15.xyw = model13_14_15.xyw * albedo_alpha.xyz;
-    r9.xyz = cb1[261].xyz * albedo_alpha.xyz;
-    model13_14_15.xyw = cb1[255].xxx ? model13_14_15.xyw : r9.xyz;
-    r9.xyz = isModel_5_13.y ? model13_14_15.xyw : r14.xyz;
-    model13_14_15.xyw = isModel_5_13.y ? model13_14_15.xyw : r8.xyz;
-    packedNormalWS_perObjectData.xw = isModel_5_13.y ? float2(0,0) : r10.xy;
-    r8.xyz = cb1[264].xyz + cb1[264].xyz;
-    r8.xyz = perObjectData * r8.xyz + -cb1[264].xyz;
-    r10.xyz = float3(0,0,0);
-    shadingModelID = 1;
-    customData.x = 0;
-    while (true) {
-        model_low4_high4.z = ((uint)customData.x >= asuint(cb2[128].x)) ? 1.0 : 0.0;
-        if (model_low4_high4.z != 0) break;
-        bitmask.z = ((~(-1 << 29)) << 3) & 0xffffffff;  model_low4_high4.z = (((uint)customData.x << 3) & bitmask.z) | ((uint)7 & ~bitmask.z);
-        bitmask.w = ((~(-1 << 3)) << 5) & 0xffffffff;  model_low4_high4.w = (((uint)cb2[model_low4_high4.z+0].w << 5) & bitmask.w) | ((uint)0 & ~bitmask.w);
-        model_low4_high4.w = (int)model_low4_high4.y & (int)model_low4_high4.w;
-        if (model_low4_high4.w == 0) {
-        model_low4_high4.w = (int)customData.x + 1;
-        customData.x = model_low4_high4.w;
-        continue;
-        }
-        model_low4_high4.w = (uint)customData.x << 3;
-        r11.xyz = cb2[model_low4_high4.w+0].xyz + -posWS.xyz;
-        r6.w = cb2[model_low4_high4.w+0].w * cb2[model_low4_high4.w+0].w;
-        r7.w = dot(r11.xyz, r11.xyz);
-        r6.w = r7.w * r6.w;
-        r8.w = (1 >= r6.w) ? 1.0 : 0.0;
-        if (r8.w != 0) {
-        bitmask.x = ((~(-1 << 29)) << 3) & 0xffffffff;  r12.x = (((uint)customData.x << 3) & bitmask.x) | ((uint)1 & ~bitmask.x);
-        bitmask.y = ((~(-1 << 29)) << 3) & 0xffffffff;  r12.y = (((uint)customData.x << 3) & bitmask.y) | ((uint)2 & ~bitmask.y);
-        bitmask.z = ((~(-1 << 29)) << 3) & 0xffffffff;  r12.z = (((uint)customData.x << 3) & bitmask.z) | ((uint)3 & ~bitmask.z);
-        bitmask.w = ((~(-1 << 29)) << 3) & 0xffffffff;  r12.w = (((uint)customData.x << 3) & bitmask.w) | ((uint)4 & ~bitmask.w);
-        bitmask.x = ((~(-1 << 29)) << 3) & 0xffffffff;  r13.x = (((uint)customData.x << 3) & bitmask.x) | ((uint)5 & ~bitmask.x);
-        bitmask.y = ((~(-1 << 29)) << 3) & 0xffffffff;  r13.y = (((uint)customData.x << 3) & bitmask.y) | ((uint)6 & ~bitmask.y);
-        r6.w = saturate(r6.w * 2.5 + -1.5);
-        r8.w = r6.w * r6.w;
-        r6.w = -r6.w * 2 + 3;
-        r6.w = -r8.w * r6.w + 1;
-        r7.w = rsqrt(r7.w);
-        r14.xyz = r11.xyz * r7.www;
-        r7.w = dot(normal.xyz, r14.xyz);
-        r7.w = 1 + r7.w;
-        r13.zw = cb2[r13.x+0].ww * float2(0.939999998,0.0600000024);
-        r7.w = r7.w * 0.5 + -r13.z;
-        r8.w = 1 / r13.w;
-        r7.w = saturate(r8.w * r7.w);
-        r8.w = r7.w * -2 + 3;
-        r7.w = r7.w * r7.w;
-        r7.w = r8.w * r7.w;
-        r7.w = min(1, r7.w);
-        r15.xyz = cb2[r13.y+0].xyz * r9.xyz;
-        r13.xzw = albedo_alpha.xyz * cb2[r13.x+0].xyz + -r15.xyz;
-        r13.xzw = r7.www * r13.xzw + r15.xyz;
-        r13.xzw = cb2[model_low4_high4.z+0].xxx * r13.xzw;
-        r11.xyz = cb2[model_low4_high4.w+0].www * r11.xyz;
-        model_low4_high4.w = dot(r11.xyz, r11.xyz);
-        model_low4_high4.w = model_low4_high4.w * cb2[r12.w+0].x + cb2[r12.w+0].y;
-        model_low4_high4.w = 9.99999975e-005 + model_low4_high4.w;
-        model_low4_high4.w = 1 / model_low4_high4.w;
-        model_low4_high4.w = -1 + model_low4_high4.w;
-        model_low4_high4.w = cb2[r12.w+0].z * model_low4_high4.w;
-        model_low4_high4.w = model_low4_high4.w * model_low4_high4.w;
-        model_low4_high4.w = min(1, model_low4_high4.w);
-        if (4 == 0) r7.w = 0; else if (4+16 < 32) {       r7.w = (uint)cb2[r12.x+0].w << (32-(4 + 16)); r7.w = (uint)r7.w >> (32-4);      } else r7.w = (uint)cb2[r12.x+0].w >> 16;
-        r7.w = ((int)r7.w == 2) ? 1.0 : 0.0;
-        r8.w = dot(r14.xyz, cb2[r12.x+0].xyz);
-        r8.w = -cb2[r12.y+0].x + r8.w;
-        r8.w = saturate(cb2[r12.y+0].y * r8.w);
-        r8.w = r8.w * r8.w;
-        r8.w = r8.w * r8.w;
-        r8.w = r8.w * model_low4_high4.w;
-        model_low4_high4.w = r7.w ? r8.w : model_low4_high4.w;
-        r7.w = dot(r8.xyz, r14.xyz);
-        r7.w = saturate(r7.w * 0.5 + 0.5);
-        r7.w = packedNormalWS_perObjectData.w * r7.w + -perObjectData;
-        r7.w = cb2[r12.w+0].w * r7.w + perObjectData;
-        r11.xyz = cb2[r12.z+0].www * r9.xyz;
-        r12.xyw = -r9.xyz * cb2[r12.z+0].www + albedo_alpha.xyz;
-        r11.xyz = r7.www * r12.xyw + r11.xyz;
-        r11.xyz = cb2[r12.z+0].xyz * r11.xyz;
-        r7.w = cb2[r12.z+0].x + cb2[r12.z+0].y;
-        r7.w = cb2[r12.z+0].z + r7.w;
-        r7.w = cb2[model_low4_high4.z+0].x + r7.w;
-        r7.w = saturate(10 * r7.w);
-        model_low4_high4.z = cb2[model_low4_high4.z+0].y * r7.w;
-        r12.xyz = r13.xzw * model_low4_high4.www;
-        r11.xyz = r11.xyz * model_low4_high4.www + r12.xyz;
-        r6.w = r6.w + -model_low4_high4.w;
-        model_low4_high4.w = cb2[r13.y+0].w * r6.w + model_low4_high4.w;
-        r10.xyz = r11.xyz * shadingModelID + r10.xyz;
-        model_low4_high4.z = -model_low4_high4.w * model_low4_high4.z + 1;
-        shadingModelID = model_low4_high4.z * shadingModelID;
-        }
-        customData.x = (int)customData.x + 1;
-    }
-    model_low4_high4.yzw = shadingModelID * model13_14_15.xyw + r10.xyz;
-    perObjectData = ((int)model_low4_high4.x != 13) ? 1.0 : 0.0;
-    if (perObjectData != 0) {
-        perObjectData = ((int)model_low4_high4.x == 1) ? 1.0 : 0.0;
-        perObjectData = perObjectData ? customData.z : customData.y;
-        customData.xyz = cb1[67].xyz + -posWS.xyz;
-        packedNormalWS_perObjectData.w = dot(customData.xyz, customData.xyz);
-        packedNormalWS_perObjectData.w = rsqrt(packedNormalWS_perObjectData.w);
-        customData.xyz = customData.xyz * packedNormalWS_perObjectData.www;
-        packedNormalWS_perObjectData.w = saturate(-0.100000001 + perObjectData);
-        perObjectData = saturate(10 * perObjectData);
-        shadingModelID = packedNormalWS_perObjectData.w * 2000 + 50;
-        model_low4_high4.x = packedNormalWS_perObjectData.w + packedNormalWS_perObjectData.w;
-        perObjectData = cb0[0].x * perObjectData;
-        perObjectData = perObjectData * 0.800000012 + model_low4_high4.x;
-        model13_14_15.xyw = cb1[21].xyz * normal.yyy;
-        model13_14_15.xyw = normal.xxx * cb1[20].xyz + model13_14_15.xyw;
-        model13_14_15.xyw = normal.zzz * cb1[22].xyz + model13_14_15.xyw;
-        model_low4_high4.x = asint(cb0[0].w);
-        model_low4_high4.x = (0.5 < model_low4_high4.x) ? 1.0 : 0.0;
-        customData.xyz = model_low4_high4.xxx ? float3(0,0,0) : customData.xyz;
-        r6.xy = model_low4_high4.xx ? cb0[0].yz : cb1[264].xy;
-        r6.z = model_low4_high4.x ? 0.5 : cb1[264].z;
-        normal.xyz = model_low4_high4.xxx ? model13_14_15.xyw : normal.xyz;
-        model_low4_high4.x = dot(r6.xyz, normal.xyz);
-        r8.xy = float2(0.200000003,1) + model_low4_high4.xx;
-        model_low4_high4.x = 5 * r8.x;
-        model_low4_high4.x = saturate(model_low4_high4.x);
-        model13_14_15.w = model_low4_high4.x * -2 + 3;
-        model_low4_high4.x = model_low4_high4.x * model_low4_high4.x;
-        model_low4_high4.x = model13_14_15.w * model_low4_high4.x;
-        r8.xzw = r6.xyz + customData.xyz;
-        model13_14_15.w = dot(r8.xzw, r8.xzw);
-        model13_14_15.w = rsqrt(model13_14_15.w);
-        r8.xzw = r8.xzw * model13_14_15.www;
-        model13_14_15.w = saturate(dot(normal.xyz, r8.xzw));
-        model13_14_15.w = model13_14_15.w * model13_14_15.w;
-        model13_14_15.w = model13_14_15.w * -0.800000012 + 1;
-        model13_14_15.w = model13_14_15.w * model13_14_15.w;
-        model13_14_15.w = 3.14159274 * model13_14_15.w;
-        model13_14_15.w = 0.200000003 / model13_14_15.w;
-        model13_14_15.w = model13_14_15.w * shadow;
-        r6.x = dot(r6.xyz, customData.xyz);
-        r6.xy = float2(-0.5,1) + -r6.xx;
-        r6.x = saturate(r6.x + r6.x);
-        r6.z = r6.x * -2 + 3;
-        r6.x = r6.x * r6.x;
-        r6.x = r6.z * r6.x + 1;
-        normal.x = saturate(dot(customData.xyz, normal.xyz));
-        normal.x = 0.800000012 + -normal.x;
-        normal.x = max(0, normal.x);
-        normal.y = max(0, cb1[133].x);
-        normal.y = min(1.74532926, normal.y);
-        normal.xy = float2(1.5,0.572957814) * normal.xy;
-        normal.z = max(0, depth);
-        customData.xy = min(float2(3000,50), normal.zz);
-        customData.xy = float2(3000,50) + -customData.xy;
-        customData.xy = float2(0.00033333333,0.0199999996) * customData.xy;
-        normal.z = customData.x * customData.x;
-        normal.z = normal.z * normal.z;
-        normal.z = normal.z * normal.z + customData.y;
-        normal.z = -1 + normal.z;
-        normal.y = normal.y * normal.z + 1;
-        normal.z = 1 + -normal.y;
-        normal.y = packedNormalWS_perObjectData.w * normal.z + normal.y;
-        normal.z = r8.y * 0.25 + 0.5;
-        normal.x = normal.z * normal.x;
-        normal.x = normal.x * normal.y;
-        normal.x = normal.x * r6.x;
-        normal.x = 0.00999999978 * normal.x;
-        customData.xy = float2(9.99999975e-005,9.99999975e-005) + model13_14_15.xy;
-        normal.z = dot(customData.xy, customData.xy);
-        normal.z = rsqrt(normal.z);
-        customData.xy = customData.xy * normal.zz;
-        customData.xy = customData.xy * perObjectData;
-        customData.z = customData.y * normal.x;
-        normal.y = -0.5;
-        normal.xy = customData.xz * normal.xy;
-        perObjectData = 0.400000006 * r6.y;
-        normal.z = model_low4_high4.x * 0.800000012 + 0.200000003;
-        customData.x = model13_14_15.w * model_low4_high4.x;
-        customData.x = 1.5 * customData.x;
-        perObjectData = perObjectData * normal.z + customData.x;
-        normal.z = shadow * 0.5 + 0.5;
-        perObjectData = normal.z * perObjectData;
-        customData.xy = screenUV_ndcUV.xy * _ScaledScreenParams.xy + -cb1[134].xy;
-        normal.xy = customData.xy * cb1[135].zw + normal.xy;
-        normal.xy = normal.xy * cb1[135].xy + cb1[134].xy;
-        normal.xy = ((_ScaledScreenParams.zw - 1) * normal.xy); // unity需要多一步 因为是1开头的
-        normal.x = tex2D(_IN6, normal.xy).x;
-        normal.y = normal.x * cb1[65].x + cb1[65].y;
-        normal.x = normal.x * cb1[65].z + -cb1[65].w;
-        normal.x = 1 / normal.x;
-        normal.x = normal.y + normal.x;
-        normal.x = normal.x + -depth;
-        normal.x = max(9.99999975e-005, normal.x);
-        packedNormalWS_perObjectData.w = -packedNormalWS_perObjectData.w * 1000 + normal.x;
-        normal.x = 1 / shadingModelID;
-        packedNormalWS_perObjectData.w = saturate(normal.x * packedNormalWS_perObjectData.w);
-        normal.x = packedNormalWS_perObjectData.w * -2 + 3;
-        packedNormalWS_perObjectData.w = packedNormalWS_perObjectData.w * packedNormalWS_perObjectData.w;
-        packedNormalWS_perObjectData.w = normal.x * packedNormalWS_perObjectData.w;
-        packedNormalWS_perObjectData.w = min(1, packedNormalWS_perObjectData.w);
-        normal.x = dot(cb1[263].xyz, float3(0.300000012,0.589999974,0.109999999));
-        float3 smjb = cb1[263].xyz + -normal.xxx;
-        normal.xyz = smjb * float3(0.75,0.75,0.75) + normal.xxx;
-        customData.xyz = cb1[263].xyz + -normal.xyz;
-        normal.xyz = shadow * customData.xyz + normal.xyz;
-        normal.xyz = normal.xyz * perObjectData;
-        normal.xyz = float3(0.100000001,0.100000001,0.100000001) * normal.xyz;
-        customData.xyz = float3(1,1,1) + albedo_alpha.xyz;
-        customData.xyz = customData.xyz * normal.xyz;
-        model13_14_15.xyw = albedo_alpha.xyz * float3(1.20000005,1.20000005,1.20000005) + float3(-1,-1,-1);
-        model13_14_15.xyw = saturate(-model13_14_15.xyw);
-        r6.xyz = model13_14_15.xyw * float3(-2,-2,-2) + float3(3,3,3);
-        model13_14_15.xyw = model13_14_15.xyw * model13_14_15.xyw;
-        model13_14_15.xyw = r6.xyz * model13_14_15.xyw;
-        model13_14_15.xyw = model13_14_15.xyw * float3(14,14,14) + float3(1,1,1);
-        normal.xyz = model13_14_15.xyw * normal.xyz;
-        normal.xyz = normal.xyz * albedo_alpha.xyz + -customData.xyz;
-        normal.xyz = cb1[260].zzz * normal.xyz + customData.xyz;
-        normal.xyz = normal.xyz * packedNormalWS_perObjectData.www;
-        perObjectData = -10000 + depth;
-        perObjectData = max(0, perObjectData);
-        perObjectData = min(5000, perObjectData);
-        perObjectData = 5000 + -perObjectData;
-        perObjectData = 0.000199999995 * perObjectData;
-        normal.xyz = perObjectData * normal.xyz;
-        normal.xyz = cb0[1].xyz * normal.xyz;
-    } else {
-        normal.xyz = float3(0,0,0);
-    }
-    perObjectData = (0 != isCharaAnisotropicFabric15) ? 1.0 : 0.0;
-    albedo_alpha.xyz = model_low4_high4.yzw * msrSq;
-    albedo_alpha.xyz = cb1[263].xyz * albedo_alpha.xyz;
-    albedo_alpha.xyz = albedo_alpha.xyz * float3(0.5,0.5,0.5) + -model_low4_high4.yzw;
-    albedo_alpha.xyz = packedNormalWS_perObjectData.www * albedo_alpha.xyz + model_low4_high4.yzw;
-    normal.xyz = model_low4_high4.yzw + normal.xyz;
-    normal.xyz = perObjectData ? albedo_alpha.xyz : normal.xyz;
-    packedNormalWS_perObjectData.xzw = isModel_5_13.y ? model_low4_high4.yzw : normal.xyz;
-    packedNormalWS_perObjectData.xyz = packedNormalWS_perObjectData.xzw / eyeAdaptation;
-    packedNormalWS_perObjectData.xyz = min(float3(0,0,0), -packedNormalWS_perObjectData.xyz);
-    color.xyz = -packedNormalWS_perObjectData.xyz;
-    return color;
+// ---- 移植自反编译代码 ----
+
+  r0.xyz = v1.zxy * v0.yzx;
+  r0.xyz = v1.yzx * v0.zxy + -r0.xyz;
+  r0.xyz = v1.www * r0.xyz;
+  r1.xyzw = cb0[45].xyzw * v9.yyyy;
+  r1.xyzw = v9.xxxx * cb0[44].xyzw + r1.xyzw;
+  r1.xyzw = v9.zzzz * cb0[46].xyzw + r1.xyzw;
+  r1.xyzw = cb0[47].xyzw + r1.xyzw;
+  r1.xyz = r1.xyz / r1.www;
+  r0.w = dot(-r1.xyz, -r1.xyz);
+  r0.w = rsqrt(r0.w);
+  r2.xyz = -r1.xyz * r0.www;
+  r3.xyzw = _IN0.SampleBias(sampler_IN0, v2.xy, cb0[149].y).xyzw;
+  r3.xy = r3.xy * float2(2,2) + float2(-1,-1);
+  r3.xy = cb4[64].ww * r3.xy;
+  r0.xyz = r3.yyy * r0.xyz;
+  r0.xyz = r3.xxx * v0.xyz + r0.xyz;
+  r0.xyz = v1.xyz + r0.xyz;
+  r1.w = 1 + -cb0[144].w;
+  r4.xyz = v1.xyz * r1.www;
+  r0.xyz = r0.xyz * cb0[144].www + r4.xyz;
+  r1.w = dot(r0.xyz, r0.xyz);
+  r1.w = rsqrt(r1.w);
+  r0.xyz = r1.www * r0.xyz;
+  r3.xy = _IN1.SampleLevel(sampler_IN1, v2.xy, cb0[149].y).xy;
+  r4.xyzw = (r3.xxxx >= float4(0.0500000007,0.300000012,0.5,0.899999976));
+  r4.xyzw = r4.xyzw ? float4(1,1,1,1) : 0;
+  r5.xyzw = (float4(0.0500000007,0.300000012,0.5,0.899999976) >= r3.xxxx);
+  r5.yzw = r5.yzw ? float3(1,1,1) : 0;
+  r4.yz = r5.zw * r4.yz;
+  r1.w = -r4.x * r5.y + 1;
+  r1.w = r5.x ? 1 : r1.w;
+  r1.w = -r4.y * r1.w + 1;
+  r2.w = r4.z * r1.w;
+  r1.w = -r4.z * r1.w + 1;
+  r1.w = r4.w * r1.w;
+  r3.x = (cb4[65].y >= 0.5);
+  r1.w = r3.x ? r1.w : cb4[65].x;
+  r3.x = 1 + -r1.w;
+  r1.w = cb4[65].z * r3.x + r1.w;
+  r4.xyz = float3(-1,-1,-1) + cb4[4].xyz;
+  r4.xyz = r1.www * r4.xyz + float3(1,1,1);
+  r5.xyzw = _IN2.SampleBias(sampler_IN2, v2.xy, cb0[149].y).xyzw;
+  r5.xyz = cb4[6].xyz * r5.xyz;
+  r6.xyz = r5.xyz * r4.xyz;
+  r3.x = cb4[65].w * r3.z;
+  r3.z = cb4[66].x * r3.w;
+  r4.w = saturate(dot(r0.xyz, r2.xyz));
+  r6.w = (2.98023295e-008 >= r3.z);
+  r7.x = log2(r3.z);
+  r7.x = 0.100000001 * r7.x;
+  r7.x = exp2(r7.x);
+  r6.w = r6.w ? 0 : r7.x;
+  r7.x = 1 + -r6.w;
+  r7.x = r7.x * 19.8999996 + 0.100000001;
+  r6.w = r6.w * -999 + 1000;
+  r7.y = (r3.x >= 0.850000024);
+  r7.y = r7.y ? 1.000000 : 0;
+  r7.z = cb4[66].y + -cb4[66].z;
+  r7.z = r7.y * r7.z + cb4[66].z;
+  r8.xyz = -cb3[36].xyz + cb3[17].xyz;
+  r8.xyz = cb4[67].yyy * r8.xyz;
+  r7.w = (cb4[66].w >= 0.5);
+  r7.w = r7.w ? 1.000000 : 0;
+  r8.xyz = r7.www * r8.xyz + cb3[36].xyz;
+  r7.w = dot(r8.xyz, r8.xyz);
+  r7.w = sqrt(r7.w);
+  r8.xyz = r8.xyz / r7.www;
+  r9.xyz = cb4[8].xyz + cb2[5].xyz;
+  r10.xyz = cb1[0].xyz + -r9.xyz;
+  r7.w = dot(r10.xyz, r10.xyz);
+  r7.w = sqrt(r7.w);
+  r10.xyz = r10.xyz / r7.www;
+  r9.xyz = -cb1[0].xyz + r9.xyz;
+  r7.w = dot(r9.xyz, r9.xyz);
+  r7.w = sqrt(r7.w);
+  r7.w = saturate(cb1[0].w * r7.w);
+  r9.xyz = -r10.xyz + r8.xyz;
+  r9.xyz = r7.www * r9.xyz + r10.xyz;
+  r9.xyz = r9.xyz + -r8.xyz;
+  r8.xyz = cb1[1].zzz * r9.xyz + r8.xyz;
+  r7.w = saturate(cb2[27].y);
+  r9.xy = v6.xy;
+  r9.z = v7.x;
+  r9.xyz = r9.xyz + -r8.xyz;
+  r8.xyz = r7.www * r9.xyz + r8.xyz;
+  r7.w = dot(r8.xyz, r8.xyz);
+  r7.w = sqrt(r7.w);
+  r8.xyz = r8.xyz / r7.www;
+  r2.x = dot(r8.xyz, r2.xyz);
+  r2.y = 1 + -abs(r2.z);
+  r2.x = r2.x * r2.y + 1;
+  r2.x = 0.5 * r2.x;
+  r2.y = -cb4[68].x + cb4[67].w;
+  r2.x = r2.x * r2.y + cb4[68].x;
+  r2.y = 1 + -r4.w;
+  r2.x = r2.x * r2.y + cb4[68].y;
+  r2.y = -cb4[68].z + r2.x;
+  r2.z = cb4[68].z + r2.x;
+  r4.w = cb4[68].w * r5.w;
+  r5.w = max(0, r4.w);
+  r5.w = min(cb4[69].x, r5.w);
+  r5.w = r5.w / cb4[69].x;
+  r7.w = max(cb4[69].y, r4.w);
+  r7.w = min(1, r7.w);
+  r7.w = -cb4[69].y + r7.w;
+  r9.xy = float2(1,1) + -cb4[69].yz;
+  r7.w = r7.w / r9.x;
+  r8.w = -cb4[69].z + r5.w;
+  r9.x = 1 / r9.y;
+  r8.w = saturate(r9.x * r8.w);
+  r9.x = r8.w * -2 + 3;
+  r8.w = r8.w * r8.w;
+  r8.w = r9.x * r8.w;
+  r8.w = cb4[69].w * r8.w;
+  r9.x = (2.98023295e-008 >= r8.w);
+  r8.w = log2(r8.w);
+  r8.w = cb4[70].x * r8.w;
+  r8.w = exp2(r8.w);
+  r8.w = cb4[70].y * r8.w;
+  r8.w = r9.x ? 0 : r8.w;
+  r9.x = dot(r0.xyz, r8.xyz);
+  r8.w = r9.x * 0.5 + r8.w;
+  r8.w = 0.5 + r8.w;
+  r2.z = r2.z + -r2.y;
+  r2.y = r8.w + -r2.y;
+  r2.z = 1 / r2.z;
+  r2.y = saturate(r2.y * r2.z);
+  r2.z = r2.y * -2 + 3;
+  r2.y = r2.y * r2.y;
+  r2.y = r2.z * r2.y;
+  r2.z = min(cb4[69].z, r5.w);
+  r2.z = r2.z / cb4[70].z;
+  r5.w = max(0.899999976, r2.z);
+  r5.w = min(1, r5.w);
+  r5.w = -0.899999976 + r5.w;
+  r2.y = r5.w * r2.y;
+  r5.w = (r2.y >= 0.0400000066);
+  r9.x = r5.w ? 1.000000 : 0;
+  r9.yzw = r9.xxx * r8.xyz;
+  r9.yzw = float3(2,2,0) * r9.yzw;
+  r9.yzw = r8.xyz * float3(-1,-1,1) + r9.yzw;
+  r9.yzw = -r1.xyz * r0.www + r9.yzw;
+  r10.x = dot(r9.yzw, r9.yzw);
+  r10.x = sqrt(r10.x);
+  r9.yzw = r9.yzw / r10.xxx;
+  r9.y = saturate(dot(r9.yzw, r0.xyz));
+  r8.xyz = -r1.xyz * r0.www + r8.xyz;
+  r0.w = dot(r8.xyz, r8.xyz);
+  r0.w = sqrt(r0.w);
+  r8.xyz = r8.xyz / r0.www;
+  r0.w = saturate(dot(r0.xyz, r8.xyz));
+  r0.w = r0.w + -r9.y;
+  r0.w = r7.y * r0.w + r9.y;
+  r0.w = log2(r0.w);
+  r0.w = r6.w * r0.w;
+  r0.w = exp2(r0.w);
+  r0.w = r0.w * r7.z;
+  r6.w = 2 + r7.z;
+  r0.w = r6.w * r0.w;
+  r0.w = r0.w * 0.159154937 + -0.600000024;
+  r0.w = saturate(0.833333373 * r0.w);
+  r6.w = r0.w * -2 + 3;
+  r0.w = r0.w * r0.w;
+  r0.w = r6.w * r0.w;
+  r0.w = r7.x * r0.w;
+  r6.w = r3.x * 0.5 + 0.5;
+  r8.xyz = r6.xyz * r3.xxx;
+  r6.w = 0.0799999982 * r6.w;
+  r9.yzw = r4.xyz * r5.xyz + -r6.www;
+  r9.yzw = r3.xxx * r9.yzw + r6.www;
+  r10.xyzw = r3.zzzz * float4(-1,-0.0274999999,-0.572000027,0.0219999999) + float4(1,0.0425000004,1.03999996,-0.0399999991);
+  r3.x = r10.x * r10.x;
+  r3.x = min(0.00160857651, r3.x);
+  r3.x = r3.x * r10.x + r10.y;
+  r7.xz = r3.xx * float2(-1.03999996,1.03999996) + r10.zw;
+  r3.x = saturate(50 * r9.z);
+  r3.x = r7.z * r3.x;
+  r10.xyz = r9.yzw * r7.xxx + r3.xxx;
+  r9.yzw = cb4[71].xxx * r9.yzw;
+  r11.xyz = r9.yzw * r0.www;
+  r10.xyz = cb4[71].xxx * r10.xyz;
+  r8.xyz = cb4[71].xxx * -r8.xyz + r6.xyz;
+  r11.xyz = r11.xyz * r7.yyy;
+  r11.xyz = cb4[71].yyy * r11.xyz;
+  r2.w = max(r1.w, r2.w);
+  r2.w = 1 + -r2.w;
+  r3.x = -r3.w * cb4[66].x + 1;
+  r3.x = (r3.x >= 0.00999999978);
+  r3.x = r3.x ? 1.000000 : 0;
+  r2.w = r3.x * r2.w;
+  r7.xzw = r7.www * r6.xyz;
+  r7.xzw = cb4[10].xyz * r7.xzw;
+  r7.xzw = r2.www * r11.xyz + r7.xzw;
+  r7.xzw = v7.yyy * cb4[45].xyz + r7.xzw;
+  r11.xyz = cb4[46].xyz + -r7.xzw;
+  r7.xzw = cb4[83].yyy * r11.xyz + r7.xzw;
+  r8.xyz = r9.yzw * r0.www + r8.xyz;
+  r11.xyzw = cb0[13].yzzx * r1.yyyy;
+  r11.xyzw = r1.xxxx * cb0[12].yzzx + r11.xyzw;
+  r11.xyzw = r1.zzzz * cb0[14].yzzx + r11.xyzw;
+  r11.xyzw = cb0[15].yzzx + r11.xyzw;
+  r0.w = dot(r11.xzw, r11.xzw);
+  r0.w = sqrt(r0.w);
+  r11.xyzw = r11.xyzw / r0.wwww;
+  r12.xyzw = cb0[13].zxyz * r0.yyyy;
+  r12.xyzw = r0.xxxx * cb0[12].zxyz + r12.xyzw;
+  r12.xyzw = r0.zzzz * cb0[14].zxyz + r12.xyzw;
+  r3.xw = r12.zw * r11.zw;
+  r3.xw = r11.yx * r12.yx + -r3.wx;
+  r3.xw = r3.xw * float2(0.5,0.5) + float2(0.5,0.5);
+  r11.xyzw = _IN3.SampleBias(sampler_IN3, r3.xw, cb0[149].y).xyzw;
+  r0.w = 3 * r3.z;
+  r0.w = saturate(r0.w);
+  r3.x = r11.y + -r11.x;
+  r0.w = r0.w * r3.x + r11.x;
+  r3.xz = saturate(r3.zz * float2(3,3) + float2(-1,-2));
+  r3.w = r11.z + -r0.w;
+  r0.w = r3.x * r3.w + r0.w;
+  r3.x = r11.w + -r0.w;
+  r0.w = r3.z * r3.x + r0.w;
+  r3.x = cb4[83].z + -cb4[83].w;
+  r3.x = r7.y * r3.x + cb4[83].w;
+  r3.z = r5.w ? 0 : 1;
+  r3.w = r3.x * r3.z;
+  r5.w = cb4[84].x + -cb4[83].w;
+  r5.w = r7.y * r5.w + cb4[83].w;
+  r3.x = -r3.x * r3.z + r5.w;
+  r3.x = r9.x * r3.x + r3.w;
+  r0.w = r3.x * r0.w;
+  r3.xzw = r10.xyz * r0.www + r8.xyz;
+  r3.xzw = -r4.xyz * r5.xyz + r3.xzw;
+  r3.xzw = r2.www * r3.xzw + r6.xyz;
+  r4.xyz = cb4[84].zzz * r3.xzw;
+  r0.w = max(0, r8.w);
+  r0.w = min(cb4[85].z, r0.w);
+  r2.w = r8.w + -r0.w;
+  r0.w = r2.z * r2.w + r0.w;
+  r0.w = 0.5 + r0.w;
+  r5.x = saturate(r0.w + -r2.x);
+  r0.w = 0.100000001 + -cb4[85].w;
+  r5.y = r1.w * r0.w + cb4[85].w;
+  r5.xyz = _IN4.SampleBias(sampler_IN4, r5.xy, cb0[149].y).xyz;
+  r0.w = (cb3[1].w >= 0.0500000007);
+  r0.w = r0.w ? 1.000000 : 0;
+  r0.w = r3.y * r0.w;
+  r3.xyz = -cb4[84].zzz * r3.xzw + r5.xyz;
+  r6.xyz = r4.xyz + r4.xyz;
+  r3.xyz = r0.www * r3.xyz + r6.xyz;
+  r3.xyz = r3.xyz * float3(0.5,0.5,0.5) + -r4.xyz;
+  r3.xyz = r1.www * r3.xyz + r4.xyz;
+  r2.x = dot(r3.xyz, float3(0.300000012,0.589999974,0.109999999));
+  r4.xyz = r2.xxx + -r3.xyz;
+  o3_BaseColor_ToonSkinMask.xyz = cb4[86].xxx * r4.xyz + r3.xyz;
+  r3.xyz = -cb4[62].xyz + cb4[61].xyz;
+  r3.xyz = r1.www * r3.xyz + cb4[62].xyz;
+  r4.xyz = r5.xyz + -r3.xyz;
+  r3.xyz = r0.www * r4.xyz + r3.xyz;
+  r0.w = dot(r3.xyz, float3(0.300000012,0.589999974,0.109999999));
+  r4.xyz = r0.www + -r3.xyz;
+  r3.xyz = cb4[86].xxx * r4.xyz + r3.xyz;
+  r0.w = 1 + -r2.z;
+  r0.w = -r0.w * cb4[94].y + 1;
+  r2.x = r2.y * 4.99999905 + 0.5;
+  r0.w = r2.x * r0.w;
+  r2.x = asint(cb2[26].w) & 1;
+  r2.x = (0 < (uint)r2.x);
+  r2.y = (asint(cb0[160].x) != 0);
+  r2.x = (int)r2.y | (int)r2.x;
+  if (r2.x != 0) {
+    r2.xy = -cb0[134].xy + v9.xy;
+    r2.xy = r2.xy * cb0[135].zw + float2(-0.5,-0.5);
+    r2.xy = v9.ww * r2.xy;
+    r2.zw = v9.zw;
+    r5.xyw = float3(2,-2,1);
+    r5.z = v9.w;
+    r2.xyzw = r5.xyzw * r2.xyzw;
+    r2.xyz = r2.zxy / r2.www;
+    r2.yz = -cb0[131].xy + r2.yz;
+    r4.xyz = v8.zxy / v8.www;
+    r4.yz = -cb0[131].zw + r4.yz;
+    r2.xyz = -r4.xyz + r2.xyz;
+    r5.xy = r2.yz * float2(0.249500006,0.249500006) + float2(0.499992371,0.499992371);
+    r2.y = (uint)r2.x >> 16;
+    r2.y = (uint)r2.y;
+    r2.y = r2.y * 1.52590219e-005 + 1.52590223e-006;
+    r2.x = (int)r2.x & 0x0000ffff;
+    r2.x = (uint)r2.x;
+    r2.x = r2.x * 1.52590219e-005 + 1.52590223e-006;
+    r5.zw = min(float2(1,1), r2.yx);
+    r2.x = (cb2[20].w == 0.000000);
+    r2.y = (asint(cb0[160].x) == 0);
+    r2.x = r2.y ? r2.x : 0;
+    o4.xyzw = r2.xxxx ? float4(0,0,0,0) : r5.xyzw;
+  } else {
+    o4.xyzw = float4(0,0,0,0);
+  }
+  r2.xyz = max(float3(0,0,0), r7.xzw);
+  r2.w = (0 < cb0[146].x);
+  if (r2.w != 0) {
+    r1.xyz = -cb0[70].xyz + r1.xyz;
+    r4.xyz = -cb2[5].xyz + r1.xyz;
+    r5.xyz = float3(1,1,1) + cb2[19].xyz;
+    r4.xyz = (r5.xyz < abs(r4.xyz));
+    r2.w = (int)r4.y | (int)r4.x;
+    r2.w = (int)r4.z | (int)r2.w;
+    r1.x = dot(r1.xyz, float3(0.577000022,0.577000022,0.577000022));
+    r1.x = 0.00200000009 * r1.x;
+    r1.x = frac(r1.x);
+    r1.x = (0.5 < r1.x);
+    r1.xyz = r1.xxx ? float3(0,1,1) : float3(1,1,0);
+    r2.xyz = r2.www ? r1.xyz : r2.xyz;
+  }
+  r1.x = (asint(cb0[249].x) == 1);
+  if (r1.x != 0) {
+    r1.x = dot(float3(1,1,1), abs(r0.xyz));
+    r1.xy = r0.xy / r1.xx;
+    r4.xy = float2(1,1) + -abs(r1.yx);
+    r5.xy = (r1.xy >= float2(0,0));
+    r5.xy = r5.xy ? float2(0.5,0.5) : float2(-0.5,-0.5);
+    r4.xy = r5.xy * r4.xy;
+    r1.z = (0 >= r0.z);
+    r1.z = r1.z ? 1.000000 : 0;
+    r4.xy = r4.xy * float2(2,2) + -r1.xy;
+    r1.xy = r1.zz * r4.xy + r1.xy;
+    o1_Normal_Diffuse_FaceSDFMask.xy = r1.xy * float2(0.5,0.5) + float2(0.5,0.5);
+    r3.xyz = saturate(r3.xyz);
+    o2_ShadowColor_PackShadeMode_OutputMask.xyz = sqrt(r3.xyz);
+    bitmask.x = ((~(-1 << 3)) << 5) & 0xffffffff;  r1.x = (((uint)cb2[23].w << 5) & bitmask.x) | ((uint)12 & ~bitmask.x);
+    r1.x = (uint)r1.x;
+    o2_ShadowColor_PackShadeMode_OutputMask.w = 0.00392156886 * r1.x;
+    o1_Normal_Diffuse_FaceSDFMask.z = 1;
+    o1_Normal_Diffuse_FaceSDFMask.w = r0.w;
+    o4.xyzw = float4(0,0,0,0);
+    r1.xy = float2(0,0);
+    o3_BaseColor_ToonSkinMask.w = cb4[94].z;
+  } else {
+    r1.z = (r1.w >= 0.5);
+    o1_Normal_Diffuse_FaceSDFMask.w = r1.z ? 0.666000 : 0;
+    r1.z = saturate(cb4[94].w);
+    r1.z = 255 * r1.z;
+    r1.z = round(r1.z);
+    r1.w = saturate(cb4[95].x);
+    r1.w = 15 * r1.w;
+    r1.w = round(r1.w);
+    r1.zw = (uint2)r1.zw;
+    bitmask.z = ((~(-1 << 4)) << 0) & 0xffffffff;  r1.z = (((uint)r1.w << 0) & bitmask.z) | ((uint)r1.z & ~bitmask.z);
+    r1.z = (uint)r1.z;
+    r1.y = 0.00392156886 * r1.z;
+    r1.z = dot(float3(1,1,1), abs(r0.xyz));
+    r0.xy = r0.xy / r1.zz;
+    r1.zw = float2(1,1) + -abs(r0.yx);
+    r4.xy = (r0.xy >= float2(0,0));
+    r4.xy = r4.xy ? float2(0.5,0.5) : float2(-0.5,-0.5);
+    r1.zw = r4.xy * r1.zw;
+    r0.z = (0 >= r0.z);
+    r0.z = r0.z ? 1.000000 : 0;
+    r1.zw = r1.zw * float2(2,2) + -r0.xy;
+    r0.xy = r0.zz * r1.zw + r0.xy;
+    o1_Normal_Diffuse_FaceSDFMask.xy = r0.xy * float2(0.5,0.5) + float2(0.5,0.5);
+    r3.xyz = saturate(r3.xyz);
+    o2_ShadowColor_PackShadeMode_OutputMask.xyz = sqrt(r3.xyz);
+    bitmask.x = ((~(-1 << 3)) << 5) & 0xffffffff;  r0.x = (((uint)cb2[23].w << 5) & bitmask.x) | ((uint)12 & ~bitmask.x);
+    r0.x = (uint)r0.x;
+    o2_ShadowColor_PackShadeMode_OutputMask.w = 0.00392156886 * r0.x;
+    o1_Normal_Diffuse_FaceSDFMask.z = r0.w;
+    r1.x = cb4[94].z;
+    o3_BaseColor_ToonSkinMask.w = r4.w;
+  }
+  o0_GI.xyz = r2.xyz;
+  o0_GI.w = 0;
+  o5_RimDepth.xyzw = v9.zzzz;
+  o6_rimStrength_HSVPack_groundSpec_charRegion.xy = r1.xy;
+  o6_rimStrength_HSVPack_groundSpec_charRegion.zw = float2(0,0);
+
+  // 由于这是测试因此没用MRT 只能改o0预览正确性 即使这里错误也不用管
+  OUT.o0_GI = o3_BaseColor_ToonSkinMask;
+  OUT.o1_Normal_Diffuse_FaceSDFMask = o1_Normal_Diffuse_FaceSDFMask;
+  OUT.o2_ShadowColor_PackShadeMode_OutputMask = o2_ShadowColor_PackShadeMode_OutputMask;
+  OUT.o3_BaseColor_ToonSkinMask = o3_BaseColor_ToonSkinMask;
+  OUT.o4 = o4;
+  OUT.o5_RimDepth = o5_RimDepth;
+  OUT.o6_rimStrength_HSVPack_groundSpec_charRegion = o6_rimStrength_HSVPack_groundSpec_charRegion;
+  
+  return OUT;
 }

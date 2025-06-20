@@ -100,7 +100,7 @@ FragOutput frag (Varyings fragmentInput)
     float2 placeholder_TexCoord2 = 0;
     float4 placeholder_ScreenPos = 0;
     
-    FragOutput fragOutput;
+    FragOutput fragOutput = (FragOutput)0;
     float4 gBuffer_GI, gBuffer_Normal, gBuffer_Shadow, gBuffer_BaseColor, gBuffer_MotionVectors, gBuffer_RimDepth, gBuffer_RimAndMasks;
     float4 normalAndLightingCalcs,worldPosAndFlags,viewDirAndShading,texSampleAndColor,maskingAndConditions,baseColorAndSss,litColorAndConstants,lightParamsAndGI,lightDirAndDiffuse,lightVecsAndHair,lightVecsAndOutline,matcapAndGI,matcapCoordHelper;
     uint4 bitmask, unused_UintDest;
@@ -480,7 +480,7 @@ FragOutput frag (Varyings fragmentInput)
   gBuffer_RimAndMasks.xy = worldPosAndFlags.xy;
   gBuffer_RimAndMasks.zw = float2(0,0);
 
-  fragOutput.o0_GI = gBuffer_Normal;
+  fragOutput.o0_GI = gBuffer_GI;
   fragOutput.o1_Normal_Diffuse_FaceSDFMask = gBuffer_Normal;
   fragOutput.o2_ShadowColor_PackShadeMode_OutputMask = gBuffer_Shadow;
   fragOutput.o3_BaseColor_ToonSkinMask = gBuffer_BaseColor;
