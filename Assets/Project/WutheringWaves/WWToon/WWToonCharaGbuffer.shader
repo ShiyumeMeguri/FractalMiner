@@ -480,6 +480,9 @@ FragOutput frag (Varyings fragmentInput)
   gBuffer_RimAndMasks.xy = worldPosAndFlags.xy;
   gBuffer_RimAndMasks.zw = float2(0,0);
 
+  fragOutput.o0_GI = gBuffer_Shadow;
+  return fragOutput;
+
   fragOutput.o0_GI = gBuffer_GI;
   fragOutput.o1_Normal_Diffuse_FaceSDFMask = gBuffer_Normal;
   fragOutput.o2_ShadowColor_PackShadeMode_OutputMask = gBuffer_Shadow;

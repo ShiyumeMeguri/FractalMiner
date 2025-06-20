@@ -66,12 +66,12 @@ struct Varyings
             
             Varyings vert (Attributes IN)
             {
-                Varyings OUT;
-                OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
-                OUT.uv.xy = IN.uv;
-                float2 ndc = OUT.positionCS.xy / OUT.positionCS.w;
-                OUT.uv.zw = ndc;
-                return OUT;
+                Varyings fragOutput;
+                fragOutput.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
+                fragOutput.uv.xy = IN.uv;
+                float2 ndc = fragOutput.positionCS.xy / fragOutput.positionCS.w;
+                fragOutput.uv.zw = ndc;
+                return fragOutput;
             }
             
             StructuredBuffer<float4> cb0;
@@ -106,7 +106,7 @@ FragOutput frag (Varyings fragmentInput)
     float4 v8 = 0;
     
     // 声明输出结构和内部变量
-    FragOutput OUT = (FragOutput)0;
+    FragOutput fragOutput = (FragOutput)0;
     float4 o0_GI, o1_Normal_Diffuse_FaceSDFMask, o2_ShadowColor_PackShadeMode_OutputMask, o3_BaseColor_ToonSkinMask, o4, o5_RimDepth, o6_rimStrength_HSVPack_groundSpec_charRegion;
     float4 r0,r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11,r12;
     uint4 bitmask, uiDest;
@@ -488,16 +488,19 @@ FragOutput frag (Varyings fragmentInput)
   o6_rimStrength_HSVPack_groundSpec_charRegion.xy = r1.xy;
   o6_rimStrength_HSVPack_groundSpec_charRegion.zw = float2(0,0);
 
+  fragOutput.o0_GI = o2_ShadowColor_PackShadeMode_OutputMask;
+  return fragOutput;
+
   // 由于这是测试因此没用MRT 只能改o0预览正确性 即使这里错误也不用管
-  OUT.o0_GI = o0_GI;
-  OUT.o1_Normal_Diffuse_FaceSDFMask = o1_Normal_Diffuse_FaceSDFMask;
-  OUT.o2_ShadowColor_PackShadeMode_OutputMask = o2_ShadowColor_PackShadeMode_OutputMask;
-  OUT.o3_BaseColor_ToonSkinMask = o3_BaseColor_ToonSkinMask;
-  OUT.o4 = o4;
-  OUT.o5_RimDepth = o5_RimDepth;
-  OUT.o6_rimStrength_HSVPack_groundSpec_charRegion = o6_rimStrength_HSVPack_groundSpec_charRegion;
+  fragOutput.o0_GI = o0_GI;
+  fragOutput.o1_Normal_Diffuse_FaceSDFMask = o1_Normal_Diffuse_FaceSDFMask;
+  fragOutput.o2_ShadowColor_PackShadeMode_OutputMask = o2_ShadowColor_PackShadeMode_OutputMask;
+  fragOutput.o3_BaseColor_ToonSkinMask = o3_BaseColor_ToonSkinMask;
+  fragOutput.o4 = o4;
+  fragOutput.o5_RimDepth = o5_RimDepth;
+  fragOutput.o6_rimStrength_HSVPack_groundSpec_charRegion = o6_rimStrength_HSVPack_groundSpec_charRegion;
   
-  return OUT;
+  return fragOutput;
 }
             ENDHLSL
         }
