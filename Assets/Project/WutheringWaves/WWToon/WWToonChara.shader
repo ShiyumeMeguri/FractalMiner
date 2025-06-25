@@ -92,16 +92,16 @@ struct Varyings
             StructuredBuffer<float4> cb1;
             StructuredBuffer<float4> cb2;
             
-            // 已知 _IN0 是深度+Stencil 
-            // 已知 _IN1 XY八面体压缩法线 B是diffuseFactor A是FaceSDFMask
-            // 已知 _IN2 XYZ是ShadowColor W是00001111=ShadeMode 11110000=OutputMask 
-            // 已知 _IN3 是Albedo和ToonSkinMask
-            // 未知 _IN4
-            // 已知 _IN5 R是阴影 G未使用 B是阴影强度 A通道为什么和B一样
-            // 已知 _IN6 R16深度
-            // 已知 _IN7 1x1像素 全0
-            // 已知 _IN8 MSSAO 多分辨率屏幕空间AO
-            // 已知 _IN9 1x1像素 EyeAdaptation自动曝光
+// 已知 _IN0 : 深度 + Stencil（仅 .x 用于 RawDepth → 线性化）
+// 已知 _IN1 : XY = 八面体压缩法线，Z = diffuseFactor，W = FaceSDFMask
+// 已知 _IN2 : XYZ = ShadowColor，W = 00001111 = ShadeMode，11110000 = OutputMask
+// 已知 _IN3 : RGB = Albedo，A = ToonSkinMask / AO（取决于 Pass）
+// 已知 _IN4 : R = rimIntensityMask，G = HSVMask_HSVShift，B = groundSpecularMask，A = isChara
+// 已知 _IN5 : R = 阴影，G 未使用，B = 阴影强度，A ≈ B（冗余）
+// 已知 _IN6 : R16 深度纹理（供 Rim-Light 深度比较）
+// 已知 _IN7 : 1×1 全 0（Procedural Ambient 占位，用于 SpiralBlur3x3）
+// 已知 _IN8 : MSSAO 屏幕空间 AO（.r）
+// 已知 _IN9 : 1×1 Eye-Adaptation 自动曝光（.r）
 float4 frag (Varyings fragmentInput) : SV_Target
 {
     float4 v0 = fragmentInput.uv;
