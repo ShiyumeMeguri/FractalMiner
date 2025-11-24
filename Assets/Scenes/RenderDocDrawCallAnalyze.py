@@ -1,35 +1,38 @@
 import renderdoc as rd
 import qrenderdoc as qrd
+import sys
 
-# --- 1. ???? Resource ID ---
+# ==========================================
+# [??] 0 = ????Event; "10-30" = ??
+TARGET_RANGE = "0"  
+# ==========================================
+
+# ?????????Buffer???????
+# Key: ResourceId, Value: {"name": str, "content": str, "size": int}
+BUFFER_CACHE = {}
+
+# --- 1. ???? ---
 def get_resource_id_safe(obj):
     if obj is None: return rd.ResourceId.Null()
-    
     if hasattr(obj, 'resourceId'): return obj.resourceId
     if hasattr(obj, 'resource'): return obj.resource
     if hasattr(obj, 'descriptor'):
         desc = obj.descriptor
         if hasattr(desc, 'resource'): return desc.resource
-            
     return rd.ResourceId.Null()
 
-# --- 2. ????? (????: ??????????) ---
 def format_numeric(variable):
     try:
-        # ??????
         rows = variable.rows
         cols = variable.columns
         val = variable.value
-        
-        # [FIX] ????: ????????????? Enum ??????
-        # variable.type ??? Enum ???str() ???? "VarType.Int" ? "Int"
         type_str = str(variable.type).lower()
         
-        # ???? float
+        # ?????
         data_source = val.f32v
         fmt_str = "{:.4f}"
+        type_prefix = "vec"
         
-        # ??????
         if 'uint' in type_str:
             data_source = val.u32v
             fmt_str = "{}"
@@ -41,17 +44,13 @@ def format_numeric(variable):
         elif 'double' in type_str:
             data_source = val.f64v
             type_prefix = "dvec"
-        else:
-            # Float case
-            type_prefix = "vec"
 
-        # ???? (Matrix)
+        # Matrix
         if rows > 1: 
             lines = []
             for r in range(rows):
                 row_vals = []
                 for c in range(cols):
-                    # ??????
                     idx = r * cols + c
                     if idx < len(data_source):
                         row_vals.append("{:.3f}".format(data_source[idx]))
@@ -59,8 +58,7 @@ def format_numeric(variable):
                         row_vals.append("0.0")
                 lines.append(f"[{', '.join(row_vals)}]")
             return "\n      " + "\n      ".join(lines)
-            
-        # ???? (Vector)
+        # Vector
         elif cols > 1: 
             vals = []
             for i in range(cols):
@@ -69,16 +67,13 @@ def format_numeric(variable):
                 else:
                     vals.append("0")
             return f"{type_prefix}{cols}({', '.join(vals)})"
-            
-        # ???? (Scalar)
+        # Scalar
         else: 
             if len(data_source) > 0:
                 return fmt_str.format(data_source[0])
             return "0"
-            
     except Exception as e:
-        # ??????????
-        return f"? (Err: {e} | TypeStr: {str(variable.type)})"
+        return f"? (Err: {e})"
 
 def extract_variables(variables, indent=0):
     lines = []
@@ -92,50 +87,20 @@ def extract_variables(variables, indent=0):
             lines.append(f"{prefix}- {v.name}: {val_str}")
     return lines
 
-# --- 3. ?????? ---
-def analyze_data(controller):
-    print("\n" + "="*20 + " COPY START " + "="*20)
-    
-    event_id = 0
-    if hasattr(pyrenderdoc, 'CurEvent'):
-        event_id = pyrenderdoc.CurEvent()
-    
-    print(f"# RenderDoc Context Analysis")
-    print(f"**Event ID:** {event_id}")
-    
-    # === [??????] ===
+def get_res_display_info(controller, rid):
     resources = controller.GetResources()
-    name_map = {r.resourceId: r.name for r in resources}
+    # ??????????Map?????
+    for r in resources:
+        if r.resourceId == rid:
+            return r.name
+    return f"Res_{int(rid)}"
 
-    textures = controller.GetTextures()
-    tex_det_map = {t.resourceId: t for t in textures}
-
-    buffers = controller.GetBuffers()
-    buf_det_map = {b.resourceId: b for b in buffers}
-
-    def get_res_display_info(rid):
-        name = name_map.get(rid, f"ID_{rid}")
-        if not name or name == f"ID_{rid}": 
-            name = name_map.get(rid, f"Res_{int(rid)}")
-        
-        details = "Unknown Type"
-        fmt = "-"
-        
-        if rid in tex_det_map:
-            tex = tex_det_map[rid]
-            dim = f"{tex.width}x{tex.height}"
-            if tex.depth > 1: dim += f"x{tex.depth}"
-            if tex.arraysize > 1: dim += f"[{tex.arraysize}]"
-            details = dim
-            fmt = tex.format.Name()
-        elif rid in buf_det_map:
-            buf = buf_det_map[rid]
-            details = f"{buf.length} bytes"
-            fmt = "Buffer"
-            
-        return name, details, fmt
-
+# --- 2. ??Event???? (???Buffer????????) ---
+def process_event(controller, event_id):
+    controller.SetFrameEvent(event_id, True)
     state = controller.GetPipelineState()
+    
+    print(f"\n>>> [Event {event_id}] Analysis")
     
     stages = [
         (rd.ShaderStage.Vertex, "Vertex Shader"),
@@ -148,139 +113,118 @@ def analyze_data(controller):
         if shader_id == rd.ResourceId.Null():
             continue
 
-        print(f"\n## {stage_name}")
+        print(f"  [{stage_name}]")
         
-        # ?? Pipeline Object
-        pipe_id = rd.ResourceId.Null()
-        if stage_enum == rd.ShaderStage.Compute:
-            pipe_id = state.GetComputePipelineObject()
-        else:
-            pipe_id = state.GetGraphicsPipelineObject()
-        
-        # --- A. Shader Code ---
+        # Pipeline & Reflection
+        pipe_id = state.GetComputePipelineObject() if stage_enum == rd.ShaderStage.Compute else state.GetGraphicsPipelineObject()
         reflection = state.GetShaderReflection(stage_enum)
-        entry_point = reflection.entryPoint if reflection else "main"
+        entry = reflection.entryPoint if reflection else "main"
         
-        code = None
+        # A. Source Code (??????????)
         fname = "Unknown"
         if reflection and reflection.debugInfo and reflection.debugInfo.files:
-            f = reflection.debugInfo.files[0]
-            fname = f.filename
-            code = f.contents
+            fname = reflection.debugInfo.files[0].filename
+        print(f"    File: {fname}")
         
-        if not code:
-            fname = "Disassembly"
-            try:
-                code = controller.DisassembleShader(shader_id, reflection, "")
-            except:
-                code = "// Disassembly failed"
-
-        print(f"> **Source:** {fname}")
-        print("```glsl")
-        if code:
-            lines = code.split('\n')
-            if len(lines) > 120:
-                print("\n".join(lines[:120]))
-                print(f"\n// ... Truncated {len(lines)-120} lines ...")
-            else:
-                print(code.strip())
-        else:
-            print("// No code")
-        print("```")
-        
-        # --- B. Bound Textures ---
-        print(f"\n### Bound Textures ({stage_name})")
-        ro_resources = state.GetReadOnlyResources(stage_enum)
-        
-        found_tex = False
-        if ro_resources:
-            header_printed = False
-            for i, res in enumerate(ro_resources):
-                res_id = get_resource_id_safe(res)
-                if res_id != rd.ResourceId.Null():
-                    if not header_printed:
-                        print("| Slot | Resource Name | Size | Format |")
-                        print("| :--- | :--- | :--- | :--- |")
-                        header_printed = True
-                    found_tex = True
-                    name, size, fmt = get_res_display_info(res_id)
-                    print(f"| {i} | **{name}** | {size} | {fmt} |")
-        
-        if not found_tex:
-            print("> No textures bound.")
-
-        # --- C. Constant Buffers ---
-        print(f"\n### Constant Buffers ({stage_name})")
+        # B. Constant Buffers (????)
         cblocks = state.GetConstantBlocks(stage_enum)
-        
-        found_cb = False
         if reflection and reflection.constantBlocks:
             for i, cb_refl in enumerate(reflection.constantBlocks):
                 slot = cb_refl.fixedBindNumber
-                if slot < 0 or slot > 1000: 
-                    slot = i
+                if slot < 0: slot = i
                 
                 if slot < len(cblocks):
-                    used_desc = cblocks[slot]
-                    desc = used_desc.descriptor
-                    
+                    desc = cblocks[slot].descriptor
                     buf_id = desc.resource
-                    byte_size = desc.byteSize
-                    byte_offset = desc.byteOffset
                     
-                    if buf_id != rd.ResourceId.Null() or byte_size > 0:
-                        found_cb = True
-                        print(f"\n#### Slot {slot}: {cb_refl.name}")
+                    if buf_id != rd.ResourceId.Null():
+                        # ????
+                        res_name = get_res_display_info(controller, buf_id)
+                        print(f"    - Slot {slot} ({cb_refl.name}): -> Ref BufferID: {int(buf_id)} | Name: {res_name}")
                         
-                        name, size_str, _ = get_res_display_info(buf_id)
-                        print(f"> Resource: **{name}** (Size: {byte_size} bytes, Offset: {byte_offset})")
-
-                        try:
-                            if buf_id != rd.ResourceId.Null():
+                        # ????Buffer????????????????
+                        if buf_id not in BUFFER_CACHE:
+                            try:
                                 vars = controller.GetCBufferVariableContents(
-                                    pipe_id, shader_id, stage_enum, entry_point, slot, 
-                                    buf_id, byte_offset, byte_size
+                                    pipe_id, shader_id, stage_enum, entry, slot, 
+                                    buf_id, desc.byteOffset, desc.byteSize
                                 )
                                 if vars:
-                                    print("```yaml")
-                                    content = extract_variables(vars)
-                                    if len(content) > 150:
-                                        print("\n".join(content[:150]))
-                                        print(f"# ... {len(content)-150} more lines ...")
-                                    else:
-                                        print("\n".join(content))
-                                    print("```")
+                                    content_lines = extract_variables(vars)
+                                    BUFFER_CACHE[buf_id] = {
+                                        "name": res_name,
+                                        "size": desc.byteSize,
+                                        "content": content_lines
+                                    }
                                 else:
-                                    print("> (No variable data interpreted)")
-                            else:
-                                print("> (Buffer not backed by Resource ID)")
-                        except Exception as e:
-                            print(f"> Error reading content: {e}")
-        
-        if not found_cb:
-            print("> No Constant Buffers.")
-
-    # --- D. Output Targets ---
-    print("\n## Output Targets")
+                                    BUFFER_CACHE[buf_id] = {"name": res_name, "content": ["(No readable vars)"], "size": desc.byteSize}
+                            except Exception as e:
+                                BUFFER_CACHE[buf_id] = {"name": res_name, "content": [f"Error: {e}"], "size": 0}
+    
+    # Output Targets (??)
     outputs = state.GetOutputTargets()
-    print("| Slot | Resource Name | Size | Format |")
-    print("| :--- | :--- | :--- | :--- |")
+    valid_outs = []
     for i, out in enumerate(outputs):
-        out_id = get_resource_id_safe(out)
-        if out_id != rd.ResourceId.Null():
-            name, size, fmt = get_res_display_info(out_id)
-            print(f"| {i} | **{name}** | {size} | {fmt} |")
+        rid = get_resource_id_safe(out)
+        if rid != rd.ResourceId.Null():
+            valid_outs.append(f"Slot {i}: {get_res_display_info(controller, rid)}")
+    if valid_outs:
+        print(f"  [Outputs] {', '.join(valid_outs)}")
 
-    print("\n" + "="*20 + " COPY END " + "="*20 + "\n")
+# --- 3. ??? ---
+def analyze_main(controller):
+    global BUFFER_CACHE
+    BUFFER_CACHE.clear()
+    
+    # ????
+    target_eids = []
+    if TARGET_RANGE == "0":
+        if hasattr(pyrenderdoc, 'CurEvent'):
+            target_eids = [pyrenderdoc.CurEvent()]
+    elif "-" in TARGET_RANGE:
+        try:
+            start, end = map(int, TARGET_RANGE.split("-"))
+            target_eids = list(range(start, end + 1))
+        except:
+            print("Invalid range format.")
+            return
+    else:
+        # ??????
+        try:
+            target_eids = [int(TARGET_RANGE)]
+        except:
+            pass
+
+    print(f"AI Context Export | Range: {TARGET_RANGE} | Events: {len(target_eids)}")
+    print("="*40)
+
+    # ??1?????Event????????Buffer
+    for eid in target_eids:
+        process_event(controller, eid)
+
+    print("\n" + "="*40)
+    print(" DEDUPLICATED BUFFER CONTENTS (Referenced above)")
+    print("="*40)
+    
+    # ??2?????Buffer??
+    if not BUFFER_CACHE:
+        print("(No Constant Buffers captured)")
+    
+    for rid, data in BUFFER_CACHE.items():
+        print(f"\n>>> Buffer ID: {int(rid)} | Name: {data['name']} | Size: {data['size']} bytes")
+        print("```yaml")
+        if len(data['content']) > 200:
+            print("\n".join(data['content'][:200]))
+            print(f"\n# ... Truncated {len(data['content'])-200} lines ...")
+        else:
+            print("\n".join(data['content']))
+        print("```")
+        
+    print("\n[End of Analysis]")
 
 def run():
     if hasattr(pyrenderdoc, 'Replay'):
         manager = pyrenderdoc.Replay()
-        try:
-            manager.BlockInvoke(analyze_data)
-        except Exception as e:
-            import traceback
-            print(f"? Error: {e}")
-            traceback.print_exc()
+        manager.BlockInvoke(analyze_main)
 
 run()
