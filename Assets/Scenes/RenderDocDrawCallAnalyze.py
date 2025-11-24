@@ -194,8 +194,6 @@ def analyze_main(controller):
         try: target_eids = [int(TARGET_RANGE)]
         except: pass
 
-    print(f"# Context Analysis | Events: {target_eids}")
-
     # 1. 收集引用
     for eid in target_eids:
         process_event(controller, eid)
