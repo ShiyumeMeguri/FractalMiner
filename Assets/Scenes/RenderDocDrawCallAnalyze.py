@@ -3,15 +3,15 @@ import qrenderdoc as qrd
 import sys
 
 # ==========================================
-# [??] 0 = ????Event; "10-30" = ??
+# [设置] 0 = 当前选中Event; "10-30" = 范围
 TARGET_RANGE = "0"  
 # ==========================================
 
-# ?????????Buffer???????
-# Key: ResourceId, Value: {"name": str, "content": str, "size": int}
-BUFFER_CACHE = {}
+# --- 全局缓存 (去重用) ---
+BUFFER_CACHE = {} # {id: {name, size, content}}
+SHADER_CACHE = {} # {id: {stage, filename, content}}
 
-# --- 1. ???? ---
+# --- 1. 辅助函数 ---
 def get_resource_id_safe(obj):
     if obj is None: return rd.ResourceId.Null()
     if hasattr(obj, 'resourceId'): return obj.resourceId
@@ -28,7 +28,6 @@ def format_numeric(variable):
         val = variable.value
         type_str = str(variable.type).lower()
         
-        # ?????
         data_source = val.f32v
         fmt_str = "{:.4f}"
         type_prefix = "vec"
@@ -45,33 +44,21 @@ def format_numeric(variable):
             data_source = val.f64v
             type_prefix = "dvec"
 
-        # Matrix
         if rows > 1: 
             lines = []
             for r in range(rows):
                 row_vals = []
                 for c in range(cols):
                     idx = r * cols + c
-                    if idx < len(data_source):
-                        row_vals.append("{:.3f}".format(data_source[idx]))
-                    else:
-                        row_vals.append("0.0")
+                    val_data = data_source[idx] if idx < len(data_source) else 0
+                    row_vals.append("{:.3f}".format(val_data))
                 lines.append(f"[{', '.join(row_vals)}]")
             return "\n      " + "\n      ".join(lines)
-        # Vector
         elif cols > 1: 
-            vals = []
-            for i in range(cols):
-                if i < len(data_source):
-                    vals.append(fmt_str.format(data_source[i]))
-                else:
-                    vals.append("0")
+            vals = [fmt_str.format(data_source[i]) if i < len(data_source) else "0" for i in range(cols)]
             return f"{type_prefix}{cols}({', '.join(vals)})"
-        # Scalar
         else: 
-            if len(data_source) > 0:
-                return fmt_str.format(data_source[0])
-            return "0"
+            return fmt_str.format(data_source[0]) if len(data_source) > 0 else "0"
     except Exception as e:
         return f"? (Err: {e})"
 
@@ -83,24 +70,45 @@ def extract_variables(variables, indent=0):
             lines.append(f"{prefix}- {v.name}:")
             lines.extend(extract_variables(v.members, indent + 1))
         else:
-            val_str = format_numeric(v)
-            lines.append(f"{prefix}- {v.name}: {val_str}")
+            lines.append(f"{prefix}- {v.name}: {format_numeric(v)}")
     return lines
 
 def get_res_display_info(controller, rid):
+    # 简单获取名称，避免大量API调用
     resources = controller.GetResources()
-    # ??????????Map?????
     for r in resources:
         if r.resourceId == rid:
             return r.name
     return f"Res_{int(rid)}"
 
-# --- 2. ??Event???? (???Buffer????????) ---
+# --- 2. 获取 Shader 代码 (源文件 或 反汇编) ---
+def fetch_shader_code(controller, shader_id, reflection, stage_name):
+    fname = "Unknown"
+    code = ""
+    
+    # 1. 尝试获取源码
+    if reflection and reflection.debugInfo and reflection.debugInfo.files:
+        f = reflection.debugInfo.files[0]
+        fname = f.filename
+        code = f.contents
+    
+    # 2. 源码失败，尝试反汇编
+    if not code or len(code) == 0:
+        fname = f"Disassembly ({stage_name})"
+        try:
+            # 这是一个耗时操作，但只会对每个Shader做一次
+            code = controller.DisassembleShader(shader_id, reflection, "")
+        except Exception as e:
+            code = f"// Disassembly failed: {e}"
+
+    return fname, code
+
+# --- 3. 单个Event分析逻辑 ---
 def process_event(controller, event_id):
     controller.SetFrameEvent(event_id, True)
     state = controller.GetPipelineState()
     
-    print(f"\n>>> [Event {event_id}] Analysis")
+    print(f"\n>>> [Event {event_id}]")
     
     stages = [
         (rd.ShaderStage.Vertex, "Vertex Shader"),
@@ -112,21 +120,26 @@ def process_event(controller, event_id):
         shader_id = state.GetShader(stage_enum)
         if shader_id == rd.ResourceId.Null():
             continue
-
-        print(f"  [{stage_name}]")
-        
-        # Pipeline & Reflection
+            
         pipe_id = state.GetComputePipelineObject() if stage_enum == rd.ShaderStage.Compute else state.GetGraphicsPipelineObject()
         reflection = state.GetShaderReflection(stage_enum)
         entry = reflection.entryPoint if reflection else "main"
+
+        # === Shader 处理 (去重) ===
+        # 无论如何，先记录这个 Event 用了这个 Shader ID
+        if shader_id not in SHADER_CACHE:
+            fname, code = fetch_shader_code(controller, shader_id, reflection, stage_name)
+            SHADER_CACHE[shader_id] = {
+                "stage": stage_name,
+                "filename": fname,
+                "content": code
+            }
         
-        # A. Source Code (??????????)
-        fname = "Unknown"
-        if reflection and reflection.debugInfo and reflection.debugInfo.files:
-            fname = reflection.debugInfo.files[0].filename
-        print(f"    File: {fname}")
-        
-        # B. Constant Buffers (????)
+        cached_shader = SHADER_CACHE[shader_id]
+        print(f"  [{stage_name}]")
+        print(f"    Ref ShaderID: {int(shader_id)} | File: {cached_shader['filename']}")
+
+        # === Constant Buffer 处理 (去重) ===
         cblocks = state.GetConstantBlocks(stage_enum)
         if reflection and reflection.constantBlocks:
             for i, cb_refl in enumerate(reflection.constantBlocks):
@@ -138,11 +151,10 @@ def process_event(controller, event_id):
                     buf_id = desc.resource
                     
                     if buf_id != rd.ResourceId.Null():
-                        # ????
                         res_name = get_res_display_info(controller, buf_id)
-                        print(f"    - Slot {slot} ({cb_refl.name}): -> Ref BufferID: {int(buf_id)} | Name: {res_name}")
+                        print(f"    - Slot {slot} ({cb_refl.name}) -> BufferID: {int(buf_id)} | {res_name}")
                         
-                        # ????Buffer????????????????
+                        # 缓存 Buffer 内容
                         if buf_id not in BUFFER_CACHE:
                             try:
                                 vars = controller.GetCBufferVariableContents(
@@ -150,33 +162,23 @@ def process_event(controller, event_id):
                                     buf_id, desc.byteOffset, desc.byteSize
                                 )
                                 if vars:
-                                    content_lines = extract_variables(vars)
                                     BUFFER_CACHE[buf_id] = {
                                         "name": res_name,
                                         "size": desc.byteSize,
-                                        "content": content_lines
+                                        "content": extract_variables(vars)
                                     }
                                 else:
-                                    BUFFER_CACHE[buf_id] = {"name": res_name, "content": ["(No readable vars)"], "size": desc.byteSize}
+                                    BUFFER_CACHE[buf_id] = {"name": res_name, "size": desc.byteSize, "content": ["(No readable vars)"]}
                             except Exception as e:
-                                BUFFER_CACHE[buf_id] = {"name": res_name, "content": [f"Error: {e}"], "size": 0}
-    
-    # Output Targets (??)
-    outputs = state.GetOutputTargets()
-    valid_outs = []
-    for i, out in enumerate(outputs):
-        rid = get_resource_id_safe(out)
-        if rid != rd.ResourceId.Null():
-            valid_outs.append(f"Slot {i}: {get_res_display_info(controller, rid)}")
-    if valid_outs:
-        print(f"  [Outputs] {', '.join(valid_outs)}")
+                                BUFFER_CACHE[buf_id] = {"name": res_name, "size": 0, "content": [f"Err: {e}"]}
 
-# --- 3. ??? ---
+# --- 4. 主逻辑 ---
 def analyze_main(controller):
-    global BUFFER_CACHE
+    global BUFFER_CACHE, SHADER_CACHE
     BUFFER_CACHE.clear()
+    SHADER_CACHE.clear()
     
-    # ????
+    # 解析范围
     target_eids = []
     if TARGET_RANGE == "0":
         if hasattr(pyrenderdoc, 'CurEvent'):
@@ -186,41 +188,49 @@ def analyze_main(controller):
             start, end = map(int, TARGET_RANGE.split("-"))
             target_eids = list(range(start, end + 1))
         except:
-            print("Invalid range format.")
+            print("Invalid range.")
             return
     else:
-        # ??????
-        try:
-            target_eids = [int(TARGET_RANGE)]
-        except:
-            pass
+        try: target_eids = [int(TARGET_RANGE)]
+        except: pass
 
-    print(f"AI Context Export | Range: {TARGET_RANGE} | Events: {len(target_eids)}")
-    print("="*40)
+    print(f"# Context Analysis | Events: {target_eids}")
 
-    # ??1?????Event????????Buffer
+    # 1. 收集引用
     for eid in target_eids:
         process_event(controller, eid)
 
     print("\n" + "="*40)
-    print(" DEDUPLICATED BUFFER CONTENTS (Referenced above)")
+    print(" === UNIQUE SHADER CODES ===")
+    print("="*40)
+
+    # 2. 打印去重后的 Shader
+    for sid, data in SHADER_CACHE.items():
+        print(f"\n>>> Shader ID: {int(sid)} ({data['stage']}) | File: {data['filename']}")
+        print("```glsl")
+        code_lines = data['content'].split('\n')
+        # 限制行数防止AI上下文爆炸，但给足够多
+        if len(code_lines) > 300:
+            print("\n".join(code_lines[:300]))
+            print(f"\n// ... Truncated {len(code_lines)-300} lines ...")
+        else:
+            print(data['content'])
+        print("```")
+
+    print("\n" + "="*40)
+    print(" === UNIQUE BUFFER CONTENTS ===")
     print("="*40)
     
-    # ??2?????Buffer??
-    if not BUFFER_CACHE:
-        print("(No Constant Buffers captured)")
-    
-    for rid, data in BUFFER_CACHE.items():
-        print(f"\n>>> Buffer ID: {int(rid)} | Name: {data['name']} | Size: {data['size']} bytes")
+    # 3. 打印去重后的 Buffer
+    for bid, data in BUFFER_CACHE.items():
+        print(f"\n>>> Buffer ID: {int(bid)} | Name: {data['name']}")
         print("```yaml")
         if len(data['content']) > 200:
             print("\n".join(data['content'][:200]))
-            print(f"\n# ... Truncated {len(data['content'])-200} lines ...")
+            print(f"# ... Truncated {len(data['content'])-200} lines ...")
         else:
             print("\n".join(data['content']))
         print("```")
-        
-    print("\n[End of Analysis]")
 
 def run():
     if hasattr(pyrenderdoc, 'Replay'):
