@@ -11,7 +11,7 @@ TARGET_RANGE = "0"
 BUFFER_CACHE = {} # {id: {name, size, content}}
 SHADER_CACHE = {} # {id: {stage, filename, content}}
 
-# --- 1. 辅助函数 ---
+# --- 1. 辅助格式化函数 ---
 def get_resource_id_safe(obj):
     if obj is None: return rd.ResourceId.Null()
     if hasattr(obj, 'resourceId'): return obj.resourceId
@@ -29,7 +29,7 @@ def format_numeric(variable):
         type_str = str(variable.type).lower()
         
         data_source = val.f32v
-        fmt_str = "{:.4f}"
+        fmt_str = "{:.6f}"
         type_prefix = "vec"
         
         if 'uint' in type_str:
@@ -51,7 +51,7 @@ def format_numeric(variable):
                 for c in range(cols):
                     idx = r * cols + c
                     val_data = data_source[idx] if idx < len(data_source) else 0
-                    row_vals.append("{:.3f}".format(val_data))
+                    row_vals.append(fmt_str.format(val_data))
                 lines.append(f"[{', '.join(row_vals)}]")
             return "\n      " + "\n      ".join(lines)
         elif cols > 1: 
@@ -74,46 +74,132 @@ def extract_variables(variables, indent=0):
     return lines
 
 def get_res_display_info(controller, rid):
-    # 简单获取名称，避免大量API调用
-    resources = controller.GetResources()
-    for r in resources:
-        if r.resourceId == rid:
-            return r.name
+    try:
+        resources = controller.GetResources()
+        for r in resources:
+            if r.resourceId == rid:
+                return r.name
+    except:
+        pass
     return f"Res_{int(rid)}"
 
-# --- 2. 获取 Shader 代码 (源文件 或 反汇编) ---
+# --- 2. 核心：打印管线状态 (修复 Blend 属性访问) ---
+def print_pipeline_details(state):
+    # 2.1 Topology
+    try:
+        topo = state.GetPrimitiveTopology()
+        print(f"  [Input Assembly]")
+        print(f"    Topology: {topo}")
+    except:
+        pass
+
+    # 2.2 Rasterizer (Viewport/Scissor)
+    try:
+        vp = state.GetViewport(0)
+        sc = state.GetScissor(0)
+        print(f"  [Rasterizer Data (Slot 0)]")
+        print(f"    Viewport: {vp.x:.1f}, {vp.y:.1f} | Size: {vp.width:.1f}x{vp.height:.1f} | Z: {vp.minDepth}-{vp.maxDepth}")
+        print(f"    Scissor:  {sc.x}, {sc.y} | Size: {sc.width}x{sc.height}")
+    except:
+        pass
+
+    # 2.3 Stencil
+    try:
+        front, back = state.GetStencilFaces()
+        print(f"  [Depth & Stencil State]")
+        
+        def fmt_face(name, face):
+            # 安全获取属性，防止部分API版本差异
+            ref = getattr(face, 'reference', '?')
+            cmask = getattr(face, 'compareMask', 0)
+            wmask = getattr(face, 'writeMask', 0)
+            func = getattr(face, 'function', '?')
+            pass_op = getattr(face, 'passOperation', '?')
+            fail_op = getattr(face, 'failOperation', '?')
+            zfail_op = getattr(face, 'depthFailOperation', '?')
+            
+            print(f"    [{name}] Ref:{ref} Mask:0x{cmask:02X} Write:0x{wmask:02X}")
+            print(f"       Func: {func}")
+            print(f"       Pass: {pass_op} | Fail: {fail_op} | ZFail: {zfail_op}")
+
+        fmt_face("Stencil Front", front)
+        fmt_face("Stencil Back ", back)
+    except Exception as e:
+        print(f"  [Depth & Stencil State] Error: {e}")
+
+    # 2.4 Blend State (修复：使用正确的属性名)
+    try:
+        blends = state.GetColorBlends()
+        print(f"  [Blend State]")
+        print(f"    Independent Blend: {state.IsIndependentBlendingEnabled()}")
+        
+        printed_any_rt = False
+        for i, rt in enumerate(blends):
+            # 【修复点】使用 rt.enabled 而不是 rt.blendEnable
+            is_enabled = rt.enabled
+            write_mask = rt.writeMask
+            
+            if is_enabled or write_mask != 0:
+                printed_any_rt = True
+                print(f"    RT[{i}]: Enabled={is_enabled}, WriteMask=0x{write_mask:02X}")
+                
+                if is_enabled:
+                    # 【修复点】混合公式在 colorBlend 和 alphaBlend 子对象中
+                    cb = rt.colorBlend
+                    ab = rt.alphaBlend
+                    
+                    # 尝试打印 (Source, Dest, Op)
+                    print(f"      Color: Src={cb.source} {cb.operation} Dst={cb.destination}")
+                    print(f"      Alpha: Src={ab.source} {ab.operation} Dst={ab.destination}")
+                
+                if rt.logicOperationEnabled:
+                    print(f"      LogicOp: {rt.logicOperation}")
+
+        if not printed_any_rt:
+            print(f"    (No active Render Targets output)")
+            
+    except Exception as e:
+        print(f"  [Blend State] Error: {e}")
+
+# --- 3. 获取 Shader 代码 ---
 def fetch_shader_code(controller, shader_id, reflection, stage_name):
     fname = "Unknown"
     code = ""
     
-    # 1. 尝试获取源码
     if reflection and reflection.debugInfo and reflection.debugInfo.files:
         f = reflection.debugInfo.files[0]
         fname = f.filename
         code = f.contents
     
-    # 2. 源码失败，尝试反汇编
     if not code or len(code) == 0:
         fname = f"Disassembly ({stage_name})"
         try:
-            # 这是一个耗时操作，但只会对每个Shader做一次
             code = controller.DisassembleShader(shader_id, reflection, "")
         except Exception as e:
             code = f"// Disassembly failed: {e}"
 
     return fname, code
 
-# --- 3. 单个Event分析逻辑 ---
+# --- 4. 单个Event分析逻辑 ---
 def process_event(controller, event_id):
     controller.SetFrameEvent(event_id, True)
     state = controller.GetPipelineState()
     
-    print(f"\n>>> [Event {event_id}]")
+    print(f"\n{'='*60}")
+    print(f">>> [Event {event_id}] Pipeline Analysis")
+    print(f"{'='*60}")
     
+    # 4.1 打印管线状态
+    print_pipeline_details(state)
+    
+    # 4.2 遍历 Shader 阶段
     stages = [
         (rd.ShaderStage.Vertex, "Vertex Shader"),
         (rd.ShaderStage.Pixel, "Pixel Shader"),
         (rd.ShaderStage.Compute, "Compute Shader"),
+        (rd.ShaderStage.Geometry, "Geometry Shader"),
+        (rd.ShaderStage.Hull, "Hull Shader"),
+        (rd.ShaderStage.Domain, "Domain Shader"),
     ]
     
     for stage_enum, stage_name in stages:
@@ -125,8 +211,7 @@ def process_event(controller, event_id):
         reflection = state.GetShaderReflection(stage_enum)
         entry = reflection.entryPoint if reflection else "main"
 
-        # === Shader 处理 (去重) ===
-        # 无论如何，先记录这个 Event 用了这个 Shader ID
+        # 缓存 Shader
         if shader_id not in SHADER_CACHE:
             fname, code = fetch_shader_code(controller, shader_id, reflection, stage_name)
             SHADER_CACHE[shader_id] = {
@@ -136,12 +221,15 @@ def process_event(controller, event_id):
             }
         
         cached_shader = SHADER_CACHE[shader_id]
-        print(f"  [{stage_name}]")
-        print(f"    Ref ShaderID: {int(shader_id)} | File: {cached_shader['filename']}")
+        print(f"\n  [{stage_name}]")
+        print(f"    Ref ShaderID: {int(shader_id)}") 
+        print(f"    File: {cached_shader['filename']}")
+        print(f"    EntryPoint: {entry}")
 
-        # === Constant Buffer 处理 (去重) ===
+        # === Constant Buffer 处理 ===
         cblocks = state.GetConstantBlocks(stage_enum)
         if reflection and reflection.constantBlocks:
+            print(f"    [Bound Constant Buffers]")
             for i, cb_refl in enumerate(reflection.constantBlocks):
                 slot = cb_refl.fixedBindNumber
                 if slot < 0: slot = i
@@ -152,7 +240,7 @@ def process_event(controller, event_id):
                     
                     if buf_id != rd.ResourceId.Null():
                         res_name = get_res_display_info(controller, buf_id)
-                        print(f"    - Slot {slot} ({cb_refl.name}) -> BufferID: {int(buf_id)} | {res_name}")
+                        print(f"      - Slot {slot} ({cb_refl.name}) -> BufferID: {int(buf_id)} | {res_name}")
                         
                         # 缓存 Buffer 内容
                         if buf_id not in BUFFER_CACHE:
@@ -171,8 +259,10 @@ def process_event(controller, event_id):
                                     BUFFER_CACHE[buf_id] = {"name": res_name, "size": desc.byteSize, "content": ["(No readable vars)"]}
                             except Exception as e:
                                 BUFFER_CACHE[buf_id] = {"name": res_name, "size": 0, "content": [f"Err: {e}"]}
+        else:
+            pass
 
-# --- 4. 主逻辑 ---
+# --- 5. 主逻辑 ---
 def analyze_main(controller):
     global BUFFER_CACHE, SHADER_CACHE
     BUFFER_CACHE.clear()
@@ -196,38 +286,32 @@ def analyze_main(controller):
 
     # 1. 收集引用
     for eid in target_eids:
-        process_event(controller, eid)
+        try:
+            process_event(controller, eid)
+        except Exception as e:
+            print(f"Error processing event {eid}: {e}")
 
-    print("\n" + "="*40)
-    print(" === UNIQUE SHADER CODES ===")
-    print("="*40)
+    print("\n" + "#"*60)
+    print(" # REFERENCE: UNIQUE SHADER CODES")
+    print(" # (Full output, no truncation)")
+    print("#"*60)
 
-    # 2. 打印去重后的 Shader
+    # 2. 打印去重后的 Shader (不截断)
     for sid, data in SHADER_CACHE.items():
         print(f"\n>>> Shader ID: {int(sid)} ({data['stage']}) | File: {data['filename']}")
         print("```glsl")
-        code_lines = data['content'].split('\n')
-        # 限制行数防止AI上下文爆炸，但给足够多
-        if len(code_lines) > 300:
-            print("\n".join(code_lines[:300]))
-            print(f"\n// ... Truncated {len(code_lines)-300} lines ...")
-        else:
-            print(data['content'])
+        print(data['content'])
         print("```")
 
-    print("\n" + "="*40)
-    print(" === UNIQUE BUFFER CONTENTS ===")
-    print("="*40)
+    print("\n" + "#"*60)
+    print(" # REFERENCE: UNIQUE BUFFER CONTENTS")
+    print("#"*60)
     
     # 3. 打印去重后的 Buffer
     for bid, data in BUFFER_CACHE.items():
         print(f"\n>>> Buffer ID: {int(bid)} | Name: {data['name']}")
         print("```yaml")
-        if len(data['content']) > 200:
-            print("\n".join(data['content'][:200]))
-            print(f"# ... Truncated {len(data['content'])-200} lines ...")
-        else:
-            print("\n".join(data['content']))
+        print("\n".join(data['content']))
         print("```")
 
 def run():
