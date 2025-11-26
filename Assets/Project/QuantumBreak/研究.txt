@@ -1,3 +1,9 @@
-GeometricDistortion 是最主要的功能 这个是放在地图中心位置的一个正方形体积区域 类似贴花的box 在box范围内才会有时间扭曲地形效果
+1. 核心机制破解：GeometricDistortion (几何扭曲)
+    GeometricDistortion Pass 的本质。原本以为是某种复杂的后处理，实际上它的底层逻辑与水面波纹渲染（Water Ripple Rendering）完全一致。
+    生成原理： 利用粒子系统（Particle System）或网格作为“笔刷”，将高度信息绘制到一张特定的 Render Target (RT) 上。
+    应用方式： 这张 RT 随后被用作全局的高度图（Heightmap），在场景物体的 Vertex Shader 中采样，从而产生顶点的偏移和起伏。
+    空间限制（关键发现）： 这并不是无限范围的。它实际上是一个位于地图中心的正方形体积（Box），类似于一个巨大的正交投影贴花（Decal Projection）。
+    逻辑： 只有在这个 Box 范围内的物体才会受到时间扭曲的影响。
+    边界： 超出 Box 范围的区域没有波形计算，直接通过正交投影的边界截断，保证了性能和效果的可控性。
 
 如图Caustics.png所示 这是一种提供自定义的屏幕空间焦散模拟的时间爆炸光源效果
