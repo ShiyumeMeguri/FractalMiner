@@ -11,7 +11,7 @@ TARGET_RANGE = "0"
 BUFFER_CACHE = {} # {id: {name, size, content}}
 SHADER_CACHE = {} # {id: {stage, filename, content}}
 
-# --- 1. 新增功能：Clear 辅助函数 ---
+# --- 1. Clear 辅助函数 ---
 def find_clear_values(controller, action):
     try:
         sd_file = controller.GetStructuredFile()
@@ -231,20 +231,21 @@ def print_pipeline_details(controller, state):
     except Exception as e:
         print(f"  [Blend State] Error: {e}")
 
-    # --- 2.5 [修复后] Render Targets (Output Textures) ---
+    # --- 2.5 Render Targets (Output Textures) ---
     try:
         targets = state.GetOutputTargets()
         depth_target = state.GetDepthTarget()
         print(f"  [Render Targets (Outputs)]")
         
-        # Depth - 使用 .resource 而不是 .resourceId
+        # Depth
+        # 注意：Descriptor对象使用 .resource 获取 ResourceId
         if depth_target.resource != rd.ResourceId.Null():
             name = get_res_display_info(controller, depth_target.resource)
             print(f"    Depth Target: ID {int(depth_target.resource)} | {name}")
         else:
             print(f"    Depth Target: (Unbound)")
         
-        # Colors - 使用 .resource 而不是 .resourceId
+        # Colors
         printed_out = False
         for i, target in enumerate(targets):
             if target.resource != rd.ResourceId.Null():
@@ -400,18 +401,19 @@ def process_event(controller, event_id, action_map):
                             except Exception as e:
                                 BUFFER_CACHE[buf_id] = {"name": res_name, "size": 0, "content": [f"Err: {e}"]}
         
-        # === [修复后] Input Textures (SRVs) 处理 ===
+        # === [核心修复] Input Textures (SRVs) 处理 ===
         try:
             ro_resources = state.GetReadOnlyResources(stage_enum)
             if ro_resources and len(ro_resources) > 0:
                 res_map = {}
                 if reflection and reflection.readOnlyResources:
                     for r in reflection.readOnlyResources:
-                        res_map[r.bindPoint] = r.name
+                        # 修复: 使用 fixedBindNumber 而不是 bindPoint
+                        res_map[r.fixedBindNumber] = r.name
                 
                 printed_header = False
                 for i, bind_res in enumerate(ro_resources):
-                    # bind_res 是 Descriptor 类型，使用 .resource 而不是 .resourceId
+                    # bind_res 是 Descriptor 类型，使用 .resource
                     if bind_res.resource != rd.ResourceId.Null():
                         if not printed_header:
                             print(f"    [Bound Resources (Textures/SRVs)]")
