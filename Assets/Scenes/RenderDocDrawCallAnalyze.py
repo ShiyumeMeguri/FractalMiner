@@ -21,15 +21,14 @@ def find_clear_values(controller, action):
         target_chunk = None
         chunk_list = sd_file.chunks
         
-        # 1. 尝试精确定位 Chunk
+        # 1. 尝试精确定位
         for ev in action.events:
             if ev.eventId == action.eventId:
                 if ev.chunkIndex < len(chunk_list):
                     target_chunk = chunk_list[ev.chunkIndex]
                 break
         
-        # 2. 兜底策略：如果 Action ID 没对上，取该 Action 的最后一个 Event
-        # (针对 Clear 操作，这通常是正确的)
+        # 2. 兜底策略
         if not target_chunk and len(action.events) > 0:
             target_chunk = chunk_list[action.events[-1].chunkIndex]
         
@@ -46,36 +45,30 @@ def find_clear_values(controller, action):
             val_data = param.data
             name_lower = name.lower()
             
-            # --- [Color 提取逻辑] ---
-            # 匹配名字：ColorRGBA (D3D11) 或包含 color 的参数
+            # --- [View/Target ID 提取] ---
+            if "view" in name_lower or "target" in name_lower:
+                if hasattr(val_data, 'resourceId') and val_data.resourceId != rd.ResourceId.Null():
+                    result['view_id'] = val_data.resourceId
+
+            # --- [Color 提取] ---
             if "color" in name_lower:
-                # [情况 A] 数据直接在 f32v 数组里 (Standard)
                 if hasattr(val_data, 'f32v') and len(val_data.f32v) >= 4:
                     result['color'] = tuple(val_data.f32v[:4])
-                    
-                # [情况 B] 数据在 u32v 数组里 (Integer RenderTargets)
                 elif hasattr(val_data, 'u32v') and len(val_data.u32v) >= 4:
                     result['color'] = tuple(val_data.u32v[:4])
-
-                # [情况 C] 数据是结构体，包含子节点 (Fixed Issue)
                 elif param.NumChildren() >= 4:
                     try:
                         temp_color = []
                         for k in range(4):
                             child = param.GetChild(k)
-                            # 尝试读取 basic.f (float) 或 basic.d (double)
                             if hasattr(child.data, 'basic'):
-                                if hasattr(child.data.basic, 'f'):
-                                    temp_color.append(child.data.basic.f)
-                                elif hasattr(child.data.basic, 'd'):
-                                    temp_color.append(child.data.basic.d)
-                        
+                                if hasattr(child.data.basic, 'f'): temp_color.append(child.data.basic.f)
+                                elif hasattr(child.data.basic, 'd'): temp_color.append(child.data.basic.d)
                         if len(temp_color) == 4:
                             result['color'] = tuple(temp_color)
-                    except:
-                        pass 
+                    except: pass 
 
-            # --- [Depth 提取逻辑] ---
+            # --- [Depth 提取] ---
             if "depth" in name_lower:
                 if hasattr(val_data, 'basic'):
                     if hasattr(val_data.basic, 'f'): result['depth'] = val_data.basic.f
@@ -83,7 +76,7 @@ def find_clear_values(controller, action):
                 elif hasattr(val_data, 'f32v') and len(val_data.f32v) > 0:
                     result['depth'] = val_data.f32v[0]
 
-            # --- [Stencil 提取逻辑] ---
+            # --- [Stencil 提取] ---
             if "stencil" in name_lower:
                 if hasattr(val_data, 'basic'):
                     if hasattr(val_data.basic, 'u'): result['stencil'] = val_data.basic.u
@@ -95,7 +88,6 @@ def find_clear_values(controller, action):
 
         return result
     except Exception as e:
-        print(f"      [Warning] Failed to parse SDChunk: {e}")
         return None
 
 def flatten_actions(actions, lookup_dict):
@@ -166,8 +158,8 @@ def get_res_display_info(controller, rid):
         pass
     return f"Res_{int(rid)}"
 
-# --- 3. 核心：打印管线状态 (还原了被删除的 Topology/Viewport/Stencil/DetailedBlend) ---
-def print_pipeline_details(state):
+# --- 3. 核心：打印管线状态 ---
+def print_pipeline_details(controller, state):
     # 2.1 Topology
     try:
         topo = state.GetPrimitiveTopology()
@@ -176,7 +168,7 @@ def print_pipeline_details(state):
     except:
         pass
 
-    # 2.2 Rasterizer (Viewport/Scissor)
+    # 2.2 Rasterizer
     try:
         vp = state.GetViewport(0)
         sc = state.GetScissor(0)
@@ -234,10 +226,37 @@ def print_pipeline_details(state):
                     print(f"      LogicOp: {rt.logicOperation}")
 
         if not printed_any_rt:
-            print(f"    (No active Render Targets output)")
+            print(f"    (No active Blend configs)")
             
     except Exception as e:
         print(f"  [Blend State] Error: {e}")
+
+    # --- 2.5 [修复后] Render Targets (Output Textures) ---
+    try:
+        targets = state.GetOutputTargets()
+        depth_target = state.GetDepthTarget()
+        print(f"  [Render Targets (Outputs)]")
+        
+        # Depth - 使用 .resource 而不是 .resourceId
+        if depth_target.resource != rd.ResourceId.Null():
+            name = get_res_display_info(controller, depth_target.resource)
+            print(f"    Depth Target: ID {int(depth_target.resource)} | {name}")
+        else:
+            print(f"    Depth Target: (Unbound)")
+        
+        # Colors - 使用 .resource 而不是 .resourceId
+        printed_out = False
+        for i, target in enumerate(targets):
+            if target.resource != rd.ResourceId.Null():
+                printed_out = True
+                name = get_res_display_info(controller, target.resource)
+                print(f"    RT[{i}]: ID {int(target.resource)} | {name}")
+        
+        if not printed_out:
+            print(f"    (No active Color Outputs)")
+
+    except Exception as e:
+        print(f"  [Render Targets] Error: {e}")
 
 # --- 4. 获取 Shader 代码 ---
 def fetch_shader_code(controller, shader_id, reflection, stage_name):
@@ -258,7 +277,7 @@ def fetch_shader_code(controller, shader_id, reflection, stage_name):
 
     return fname, code
 
-# --- 5. 单个Event分析逻辑 (合并了新旧逻辑) ---
+# --- 5. 单个Event分析逻辑 ---
 def process_event(controller, event_id, action_map):
     controller.SetFrameEvent(event_id, True)
     state = controller.GetPipelineState()
@@ -267,7 +286,7 @@ def process_event(controller, event_id, action_map):
     print(f">>> [Event {event_id}] Pipeline Analysis")
     print(f"{'='*60}")
     
-    # --- 新增：Clear 检测逻辑 ---
+    # --- Clear 检测 ---
     FlagsEnum = getattr(rd, 'ActionFlags', getattr(rd, 'DrawFlags', None))
     action = action_map.get(event_id)
     is_clear = False
@@ -288,6 +307,11 @@ def process_event(controller, event_id, action_map):
             
             clear_vals = find_clear_values(controller, action)
             if clear_vals:
+                if 'view_id' in clear_vals:
+                    vid = clear_vals['view_id']
+                    res_name = get_res_display_info(controller, vid)
+                    print(f"      Target View: ID {int(vid)} | {res_name}")
+
                 if 'color' in clear_vals:
                     c = clear_vals['color']
                     print(f"      Clear Color: ({c[0]:.4f}, {c[1]:.4f}, {c[2]:.4f}, {c[3]:.4f})")
@@ -298,14 +322,13 @@ def process_event(controller, event_id, action_map):
             else:
                 print(f"      (Could not extract clear values)")
             print(f"  " + "!"*40)
-            print(f"  (Note: Pipeline state below is preserved from previous draws)")
     else:
         print(f"  [Action Info] Not found in Action Tree")
 
-    # 5.1 打印管线状态 (使用原有详细逻辑)
-    print_pipeline_details(state)
+    # 5.1 打印管线状态
+    print_pipeline_details(controller, state)
     
-    # 5.2 遍历 Shader 阶段 (还原了被删除的 Geometry/Hull/Domain 支持)
+    # 5.2 遍历 Shader 阶段
     stages = [
         (rd.ShaderStage.Vertex, "Vertex Shader"),
         (rd.ShaderStage.Pixel, "Pixel Shader"),
@@ -324,13 +347,11 @@ def process_event(controller, event_id, action_map):
         reflection = state.GetShaderReflection(stage_enum)
         entry = reflection.entryPoint if reflection else "main"
 
-        # 如果是 Clear 事件，使用简化输出 (保留"修改后"的特性，避免 Clear 时打印无用 Shader)
         if is_clear:
             print(f"\n  [{stage_name}] (Bound but unused)")
             print(f"    ID: {int(shader_id)}")
             continue
 
-        # --- 正常 Shader 处理 (还原原有详细逻辑) ---
         if shader_id not in SHADER_CACHE:
             fname, code = fetch_shader_code(controller, shader_id, reflection, stage_name)
             SHADER_CACHE[shader_id] = {
@@ -355,13 +376,13 @@ def process_event(controller, event_id, action_map):
                 
                 if slot < len(cblocks):
                     desc = cblocks[slot].descriptor
+                    # desc 是 Descriptor 类型，使用 .resource
                     buf_id = desc.resource
                     
                     if buf_id != rd.ResourceId.Null():
                         res_name = get_res_display_info(controller, buf_id)
                         print(f"      - Slot {slot} ({cb_refl.name}) -> BufferID: {int(buf_id)} | {res_name}")
                         
-                        # 缓存 Buffer 内容
                         if buf_id not in BUFFER_CACHE:
                             try:
                                 vars = controller.GetCBufferVariableContents(
@@ -378,8 +399,29 @@ def process_event(controller, event_id, action_map):
                                     BUFFER_CACHE[buf_id] = {"name": res_name, "size": desc.byteSize, "content": ["(No readable vars)"]}
                             except Exception as e:
                                 BUFFER_CACHE[buf_id] = {"name": res_name, "size": 0, "content": [f"Err: {e}"]}
-        else:
-            pass
+        
+        # === [修复后] Input Textures (SRVs) 处理 ===
+        try:
+            ro_resources = state.GetReadOnlyResources(stage_enum)
+            if ro_resources and len(ro_resources) > 0:
+                res_map = {}
+                if reflection and reflection.readOnlyResources:
+                    for r in reflection.readOnlyResources:
+                        res_map[r.bindPoint] = r.name
+                
+                printed_header = False
+                for i, bind_res in enumerate(ro_resources):
+                    # bind_res 是 Descriptor 类型，使用 .resource 而不是 .resourceId
+                    if bind_res.resource != rd.ResourceId.Null():
+                        if not printed_header:
+                            print(f"    [Bound Resources (Textures/SRVs)]")
+                            printed_header = True
+                        
+                        r_name = get_res_display_info(controller, bind_res.resource)
+                        var_name = res_map.get(i, f"Slot {i}")
+                        print(f"      - {var_name} -> ID: {int(bind_res.resource)} | {r_name}")
+        except Exception as e:
+            print(f"    [Bound Resources] Error: {e}")
 
 # --- 6. 主逻辑 ---
 def analyze_main(controller):
@@ -387,7 +429,6 @@ def analyze_main(controller):
     BUFFER_CACHE.clear()
     SHADER_CACHE.clear()
     
-    # 解析范围
     target_eids = []
     if TARGET_RANGE == "0":
         if hasattr(pyrenderdoc, 'CurEvent'):
@@ -403,7 +444,6 @@ def analyze_main(controller):
         try: target_eids = [int(TARGET_RANGE)]
         except: pass
 
-    # 构建 Action Map (新功能)
     print("Preparing Action Map...")
     action_map = {}
     try:
@@ -411,14 +451,12 @@ def analyze_main(controller):
         flatten_actions(root_actions, action_map)
     except: print("Warning: Failed to map actions.")
 
-    # 1. 收集引用
     for eid in target_eids:
         try:
             process_event(controller, eid, action_map)
         except Exception as e:
             print(f"Error processing event {eid}: {e}")
 
-    # 2. 打印去重后的 Shader (还原了无截断的完整输出)
     print("\n" + "#"*60)
     print(" # REFERENCE: UNIQUE SHADER CODES")
     print(" # (Full output, no truncation)")
@@ -430,7 +468,6 @@ def analyze_main(controller):
         print(data['content'])
         print("```")
 
-    # 3. 打印去重后的 Buffer (还原了原有格式)
     print("\n" + "#"*60)
     print(" # REFERENCE: UNIQUE BUFFER CONTENTS")
     print("#"*60)
