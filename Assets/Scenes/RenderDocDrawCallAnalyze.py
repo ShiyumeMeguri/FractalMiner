@@ -15,20 +15,30 @@ SHADER_CACHE = {} # {id: {stage, filename, content}}
 def find_clear_values(controller, action):
     try:
         sd_file = controller.GetStructuredFile()
+        if not sd_file or not sd_file.chunks:
+            return None
         
         target_chunk = None
+        chunk_list = sd_file.chunks
+        
+        # 1. 尝试精确定位 Chunk
         for ev in action.events:
             if ev.eventId == action.eventId:
-                if ev.chunkIndex < len(sd_file.chunks):
-                    target_chunk = sd_file.chunks[ev.chunkIndex]
+                if ev.chunkIndex < len(chunk_list):
+                    target_chunk = chunk_list[ev.chunkIndex]
                 break
+        
+        # 2. 兜底策略：如果 Action ID 没对上，取该 Action 的最后一个 Event
+        # (针对 Clear 操作，这通常是正确的)
+        if not target_chunk and len(action.events) > 0:
+            target_chunk = chunk_list[action.events[-1].chunkIndex]
         
         if not target_chunk:
             return None
 
         result = {}
         
-        # 遍历 API 参数
+        # 3. 遍历参数
         count = target_chunk.NumChildren()
         for i in range(count):
             param = target_chunk.GetChild(i)
@@ -36,24 +46,48 @@ def find_clear_values(controller, action):
             val_data = param.data
             name_lower = name.lower()
             
-            # --- 1. 提取颜色 (Color) ---
-            if ("color" in name_lower or "value" in name_lower) and "view" not in name_lower:
+            # --- [Color 提取逻辑] ---
+            # 匹配名字：ColorRGBA (D3D11) 或包含 color 的参数
+            if "color" in name_lower:
+                # [情况 A] 数据直接在 f32v 数组里 (Standard)
                 if hasattr(val_data, 'f32v') and len(val_data.f32v) >= 4:
                     result['color'] = tuple(val_data.f32v[:4])
+                    
+                # [情况 B] 数据在 u32v 数组里 (Integer RenderTargets)
                 elif hasattr(val_data, 'u32v') and len(val_data.u32v) >= 4:
                     result['color'] = tuple(val_data.u32v[:4])
 
-            # --- 2. 提取深度 (Depth) ---
-            if name_lower == "depth":
+                # [情况 C] 数据是结构体，包含子节点 (Fixed Issue)
+                elif param.NumChildren() >= 4:
+                    try:
+                        temp_color = []
+                        for k in range(4):
+                            child = param.GetChild(k)
+                            # 尝试读取 basic.f (float) 或 basic.d (double)
+                            if hasattr(child.data, 'basic'):
+                                if hasattr(child.data.basic, 'f'):
+                                    temp_color.append(child.data.basic.f)
+                                elif hasattr(child.data.basic, 'd'):
+                                    temp_color.append(child.data.basic.d)
+                        
+                        if len(temp_color) == 4:
+                            result['color'] = tuple(temp_color)
+                    except:
+                        pass 
+
+            # --- [Depth 提取逻辑] ---
+            if "depth" in name_lower:
                 if hasattr(val_data, 'basic'):
-                    result['depth'] = val_data.basic.d
+                    if hasattr(val_data.basic, 'f'): result['depth'] = val_data.basic.f
+                    elif hasattr(val_data.basic, 'd'): result['depth'] = val_data.basic.d
                 elif hasattr(val_data, 'f32v') and len(val_data.f32v) > 0:
                     result['depth'] = val_data.f32v[0]
 
-            # --- 3. 提取模板 (Stencil) ---
-            if name_lower == "stencil":
+            # --- [Stencil 提取逻辑] ---
+            if "stencil" in name_lower:
                 if hasattr(val_data, 'basic'):
-                    result['stencil'] = val_data.basic.u
+                    if hasattr(val_data.basic, 'u'): result['stencil'] = val_data.basic.u
+                    elif hasattr(val_data.basic, 'i'): result['stencil'] = val_data.basic.i
                 elif hasattr(val_data, 'u8v') and len(val_data.u8v) > 0:
                     result['stencil'] = val_data.u8v[0]
                 elif hasattr(val_data, 'u32v') and len(val_data.u32v) > 0:
