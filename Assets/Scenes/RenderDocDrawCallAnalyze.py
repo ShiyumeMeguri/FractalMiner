@@ -11,15 +11,64 @@ TARGET_RANGE = "0"
 BUFFER_CACHE = {} # {id: {name, size, content}}
 SHADER_CACHE = {} # {id: {stage, filename, content}}
 
-# --- 1. 辅助格式化函数 ---
-def get_resource_id_safe(obj):
-    if obj is None: return rd.ResourceId.Null()
-    if hasattr(obj, 'resourceId'): return obj.resourceId
-    if hasattr(obj, 'resource'): return obj.resource
-    if hasattr(obj, 'descriptor'):
-        desc = obj.descriptor
-        if hasattr(desc, 'resource'): return desc.resource
-    return rd.ResourceId.Null()
+# --- 1. 新增功能：Clear 辅助函数 ---
+def find_clear_values(controller, action):
+    try:
+        sd_file = controller.GetStructuredFile()
+        
+        target_chunk = None
+        for ev in action.events:
+            if ev.eventId == action.eventId:
+                if ev.chunkIndex < len(sd_file.chunks):
+                    target_chunk = sd_file.chunks[ev.chunkIndex]
+                break
+        
+        if not target_chunk:
+            return None
+
+        result = {}
+        
+        # 遍历 API 参数
+        count = target_chunk.NumChildren()
+        for i in range(count):
+            param = target_chunk.GetChild(i)
+            name = param.name
+            val_data = param.data
+            name_lower = name.lower()
+            
+            # --- 1. 提取颜色 (Color) ---
+            if ("color" in name_lower or "value" in name_lower) and "view" not in name_lower:
+                if hasattr(val_data, 'f32v') and len(val_data.f32v) >= 4:
+                    result['color'] = tuple(val_data.f32v[:4])
+                elif hasattr(val_data, 'u32v') and len(val_data.u32v) >= 4:
+                    result['color'] = tuple(val_data.u32v[:4])
+
+            # --- 2. 提取深度 (Depth) ---
+            if name_lower == "depth":
+                if hasattr(val_data, 'basic'):
+                    result['depth'] = val_data.basic.d
+                elif hasattr(val_data, 'f32v') and len(val_data.f32v) > 0:
+                    result['depth'] = val_data.f32v[0]
+
+            # --- 3. 提取模板 (Stencil) ---
+            if name_lower == "stencil":
+                if hasattr(val_data, 'basic'):
+                    result['stencil'] = val_data.basic.u
+                elif hasattr(val_data, 'u8v') and len(val_data.u8v) > 0:
+                    result['stencil'] = val_data.u8v[0]
+                elif hasattr(val_data, 'u32v') and len(val_data.u32v) > 0:
+                    result['stencil'] = val_data.u32v[0]
+
+        return result
+    except Exception as e:
+        print(f"      [Warning] Failed to parse SDChunk: {e}")
+        return None
+
+def flatten_actions(actions, lookup_dict):
+    for action in actions:
+        lookup_dict[action.eventId] = action
+        if action.children:
+            flatten_actions(action.children, lookup_dict)
 
 def format_numeric(variable):
     try:
@@ -83,7 +132,7 @@ def get_res_display_info(controller, rid):
         pass
     return f"Res_{int(rid)}"
 
-# --- 2. 核心：打印管线状态 (修复 Blend 属性访问) ---
+# --- 3. 核心：打印管线状态 (还原了被删除的 Topology/Viewport/Stencil/DetailedBlend) ---
 def print_pipeline_details(state):
     # 2.1 Topology
     try:
@@ -109,7 +158,6 @@ def print_pipeline_details(state):
         print(f"  [Depth & Stencil State]")
         
         def fmt_face(name, face):
-            # 安全获取属性，防止部分API版本差异
             ref = getattr(face, 'reference', '?')
             cmask = getattr(face, 'compareMask', 0)
             wmask = getattr(face, 'writeMask', 0)
@@ -127,7 +175,7 @@ def print_pipeline_details(state):
     except Exception as e:
         print(f"  [Depth & Stencil State] Error: {e}")
 
-    # 2.4 Blend State (修复：使用正确的属性名)
+    # 2.4 Blend State
     try:
         blends = state.GetColorBlends()
         print(f"  [Blend State]")
@@ -135,7 +183,6 @@ def print_pipeline_details(state):
         
         printed_any_rt = False
         for i, rt in enumerate(blends):
-            # 【修复点】使用 rt.enabled 而不是 rt.blendEnable
             is_enabled = rt.enabled
             write_mask = rt.writeMask
             
@@ -144,11 +191,8 @@ def print_pipeline_details(state):
                 print(f"    RT[{i}]: Enabled={is_enabled}, WriteMask=0x{write_mask:02X}")
                 
                 if is_enabled:
-                    # 【修复点】混合公式在 colorBlend 和 alphaBlend 子对象中
                     cb = rt.colorBlend
                     ab = rt.alphaBlend
-                    
-                    # 尝试打印 (Source, Dest, Op)
                     print(f"      Color: Src={cb.source} {cb.operation} Dst={cb.destination}")
                     print(f"      Alpha: Src={ab.source} {ab.operation} Dst={ab.destination}")
                 
@@ -161,7 +205,7 @@ def print_pipeline_details(state):
     except Exception as e:
         print(f"  [Blend State] Error: {e}")
 
-# --- 3. 获取 Shader 代码 ---
+# --- 4. 获取 Shader 代码 ---
 def fetch_shader_code(controller, shader_id, reflection, stage_name):
     fname = "Unknown"
     code = ""
@@ -180,8 +224,8 @@ def fetch_shader_code(controller, shader_id, reflection, stage_name):
 
     return fname, code
 
-# --- 4. 单个Event分析逻辑 ---
-def process_event(controller, event_id):
+# --- 5. 单个Event分析逻辑 (合并了新旧逻辑) ---
+def process_event(controller, event_id, action_map):
     controller.SetFrameEvent(event_id, True)
     state = controller.GetPipelineState()
     
@@ -189,10 +233,45 @@ def process_event(controller, event_id):
     print(f">>> [Event {event_id}] Pipeline Analysis")
     print(f"{'='*60}")
     
-    # 4.1 打印管线状态
+    # --- 新增：Clear 检测逻辑 ---
+    FlagsEnum = getattr(rd, 'ActionFlags', getattr(rd, 'DrawFlags', None))
+    action = action_map.get(event_id)
+    is_clear = False
+    
+    if action:
+        try: name = action.GetName(controller.GetStructuredFile())
+        except: name = action.customName if action.customName else f"Action {action.eventId}"
+        print(f"  [Action Info] Name: {name}")
+        
+        flag_clear = False
+        if FlagsEnum:
+            flag_clear = bool(action.flags & (FlagsEnum.Clear | FlagsEnum.ClearDepthStencil))
+        
+        if flag_clear:
+            is_clear = True
+            print(f"  " + "!"*40)
+            print(f"  [!] CLEAR OPERATION DETECTED")
+            
+            clear_vals = find_clear_values(controller, action)
+            if clear_vals:
+                if 'color' in clear_vals:
+                    c = clear_vals['color']
+                    print(f"      Clear Color: ({c[0]:.4f}, {c[1]:.4f}, {c[2]:.4f}, {c[3]:.4f})")
+                if 'depth' in clear_vals:
+                    print(f"      Clear Depth: {clear_vals['depth']:.4f}")
+                if 'stencil' in clear_vals:
+                    print(f"      Clear Stencil: {clear_vals['stencil']}")
+            else:
+                print(f"      (Could not extract clear values)")
+            print(f"  " + "!"*40)
+            print(f"  (Note: Pipeline state below is preserved from previous draws)")
+    else:
+        print(f"  [Action Info] Not found in Action Tree")
+
+    # 5.1 打印管线状态 (使用原有详细逻辑)
     print_pipeline_details(state)
     
-    # 4.2 遍历 Shader 阶段
+    # 5.2 遍历 Shader 阶段 (还原了被删除的 Geometry/Hull/Domain 支持)
     stages = [
         (rd.ShaderStage.Vertex, "Vertex Shader"),
         (rd.ShaderStage.Pixel, "Pixel Shader"),
@@ -211,7 +290,13 @@ def process_event(controller, event_id):
         reflection = state.GetShaderReflection(stage_enum)
         entry = reflection.entryPoint if reflection else "main"
 
-        # 缓存 Shader
+        # 如果是 Clear 事件，使用简化输出 (保留"修改后"的特性，避免 Clear 时打印无用 Shader)
+        if is_clear:
+            print(f"\n  [{stage_name}] (Bound but unused)")
+            print(f"    ID: {int(shader_id)}")
+            continue
+
+        # --- 正常 Shader 处理 (还原原有详细逻辑) ---
         if shader_id not in SHADER_CACHE:
             fname, code = fetch_shader_code(controller, shader_id, reflection, stage_name)
             SHADER_CACHE[shader_id] = {
@@ -262,7 +347,7 @@ def process_event(controller, event_id):
         else:
             pass
 
-# --- 5. 主逻辑 ---
+# --- 6. 主逻辑 ---
 def analyze_main(controller):
     global BUFFER_CACHE, SHADER_CACHE
     BUFFER_CACHE.clear()
@@ -284,30 +369,38 @@ def analyze_main(controller):
         try: target_eids = [int(TARGET_RANGE)]
         except: pass
 
+    # 构建 Action Map (新功能)
+    print("Preparing Action Map...")
+    action_map = {}
+    try:
+        root_actions = controller.GetRootActions()
+        flatten_actions(root_actions, action_map)
+    except: print("Warning: Failed to map actions.")
+
     # 1. 收集引用
     for eid in target_eids:
         try:
-            process_event(controller, eid)
+            process_event(controller, eid, action_map)
         except Exception as e:
             print(f"Error processing event {eid}: {e}")
 
+    # 2. 打印去重后的 Shader (还原了无截断的完整输出)
     print("\n" + "#"*60)
     print(" # REFERENCE: UNIQUE SHADER CODES")
     print(" # (Full output, no truncation)")
     print("#"*60)
 
-    # 2. 打印去重后的 Shader (不截断)
     for sid, data in SHADER_CACHE.items():
         print(f"\n>>> Shader ID: {int(sid)} ({data['stage']}) | File: {data['filename']}")
         print("```glsl")
         print(data['content'])
         print("```")
 
+    # 3. 打印去重后的 Buffer (还原了原有格式)
     print("\n" + "#"*60)
     print(" # REFERENCE: UNIQUE BUFFER CONTENTS")
     print("#"*60)
     
-    # 3. 打印去重后的 Buffer
     for bid, data in BUFFER_CACHE.items():
         print(f"\n>>> Buffer ID: {int(bid)} | Name: {data['name']}")
         print("```yaml")
