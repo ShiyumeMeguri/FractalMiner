@@ -238,7 +238,6 @@ def print_pipeline_details(controller, state):
         print(f"  [Render Targets (Outputs)]")
         
         # Depth
-        # 注意：Descriptor对象使用 .resource 获取 ResourceId
         if depth_target.resource != rd.ResourceId.Null():
             name = get_res_display_info(controller, depth_target.resource)
             print(f"    Depth Target: ID {int(depth_target.resource)} | {name}")
@@ -376,8 +375,8 @@ def process_event(controller, event_id, action_map):
                 if slot < 0: slot = i
                 
                 if slot < len(cblocks):
+                    # cblocks[i] 是 UsedDescriptor，包含 .descriptor
                     desc = cblocks[slot].descriptor
-                    # desc 是 Descriptor 类型，使用 .resource
                     buf_id = desc.resource
                     
                     if buf_id != rd.ResourceId.Null():
@@ -408,20 +407,23 @@ def process_event(controller, event_id, action_map):
                 res_map = {}
                 if reflection and reflection.readOnlyResources:
                     for r in reflection.readOnlyResources:
-                        # 修复: 使用 fixedBindNumber 而不是 bindPoint
                         res_map[r.fixedBindNumber] = r.name
                 
                 printed_header = False
                 for i, bind_res in enumerate(ro_resources):
-                    # bind_res 是 Descriptor 类型，使用 .resource
-                    if bind_res.resource != rd.ResourceId.Null():
+                    # 修复点：bind_res 是 UsedDescriptor 类型
+                    # 必须访问 bind_res.descriptor 才能获取 Descriptor 对象
+                    # 然后访问 .descriptor.resource 获取 ResourceId
+                    actual_desc = bind_res.descriptor
+                    
+                    if actual_desc.resource != rd.ResourceId.Null():
                         if not printed_header:
                             print(f"    [Bound Resources (Textures/SRVs)]")
                             printed_header = True
                         
-                        r_name = get_res_display_info(controller, bind_res.resource)
+                        r_name = get_res_display_info(controller, actual_desc.resource)
                         var_name = res_map.get(i, f"Slot {i}")
-                        print(f"      - {var_name} -> ID: {int(bind_res.resource)} | {r_name}")
+                        print(f"      - {var_name} -> ID: {int(actual_desc.resource)} | {r_name}")
         except Exception as e:
             print(f"    [Bound Resources] Error: {e}")
 
