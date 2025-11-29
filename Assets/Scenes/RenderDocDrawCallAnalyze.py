@@ -3,7 +3,7 @@ import qrenderdoc as qrd
 import sys
 
 # ==========================================
-# [设置] 0 = 当前选中Event; "10-30" = 范围
+# [设置] 0 = 当前选中Event; "10-30" = 范围; "7-10,15-19" = 组合
 TARGET_RANGE = "0"  
 # ==========================================
 
@@ -434,19 +434,38 @@ def analyze_main(controller):
     SHADER_CACHE.clear()
     
     target_eids = []
-    if TARGET_RANGE == "0":
+    
+    # Mode 1: Auto (Current Event) - Only if explicitly "0"
+    if TARGET_RANGE.strip() == "0":
         if hasattr(pyrenderdoc, 'CurEvent'):
             target_eids = [pyrenderdoc.CurEvent()]
-    elif "-" in TARGET_RANGE:
-        try:
-            start, end = map(int, TARGET_RANGE.split("-"))
-            target_eids = list(range(start, end + 1))
-        except:
-            print("Invalid range.")
-            return
+    
+    # Mode 2: Explicit List/Ranges (e.g., "7-10,15,20-22")
     else:
-        try: target_eids = [int(TARGET_RANGE)]
-        except: pass
+        parts = TARGET_RANGE.split(',')
+        for part in parts:
+            part = part.strip()
+            if not part: 
+                continue
+            
+            if "-" in part:
+                try:
+                    range_split = part.split("-")
+                    if len(range_split) == 2:
+                        start, end = int(range_split[0]), int(range_split[1])
+                        target_eids.extend(range(start, end + 1))
+                    else:
+                        print(f"Warning: Invalid range format ignored: {part}")
+                except:
+                    print(f"Warning: Could not parse range: {part}")
+            else:
+                try:
+                    target_eids.append(int(part))
+                except:
+                    print(f"Warning: Could not parse ID: {part}")
+
+    # Deduplicate and sort
+    target_eids = sorted(list(set(target_eids)))
 
     print("Preparing Action Map...")
     action_map = {}
