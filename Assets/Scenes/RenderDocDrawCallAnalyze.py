@@ -66,7 +66,8 @@ def find_clear_values(controller, action):
                                 elif hasattr(child.data.basic, 'd'): temp_color.append(child.data.basic.d)
                         if len(temp_color) == 4:
                             result['color'] = tuple(temp_color)
-                    except: pass 
+                    except Exception as e:
+                        print(f"[Error] Failed to extract color child: {e}")
 
             # --- [Depth 提取] ---
             if "depth" in name_lower:
@@ -88,6 +89,7 @@ def find_clear_values(controller, action):
 
         return result
     except Exception as e:
+        print(f"[Error] find_clear_values failed: {e}")
         return None
 
 def flatten_actions(actions, lookup_dict):
@@ -154,8 +156,8 @@ def get_res_display_info(controller, rid):
         for r in resources:
             if r.resourceId == rid:
                 return r.name
-    except:
-        pass
+    except Exception as e:
+        print(f"[Error] get_res_display_info failed: {e}")
     return f"Res_{int(rid)}"
 
 # --- 3. 核心：打印管线状态 ---
@@ -165,12 +167,11 @@ def print_pipeline_details(controller, state):
         topo = state.GetPrimitiveTopology()
         print(f"  [Input Assembly]")
         print(f"    Topology: {topo}")
-    except:
-        pass
+    except Exception as e:
+        print(f"  [Input Assembly] Error: {e}")
 
     # 2.2 Rasterizer State
     try:
-        # [推断] 获取 Rasterizer State，如果 API 不支持会进 except
         rs = state.GetRasterizerState()
         print(f"  [Rasterizer State]")
         # 转换枚举/bool为精简可读格式
@@ -182,8 +183,7 @@ def print_pipeline_details(controller, state):
         print(f"    DepthClip: {rs.depthClip} | MSAA: {rs.multisampleEnable} | ScissorEnable: {rs.scissorEnable}")
         print(f"    DepthBias: {rs.depthBias:.6f} | Clamp: {rs.depthBiasClamp:.6f} | Slope: {rs.slopeScaledDepthBias:.6f}")
     except Exception as e:
-        # 某些旧 API 可能没有此方法，静默处理
-        pass
+        print(f"  [Rasterizer State] Error: {e}")
 
     # 2.3 Viewports & Scissors (Multi-slot)
     try:
@@ -208,19 +208,16 @@ def print_pipeline_details(controller, state):
 
     # 2.4 Depth State
     try:
-        # [推断] 获取 Depth State
         ds = state.GetDepthState()
         print(f"  [Depth State]")
         func_name = str(ds.depthFunction).split('.')[-1]
         print(f"    Test: {ds.depthEnable} | Write: {ds.depthWrite} | Func: {func_name}")
-    except:
-        pass
+    except Exception as e:
+        print(f"  [Depth State] Error: {e}")
 
     # 2.5 Stencil State
     try:
         front, back = state.GetStencilFaces()
-        # 只有在 Stencil 启用或有意义时打印详细信息? 
-        # 这里为了完备性，直接打印
         print(f"  [Stencil State]")
         
         def fmt_face(name, face):
@@ -238,8 +235,7 @@ def print_pipeline_details(controller, state):
         fmt_face("Front", front)
         fmt_face("Back ", back)
     except Exception as e:
-        # 某些情况可能无法获取
-        pass
+        print(f"  [Stencil State] Error: {e}")
 
     # 2.6 Blend State
     try:
@@ -341,8 +337,13 @@ def process_event(controller, event_id, action_map):
     is_clear = False
     
     if action:
-        try: name = action.GetName(controller.GetStructuredFile())
-        except: name = action.customName if action.customName else f"Action {action.eventId}"
+        try: 
+            name = action.GetName(controller.GetStructuredFile())
+        except Exception as e:
+            # 这里虽然提供了默认值，但按照“打印所有错误”的要求，输出日志
+            print(f"  [Warning] Failed to get action name: {e}")
+            name = action.customName if action.customName else f"Action {action.eventId}"
+        
         print(f"  [Action Info] Name: {name}")
         
         flag_clear = False
@@ -526,13 +527,13 @@ def analyze_main(controller):
                         target_eids.extend(range(start, end + 1))
                     else:
                         print(f"Warning: Invalid range format ignored: {part}")
-                except:
-                    print(f"Warning: Could not parse range: {part}")
+                except Exception as e:
+                    print(f"Warning: Could not parse range: {part}, Error: {e}")
             else:
                 try:
                     target_eids.append(int(part))
-                except:
-                    print(f"Warning: Could not parse ID: {part}")
+                except Exception as e:
+                    print(f"Warning: Could not parse ID: {part}, Error: {e}")
 
     # Deduplicate and sort
     target_eids = sorted(list(set(target_eids)))
@@ -542,7 +543,8 @@ def analyze_main(controller):
     try:
         root_actions = controller.GetRootActions()
         flatten_actions(root_actions, action_map)
-    except: print("Warning: Failed to map actions.")
+    except Exception as e: 
+        print(f"Warning: Failed to map actions. Error: {e}")
 
     for eid in target_eids:
         try:
