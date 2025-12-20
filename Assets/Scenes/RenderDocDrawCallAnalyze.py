@@ -170,30 +170,35 @@ def print_pipeline_details(controller, state):
     except Exception as e:
         print(f"  [Input Assembly] Error: {e}")
 
-    # 2.2 Rasterizer State
+    # 2.2 Rasterizer State (API Specific)
+    print(f"  [Rasterizer State]")
     try:
-        rs = state.GetRasterizerState()
-        print(f"  [Rasterizer State]")
-        # 转换枚举/bool为精简可读格式
-        cull_mode = str(rs.cullMode).split('.')[-1]
-        fill_mode = str(rs.fillMode).split('.')[-1]
-        front_face = "CCW" if rs.frontCCW else "CW"
-        
-        print(f"    Cull: {cull_mode} | Fill: {fill_mode} | Front: {front_face}")
-        print(f"    DepthClip: {rs.depthClip} | MSAA: {rs.multisampleEnable} | ScissorEnable: {rs.scissorEnable}")
-        print(f"    DepthBias: {rs.depthBias:.6f} | Clamp: {rs.depthBiasClamp:.6f} | Slope: {rs.slopeScaledDepthBias:.6f}")
+        if state.IsCaptureD3D11():
+            d3d11 = controller.GetD3D11PipelineState()
+            rs = d3d11.rasterizer.state
+            
+            cull = str(rs.cullMode).split('.')[-1]
+            fill = str(rs.fillMode).split('.')[-1]
+            front = "CCW" if rs.frontCCW else "CW"
+            
+            print(f"    Cull: {cull} | Fill: {fill} | Front: {front}")
+            print(f"    DepthClip: {rs.depthClip} | MSAA: {rs.multisampleEnable} | ScissorEnable: {rs.scissorEnable}")
+            print(f"    DepthBias: {rs.depthBias} | Clamp: {rs.depthBiasClamp:.4f} | Slope: {rs.slopeScaledDepthBias:.4f}")
+        else:
+            print(f"    (Generic) Detail fetch not implemented for non-D3D11 API yet")
     except Exception as e:
-        print(f"  [Rasterizer State] Error: {e}")
+        print(f"    Error fetching RS state: {e}")
 
     # 2.3 Viewports & Scissors (Multi-slot)
     try:
         print(f"  [Viewports & Scissors]")
         printed_vp = False
-        # 遍历常用的槽位，RenderDoc 通常支持多个，这里检查前 16 个
+        # 现代API通常支持多个VP (e.g. D3D11 supports 16)
         for i in range(16):
             vp = state.GetViewport(i)
             sc = state.GetScissor(i)
-            # 过滤无效视口以节省 token
+            
+            # 简单判断有效性：宽高不全为0
             if vp.width == 0 and vp.height == 0 and sc.width == 0 and sc.height == 0:
                 continue
             
@@ -206,14 +211,20 @@ def print_pipeline_details(controller, state):
     except Exception as e:
         print(f"  [Viewports] Error: {e}")
 
-    # 2.4 Depth State
+    # 2.4 Depth State (API Specific for Func/Write)
+    print(f"  [Depth State]")
     try:
-        ds = state.GetDepthState()
-        print(f"  [Depth State]")
-        func_name = str(ds.depthFunction).split('.')[-1]
-        print(f"    Test: {ds.depthEnable} | Write: {ds.depthWrite} | Func: {func_name}")
+        if state.IsCaptureD3D11():
+            d3d11 = controller.GetD3D11PipelineState()
+            ds = d3d11.outputMerger.depthStencilState
+            
+            func = str(ds.depthFunction).split('.')[-1]
+            print(f"    Test: {ds.depthEnable} | Write: {ds.depthWrites} | Func: {func}")
+        else:
+            # Fallback to whatever generic info is available, though minimal
+            print(f"    (Generic) Detail fetch not implemented for non-D3D11 API yet")
     except Exception as e:
-        print(f"  [Depth State] Error: {e}")
+        print(f"    Error fetching Depth state: {e}")
 
     # 2.5 Stencil State
     try:
@@ -340,7 +351,6 @@ def process_event(controller, event_id, action_map):
         try: 
             name = action.GetName(controller.GetStructuredFile())
         except Exception as e:
-            # 这里虽然提供了默认值，但按照“打印所有错误”的要求，输出日志
             print(f"  [Warning] Failed to get action name: {e}")
             name = action.customName if action.customName else f"Action {action.eventId}"
         
@@ -425,7 +435,6 @@ def process_event(controller, event_id, action_map):
                 if slot < 0: slot = i
                 
                 if slot < len(cblocks):
-                    # cblocks[i] 是 UsedDescriptor，包含 .descriptor
                     desc = cblocks[slot].descriptor
                     buf_id = desc.resource
                     
@@ -475,11 +484,11 @@ def process_event(controller, event_id, action_map):
             print(f"    [Bound Resources] Error: {e}")
 
         # === [新增] Input/Output Resources (UAVs) ===
+        # 支持 Compute Shader 和 Pixel Shader 的 UAV 绑定
         try:
             rw_resources = state.GetReadWriteResources(stage_enum)
             if rw_resources and len(rw_resources) > 0:
                 res_map = {}
-                # [推断] Reflection 通常也有 readWriteResources 字段对应 UAV
                 if reflection and hasattr(reflection, 'readWriteResources'):
                     for r in reflection.readWriteResources:
                         res_map[r.fixedBindNumber] = r.name
