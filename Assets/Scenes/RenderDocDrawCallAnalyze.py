@@ -168,40 +168,80 @@ def print_pipeline_details(controller, state):
     except:
         pass
 
-    # 2.2 Rasterizer
+    # 2.2 Rasterizer State
     try:
-        vp = state.GetViewport(0)
-        sc = state.GetScissor(0)
-        print(f"  [Rasterizer Data (Slot 0)]")
-        print(f"    Viewport: {vp.x:.1f}, {vp.y:.1f} | Size: {vp.width:.1f}x{vp.height:.1f} | Z: {vp.minDepth}-{vp.maxDepth}")
-        print(f"    Scissor:  {sc.x}, {sc.y} | Size: {sc.width}x{sc.height}")
+        # [推断] 获取 Rasterizer State，如果 API 不支持会进 except
+        rs = state.GetRasterizerState()
+        print(f"  [Rasterizer State]")
+        # 转换枚举/bool为精简可读格式
+        cull_mode = str(rs.cullMode).split('.')[-1]
+        fill_mode = str(rs.fillMode).split('.')[-1]
+        front_face = "CCW" if rs.frontCCW else "CW"
+        
+        print(f"    Cull: {cull_mode} | Fill: {fill_mode} | Front: {front_face}")
+        print(f"    DepthClip: {rs.depthClip} | MSAA: {rs.multisampleEnable} | ScissorEnable: {rs.scissorEnable}")
+        print(f"    DepthBias: {rs.depthBias:.6f} | Clamp: {rs.depthBiasClamp:.6f} | Slope: {rs.slopeScaledDepthBias:.6f}")
+    except Exception as e:
+        # 某些旧 API 可能没有此方法，静默处理
+        pass
+
+    # 2.3 Viewports & Scissors (Multi-slot)
+    try:
+        print(f"  [Viewports & Scissors]")
+        printed_vp = False
+        # 遍历常用的槽位，RenderDoc 通常支持多个，这里检查前 16 个
+        for i in range(16):
+            vp = state.GetViewport(i)
+            sc = state.GetScissor(i)
+            # 过滤无效视口以节省 token
+            if vp.width == 0 and vp.height == 0 and sc.width == 0 and sc.height == 0:
+                continue
+            
+            printed_vp = True
+            print(f"    [{i}] VP: {vp.x:.1f},{vp.y:.1f} {vp.width:.1f}x{vp.height:.1f} Z:{vp.minDepth}-{vp.maxDepth}")
+            print(f"        SC: {sc.x},{sc.y} {sc.width}x{sc.height}")
+        
+        if not printed_vp:
+            print(f"    (No active viewports)")
+    except Exception as e:
+        print(f"  [Viewports] Error: {e}")
+
+    # 2.4 Depth State
+    try:
+        # [推断] 获取 Depth State
+        ds = state.GetDepthState()
+        print(f"  [Depth State]")
+        func_name = str(ds.depthFunction).split('.')[-1]
+        print(f"    Test: {ds.depthEnable} | Write: {ds.depthWrite} | Func: {func_name}")
     except:
         pass
 
-    # 2.3 Stencil
+    # 2.5 Stencil State
     try:
         front, back = state.GetStencilFaces()
-        print(f"  [Depth & Stencil State]")
+        # 只有在 Stencil 启用或有意义时打印详细信息? 
+        # 这里为了完备性，直接打印
+        print(f"  [Stencil State]")
         
         def fmt_face(name, face):
             ref = getattr(face, 'reference', '?')
             cmask = getattr(face, 'compareMask', 0)
             wmask = getattr(face, 'writeMask', 0)
-            func = getattr(face, 'function', '?')
-            pass_op = getattr(face, 'passOperation', '?')
-            fail_op = getattr(face, 'failOperation', '?')
-            zfail_op = getattr(face, 'depthFailOperation', '?')
+            func = str(getattr(face, 'function', '?')).split('.')[-1]
+            pass_op = str(getattr(face, 'passOperation', '?')).split('.')[-1]
+            fail_op = str(getattr(face, 'failOperation', '?')).split('.')[-1]
+            zfail_op = str(getattr(face, 'depthFailOperation', '?')).split('.')[-1]
             
-            print(f"    [{name}] Ref:{ref} Mask:0x{cmask:02X} Write:0x{wmask:02X}")
-            print(f"       Func: {func}")
-            print(f"       Pass: {pass_op} | Fail: {fail_op} | ZFail: {zfail_op}")
+            print(f"    [{name}] Ref:{ref} Mask:0x{cmask:02X} Write:0x{wmask:02X} Func:{func}")
+            print(f"       Op: Pass={pass_op} Fail={fail_op} ZFail={zfail_op}")
 
-        fmt_face("Stencil Front", front)
-        fmt_face("Stencil Back ", back)
+        fmt_face("Front", front)
+        fmt_face("Back ", back)
     except Exception as e:
-        print(f"  [Depth & Stencil State] Error: {e}")
+        # 某些情况可能无法获取
+        pass
 
-    # 2.4 Blend State
+    # 2.6 Blend State
     try:
         blends = state.GetColorBlends()
         print(f"  [Blend State]")
@@ -219,8 +259,17 @@ def print_pipeline_details(controller, state):
                 if is_enabled:
                     cb = rt.colorBlend
                     ab = rt.alphaBlend
-                    print(f"      Color: Src={cb.source} {cb.operation} Dst={cb.destination}")
-                    print(f"      Alpha: Src={ab.source} {ab.operation} Dst={ab.destination}")
+                    # 精简输出
+                    src_c = str(cb.source).split('.')[-1]
+                    dst_c = str(cb.destination).split('.')[-1]
+                    op_c  = str(cb.operation).split('.')[-1]
+                    
+                    src_a = str(ab.source).split('.')[-1]
+                    dst_a = str(ab.destination).split('.')[-1]
+                    op_a  = str(ab.operation).split('.')[-1]
+
+                    print(f"      Color: {src_c} {op_c} {dst_c}")
+                    print(f"      Alpha: {src_a} {op_a} {dst_a}")
                 
                 if rt.logicOperationEnabled:
                     print(f"      LogicOp: {rt.logicOperation}")
@@ -231,7 +280,7 @@ def print_pipeline_details(controller, state):
     except Exception as e:
         print(f"  [Blend State] Error: {e}")
 
-    # --- 2.5 Render Targets (Output Textures) ---
+    # --- 2.7 Render Targets (Output Textures) ---
     try:
         targets = state.GetOutputTargets()
         depth_target = state.GetDepthTarget()
@@ -400,7 +449,7 @@ def process_event(controller, event_id, action_map):
                             except Exception as e:
                                 BUFFER_CACHE[buf_id] = {"name": res_name, "size": 0, "content": [f"Err: {e}"]}
         
-        # === [核心修复] Input Textures (SRVs) 处理 ===
+        # === Input Textures (SRVs) 处理 ===
         try:
             ro_resources = state.GetReadOnlyResources(stage_enum)
             if ro_resources and len(ro_resources) > 0:
@@ -411,9 +460,6 @@ def process_event(controller, event_id, action_map):
                 
                 printed_header = False
                 for i, bind_res in enumerate(ro_resources):
-                    # 修复点：bind_res 是 UsedDescriptor 类型
-                    # 必须访问 bind_res.descriptor 才能获取 Descriptor 对象
-                    # 然后访问 .descriptor.resource 获取 ResourceId
                     actual_desc = bind_res.descriptor
                     
                     if actual_desc.resource != rd.ResourceId.Null():
@@ -426,6 +472,30 @@ def process_event(controller, event_id, action_map):
                         print(f"      - {var_name} -> ID: {int(actual_desc.resource)} | {r_name}")
         except Exception as e:
             print(f"    [Bound Resources] Error: {e}")
+
+        # === [新增] Input/Output Resources (UAVs) ===
+        try:
+            rw_resources = state.GetReadWriteResources(stage_enum)
+            if rw_resources and len(rw_resources) > 0:
+                res_map = {}
+                # [推断] Reflection 通常也有 readWriteResources 字段对应 UAV
+                if reflection and hasattr(reflection, 'readWriteResources'):
+                    for r in reflection.readWriteResources:
+                        res_map[r.fixedBindNumber] = r.name
+                
+                printed_header = False
+                for i, bind_res in enumerate(rw_resources):
+                    actual_desc = bind_res.descriptor
+                    if actual_desc.resource != rd.ResourceId.Null():
+                        if not printed_header:
+                            print(f"    [Read-Write Resources (UAVs)]")
+                            printed_header = True
+                        
+                        r_name = get_res_display_info(controller, actual_desc.resource)
+                        var_name = res_map.get(i, f"Slot {i}")
+                        print(f"      - {var_name} -> ID: {int(actual_desc.resource)} | {r_name}")
+        except Exception as e:
+            print(f"    [Read-Write Resources] Error: {e}")
 
 # --- 6. 主逻辑 ---
 def analyze_main(controller):
