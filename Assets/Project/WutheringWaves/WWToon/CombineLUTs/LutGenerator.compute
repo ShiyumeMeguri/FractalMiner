@@ -1,0 +1,54 @@
+#pragma kernel cs_main
+#pragma only_renderers d3d11
+
+// ---------------------------------------------------------------------------------
+// 对应UE4的宏定义 (需要保留，因为库文件中的逻辑会用到它们)
+// ---------------------------------------------------------------------------------
+#define USE_COLOR_MATRIX    1
+#define USE_SHADOW_TINT     1
+#define USE_CONTRAST        1
+#define BLENDCOUNT          0
+#define USE_VOLUME_LUT      1
+#define BRANCH              [branch]
+#define FEATURE_LEVEL       1
+#define FEATURE_LEVEL_ES3_1 0
+
+// ---------------------------------------------------------------------------------
+// 输出目标 (3D Render Texture)
+// ---------------------------------------------------------------------------------
+RWTexture3D<float4> RWOutComputeTex;
+
+
+// ---------------------------------------------------------------------------------
+// 辅助函数 (在原文章的CS中有，这里保留)
+// ---------------------------------------------------------------------------------
+#ifndef PI
+#define PI 3.1415926
+#endif
+
+float Square(float x) { return x * x; }
+float2 Square(float2 x) { return x * x; }
+float3 Square(float3 x) { return x * x; }
+float4 Square(float4 x) { return x * x; }
+// ---------------------------------------------------------------------------------
+// 包含你准备好的UE4核心算法库
+// ---------------------------------------------------------------------------------
+#include "ColorGradeAndTonemap_Library.hlsl"
+
+// ---------------------------------------------------------------------------------
+// Compute Shader 主入口
+// ---------------------------------------------------------------------------------
+[numthreads(8, 8, 8)]
+void cs_main(uint3 DispatchThreadId : SV_DispatchThreadID)
+{
+    float4 CombineLUTsComputeParams = float4(0, 0, 1.0f / 32.0f, 1.0f / 32.0f);
+
+    float2 UV = ((float2)DispatchThreadId.xy + 0.5f) * CombineLUTsComputeParams.zw;
+    uint LayerIndex = DispatchThreadId.z;
+
+    // 调用UE4的核心函数来计算当前坐标的LUT颜色
+    float4 OutColor = CombineLUTsCommon(UV, LayerIndex);
+
+    // 将计算结果写入3D纹理
+    RWOutComputeTex[DispatchThreadId] = OutColor;
+}
