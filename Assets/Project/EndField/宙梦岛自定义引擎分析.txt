@@ -1,0 +1,1 @@
+MonoBehavior不存在 直接叫 Behavior 并且继承链在AssemblyDumper中生成的时候有错误 也许他们已经把mono后端换成netcore现代化版本的了.
