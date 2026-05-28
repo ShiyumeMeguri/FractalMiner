@@ -1,3 +1,62 @@
 MonoBehavior不存在 直接叫 Behavior 并且继承链在AssemblyDumper中生成的时候有错误 也许他们已经把mono后端换成netcore现代化版本的了.
 EndField“找不到根类”错误的根本原因：它是一个ECS覆盖层，包含叶子组件和MonoBehaviour(114)，但丢弃了整个抽象链（Behaviour/Component/Transform/Renderer/Collider/...，约15个基类）。
 也就是说确实平坦化了 符合ECS的情况 Gameobject即Entity本身 不存在任何数据
+
+有一个垃圾设计 m_CollisionMeshBaked打破了数据平坦化会导致cachemiss 而且还导致我的类型树自动读取无法正确读取
+[RetargetMethod(typeof(Mesh_2020_1_0_a19))]
+public void Mesh_ReadRelease(ref EndianSpanReader reader)
+{
+    var _this = (object)this as Mesh_2020_1_0_a19;
+    var type = typeof(Mesh_2020_1_0_a19);
+
+    // 1. 基础信息
+    _this.m_Name = reader.ReadRelease_Utf8StringAlign();
+    _this.m_SubMeshes.ReadRelease_ArrayAlign_Asset<SubMesh_2017_3>(ref reader);
+    _this.m_Shapes.ReadRelease(ref reader);
+    _this.m_BindPose.ReadRelease_ArrayAlign_Asset<Matrix4x4f>(ref reader);
+    _this.m_BoneNameHashes.ReadRelease_ArrayAlign_UInt32(ref reader);
+    _this.m_RootBoneNameHash = reader.ReadUInt32();
+    _this.m_BonesAABB.ReadRelease_ArrayAlign_Asset<MinMaxAABB>(ref reader);
+    _this.m_VariableBoneCountWeights.ReadRelease(ref reader);
+
+    // 2. 压缩与属性
+    _this.m_MeshCompression = reader.ReadByte();
+    if (_this.m_MeshCompression == 4)
+    {
+        _this.m_MeshCompression = 0;
+    }
+
+    _this.m_IsReadable = reader.ReadBoolean();
+    _this.m_KeepVertices = reader.ReadBoolean();
+    _this.m_KeepIndices = reader.ReadBoolean();
+
+    // 3. 旧版新增定义 (作为局部变量缓存，用于对齐流)
+    var m_CollisionMeshOnly = reader.ReadBoolean();
+    var m_CollisionMeshBaked = reader.ReadBoolean();
+    var m_CollisionMeshConvex = reader.ReadRelease_BooleanAlign();
+
+    // 4. 数据体
+    _this.m_IndexFormat = reader.ReadInt32();
+    _this.m_IndexBuffer = reader.ReadRelease_ArrayAlign_Byte();
+    _this.m_VertexData.ReadRelease_AssetAlign(ref reader);
+
+    // 5. 根据旧版逻辑处理 CompressedMesh
+    if (!m_CollisionMeshBaked)
+    {
+        _this.m_CompressedMesh.ReadRelease(ref reader);
+    }
+
+    _this.m_LocalAABB.ReadRelease(ref reader);
+    _this.m_MeshUsageFlags = reader.ReadInt32();
+    _this.m_BakedConvexCollisionMesh = reader.ReadRelease_ArrayAlign_Byte();
+    _this.m_BakedTriangleCollisionMesh = reader.ReadRelease_ArrayAlign_Byte();
+
+    // 6. 度量信息与对齐
+    _this.m_MeshMetrics_0_ = reader.ReadSingle();
+    _this.m_MeshMetrics_1_ = reader.ReadSingle();
+    var m_MeshMetrics_2_ = reader.ReadRelease_SingleAlign();
+
+    // 7. 流数据与结尾
+    _this.m_StreamData.ReadRelease(ref reader);
+    var m_BonesPerVertex = reader.ReadUInt32();
+}
