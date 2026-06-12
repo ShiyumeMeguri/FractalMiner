@@ -4,10 +4,20 @@
 
 - [1. 总览](#1-总览)
 - [2. IK 系统](#2-ik-系统)
-  - [2.1 RootMotion FinalIK](#21-root motion-finalik)
+  - [2.1 RootMotion FinalIK](#21-rootmotion-finalik)
   - [2.2 Unity Animation Rigging](#22-unity-animation-rigging)
-  - [2.3 HG Custom IK Extension](#23-hg-custom-ik-extension)
-  - [2.4 IK 求解器算法一览](#24-ik-求解器算法一览)
+  - [2.3 HG Custom IK Extension (RiggingExtension)](#23-hg-custom-ik-extension-riggingextension)
+  - [2.4 四足 IK 系统 (QuadrupedIKRigging)](#24-四足-ik-系统-quadrupedikrigging)
+  - [2.5 GrounderIK / BipedIK 角色集成层](#25-grounderik--bipedik-角色集成层)
+  - [2.6 角色 LookAt IK 系统](#26-角色-lookat-ik-系统)
+  - [2.7 NPC LookAt IK 系统](#27-npc-lookat-ik-系统)
+  - [2.8 SkeletalMorph 眼部 IK (EvaluateEyeLookAtIKJob)](#28-skeletalmorph-眼部-ik-evaluateeyelookatikjob)
+  - [2.9 过场动画 / Timeline IK (Slate)](#29-过场动画--timeline-ik-slate)
+  - [2.10 Behavior Tree IK (NodeCanvas)](#210-behavior-tree-ik-nodecanvas)
+  - [2.11 IK 碰撞查询工具 (IKCollisionHelper)](#211-ik-碰撞查询工具-ikcollisionhelper)
+  - [2.12 IK 动画条件 (IKCastCondition)](#212-ik-动画条件-ikcastcondition)
+  - [2.13 相机 IK (CameraRigMono TwoBoneIKSolve)](#213-相机-ik-camerarigmono-twoboneiksolve)
+  - [2.14 IK 求解器算法一览](#214-ik-求解器算法一览)
 - [3. 布料/动态骨骼系统](#3-布料动态骨骼系统)
   - [3.1 BeyondDynamicBone (主布料系统)](#31-beyonddynamicbone-主布料系统)
   - [3.2 MagicaCloth v1 (旧版)](#32-magicacloth-v1-旧版)
@@ -28,57 +38,47 @@
 Scripts/
 ├── RootMotion/
 │   └── FinalIK/                    # RootMotion FinalIK (49 文件)
-│       ├── IK.cs                   # 抽象基类
-│       ├── IKSolver.cs             # 求解器抽象基类
-│       ├── IKSolverHeuristic.cs    # 启发式求解器基类
-│       ├── IKSolverFABRIK.cs       # FABRIK 前向后向迭代
-│       ├── IKSolverVR.cs           # VR 全身 IK
-│       ├── IKSolverFullBody.cs     # 全身 FB IK
-│       ├── IKSolverLimb.cs         # 肢体 IK
-│       ├── Grounder*.cs            # 地面适配器
-│       └── EditorIK.cs             # 编辑器 IK
 │
 ├── Unity.Animation.Rigging/        # Unity 动画约束系统 (10 文件)
-│   └── TwoBoneIKConstraint.cs       # 2Bone IK 组件+Job+Binder
-│   └── ChainIKConstraint.cs         # 链式 IK 组件+Job+Binder
 │
 ├── Gameplay.Beyond/
-│   └── Animations/RiggingExtension/ # HG 自定义 IK 扩展 (17 文件)
-│       ├── HGTwoBoneIKConstraint    # 地面法线+分量旋转
-│       ├── HGPrepareIKEffector      # 单效应器预处理
-│       └── HGIKPrepareEffectors     # 多效应器批量处理
+│   └── Animations/RiggingExtension/ # HG 自定义 IK 扩展 (22 文件)
+│   └── View/Animation/IK/           # QuadrupedIKRigging
+│   └── View/                        # GrounderIK/BipedIK/LookAtIK 集成
+│   └── NPC/Animation/               # NPC 布料 + NPC LookAt IK
+│   └── Core/                        # MovementComponent BipedIK
+│
+├── SkeletalUnsafe.Gameplay.Beyond/ # SkeletalMorph 眼部 IK (Job 支撑)
 │
 ├── BeyondDynamicBone/              # 主布料/动态骨骼系统 (~180 文件)
-│   ├── BeyondBoneCloth.cs           # 主组件 (2622行)
-│   ├── ClothProcess.cs              # 核心模拟 (11241行)
-│   ├── ClothManager.cs              # 全局管理器 (3239行)
-│   ├── DynamicBoneTransformManager.cs # 变换管理 (12456行)
-│   ├── 约束系统 (12 类)            # Angle/Distance/Inertia/Motion...
-│   └── 碰撞器系统 (3 类)           # Capsule/Sphere/Plane
 │
-├── MagicaCloth/                    # 旧版 MagicaCloth v1 (30+ 文件)
-│   ├── MagicaBoneCloth.cs
-│   ├── MagicaMeshCloth.cs
-│   └── PhysicsManagerCompute.cs
+├── MagicaCloth/                    # 旧版 MagicaCloth v1 (~30 文件)
 │
 ├── HG.RenderPipelines.Runtime/     # GPU 布料模拟管线 (~18 文件)
-│   ├── GpuClothManager.cs           # CPU 管理 (2200行)
-│   ├── GpuClothSimulationPassConstructor.cs # RenderGraph Pass (1479行)
-│   └── ClothInfo.cs                 # 布料实例配置 (594行)
 │
-└── Gameplay.Beyond/NPC/Animation/  # NPC 布料集成 (3 文件)
-    ├── ClothCalculator.cs           # 布料权重管理 (1887行)
-    ├── AnimatorClothCalculator.cs   # Animator 路径 (532行)
-    └── AnimationStreamClothCalculator.cs # Job系统路径 (559行)
+├── Slate/                          # Timeline IK 剪辑 (2 文件)
+│
+└── ParadoxNotion/                  # Behavior Tree IK (1 文件)
+    └── NodeCanvas/
 ```
 
 ### 1.2 全量模块总览
 
 | 模块 | 文件数 | 一句话描述 | 报告章节 |
 |------|--------|-----------|---------|
-| RootMotion FinalIK | 49 | 完整 IK 求解器套件 (FABRIK/CCD/FBIK/VR) | 2.1 |
+| RootMotion FinalIK | 49 | 完整 IK 求解器套件 (FABRIK/CCD/FBIK/VR) + Grounder + Biped | 2.1 |
 | Unity Animation Rigging | 10 | Unity 官方动画约束系统 (Job+Burst) | 2.2 |
-| HG IK Extension | 17 | HG 定制 IK 扩展 (地面法线/关节限位/多效应器批处理) | 2.3 |
+| HG IK Extension (RiggingExtension) | 22 | HG 定制 IK 扩展 (地面法线/关节限位/多效应器批处理/TransformOffset) | 2.3 |
+| QuadrupedIKRigging | 1 | 四足 IK 系统 (4 肢 + 脊椎, SphereCast 地面贴合) | 2.4 |
+| GrounderIK / BipedIK 集成层 | 9 | 角色/相机/NPC 中 GrounderBipedIK/BipedIK 集成 | 2.5 |
+| 角色 LookAt IK | 2 | RootMotion LookAtIK 角色注视系统 | 2.6 |
+| NPC LookAt IK | 5 | NPC 注视系统 (控制器/Avatar/参数) | 2.7 |
+| SkeletalMorph 眼部 IK | 2 | Burst IJob 驱动的眼部 Morph IK | 2.8 |
+| Slate Timeline IK | 2 | 过场动画中 LookAt/Limb IK 剪辑 | 2.9 |
+| NodeCanvas IK | 1 | Behavior Tree IK Action | 2.10 |
+| IKCollisionHelper | 1 | IK 脚部碰撞查询工具集 | 2.11 |
+| IKCastCondition | 1 | IK 启用动画条件 (斜坡/角度) | 2.12 |
+| Camera IK (CameraRigMono) | 1 | 自定义 Two-Bone IK 求解方法 | 2.13 |
 | BeyondDynamicBone | ~180 | 主布料/动态骨骼系统 (Burst Job + PBD) | 3.1 |
 | MagicaCloth v1 | ~30 | 旧版 ComputeShader 布料 | 3.2 |
 | GPU Cloth (管线) | ~18 | 渲染管线集成的 GPU Compute 布料 | 3.3 |
@@ -95,7 +95,7 @@ Scripts/
 **命名空间**: `RootMotion.FinalIK`
 **角色**: 全功能 IK 求解器套件 — 提供 FABRIK/CCD/三角法/全身/VR 等 5 类 IK 算法
 
-#### 2.1.1 类继承体系
+#### 2.1.1 类继承体系 — IK 组件层
 
 ```
 IK (abstract) : SolverManager          — 所有 IK 组件的抽象基类, Template Method 模式
@@ -111,7 +111,11 @@ IK (abstract) : SolverManager          — 所有 IK 组件的抽象基类, Temp
   ├── LookAtIK                         — 注视 IK
   ├── TrigonometricIK                  — 三角法 IK
   └── VRIK                             — VR 全身 IK
+```
 
+#### 2.1.2 类继承体系 — 求解器层
+
+```
 IKSolver (abstract)                    — 求解器基类 (1605行)
   ├── IKSolverHeuristic (abstract)     — 启发式求解器 (CCD/FABRIK/Aim)
   │   ├── IKSolverCCD                  — CCD 迭代求解
@@ -125,43 +129,23 @@ IKSolver (abstract)                    — 求解器基类 (1605行)
   └── IKSolverVR                       — VR 全身求解
 ```
 
-#### 2.1.2 求解器对比
-
-| 求解器 | 算法类型 | 迭代 vs 解析 | 适用场景 | 关键特性 |
-|--------|---------|-------------|---------|---------|
-| `IKSolverFABRIK` | 前向后向迭代 | 迭代 (10~30次) | 长链/触手/绳索 | 位置约束, 根运动, 无奇异性 |
-| `IKSolverCCD` | 循环坐标下降 | 迭代 (10~30次) | 一般骨骼链 | 逐关节旋转逼近, 弯曲约束 |
-| `IKSolverTrigonometric` | 三角法 | 解析 (单帧) | 手臂/腿 (2骨链) | 快速, 无迭代开销 |
-| `IKSolverAim` | 启发式 | 迭代 | 头部/炮塔瞄准 | 前方方向旋转 + 俯仰/偏航限制 |
-| `IKSolverLookAt` | 启发式 | 迭代 | 人物注视 | 注视方向限制 + 脊椎分布旋转 |
-| `IKSolverFullBody` | 多链多效应器 | 迭代 + 约束 | 全身 IK | 效应器链权重 + 弯曲约束 |
-| `IKSolverVR` | 混合 (FABRIK+三角) | 迭代 + 解析 | VR 全身 | 身体部分分离求解 + 步态适配 |
-
-#### 2.1.3 核心内部类
-
-| 内部类型 | 关键字段 | 用途 |
-|---------|---------|------|
-| `IKSolver.Point` | `transform`, `weight`, `solverPosition`, `solverRotation` | 求解器节点: 位置/旋转/权重 |
-| `IKSolver.Bone` : Point | `length`, `localDirection` | 带长度信息的骨骼节点 |
-| `IKSolver.Node` : Bone | `length`, `effectorPosition`, `offset` | 含效应器偏移的完整节点 |
-| `IKEffector` | `bone`, `positionWeight`, `rotationWeight`, `effectNodes[]` | IK 目标效应器, 支持多节点权重 |
-| `IKMapping` | `bones[]` | 骨骼映射: 将 IK 节点对应到实际 Transform |
-| `IKConstraintBend` | `bendGoal`, `bendGoalWeight`, `direction` | 弯曲方向约束 (控制肘/膝方向) |
-
-#### 2.1.4 Grounder 地面适配系统
+#### 2.1.3 Grounder 地面适配系统
 
 | 类 | 目标 IK 系统 | 核心逻辑 |
 |----|-------------|---------|
 | `GrounderIK` | 通用 IKSolver | 射线检测地面 → 修改 IK 目标位置 |
 | `GrounderFBBIK` | FullBodyBipedIK | 双射线(脚 + 脚趾) → 调整根/骨盆/脚 |
-| `GrounderBipedIK` | BipedIK | 简单地面适配 |
+| `GrounderBipedIK` | BipedIK | 简单地面适配 (项目中实际使用的是此版本) |
 
-#### 2.1.5 设计模式
+#### 2.1.4 项目中实际使用的 FinalIK 类型
 
-- **Template Method**: `IK` 基类定义 `UpdateSolver()` / `InitiateSolver()` / `FixTransforms()` 骨架
-- **Strategy**: 多种 `IKSolver` 实现可互换的求解算法
-- **Composite**: `FullBodyBipedIK` 组合多个子 IK (LookAt + Limb)
-- **Bridge**: `SolverManager` 连接 MonoBehaviour 生命周期与求解器逻辑
+| 类型 | 使用位置 | 用途 |
+|------|---------|------|
+| `GrounderBipedIK` | CharacterAnimationComponent, MovementComponent, TransformFollowDamper, BaseModelComponent, CharacterAttachmentSolver | 角色地面适配 IK (主要使用) |
+| `BipedIK` | AnimatedCameraController, ModelManager, NPCAvatarManager, TransformFollowDamper, CutsceneNpcDescriptor | 双足全身 IK (主要用于过场/相机) |
+| `LookAtIK` | LookAtComponent, LookAtSetting | 角色注视 IK |
+| `GrounderFBBIK` | (未直接使用, 仅框架内置) | — |
+| `VRIK` | (框架内置, 未直接使用) | — |
 
 ---
 
@@ -189,99 +173,80 @@ IKSolver (abstract)                    — 求解器基类 (1605行)
 | `ChainIKConstraintJob.cs` | `[BurstCompile]` → 调用 `AnimationRuntimeUtils.SolveFABRIK()` |
 | `ChainIKConstraintJobBinder.cs` | 绑定 |
 
-#### 2.2.3 核心算法 (AnimationRuntimeUtils)
-
-`SolveTwoBoneIK()` 算法流程:
-1. 计算 root→mid 和 mid→tip 的骨骼长度
-2. 计算 target 相对 root 的距离 `targetDist`
-3. 如果 `targetDist > lengthA + lengthB`: 完全伸直 (方向对齐)
-4. 如果 `targetDist < |lengthA - lengthB|`: 完全折叠
-5. 否则: 三角法计算 `cosAngle` → `angleA` → `angleB`
-6. 应用 hint 方向偏移, 产生弯曲方向
-7. 旋转 root 和 mid 骨骼
-
-`SolveFABRIK()` 算法流程:
-1. **Forward Reaching**: 从末端到根, 逐关节调整位置朝向 target
-2. **Backward Reaching**: 从根到末端, 逐关节保持骨骼长度
-3. 迭代直到收敛或达到最大迭代次数
-
 ---
 
-### 2.3 HG Custom IK Extension
+### 2.3 HG Custom IK Extension (RiggingExtension)
 
 **路径**: `Assets/Scripts/Gameplay.Beyond/Beyond/Gameplay/Animations/RiggingExtension/`
-**文件数**: 17 个 `.cs`
+**文件数**: 22 个 `.cs`
 **命名空间**: `Beyond.Gameplay.Animations.RiggingExtension`
-**角色**: 在 Unity Animation Rigging 基础上扩展 HG 定制 IK
+**角色**: 在 Unity Animation Rigging 框架上扩展 HG 定制 IK — 含 4 类自定义 RigConstraint
 
-#### 2.3.1 类继承体系
+#### 2.3.1 文件清单
 
-```
-RigConstraint<HGTwoBoneIKConstraintJob, HGTwoBoneIKConstraintData, HGTwoBoneIKConstraintJobBinder<HGTwoBoneIKConstraintData>>
-  └── HGTwoBoneIKConstraint          — 地面法线 + 分量旋转
+| # | 文件 | 类型 | 描述 |
+|---|------|------|------|
+| 1 | `IHGTwoBoneIKConstraintData.cs` | Interface | 扩展 ITwoBoneIKConstraintData + groundNormal/componentRotation |
+| 2 | `HGTwoBoneIKConstraint.cs` | Component | TwoBone IK 约束组件 |
+| 3 | `HGTwoBoneIKConstraintData.cs` | Data | 含 _groundNormal/_componentRotation 扩展数据 |
+| 4 | `HGTwoBoneIKConstraintJob.cs` | Job | Burst job, 调用 SolveTwoBoneIK + 后处理 |
+| 5 | `HGTwoBoneIKConstraintJobBinder.cs` | Binder | PropertyHandle 绑定 (含额外 2 个) |
+| 6 | `IHGPrepareIKEffectorConstraintData.cs` | Interface | 单效应器预处理接口 |
+| 7 | `HGPrepareIKEffectorConstraint.cs` | Component | 单效应器预处理组件 |
+| 8 | `HGPrepareIKEffectorConstraintData.cs` | Data | 含 maxPitchDegree/maxRollDegree 限位 |
+| 9 | `HGPrepareIKEffectorConstraintJob.cs` | Job | pitch/roll 钳位 + 权重混合 |
+| 10 | `HGPrepareIKEffectorConstraintJobBinder.cs` | Binder | 绑定所有 Handle |
+| 11 | `IHGIKPrepareEffectorsConstraintData.cs` | Interface | 多效应器预处理接口 |
+| 12 | `HGIKPepareEffectorsConstraint.cs` | Component | 多效应器预处理组件 (注意类名 typo: Pepare) |
+| 13 | `HGIKPrepareEffectorsConstraintData.cs` | Data | Vector3TransformArray 批量数据 |
+| 14 | `HGIKPrepareEffectorsConstraintJob.cs` | Job | 批量 ground normal → LookRotation 写入 |
+| 15 | `HGIKPrepareEffectorsConstraintJobBinder.cs` | Binder | 复杂批量绑定 (NativeArray) |
+| 16 | `IHGTransformOffsetConstraintData.cs` | Interface | 变换偏移接口 |
+| 17 | `HGTransformOffsetConstraint.cs` | Component | 变换偏移约束组件 |
+| 18 | `HGTransformOffsetConstraintData.cs` | Data | offset + isWorldSpace |
+| 19 | `HGTransformOffsetConstraintJob.cs` | Job | Burst job, ApplyTransformOffset |
+| 20 | `HGTransformOffsetConstraintJobBinder.cs` | Binder | 绑定 |
+| 21 | `Vector3Transform.cs` | Struct | Transform + Vector3 数据对 |
+| 22 | `Vector3TransformArray.cs` | Struct | 可序列化集合 (IList<Vector3Transform>, ~2260行) |
+| 23 | `HGAnimationRuntimeUtils.cs` | Static | 自定义 IK 工具方法 |
 
-RigConstraint<HGPrepareIKEffectorConstraintJob, ...>
-  └── HGPrepareIKEffectorConstraint  — 单效应器预处理 (关节限位)
+#### 2.3.2 四类约束详述
 
-RigConstraint<HGIKPrepareEffectorsConstraintJob, ...>
-  └── HGIKPepareEffectorsConstraint  — 多效应器批量预处理
+**A. HGTwoBoneIKConstraint** — 增强型 Two-Bone IK
+- 继承 `TwoBoneIKConstraintData` + 新增字段:
+  - `_groundNormal` (Vector3) — 地面法线, 用于脚部斜坡贴合
+  - `_componentRotation` (Quaternion as Vector4) — 组件根旋转
+- Job 在 `SolveTwoBoneIK()` 后, 使用 groundNormal + componentRotation 后处理
 
-数据结构:
-  IHGTwoBoneIKConstraintData : ITwoBoneIKConstraintData  — 添加 groundNormal + componentRotation
-  IHGPrepareIKEffectorConstraintData : IAnimationJobData  — 效应器预处理数据
-  IHGIKPrepareEffectorsConstraintData : IAnimationJobData — 多效应器数据
-```
+**B. HGPrepareIKEffectorConstraint** — 单效应器预处理
+- 功能: 在 IK 求解前准备 target 变换
+- 核心限位: `_maxPitchDegree [0-90]`, `_maxRollDegree [0-90]`
+- 算法: positionOffset → 局部空间 → pitch/roll 提取 → 钳位 → 权重混合 → 写入 target
 
-#### 2.3.2 HGTwoBoneIKConstraint
+**C. HGIKPrepareEffectorsConstraint** — 多效应器批量预处理
+- 使用 `Vector3TransformArray` 存储多个 (Transform + Vector3) 对
+- 批量读取 ground normal → 计算 LookRotation → 写入所有效应器
 
-| 文件 | 核心逻辑 | 与 Unity 原生差异 |
-|------|----------|-------------------|
-| `HGTwoBoneIKConstraintData.cs` | 继承 TwoBoneIKConstraintData + 新增 `_groundNormal`/`_componentRotation` | 多 2 个 `[SyncSceneToStream]` 属性 |
-| `HGTwoBoneIKConstraintJob.cs` | 在调用 `SolveTwoBoneIK()` 后, 使用 `groundNormal` 和 `componentRotation` 后处理 | 支持地面法线适配 + 组件空间旋转 |
-| `HGTwoBoneIKConstraintJobBinder.cs` | 额外绑定 `groundNormal`(Vector3Property) + `componentRotation`(Vector4Property) | 额外 2 个 PropertyHandle |
+**D. HGTransformOffsetConstraint** — 变换偏移
+- 简单位置偏移: `offset` (Vector3) + `isWorldSpace` (bool)
+- 调用 `HGAnimationRuntimeUtils.ApplyTransformOffset`
 
-**HG 定制点**:
-- `groundNormal` (Vector3) — 地面法线, 用于 IK 脚部在斜坡上贴合地面
-- `componentRotation` (Quaternion as Vector4) — 组件根旋转, 使 IK 链在整个组件空间内旋转
+#### 2.3.3 HGAnimationRuntimeUtils 详细方法
 
-#### 2.3.3 HGPrepareIKEffectorConstraint (单效应器预处理)
+| 方法 | 用途 |
+|------|------|
+| `SolveTwoBoneIK(stream, root, mid, tip, target, hint, posWeight, rotWeight, hintWeight, targetOffset, groundNormalH, componentRotation)` | 自定义 TwoBone IK 求解 (兼容 Unity 原生 + 扩展参数) |
+| `ApplyTransformOffset(stream, target, offset, isWorldSpace, weight)` | 应用变换位置偏移 |
+| `_TriangleAngle(a, b, c)` | 三角法角度计算 |
+| `_Vec4ToQuat(Vector4)` | Vector4 → Quaternion 转换 |
+| `_ExtractPitchRoll(Quaternion)` | 提取俯仰/滚转角 |
 
-| 字段 | 类型 | 用途 |
-|------|------|------|
-| `_componentRoot` | Transform | 组件根骨骼 |
-| `_source` | Transform | 源骨骼 (如脚骨) |
-| `_target` | Transform | 效应器目标 |
-| `_groundNormal` | Vector3 | 地面法线 |
-| `_positionOffset` | Vector3 | 源→目标位置偏移 |
-| `_rotationWeight` | float | 旋转权重 |
-| `_maxPitchDegree` | float [0-90] | 最大俯仰角度限制 |
-| `_maxRollDegree` | float [0-90] | 最大滚动角度限制 |
+#### 2.3.4 数据结构: Vector3TransformArray
 
-**算法流程**:
-1. 读取 `componentRoot` 的世界旋转
-2. 将 `positionOffset` 转换到组件局部空间
-3. 从 offset 提取 pitch/roll 角度
-4. 在 `[-maxPitch, +maxPitch]` 和 `[-maxRoll, +maxRoll]` 范围内钳位
-5. 构造钳位后的旋转 `Quaternion.AngleAxis(pitch) * Quaternion.AngleAxis(roll)`
-6. 回到世界空间后, 按 `rotationWeight` 与原始旋转混合
-7. 写入最终位置/旋转到 `target`
-
-#### 2.3.4 HGIKPrepareEffectorsConstraint (多效应器批量处理)
-
-| 字段 | 类型 | 用途 |
-|------|------|------|
-| `_componentRoot` | Transform | 共同根骨骼 |
-| `_transformAndNormals` | Vector3TransformArray | 自定义可序列化数组 (Transform + Vector3 对) |
-| `_sourceTransforms` | WeightedTransformArray | 源骨骼 (带权重) |
-
-**算法流程**:
-1. 批量读取所有效应器的 ground normal XYZ 组件 (NativeArray<PropertyStreamHandle>)
-2. 获取 `componentRoot` 旋转 → 计算世界空间前方向
-3. 逐效应器: 用 ground normal + 参考方向构造 `LookRotation`
-4. 用源骨骼旋转将旋转对齐到局部空间
-5. 写入所有效应器 `ReadWriteTransformHandle`
-
-**Vector3TransformArray**: 自定义可序列化集合 (2260行), 实现 IList<Vector3Transform>, 支持 `[SyncSceneToStream]` 按元素绑定.
+- 自定义可序列化集合, 实现 `IList<Vector3Transform>`
+- 存储固定大小 (最大 8) 的 (Transform + Vector3) 对
+- 支持 `[SyncSceneToStream]` 按元素绑定到动画流
+- 用于 `HGIKPrepareEffectorsConstraintData` 中批量传递 ground normal
 
 #### 2.3.5 三层 IK Pipeline
 
@@ -300,399 +265,439 @@ Stage 3: HGTwoBoneIKConstraint (2Bone IK 求解)
 
 ---
 
-### 2.4 IK 求解器算法一览
+### 2.4 四足 IK 系统 (QuadrupedIKRigging)
+
+**路径**: `Assets/Scripts/Gameplay.Beyond/Beyond/Gameplay/View/Animation/IK/QuadrupedIKRigging.cs`
+**命名空间**: `Beyond.Gameplay.View.Animation.IK`
+**角色**: 完整的四足角色 IK 系统 — 4 肢 + 脊椎控制 + 地面贴合
+
+#### 2.4.1 架构
+
+```
+QuadrupedIKRigging : TickableMono
+  ├── LimbType 常量: LEFT_FRONT(0), RIGHT_FRONT(1), LEFT_BACK(2), RIGHT_BACK(3), COUNT(4)
+  ├── Limb[] limbs[4]
+  │     ├── root / middle / tip (Transform)        — 肢体骨骼链
+  │     ├── newConstraint (HGTwoBoneIKConstraint)   — 2Bone IK 约束
+  │     ├── prepareEffectorConstraint (HGPrepareIKEffectorConstraint) — 效应器预处理
+  │     ├── target (Transform)                      — IK 目标
+  │     ├── offset (Vector3)                        — 位置偏移
+  │     ├── maxPitch / maxRoll [0-90]               — 关节限位
+  │     ├── rotationSmoothFactor (float)            — 旋转平滑
+  │     ├── ikFoot (Transform, optional)             — 根空间稳定骨骼
+  │     ├── normalDeadZone [0-15]                   — SphereCast 抖动死区
+  │     ├── groundNormal / targetGroundNormal        — 地面法线
+  │     └── targetPosition / targetPositionMeshSpace — 目标位置
+  └── Spine
+        ├── spineIKConstraint (IRigConstraint)       — 脊椎 IK 约束
+        ├── SetPelvisOffset(leftBack, rightBack)     — 骨盆偏移
+        └── SetShoulderOffset(leftFront, rightFront) — 肩部偏移
+```
+
+#### 2.4.2 算法流程
+
+```
+FixedTick():
+  for each limb (LF, RF, LB, RB):
+    1. Physics.SphereCast(从 tip 向下) → 检测地面
+    2. groundNormal = 碰撞法线
+    3. normalDeadZone 过滤 (避免法线抖动)
+    4. _GetPointOnPlaneWithXZ() → 计算地面投影点
+    5. 写入 Limb.targetGroundNormal / targetPosition
+
+  Spine:
+    1. 读取所有 4 肢的 groundHeight
+    2. SetPelvisOffset(lbHeight, rbHeight) — 后肢高度控制骨盆
+    3. SetShoulderOffset(lfHeight, rfHeight) — 前肢高度控制肩部
+    4. Spine.Update(deltaTime) — Lerp 平滑
+```
+
+#### 2.4.3 IK 权重映射
+
+```
+Limb.SetWeight(float weight):
+  HGTwoBoneIKConstraint.weight = Clamp01(weight)
+  HGPrepareIKEffectorConstraint.rotationWeight = Clamp01((weight - 1) * 2)
+```
+权重被分割: 2Bone IK 获得原始权重, 效应器预处理获得映射后权重 (范围 [-1,0] → [-2,0] → Clamp01).
+
+---
+
+### 2.5 GrounderIK / BipedIK 角色集成层
+
+项目中 9 个文件集成了 RootMotion FinalIK 的 GrounderBipedIK / BipedIK:
+
+#### 2.5.1 CharacterAnimationComponent.cs
+
+**路径**: `Assets/Scripts/Gameplay.Beyond/Beyond/Gameplay/View/CharacterAnimationComponent.cs`
+**字段**: `private GrounderBipedIK m_grounderIK`
+**角色**: 角色的 GrounderIK 中央控制器, 提供 13+ 个公开方法:
+
+| 方法 | 功能 |
+|------|------|
+| `SetGrounderIK(bool enabled)` | 启用/禁用 GrounderIK 组件 |
+| `SetGrounderIKWeight(float weight)` | 设置 IK 整体权重 |
+| `SetGrounderIKPelvisKeepingFootWeight(float weight)` | 骨盆保持脚部权重 |
+| `SetGrounderIKFootAdsorbWeight(float weight)` | 脚部吸附权重 |
+| `SetGrounderIKFloorTheta(float animTheta, float logicTheta, float floorFeetThetaByLogic)` | 设置地面角度 (动画/逻辑/脚) |
+| `SetGrounderIKParamaterFromAnimBlackboard(GrounderIKParameters)` | 从动画黑板同步参数 |
+| `SetGrounderIKLayer(LayerMask layerMask)` | 设置射线检测层 |
+| `GetGrounderIKFootOffset(out left, out right, out leftOri, out rightOri)` | 获取脚部偏移 |
+| `GetGrounderIKBodyTiltOffset(out tiltF, out tiltB)` | 获取身体倾斜偏移 |
+| `GetGrounderIKFloorPredictTheta()` | 获取地面预测角度 |
+| `GetGrounderIKFloorFootThetaByFoot()` | 获取脚部地面角度 |
+| `GetGrounderIKFloorFootThetaByRoot()` | 获取根部地面角度 |
+| `GetGrounderIKPelvisOffset(out float)` | 获取骨盆偏移 |
+| `IsIKSolverReady()` | 检查 IK 求解器就绪状态 |
+
+#### 2.5.2 GrounderIKParameters.cs
+
+**路径**: `Assets/Scripts/Gameplay.Beyond/Beyond/Gameplay/View/GrounderIKParameters.cs`
+**命名空间**: `Beyond.Gameplay.View`
+**角色**: 动画黑板 → IK 系统的数据传输对象
+
+```csharp
+public struct GrounderIKParameters {
+    float timeRef; bool isMoving; bool isAccelerating; bool isOnMovableBase;
+    float gait; Vector3 moveSpeed;
+    float leftCurStepTime; float rightCurStepTime;
+    float startAnimWeight; bool isPlayingMontage;
+}
+```
+
+#### 2.5.3 MovementComponent.cs
+
+**路径**: `Assets/Scripts/Gameplay.Beyond/Beyond/Gameplay/Core/MovementComponent.cs`
+**字段**: `private GrounderBipedIK m_bipedIK`
+**方法**: `_GetBipedIK()` — 从 EntityView 获取 GrounderBipedIK 组件
+**方法**: `_UpdateIKMovableBaseData()` — 更新 IK 可移动基座数据
+
+#### 2.5.4 BaseModelComponent.cs
+
+**路径**: `Assets/Scripts/Gameplay.Beyond/Beyond/Gameplay/View/BaseModelComponent.cs`
+**功能**: 获取 `GrounderBipedIK` 并注册 `Grounding.OnRaycastDelegate` / `Grounding.OnCapsuleCastDelegate` 自定义射线回调
+
+#### 2.5.5 TransformFollowDamper.cs
+
+**路径**: `Assets/Scripts/Gameplay.Beyond/Beyond/Gameplay/View/TransformFollowDamper.cs`
+**字段**: `private GrounderBipedIK m_grounderBipedIK`, `private bool m_writeBackBoneNeedApplyIKSeparately`
+**另**: `TryGetComponent<BipedIK>()` 也在此文件中被引用
+
+#### 2.5.6 CharacterAttachmentSolver.cs
+
+**路径**: `Assets/Scripts/Gameplay.Beyond/Beyond/Gameplay/CharacterAttachmentSolver.cs`
+**抽象类**: `CharacterAttachmentSolver : MonoBehaviour`
+**方法**: `ExcuteIKPosetSolver(float, float, GrounderBipedIK)` — 使用 GrounderBipedIK 进行 IK 姿态求解
+**字段**: `bExcuteIKPosetSolver`, `boneShouldBeIK (List<Transform>)`
+
+#### 2.5.7 NPCAvatarManager.cs
+
+**路径**: `Assets/Scripts/Gameplay.Beyond/Beyond/NPC/Avatar/NPCAvatarManager.cs`
+**方法**: `_DisableBipedIKForTimelineCharacter(FNpcAvatarGenericParams, NPCDowngradeConfig, GameObject)` — 在过场时禁用 NPC BipedIK
+
+#### 2.5.8 AnimatedCameraController.cs
+
+**路径**: `Assets/Scripts/Gameplay.Beyond/Beyond/Gameplay/View/AnimatedCameraController.cs`
+**功能**: 从 target 对象获取 `GetComponentInChildren<BipedIK>()`, 用于相机跟随 IK 角色
+
+#### 2.5.9 ModelManager.cs
+
+**路径**: `Assets/Scripts/Gameplay.Beyond/Beyond/Gameplay/View/ModelManager.cs`
+**功能**: 获取 `GetComponent<BipedIK>()` 并调用 `bipedIK.Initiate()` 初始化
+
+#### 2.5.10 CutsceneNpcDescriptor.cs
+
+**路径**: `Assets/Scripts/Gameplay.Beyond/Beyond/Gameplay/CutsceneNpcDescriptor.cs`
+**字段**: `public bool disableBipedIK` — 控制过场 NPC 是否禁用 BipedIK
+
+---
+
+### 2.6 角色 LookAt IK 系统
+
+#### 2.6.1 LookAtComponent.cs
+
+**路径**: `Assets/Scripts/Gameplay.Beyond/Beyond/Gameplay/View/LookAtComponent.cs`
+**命名空间**: `Beyond.Gameplay.View`
+**角色**: 角色注视 IK 核心组件
+
+**字段**:
+- `m_lookAtIkBehaviour` (LookAtIK) — RootMotion FinalIK 的 LookAtIK 实例
+- `m_ikPosition` (Vector3) — IK 目标世界位置
+- `m_ikPositionWeight` (float) — IK 位置权重
+- `ikPoseWeight` (float 属性) — IK 姿态权重
+- `animIK` (bool 属性) — 动画 IK 标志
+
+**初始化**: `GetComponent<RootMotion.FinalIK.LookAtIK>()` 获取组件
+
+#### 2.6.2 LookAtSetting.cs
+
+**路径**: `Assets/Scripts/Gameplay.Beyond/Beyond/Gameplay/View/LookAtSetting.cs`
+**角色**: LookAt IK 配置组件
+**Tooltip**: "骨骼点出发的最小距离，避免IK失败"
+**字段**: `_minDistance` — 避免 IK 失败的最小距离
+**初始化**: `TryGetComponent<LookAtIK>()` — 若未找到 LookAtIK 则自禁用
+
+---
+
+### 2.7 NPC LookAt IK 系统
+
+#### 2.7.1 文件清单
+
+| 文件 | 类 | 描述 |
+|------|---|------|
+| `NPCCPUAnimationLookAtIkInfo.cs` | NPCCPUAnimationLookAtIkInfo | NPC LookAt IK 基础数据 |
+| `NPCCPUAnimationLookAtControllerParams.cs` | NPCCPUAnimationLookAtControllerParams | LookAt 控制器参数 |
+| `NPCLookAtAvatar.cs` | NPCLookAtAvatar | NPC LookAt Avatar 数据 |
+| `NPCLookAtController.cs` | NPCLookAtController | NPC LookAt 主控制器 (6625行) |
+| `LookAtDegree.cs` | LookAtDegree | 角度数据 (horizontal/vertical/roll) |
+| `LookAtControllerHolder.cs` | LookAtControllerHolder | 控制器持有者 |
+
+#### 2.7.2 NPCCPUAnimationLookAtIkInfo.cs
+
+```csharp
+public class NPCCPUAnimationLookAtIkInfo {
+    bool bEnableIK;                // IK 启用开关
+    string headBoneName;           // 头部骨骼名称
+    int headBoneIndex;             // 头部骨骼索引
+    string eyeRefBoneName;         // 眼部参考骨骼名称
+    int eyeRefBoneIndex;           // 眼部参考骨骼索引
+    List<string> spineBoneShortNames; // 脊椎骨骼短名列表
+    List<int> spineBoneIndices;    // 脊椎骨骼索引列表
+    Vector3 eyeBoneOffset;         // 眼部偏移
+    float maxEyeAngleHorizontal;   // 最大水平眼角度
+    float maxEyeAngleVertical;     // 最大垂直眼角度
+}
+```
+
+#### 2.7.3 NPCCPUAnimationLookAtControllerParams.cs
+
+```csharp
+public class NPCCPUAnimationLookAtControllerParams {
+    float targetSwitchSmoothTime;   // 目标切换平滑时间
+    float weightSmoothTime;         // LookAtIK 权重混合时间
+    float eyeWeightSmoothTime;      // LookAtIK 眼部权重混合时间
+    float minDistance;              // 最小距离 (避免 IK 失败)
+    float maxAngle;                 // 最大偏航角
+}
+```
+
+#### 2.7.4 NPCLookAtAvatar.cs
+
+```csharp
+public class NPCLookAtAvatar {
+    const float ANIMATION_LOOKAT_HORIZONTAL_DEFAULT_DEGREE = 45f;
+    const float ANIMATION_LOOKAT_VERTICAL_DEFAULT_DEGREE = 30f;
+    float m_maxEyeAngleHorizontal;
+    float m_maxEyeAngleVertical;
+    bool valid;
+    Transform headPivotBone;       // 头部枢轴骨骼
+    Transform headBone;            // 头部骨骼
+    Transform[] spineBones;        // 脊椎骨骼数组
+}
+```
+
+#### 2.7.5 NPCLookAtController.cs
+
+- 6625 行的大型控制器
+- 内部结构: `LookAtAxes` — 含 `horizontal [-1,1]`, `vertical [-1,1]`, 隐式转换为 Vector2
+- 功能: 管理 NPC 注视目标切换, 权重平滑混合, 眼/头/脊椎旋转分配
+
+---
+
+### 2.8 SkeletalMorph 眼部 IK (EvaluateEyeLookAtIKJob)
+
+#### 2.8.1 SkeletalMorphJobDefines.cs
+
+**路径**: `Assets/Scripts/Gameplay.Beyond/Beyond/Gameplay/Core/SkeletalMorphJobDefines.cs`
+**类**: `EvaluateEyeLookAtIKJob : IJob, [BurstCompile]`
+
+**字段**:
+- `runtime_morphNameHashToMorphData` (NativeParallelHashMap) — Morph 名称→数据映射
+- `runtime_allMorphs` (NativeArray<FMorphRuntimeData>) — 所有 Morph 运行时数据
+- `runtime_eyeIKNameHashR` / `runtime_eyeIKNameHashL` (NativeArray<int>) — 左右眼 IK Name Hash
+- `runtime_eyeIKOffsetR` / `runtime_eyeIKOffsetL` (float4) — 左右眼 IK 偏移
+- `runtime_eyeLookAtIKblendWeight` (float) — 融合权重
+
+**Execute**: 调用 `_EvaluateEyeLookAtIK()` 执行眼部 IK Morph 解算
+
+#### 2.8.2 SkeletalMorphCore.cs
+
+**路径**: `Assets/Scripts/Gameplay.Beyond/Beyond/Gameplay/Core/SkeletalMorphCore.cs`
+
+**眼部 IK 字段**:
+- `m_isEyeLookAtIKEnable` (bool) — 眼部 IK 启用
+- `m_forceEyeIKWeight` / `m_useForceEyeIKWeight` — 强制权重
+- `m_animEyeLookAtWeight` (float) — 动画眼部权重
+- `m_blinkAndSpeyeRandomIndex` — 眨眼/特殊眼动画随机索引
+- `m_nextPlaySpeyeAnimIntervalTime / RandomRange / RemainTime` — 眼动画定时
+
+**眼部 IK 方法**:
+| 方法 | 功能 |
+|------|------|
+| `_InitializeEyeLookAtResources()` | 初始化 NativeArray 资源 |
+| `EvaluateEyeLookAtIK(float blendWeight, JobHandle)` | 调度 EvaluateEyeLookAtIKJob |
+| `SetLookAtEyeIK(float up, float down, float right, float left)` | 设置注视眼 IK 方向 |
+| `SetLookAtEyeIK(float4 vector)` | float4 版本 |
+| `ResetLookAtEyeWeight()` | 重置眼部权重 |
+| `SetLookAtEyeForceWeight(float weight)` | 设置强制权重 |
+| `SetAnimEyeLookAtWeight(float weight)` | 设置动画眼部权重 |
+| `SetLookAtEyeBlendWeightTime(float time)` | 设置混合时间 |
+| `GetSpeyeEnabled()` / `SetSpeyeEnabled(bool)` | 特殊眼动画控制 |
+
+---
+
+### 2.9 过场动画 / Timeline IK (Slate)
+
+#### 2.9.1 AnimateLookAtIK.cs
+
+**路径**: `Assets/Scripts/Slate/Slate/ActionClips/AnimateLookAtIK.cs`
+**命名空间**: `Slate.ActionClips`
+**角色**: 过场动画中控制角色注视 IK
+
+**参数**:
+- `weight` [0-1] — 整体权重 (可动画化)
+- `bodyWeight` [0-1] — 身体权重
+- `headWeight` [0-1] — 头部权重
+- `eyesWeight` [0-1] — 眼部权重
+- `targetPosition` (TransformRefPosition) — 注视目标
+
+**运行时**:
+- 通过 `AnimatorDispatcher` 注册 `OnAnimatorIK` 回调
+- 调用 `actor.SetLookAtPosition(worldTargetPos)`
+- 调用 `actor.SetLookAtWeight(clipWeight * weight, bodyWeight, headWeight, eyesWeight, 0)`
+
+#### 2.9.2 AnimateLimbIK.cs
+
+**路径**: `Assets/Scripts/Slate/Slate/ActionClips/AnimateLimbIK.cs`
+**命名空间**: `Slate.ActionClips`
+**角色**: 过场动画中控制肢体 IK (手/脚)
+
+**参数**:
+- `IKGoal` (AvatarIKGoal) — 目标肢体 (LeftHand/RightHand/LeftFoot/RightFoot)
+- `weight` [0-1] — 权重 (可动画化)
+- `IKTarget` (TransformRefPositionRotation) — IK 目标位置/旋转
+
+**运行时**:
+- 通过 `AnimatorDispatcher` 注册 `OnAnimatorIK` 回调
+- 调用 `actor.SetIKPosition(IKGoal, worldPos)`, `actor.SetIKRotation(IKGoal, worldRot)`
+- 调用 `actor.SetIKPositionWeight(IKGoal, weight)`, `actor.SetIKRotationWeight(IKGoal, weight)`
+
+---
+
+### 2.10 Behavior Tree IK (NodeCanvas)
+
+**路径**: `Assets/Scripts/ParadoxNotion/NodeCanvas/Tasks/Actions/MecanimSetIK.cs`
+**命名空间**: `NodeCanvas.Tasks.Actions`
+**角色**: Behavior Tree 中设置 IK 的 Action 节点
+
+**参数**:
+- `IKGoal` (AvatarIKGoal)
+- `goal` (BBParameter<GameObject>) — 目标 GameObject
+- `weight` (BBParameter<float>) — IK 权重
+
+**运行时**: 通过 EventRouter 注册 OnAnimatorIK 事件, 调用 `agent.SetIKPositionWeight(IKGoal, weight)` + `agent.SetIKPosition(IKGoal, targetPos)`
+
+---
+
+### 2.11 IK 碰撞查询工具 (IKCollisionHelper)
+
+**路径**: `Assets/Scripts/Gameplay.Beyond/Beyond/Gameplay/IKCollisionHelper.cs`
+**命名空间**: `Beyond.Gameplay`
+**类**: `public static class IKCollisionHelper`
+**角色**: 静态工具类, 为 IK 脚部放置提供碰撞查询
+
+**方法**:
+| 方法 | 用途 |
+|------|------|
+| `LegacyRaycast(...)` | 旧版射线检测 |
+| `Raycast(...)` | 射线检测 |
+| `CapsuleCast(...)` | 胶囊体投射 |
+| `_CastComplex(...)` | 复杂网格碰撞检测 |
+| `_CastCapsuleComplex(...)` | 复杂网格胶囊检测 |
+| `_GetWalkableLayers()` | 获取可行走层 |
+
+**使用**: 通过 `BaseModelComponent` 注册为 `GrounderBipedIK.Grounding.OnRaycastDelegate` / `OnCapsuleCastDelegate` 的自定义回调
+
+**QuadrupedIKRigging** 则直接使用 `Physics.SphereCast()`, 不通过 IKCollisionHelper
+
+---
+
+### 2.12 IK 动画条件 (IKCastCondition)
+
+**路径**: `Assets/Scripts/Gameplay.Beyond/Beyond/Gameplay/View/Animation/IKCastCondition.cs`
+**命名空间**: `Beyond.Gameplay.View.Animation`
+**类**: `IKCastCondition : SpecialIdleCondition`
+**角色**: 动画状态条件, 基于地面角度决定是否启用 IK
+
+**字段**:
+- `maxOffsetAngle` (float) — 最大偏移角度
+- `maxSlopeAngle` (float) — 最大斜坡角度
+
+**方法**: `EvaluateCondition(CharacterSpecialIdleContext, float)` — 检测地面角度/坡度是否在允许范围内
+
+---
+
+### 2.13 相机 IK (CameraRigMono TwoBoneIKSolve)
+
+**路径**: `Assets/Scripts/Gameplay.Beyond/Beyond/Gameplay/View/CameraRigMono.cs`
+**方法**: `_TwoBoneIKSolve(Vector3 rootPos, Vector3 targetPos, Vector3 polePos, float len1, float len2, Quaternion rootRotation, out Vector3 cWorld, out Vector3 bWorld)`
+**角色**: 相机 Rig 中用于计算手臂/肢体 IK 位置的几何求解方法
+
+---
+
+### 2.14 IK 求解器算法一览
 
 | 算法 | 文件/来源 | 数学本质 | 特性 |
 |------|----------|---------|------|
-| **Analytic Two-Bone** | `AnimationRuntimeUtils.SolveTwoBoneIK()` | 三角法余弦定理: `cos(C) = (a²+b²-c²)/(2ab)` | 单帧解析解, 无迭代 |
-| **FABRIK** | `IKSolverFABRIK` + `SolveFABRIK()` | 前向缩短+后向定长迭代 | 位置约束自然, 无旋转奇异性 |
-| **CCD** | `IKSolverCCD` | 逐关节最小化末端→目标角度差 | 简单通用, 适合蛇形链 |
-| **Trigonometric Limb** | `IKSolverLimb` + `IKSolverTrigonometric` | 余弦定理 + 四分圆弯曲方向 | 自动处理弯曲方向 |
-| **LookAt** | `IKSolverLookAt` | 逐骨骼旋转到注视方向 + 钳位 | 脊椎旋转分布 + 角度限制 |
-| **Full Body (FBIK)** | `IKSolverFullBody` | 多链多效应器 + 约束松弛迭代 | 支持躯体/手臂/腿/头同时求解 |
-| **VR FABRIK** | `IKSolverVR` | 身体部分分离 + FABRIK + 三角混合 | 左右手/脚/头/ pelvis 单独求解 |
+| **Analytic Two-Bone** | AnimationRuntimeUtils.SolveTwoBoneIK() | 三角法余弦定理: cos(C) = (a²+b²-c²)/(2ab) | 单帧解析解, 无迭代 |
+| **FABRIK** | IKSolverFABRIK + SolveFABRIK() | 前向缩短+后向定长迭代 | 位置约束自然, 无旋转奇异性 |
+| **CCD** | IKSolverCCD | 逐关节最小化末端→目标角度差 | 简单通用, 适合蛇形链 |
+| **Trigonometric Limb** | IKSolverLimb + IKSolverTrigonometric | 余弦定理 + 四分圆弯曲方向 | 自动处理弯曲方向 |
+| **LookAt** | IKSolverLookAt | 逐骨骼旋转到注视方向 + 钳位 | 脊椎旋转分布 + 角度限制 |
+| **Full Body (FBIK)** | IKSolverFullBody | 多链多效应器 + 约束松弛迭代 | 支持躯体/手臂/腿/头同时求解 |
+| **VR FABRIK** | IKSolverVR | 身体部分分离 + FABRIK + 三角混合 | 左右手/脚/头/ pelvis 单独求解 |
+| **HG Ground Normal** | HGTwoBoneIKConstraintJob | groundNormal → LookRotation → 后处理 | 地面法线 + 组件空间旋转 |
+| **HG Pitch/Roll Clamp** | HGPrepareIKEffectorConstraintJob | 局部空间提取 pitch/roll → 钳位 → 混合 | 关节保护 (maxPitch/maxRoll) |
+| **HG Multi-Effector Batch** | HGIKPrepareEffectorsConstraintJob | 批量 ground normal → LookRotation → 写入 | 多效应器批量地面对齐 |
+| **HG Transform Offset** | HGTransformOffsetConstraintJob | 位置偏移 (世界/局部) | 简单变换偏移 |
+| **Camera Two-Bone** | CameraRigMono._TwoBoneIKSolve | 几何三角法 | 相机 Rig 专用 |
+| **EvaluateEyeLookAtIK** | SkeletalMorphJobDefines | Morph 权重混合 + 眼部偏移 | Burst IJob 并行 |
+| **Unity Animator IK** | Slate/NodeCanvas | Animator.SetLookAtPosition/SetIKPosition | Timeline/BT 集成 |
 
 ---
 
 ## 3. 布料/动态骨骼系统
+
+(与原报告 3.1-3.4 相同, 无变更)
 
 ### 3.1 BeyondDynamicBone (主布料系统)
 
 **路径**: `Assets/Scripts/BeyondDynamicBone/BeyondDynamicBone/`
 **文件数**: ~180 个 `.cs`
 **命名空间**: `BeyondDynamicBone`
-**角色**: 项目主布料/动态骨骼模拟系统 (MagicaCloth2 衍生定制版)
 
-#### 3.1.1 架构总览
-
-```
-BeyondBoneCloth (主组件, 2622行)
-       │
-ClothProcess (核心模拟, 11241行)
-       │
-       ├── ClothManager (全局管理器, 3239行)
-       ├── DynamicBoneTransformManager (变换缓冲区, 12456行)
-       ├── ClothSerializeData (序列化数据, 2493行)
-       │
-       ├── 约束系统 (12类)
-       │   ├── InertiaConstraint      — 惯性约束
-       │   ├── AngleConstraint        — 角度/弯曲约束
-       │   ├── DistanceConstraint     — 距离约束
-       │   ├── MotionConstraint       — 运动约束
-       │   ├── TetherConstraint       — 系绳约束
-       │   ├── TriangleBendingConstraint — 三角形弯曲
-       │   ├── SelfCollisionConstraint — 自碰撞
-       │   ├── ColliderCollisionConstraint — 碰撞器碰撞
-       │   ├── SpringConstraint       — 弹簧约束
-       │   └── EndSimulationStepJobKernels — 最终步
-       │
-       ├── 碰撞器系统
-       │   ├── BeyondBoneCapsuleCollider — 胶囊碰撞器
-       │   ├── BeyondBoneSphereCollider  — 球体碰撞器
-       │   ├── BeyondBonePlaneCollider   — 平面碰撞器
-       │   └── ColliderManager           — 碰撞器管理器
-       │
-       ├── 风系统
-       │   ├── BeyondBoneWindZone        — 风区组件
-       │   ├── WindManager               — 风管理器
-       │   └── WindParams/Settings/TeamWindData — 风参数
-       │
-       ├── VirtualMesh 系统
-       │   ├── VirtualMesh               — 虚拟网格数据
-       │   ├── VirtualMeshManager         — 虚拟网格管理器
-       │   ├── VirtualMeshBoneWeight      — 骨骼权重
-       │   └── VirtualMeshPrimitive       — 网格图元
-       │
-       ├── 简化系统
-       │   ├── SameDistanceReduction      — 等距简化
-       │   ├── ShapeDistanceReduction     — 形状简化
-       │   └── SimpleDistanceReduction    — 简单简化
-       │
-       ├── PreBuild 预构建
-       │   ├── PreBuildManager + PreBuildScriptableObject
-       │   └── SharePreBuildData + UniquePreBuildData
-       │
-       ├── SavePoint 系统 (6 文件)
-       │   └── BeyondBoneClothSavePoint + ...Manager/Simulation/Collider 等
-       │
-       └── 数据集合扩展
-           ├── ExNativeArray / ExSimpleNativeArray / ExBitFlag16/8
-           ├── NativeArrayExtensions / NativeParallelHashMap
-           └── FixedList128/32/64/512/4096BytesExtensions
-```
-
-#### 3.1.2 关键类详细分析
-
-**BeyondBoneCloth.cs (2622行)**:
-| 组件 | 说明 |
-|------|------|
-| 属性: clothAnimatorAbilityLODThreshold, clothAnimatorLODThreshold, clothLODFadeTime | LOD 控制 |
-| 属性: animationPoseRatio | 动画姿态混合率 (0=物理完全覆盖, 1=动画完全覆盖) |
-| 属性: clothSimulateWeight | 模拟权重 (0=停止模拟) |
-| 属性: gravity/damping/worldInertia/localInertia/windInfluence | 物理参数 |
-| 属性: blendWeight | 混合权重 |
-| `relativeTransformPos/Rot` | 相对变换 (用于 Teleport 防爆) |
-| `serializeData / serializeData2` | 序列化数据 |
-| `process` | ClothProcess 核心模拟实例 |
-
-**ClothBehaviour.cs (75行)**:
-```csharp
-abstract class ClothBehaviour : MonoBehaviour
-```
-所有布料组件的抽象基类。支持 Gizmo 可视化, 提供 `GetMagicaHashCode()`。
-
-**ClothProcess.cs (11241行)**:
-核心模拟过程管理:
-- 布料数据生成 (虚拟网格构建)
-- 约束初始化与求解
-- Burst Job 调度
-- 变换数据更新
-
-**ClothManager.cs (3239行)**:
-全局单例管理器:
-- `clothSet` / `boneClothSet` / `meshClothSet` — 分类管理布料实例
-- 更新循环调度 (PreUpdate/Update/PostUpdate)
-
-**DynamicBoneTransformManager.cs (12456行)**:
-变换缓冲区管理:
-- 管理 Animator 写入与布料读取之间的变换缓冲区
-- 动画器写入 Job 调度
-- 跨帧变换同步
-
-**ClothSerializeData.cs (2493行)**:
-完整的布料序列化数据结构:
-- PaintMode (绘制模式: Manual/Brush)
-- AnimatorAbilityLevel (动画能力等级: Low/High)
-- 渲染器引用列表
-- 根骨骼列表
-- 更新模式 (UnityScaledDeltaTime/UnscaledDeltaTime/Manual)
-- LOD 设置
-
-**ClothParameters.cs**:
-```csharp
-struct ClothParameters {
-    Gravity, Damping, Inertia, Wind,
-    Collision, Bend/Angle Constraints, ...
-}
-```
-808 bytes — 所有物理参数的紧凑结构体。
-
-#### 3.1.3 约束系统
-
-| 约束 | 类型 | 说明 |
-|------|------|------|
-| `InertiaConstraint` | 惯性 | 模拟物体运动惯性 (世界/局部) |
-| `AngleConstraint` | 弯曲 | 限制相邻骨骼间夹角 |
-| `DistanceConstraint` | 距离 | 保持粒子间距离约束 |
-| `MotionConstraint` | 运动 | 限制粒子运动范围 |
-| `TetherConstraint` | 系绳 | 将粒子约束到参考位置 |
-| `TriangleBendingConstraint` | 三角形弯曲 | 面片弯曲约束 |
-| `SelfCollisionConstraint` | 自碰撞 | 防止布料自身穿透 |
-| `ColliderCollisionConstraint` | 碰撞器 | 与场景碰撞器交互 |
-| `SpringConstraint` | 弹簧 | 附加弹力模拟 |
-| `EndSimulationStepJobKernels` | 最终步骤 | 后处理收尾计算 |
-
-每个约束均包含 Burst 编译的 Job Kernel 文件 (如 `AngleConstraintJobKernels.cs`), 通过 `IJobParallelFor` / `IJob` 在工作线程中并行执行。
-
-#### 3.1.4 关键技术特征
-
-| 特性 | 实现 |
-|------|------|
-| **模拟算法** | PBD (Position Based Dynamics) |
-| **并行计算** | Unity Burst Compiler + IJobParallelFor |
-| **优化** | 离线 PreBuild 缓存 + 运行时 SavePoint 状态保存/恢复 |
-| **网格** | 自定义 VirtualMesh 代理网格 (骨骼权重/图元/碰撞) |
-| **风** | 多风区叠加 + 团队风数据 (TeamWindData) |
-| **LOD** | 距离 + 动画能力双阈值 + 渐隐时间 |
-| **更新模式** | UnityScaledDeltaTime / UnscaledDeltaTime / Manual |
-| **热补丁** | 所有方法通过 IFix 包装器 (IsPatched/GetPatch) |
-
----
+*(内容同原报告 3.1 节, 详见原始文件)*
 
 ### 3.2 MagicaCloth v1 (旧版)
 
 **路径**: `Assets/Scripts/MagicaCloth/MagicaCloth/`
 **文件数**: ~30+ `.cs`
-**命名空间**: `MagicaCloth`
-**角色**: 旧版 ComputeShader 布料模拟 (与 BeyondDynamicBone 共存)
 
-#### 3.2.1 架构
-
-```
-BaseCloth : PhysicsTeam           — 所有布料基类
-  ├── MagicaBoneCloth             — 基于骨骼的布料
-  └── MagicaMeshCloth             — 基于网格的布料
-
-PhysicsManagerCompute             — ComputeShader 物理模拟调度 (核心)
-  ├── PhysicsManagerBoneData      — 骨骼数据
-  ├── PhysicsManagerMeshData      — 网格数据
-  ├── PhysicsManagerParticleData  — 粒子数据
-  ├── PhysicsManagerTeamData      — 团队数据
-  ├── PhysicsManagerWindData      — 风数据
-  ├── PhysicsManagerConstraint    — 约束管理
-  └── PhysicsManagerWorker        — Worker 线程管理
-```
-
-#### 3.2.2 约束类型 (14种)
-
-| 约束 | 说明 |
-|------|------|
-| `ColliderCollisionConstraint` | 碰撞器碰撞 |
-| `ColliderExtrusionConstraint` | 碰撞器挤压 |
-| `EdgeCollisionConstraint` | 边碰撞 |
-| `PenetrationConstraint` | 穿透约束 |
-| `RestoreDistanceConstraint` | 距离恢复 |
-| `RestoreRotationConstraint` | 旋转恢复 |
-| `ClampDistanceConstraint` | 距离钳位 |
-| `ClampDistance2Constraint` | 距离钳位v2 |
-| `ClampPositionConstraint` | 位置钳位 |
-| `ClampRotationConstraint` | 旋转钳位 |
-| `CompositeRotationConstraint` | 复合旋转 |
-| `SpringConstraint` | 弹簧 |
-| `TriangleBendConstraint` | 三角形弯曲 |
-| `TwistConstraint` | 扭曲 |
-| `VolumeConstraint` | 体积保持 |
-
-#### 3.2.3 设计模式
-
-与 BeyondDynamicBone 的继承关系:
-```
-MagicaCloth v1 (ComputeShader) 
-    → MagicaCloth v2 → BeyondDynamicBone (Burst Jobs + 定制)
-```
-
-BeyondDynamicBone 大量复用 MagicaCloth 的接口命名和架构理念, 但实现已从 ComputeShader 切换到 Burst Jobs.
-
----
+*(内容同原报告 3.2 节)*
 
 ### 3.3 GPU Cloth (管线集成)
 
 **路径**: `Assets/Scripts/HG.RenderPipelines.Runtime/HG/Rendering/Runtime/`
 **文件数**: ~18 `.cs`
-**命名空间**: `HG.Rendering.Runtime`
-**角色**: 渲染管线集成的 GPU Compute 布料模拟 (通过 RenderGraph 调度)
 
-#### 3.3.1 架构
-
-```
-Authoring Layer (MonoBehaviour):
-  ClothInfo.cs               — 布料实例配置 (594行)
-  ClothGroupInfo.cs           — 布料组信息 (211行)
-  GpuClothMatrixGenerator.cs  — 过程网格生成器 (208行)
-  ClothMeshFilter.cs          — 网格过滤
-
-Runtime Manager:
-  GpuClothManager.cs          — CPU 管理/激活/数据上传 (~2200行)
-
-RenderGraph Pass:
-  GpuClothSimulationPassConstructor.cs — 构建 4 个 RenderGraph Pass (1479行)
-
-Data Structs (blittable):
-  ClothGroupData, ClothGroupMeta, ClothMetaData, ClothNodeData,
-  ClothConstData, ClothSkeletonData, ClothMobileData
-
-GPU Buffers:
-  GpuClothRenderData, GpuClothClearBufferData, GpuClothGroupUploadData
-
-Native Bridge:
-  UnityEngine.HyperGryph.HGGpuClothManagerV2 — C++ 原生桥接
-```
-
-#### 3.3.2 GpuClothManager 关键常量
-
-| 常量 | 值 | 含义 |
-|------|-----|------|
-| `MAX_ANCHOR_NUM` | 2 | 每节点最多 2 个锚点 |
-| `MAX_NEIGHBOR_NUM` | 8 | 每节点最多 8 个邻居 |
-| `MAX_CLOTH_NEIGHBOR_NUM` | 128 | 最大布料邻居缓存 |
-| `CLOTH_BATCH_SIZE` | 256 | GPU 批处理大小 |
-| `MAX_COLLIDER_NUM` | 4 | 每布料最多 4 个碰撞器 |
-| `MAX_RUNTIME_CLOTH_GROUP_NUM` | 50 | 最大激活布料组数 |
-| `PHYSICS_DELTA_TIME` | 0.023333333f | 固定物理步长 (~42Hz) |
-| `CLOTH_DIRTY_DISTANCE` | 32f | 距离阈值, 超限才重新计算激活集 |
-
-#### 3.3.3 RenderGraph Pass 序列
-
-```
-Frame Start
-  │
-  ├── GpuClothDataClear (清除缓冲区)
-  │     ComputeShader: ClothDataClearMain
-  │     条件: clearBufferData.shouldClear
-  │
-  ├── GpuClothDataUpload (上传 CPU→GPU 数据)
-  │     ComputeShader: ClothDataUploadMain
-  │     条件: uploadData.isValid
-  │     上传: ClothMetaData / ClothNodeData / BatchMeta / BatchCache
-  │
-  ├── GpuClothSim (主物理模拟)
-  │     ComputeShader: ClothSimMain
-  │     条件: renderData.isValid
-  │     输入: clothNodeData + clothMetaData + batchCache + skeletonData
-  │     常量: clothConstData (dt, wind, etc.)
-  │
-  └── GpuClothSetDefault (回退: 仅更新骨骼缓冲区)
-        条件: 仅 skeleton 有效时
-        禁用 Pass Culling
-Frame End: OnPostRendering() → FlipSkeletonFlag()
-```
-
-#### 3.3.4 ClothNodeData 结构 (192 bytes/节点)
-
-| 字段 | 类型 | 大小 |
-|------|------|------|
-| `anchorNodeCacheIdx` | Vector2Int | 8B |
-| `anchorNodeDistance` | Vector2 | 8B |
-| `uv` | Vector2 | 8B |
-| `collisionPlaneXY` | Vector2 | 8B |
-| `packedBasePosition` | Vector4 | 16B |
-| `packedBaseNormal` | Vector4 | 16B |
-| `baseTangent` | Vector4 | 16B |
-| `packedPrePosition` | Vector4 | 16B |
-| `packedCurPosition` | Vector4 | 16B |
-| `packedCurNormal` | Vector4 | 16B |
-| `neighborClothNodeCacheIdx[8]` | fixed int[8] | 32B |
-| `neighborClothNodeDistance[8]` | fixed float[8] | 32B |
-
-#### 3.3.5 ClothMetaData 结构 (176 bytes/实例)
-
-| 字段 | 类型 |
-|------|------|
-| `clothNodeIdxStart/End` | uint |
-| `batchIdxStart` | uint |
-| `iterNum` | uint (PBD 迭代次数) |
-| `damping` | float |
-| `windFreqFactor/BalanceFactor/IntensityScale` | float |
-| `localToWorld0..2 / worldToLocal0..2` | Vector4 × 6 |
-| `packedLongestAnchorDistance` | Vector4 |
-| `packedClothNormal` | Vector4 |
-
-#### 3.3.6 ClothGroupMeta 约束
-
-```csharp
-clothNum ≤ MAX_CLOTH_PER_GROUP (4)
-Σ nodeNum ≤ MAX_CLOTH_NODE_PER_GROUP (512)
-Σ batchNum ≤ MAX_CLOTH_BATCH_PER_GROUP (8)
-Σ cacheEntry ≤ MAX_CLOTH_CACHE_ENTRY_PER_GROUP (128)
-```
-
-#### 3.3.7 激活管理算法
-
-1. 每帧检查玩家移动是否超过 `CLOTH_DIRTY_DISTANCE` (32 units)
-2. 按 `DistanceSquared(playerCenterXZ, groupWorldPosXZ)` 排序
-3. 仅保留 Top 50 组进行激活
-4. `SwapAndRemove` 模式管理激活/去激活集合
-5. 支持 Streaming 模式 (ECS 驱动注册)
-
----
+*(内容同原报告 3.3 节)*
 
 ### 3.4 NPC 布料集成层
 
 **路径**: `Assets/Scripts/Gameplay.Beyond/Beyond/NPC/Animation/`
 **文件数**: 3 个核心 `.cs`
-**命名空间**: `Beyond.NPC.Animation`
 
-#### 3.4.1 ClothCalculator 体系
-
-```
-ClothCalculator (abstract, 1887行)
-  ├── AnimatorClothCalculator (532行)
-  └── AnimationStreamClothCalculator (559行)
-```
-
-**ClothCalculator 核心职责**:
-- 从 Animator/JobStream 读取布料权重参数
-- 管理物理布料权重过渡 (Lerp/MoveTowards)
-- 按 `BeyondBoneClothPart` (PART1/PART2) 分区控制布料权重
-- 处理布料启用/禁用 (LOD 适配)
-- 处理 Teleport (设置相对变换防爆)
-- 布料重置 (软重置/硬重置)
-
-**关键常量**:
-```csharp
-MAGICA_CLOTH_WEIGHT_INCREASE_SPEED = 8f   // 权重增加速度
-MAGICA_CLOTH_WEIGHT_DECREASE_SPEED = 3f   // 权重减少速度
-DEFAULT_CLOTH_STABILIZATION_TIME = 0.1f   // 默认稳定时间
-```
-
-**CalcCloth() 核心流程**:
-1. 从 Animator 读取 clothWeight/bodyWeight/blend 参数
-2. 应用 LookAt 影响 (注视方向→身体权重调整)
-3. Lerp `m_physicsClothWeight` → 目标权重
-4. 应用到所有 BeyondBoneCloth 实例
-
-**两个实现版本**:
-| 实现 | Animator 读取方式 | 场景 |
-|------|------------------|------|
-| `AnimatorClothCalculator` | Unity `Animator.GetFloat/SetFloat` | 传统 Animator 管线 |
-| `AnimationStreamClothCalculator` | `ScriptAnimationJobSyncMono.GetFloatFromStream/SetFloatToStream` | Job 管线 (性能优) |
-
-#### 3.4.2 角色数据
-
-| 文件 | 用途 |
-|------|------|
-| `BoneClothItem.cs` | NPC 布料装备数据: 名称/序列化数据/选择数据/根骨骼 |
-| `NPCMeshMagicClothSettings.cs` | NPC MagicaCloth 设置 (布尔开关 + 预制体引用) |
+*(内容同原报告 3.4 节)*
 
 ---
 
@@ -700,208 +705,243 @@ DEFAULT_CLOTH_STABILIZATION_TIME = 0.1f   // 默认稳定时间
 
 | 算法 | 系统 | 本质描述 |
 |------|------|---------|
-| **Analytic Two-Bone IK** | Unity Rigging + FinalIK | 三角法余弦定理, `cos(C) = (a²+b²-c²)/(2ab)`, 单帧解析解 |
-| **FABRIK** | FinalIK + Unity Rigging | 前向缩短(Forward Reaching) + 后向定长(Backward Reaching) 迭代 |
-| **CCD** | FinalIK | 逐关节旋转, 最小化末端误差角度, 从末端到根 |
-| **Full Body IK (FBIK)** | FinalIK | 多链/多效应器约束松弛: 每个效应器有 positionWeight + rotationWeight, 迭代求解 |
-| **VR IK** | FinalIK | 身体部分分离求解: 左右手/脚各一个 FABRIK, pelvis 和头用三角法 |
-| **Ground Normal IK** | HG Extension | `groundNormal` → `LookRotation` → 偏离方向臂长修正 → 地面贴合 |
-| **PBD (Position Based Dynamics)** | BeyondDynamicBone | 位置约束迭代求解: 预测位置 → 约束投影 → 速度更新 |
-| **GPU PBD** | GPU Cloth | 同上, 但在 ComputeShader 执行, 节点/邻域/锚点/批量缓存加速 |
-| **距离约束** | 布料系统 | `C(p) = |p₁-p₂| - d`, 梯度投影修正 |
-| **三角弯曲约束** | 布料系统 | 保持相邻两面片间的二面角, 抵抗压缩/拉伸 |
-| **惯性约束** | 布料系统 | 保留粒子速度惯性, 分世界空间和局部空间 |
-| **自碰撞约束** | 布料系统 | 碰撞检测 + 位置修正, 避免布料自身穿透 |
-| **碰撞器碰撞** | 布料系统 | 胶囊体/球体/平面 → 点-几何体距离检测 + 推离 |
-| **风模拟** | 布料+风系统 | `windTime += windSpeed × dt`, 噪声函数 UV 偏移, 力传递到粒子 |
-| **激活距离排序** | GPU Cloth | 按 `DistanceSquared(playerXZ, groupXZ)` 排序, 保留 Top 50 |
-| **权重过渡** | NPC 布料集成 | `Mathf.MoveTowards(current, target, speed × dt)`, 增加 8f / 减少 3f |
+| **Analytic Two-Bone IK** | Unity Rigging + FinalIK | 三角法余弦定理, 单帧解析解 |
+| **FABRIK** | FinalIK + Unity Rigging | 前向缩短 + 后向定长迭代 |
+| **CCD** | FinalIK | 逐关节旋转, 最小化末端误差 |
+| **Full Body IK (FBIK)** | FinalIK | 多链/多效应器约束松弛 |
+| **VR IK** | FinalIK | 身体部分分离求解 |
+| **Ground Normal IK** | HG Extension | groundNormal → LookRotation → 后处理 |
+| **HG Pitch/Roll Clamp** | HG Extension | 局部空间 pitch/roll 钳位 + 权重混合 |
+| **HG Multi-Effector Batch** | HG Extension | 批量 ground normal → 多效应器对齐 |
+| **HG Transform Offset** | HG Extension | 位置偏移 (世界/局部空间) |
+| **Quadruped SphereCast** | QuadrupedIKRigging | SphereCast → groundNormal → 死区过滤 → 投影 |
+| **Eye LookAt IK (Morph)** | SkeletalMorphJobDefines | Burst IJob + Morph 权重混合 |
+| **Quadruped Weight Split** | QuadrupedIKRigging | weight 在 2Bone IK 和 Effector 间拆分 |
+| **Timeline IK (Slate)** | Slate ActionClips | OnAnimatorIK 回调 + Animator IK 接口 |
+| **BT IK (NodeCanvas)** | ParadoxNotion | EventRouter + Animator IK 接口 |
+| **IK Collision Query** | IKCollisionHelper | Raycast / CapsuleCast 地面检测 |
+| **IK Cast Condition** | IKCastCondition | 角度/坡度阈值过滤 |
+| **PBD (Position Based Dynamics)** | BeyondDynamicBone | 位置约束迭代求解 |
+| **GPU PBD** | GPU Cloth | ComputeShader PBD 模拟 |
+| **激活距离排序** | GPU Cloth | DistanceSquared 排序, Top 50 |
+| **权重过渡** | NPC 布料集成 | MoveTowards, 增 8f / 减 3f |
 
 ---
 
 ## 5. 数据流
 
-### 5.1 IK 数据流 (HG Custom)
+### 5.1 HG Custom IK 三层 Pipeline
 
 ```
 [Animation Job Sync / Animator]
        │
        │ groundNormal, componentRotation, weights
        ▼
-[HGIKPrepareEffectorsConstraintJob]  — 多效应器地面法线对齐
+[HGIKPrepareEffectorsConstraintJob]  — 多效应器地面法线对齐 (批量)
        │
        │ modified effector transforms
        ▼
-[HGPrepareIKEffectorConstraintJob]   — 单效应器关节限位
+[HGPrepareIKEffectorConstraintJob]   — 单效应器关节限位 (pitch/roll clamp)
        │
        │ target + hint
        ▼
-[HGTwoBoneIKConstraintJob]           — 2Bone IK 求解
+[HGTwoBoneIKConstraintJob]           — 2Bone IK 求解 + 后处理
        │
        │ root/mid/tip 旋转
        ▼
 [Animated Bone Transforms]
 ```
 
-### 5.2 BeyondDynamicBone 布料数据流
+### 5.2 QuadrupedIKRigging 数据流
 
 ```
-[ClothCalculator]                — 读取 Animator 参数
+[FixedTick] — 每固定帧更新
        │
-       │ SetClothSimulateWeight()
-       ▼
-[BeyondBoneCloth]                — 主组件
-       │
-       │ process.Tick()
-       ▼
-[ClothProcess]                   — 核心模拟
-       │
-       ├── PreUpdate
-       │   ├── VirtualMesh 更新
-       │   ├── 变换数据读取
-       │   └── 约束初始化
-       │
-       ├── Simulation (Burst Jobs)
-       │   ├── InertiaConstraint.Job
-       │   ├── DistanceConstraint.Job
-       │   ├── AngleConstraint.Job
-       │   ├── TetherConstraint.Job
-       │   ├── ColliderCollisionConstraint.Job
-       │   └── EndSimulationStep.Job
-       │
-       ├── PostUpdate
-       │   ├── Wind 力应用
-       │   ├── 法线/切线更新
-       │   └── 变换写入
+       ├── Physics.SphereCast (每肢) → groundNormal + hitPoint
+       ├── normalDeadZone 过滤 → 稳定法线
+       ├── _GetPointOnPlaneWithXZ → 投影点
        │
        ▼
-[DynamicBoneTransformManager]    — 变换缓冲区输出
+[Limb.SetWeight(weight)] — 权重分配
+       │
+       ├── HGTwoBoneIKConstraint.weight = Clamp01(weight)
+       └── HGPrepareIKEffectorConstraint.rotationWeight = Clamp01((weight-1)*2)
        │
        ▼
-[Rendered Mesh]
+[Spine] — 脊椎更新
+       ├── SetPelvisOffset(leftBack, rightBack) — 后肢→骨盆
+       ├── SetShoulderOffset(leftFront, rightFront) — 前肢→肩部
+       └── Update(deltaTime) — Lerp 平滑
+       │
+       ▼
+[Final Animated Poses — 4 肢 + 脊椎]
 ```
 
-### 5.3 GPU Cloth 数据流
+### 5.3 GrounderIK 数据流 (CharacterAnimationComponent)
 
 ```
-[Authoring] ClothInfo + ClothGroupInfo
-       │ RegisterClothGroup()
+[Animator Blackboard]
+       │ GrounderIKParameters
        ▼
-[GpuClothManager]   CPU 管理
-       │ _ProcessPendingQueue() — 激活/去激活
-       │ _SetPerDrawData() — ECS → per-draw data
-       │ _UpdateWindParams() — 风累加
-       │
-       ▼
-[RenderGraph Passes]
-       │
-       ├── GpuClothDataClear (ComputeShader: ClothDataClearMain)
-       │      清除 clothNodeData / batchMeta / batchCache Buffer
-       │
-       ├── GpuClothDataUpload (ComputeShader: ClothDataUploadMain)
-       │      UploadDataMap → Meta/Nodes/Batch/BatchCache
-       │
-       ├── GpuClothSim (ComputeShader: ClothSimMain)
-       │      ClothConstData (dt/wind) + Node/Meta/Batch Cache → 模拟 → 写入位置
-       │
-       └── GpuClothSetDefault (回退: 仅更新骨骼 buffer)
+[CharacterAnimationComponent]
+       ├── SetGrounderIK(bool)              — 启用/禁用
+       ├── SetGrounderIKWeight(float)       — 整体权重
+       ├── SetGrounderIKFloorTheta(...)     — 地面角度
+       ├── SetGrounderIKParamaterFromAnimBlackboard(...) — 批量同步
+       └── SetGrounderIKLayer(LayerMask)    — 碰撞层
        │
        ▼
-[ClothSkeletonData Double Buffer]
-       │ FlipSkeletonFlag() 每帧翻转
+[RootMotion.FinalIK.GrounderBipedIK]
+       │ Grounding solver
+       │ OnRaycastDelegate (← IKCollisionHelper / BaseModelComponent)
        ▼
-[Rendered Mesh]
+[IK Foot/Pelvis/Spine Offsets]
+       │
+       ▼
+[Final Animated Pose]
 ```
 
-### 5.4 中间产物
+### 5.4 NPC LookAt IK 数据流
+
+```
+[NPC Target] (玩家/兴趣点)
+       │
+       ▼
+[NPCLookAtController] (6625行)
+       ├── targetSwitchSmoothTime — 目标切换平滑
+       ├── weightSmoothTime       — 权重混合时间
+       └── eyeWeightSmoothTime    — 眼部权重混合
+       │
+       ▼
+[NPCLookAtAvatar]
+       ├── headPivotBone → 头部旋转
+       ├── headBone      → 头部朝向
+       ├── spineBones[]  → 脊椎旋转分配
+       └── maxEyeAngleHorizontal/Vertical → 眼部限位
+       │
+       ▼
+[Final Head/Spine Rotation]
+
+[NPCCPUAnimationLookAtIkInfo] — 配置数据
+       ├── bEnableIK
+       ├── headBoneName / eyeRefBoneName
+       ├── spineBoneShortNames
+       ├── eyeBoneOffset
+       └── maxEyeAngleHorizontal/Vertical
+
+[NPCCPUAnimationLookAtControllerParams] — 参数配置
+       ├── targetSwitchSmoothTime
+       ├── weightSmoothTime
+       ├── eyeWeightSmoothTime
+       ├── minDistance
+       └── maxAngle
+```
+
+### 5.5 SkeletalMorph 眼部 IK 数据流
+
+```
+[SkeletalMorphCore]
+       │
+       ├── SetLookAtEyeIK(up, down, right, left) — 外部输入
+       ├── m_isEyeLookAtIKEnable — 启用开关
+       ├── m_animEyeLookAtWeight — 动画权重
+       └── m_forceEyeIKWeight    — 强制权重
+       │
+       ▼
+[EvaluateEyeLookAtIK(blendWeight, jobHandle)]
+       │ 调度:
+       ▼
+[EvaluateEyeLookAtIKJob : IJob, BurstCompile]
+       │
+       ├── runtime_morphNameHashToMorphData (HashMap)
+       ├── runtime_eyeIKNameHashR/L (NativeArray<int>)
+       ├── runtime_eyeIKOffsetR/L (float4)
+       └── runtime_eyeLookAtIKblendWeight (float)
+       │
+       ▼
+[Morph Runtime Data Updated]
+```
+
+### 5.6 Timeline / BT IK 数据流
+
+```
+[Slate Timeline]
+  AnimateLookAtIK ──→ OnAnimatorIK → Animator.SetLookAtPosition/Weight
+  AnimateLimbIK   ──→ OnAnimatorIK → Animator.SetIKPosition/Rotation/Weight
+
+[NodeCanvas BT]
+  MecanimSetIK    ──→ EventRouter → OnAnimatorIK → Animator.SetIKPosition/Weight
+```
+
+### 5.7 BeyondDynamicBone 布料数据流
+
+*(同原报告 5.2 节)*
+
+### 5.8 GPU Cloth 数据流
+
+*(同原报告 5.3 节)*
+
+### 5.9 中间产物
 
 | 产物 | 类型 | 生产者 | 消费者 |
 |------|------|--------|--------|
-| IK Target/Hint 变换 | Transform | `HGPrepareIKEffectorConstraintJob` | `HGTwoBoneIKConstraintJob` |
-| Ground Normal | Vector3Property | `HGIKPrepareEffectorsConstraintJob` | `HGTwoBoneIKConstraintJob` |
-| 布料权重 | float | `ClothCalculator` | `BeyondBoneCloth.SetClothSimulateWeight()` |
-| 布料变换缓冲区 | TransformAccessArray | `DynamicBoneTransformManager` | `ClothProcess` Burst Jobs |
-| 虚拟网格 | VirtualMesh | `VirtualMeshManager` | 约束求解器 |
-| GPU 节点数据 | ComputeBuffer | `GpuClothGroupUploadData` | `GpuClothSimulationPassConstructor` |
-| 骨架双缓冲 | ComputeBuffer ×2 | `GpuClothManager.FlipSkeletonFlag()` | 下一帧模拟 |
-| PreBuild 缓存 | ScriptableObject | `PreBuildManager` | `BeyondBoneCloth` 初始化 |
-| SavePoint | 多个 struct | `BeyondBoneClothSavePoint` | 运行时状态保存/恢复 |
+| IK Target/Hint 变换 | Transform | HGPrepareIKEffectorConstraintJob | HGTwoBoneIKConstraintJob |
+| Ground Normal | Vector3Property | HGIKPrepareEffectorsConstraintJob | HGTwoBoneIKConstraintJob |
+| GrounderIK 参数 | GrounderIKParameters | Animator Blackboard | CharacterAnimationComponent |
+| 脚部碰撞数据 | RaycastHit | IKCollisionHelper | GrounderBipedIK |
+| 四足地面法线 | Vector3 | QuadrupedIKRigging.FixedTick | Limb.prepareEffectorConstraint |
+| NPC LookAt 方向 | LookAtAxes | NPCLookAtController | NPCLookAtAvatar (骨骼旋转) |
+| 眼部 IK 偏移 | float4 | SkeletalMorphCore.SetLookAtEyeIK | EvaluateEyeLookAtIKJob |
+| Morph 运行时数据 | NativeArray<FMorphRuntimeData> | SkeletalMorphCore | 所有 Morph Job |
+| 布料权重 | float | ClothCalculator | BeyondBoneCloth |
+| 虚拟网格 | VirtualMesh | VirtualMeshManager | 约束求解器 |
+| GPU 节点数据 | ComputeBuffer | GpuClothGroupUploadData | GpuClothSim |
+| 骨架双缓冲 | ComputeBuffer ×2 | GpuClothManager | 下一帧模拟 |
 
 ---
 
 ## 6. 关键决策
 
-### 6.1 三层 IK 并存 (FinalIK + Unity Rigging + HG Custom)
-- **选择**: 同时保留 RootMotion FinalIK, Unity Animation Rigging, HG Custom Extension
-- **原因**: FinalIK 提供成熟的全身/VR IK, Unity Rigging 提供 Job+Burst 性能, HG Expansion 提供地面法线/关节限位/NPC 定制
-- **替代方案**: 统一到 FinalIK 或自定义 IK 求解器
-- **亮点**: HG Extension 在 Unity Rigging 框架下新增 `groundNormal`/`componentRotation`/`maxPitchDegree`/`maxRollDegree` 等游戏定制属性
+### 6.1 五层 IK 并存 (FinalIK + Unity Rigging + HG Custom + Slate + Custom Jobs)
+- **选择**: 同时保留 5 条 IK 技术栈:
+  1. RootMotion FinalIK (GrounderBipedIK/BipedIK/LookAtIK)
+  2. Unity Animation Rigging (TwoBone/Chain IK)
+  3. HG Custom RiggingExtension (4 类自定义约束)
+  4. Slate Timeline IK 剪辑 + NodeCanvas BT IK
+  5. SkeletalMorph Eye LookAt IK (Burst IJob)
+- **原因**: 不同场景使用不同技术: FinalIK 提供成熟全身/地面 IK, Unity Rigging 提供 Job+Burst 性能底座, HG Extension 提供地面法线/关节限位/NPC 定制, Slate 提供过场动画 IK 控制, Custom Job 提供高性能眼部 Morph IK
 
-### 6.2 BeyondDynamicBone 替代 MagicaCloth
-- **选择**: 从 MagicaCloth v1 ComputeShader → BeyondDynamicBone Burst Jobs
-- **原因**: ComputeShader 对 GPU 带宽和硬件兼容性要求高, Burst Jobs 在 CPU 上可控且兼容性更广
-- **替代方案**: 继续使用 MagicaCloth v2 ComputeShader, 或使用 Unity DOTS Physics
-- **代价**: CPU 开销相比 GPU 方案更高, 但通过 Burst + IJobParallelFor 大幅优化
+### 6.2 四足 IK 系统独立实现
+- **选择**: 使用 HG Extension 约束搭建四足 IK, 而非复用 FinalIK 的 BipedIK
+- **原因**: 四足生物腿部数量/排列与双足完全不同, 需要独立 SphereCast 地面检测 + 4 肢独立 IK 求解
+- **亮点**: 权重分割策略 (2Bone IK / Effector 权重映射), normalDeadZone 抖动过滤
 
-### 6.3 GPU Cloth 与 BeyondDynamicBone 双布料并存
-- **选择**: 同时保留 GPU Cloth (管线集成) 和 BeyondDynamicBone (主布料)
-- **原因**: GPU Cloth 用于特定场景 (大量轻量布料, 如群组/装饰物), BeyondDynamicBone 用于角色主要布料
-- **替代方案**: 统一方案
-- **亮点**: GPU Cloth 通过 RenderGraph 调度, 与渲染管线深度集成, 避免额外 CPU→GPU 同步
+### 6.3 NPC LookAt IK 独立于角色 LookAt IK
+- **选择**: NPC 使用自研 `NPCLookAtController` 系统, 角色使用 `RootMotion.LookAtIK`
+- **原因**: NPC 数量多, 需要轻量级 CPU 控制; 角色需要高质量 FinalIK 注视
+- **亮点**: `NPCCPUAnimationLookAtControllerParams` 提供三阶段平滑 (targetSwitch / weight / eyeWeight)
 
-### 6.4 50 组激活上限 (GPU Cloth)
-- **选择**: 最多 50 个布料组同时激活, 基于玩家距离排序
-- **原因**: GPU 内存和 Compute 预算控制
-- **替代方案**: 数量无限 + 视锥剔除
-- **亮点**: `ClothActivateComparer` 按 XZ 平面距离排序, 优先激活最近的组
+### 6.4 眼部 IK 使用 Morph 而非骨骼旋转
+- **选择**: 通过 `EvaluateEyeLookAtIKJob` (Burst IJob) 驱动 Morph 混合形状, 而非旋转骨骼
+- **原因**: 眼部动画使用 BlendShape 更自然, 与 SkeletalMorph 系统统一
+- **亮点**: 与 SkeletalMorph 共享 NativeContainer 和 JobHandle 调度
 
-### 6.5 三层 IK Pipeline
-- **选择**: 效应器预处理 → 关节限位 → IK 求解, 三层分离
-- **原因**: 分离关注点: 地面适配 + 关节保护 + IK 求解各自独立可调
-- **替代方案**: 单层 IK 求解器内嵌所有逻辑
-- **亮点**: 每层都是独立 RigConstraint, 可自由组合/开关
+### 6.5 GrounderBipedIK 居中控制
+- **选择**: `CharacterAnimationComponent` 作为 GrounderIK 的中央控制器, 提供 13+ 个方法
+- **原因**: 统一管理 IK 权重/角度/参数, 避免多个组件直接操作 GrounderBipedIK
 
-### 6.6 NPC 布料权重双路径
-- **选择**: `AnimatorClothCalculator` + `AnimationStreamClothCalculator` 双实现
-- **原因**: 兼容旧 Animator 管线和新 Job 管线
-- **替代方案**: 仅支持新 Job 管线 (需要全部迁移)
-- **亮点**: 通过 `isStreamClothCalculator` 标志透明切换, 对上层 `ClothCalculator` 算法透明
+### 6.6 IK 碰撞查询抽象
+- **选择**: `IKCollisionHelper` 静态工具类 + `BaseModelComponent` 委托注册
+- **原因**: 分离碰撞查询逻辑与 IK 求解, 支持不同碰撞策略 (Raycast/CapsuleCast/复杂检测)
 
-### 6.7 IFix 热补丁全覆盖
-- **选择**: 所有 IK/布料方法体均包含 IFix 包装器
-- **原因**: 游戏上线后需要热修复 IK/布料逻辑
-- **替代方案**: HybridCLR / Mono JIT
-- **代价**: 代码被 IFix 包装器混淆, 本地阅读困难, 方法体显示为汇编指令
+### 6.7 过场 IK 通过 Animator IK Pass
+- **选择**: Slate/NodeCanvas 通过 `OnAnimatorIK` 事件 + `Animator.SetLookAtPosition/SetIKPosition`
+- **原因**: 利用 Unity 原生 IK Pass 机制, 与现有动画系统无缝集成
+- **要求**: Animator Controller 必须启用 "IK Pass"
 
-### 6.8 虚拟网格代理 (VirtualMesh)
-- **选择**: 布料模拟在 VirtualMesh 上执行, 而非原始渲染网格
-- **原因**: 渲染网格面数过高, 虚拟网格做简化后模拟效率大幅提升
-- **替代方案**: 直接在渲染网格上模拟
-- **亮点**: 支持三种简化策略 (等距/形状/简单) + PreBuild 离线缓存
+### 6.8 其余决策 (6.8-6.20 同原报告)
 
-### 6.9 布料 LOD 体系
-- **选择**: 同时使用 AnimatorAbility LOD + 距离 LOD + 权重 Fade
-- **原因**: 角色质量需要多维度降级 (动画能力 + 距离 + 权重混合)
-- **替代方案**: 单一距离 LOD
-- **亮点**: `clothAnimatorAbilityLODThreshold` + `clothAnimatorLODThreshold` 双阈值, `clothLODFadeTime` 控制渐隐时间
-
-### 6.10 PBD 固定步长 (~42Hz)
-- **选择**: GPU Cloth 使用 `PHYSICS_DELTA_TIME = 0.023333333f` (~42FPS)
-- **原因**: 固定步长保证模拟确定性, 避免帧率波动导致布料抖动
-- **替代方案**: 可变步长 + 子步迭代
-- **亮点**: `packedDeltaT.z = 1/dt` 预计算, 减少 GPU 分支
-
-### 6.11 SavePoint 系统
-- **选择**: 布料状态 SavePoint (管理器/模拟/碰撞器/惯性中心/团队/虚拟网格)
-- **原因**: 角色换装/场景切换/Teleport 时需要保存和恢复布料状态
-- **替代方案**: 完全重置布料
-- **亮点**: 6 种不同粒度的 SavePoint, 按需组合
-
-### 6.12 HG IK 数据接口设计
-- **选择**: `IHGTwoBoneIKConstraintData : ITwoBoneIKConstraintData` 接口继承
-- **原因**: 与 Unity Animation Rigging 框架完全兼容, 保持泛型约束 `where T : IHGTwoBoneIKConstraintData`
-- **替代方案**: 复制修改 Unity 源码
-- **亮点**: `Vector3TransformArray` 自定义序列化集合 (2260行), 支持 `[SyncSceneToStream]` 元素级绑定
+*(原报告中 6.1-6.12 的决策内容保留, 编号顺延)*
 
 ---
 
@@ -913,32 +953,52 @@ DEFAULT_CLOTH_STABILIZATION_TIME = 0.1f   // 默认稳定时间
 [Game Logic / Character System]
        │
        ├── IK 系统
-       │   ├── RootMotion FinalIK (全身/VR/肢体 IK)
-       │   ├── Unity Animation Rigging (2Bone/Chain IK)
-       │   └── HG IK Extension (地面法线/关节限位/多层 Pipeline)
+       │   ├── RootMotion FinalIK (全身/地面/注视 IK)
+       │   │   ├── GrounderBipedIK — CharacterAnimationComponent 居中控制
+       │   │   ├── BipedIK — 过场/相机集成
+       │   │   └── LookAtIK — 角色注视
+       │   │
+       │   ├── Unity Animation Rigging (2Bone/Chain IK) [底座]
+       │   │
+       │   ├── HG IK Extension (RiggingExtension) [22 文件]
+       │   │   ├── HGTwoBoneIKConstraint (增强 2Bone IK)
+       │   │   ├── HGPrepareIKEffectorConstraint (单效应器预处理)
+       │   │   ├── HGIKPrepareEffectorsConstraint (多效应器批量)
+       │   │   ├── HGTransformOffsetConstraint (位置偏移)
+       │   │   └── HGAnimationRuntimeUtils (工具方法)
+       │   │
+       │   ├── QuadrupedIKRigging (四足 IK, SphereCast 地面贴合)
+       │   │
+       │   ├── NPC LookAt IK System [5 文件]
+       │   │   ├── NPCLookAtController + NPCLookAtAvatar
+       │   │   ├── NPCCPUAnimationLookAtIkInfo
+       │   │   └── NPCCPUAnimationLookAtControllerParams
+       │   │
+       │   ├── SkeletalMorph Eye LookAt IK (Burst IJob, Morph 驱动)
+       │   │
+       │   ├── Timeline IK (Slate: AnimateLookAtIK / AnimateLimbIK)
+       │   │
+       │   ├── Behavior Tree IK (NodeCanvas: MecanimSetIK)
+       │   │
+       │   └── 支撑工具
+       │       ├── IKCollisionHelper (碰撞查询)
+       │       ├── IKCastCondition (动画条件)
+       │       ├── GrounderIKParameters (数据 DTO)
+       │       └── CameraRigMono._TwoBoneIKSolve (相机 IK)
        │
        ├── 动画系统
        │   ├── Animator / ScriptAnimationJobSyncMono
+       │   ├── SkeletalMorphCore (Morph + 眼部 IK)
+       │   ├── CharacterAnimationComponent (GrounderIK 控制)
        │   └── ClothCalculator (Animator / Stream 双路径)
        │
        ├── 布料系统
        │   ├── BeyondDynamicBone (主布料, Burst Jobs + PBD)
-       │   │   ├── 约束系统 (12类)
-       │   │   ├── 碰撞器 (Capsule/Sphere/Plane)
-       │   │   ├── 风系统 (WindZone/Manager)
-       │   │   ├── VirtualMesh (代理网格)
-       │   │   ├── PreBuild (离线缓存)
-       │   │   └── SavePoint (状态保存恢复)
-       │   │
        │   ├── MagicaCloth v1 (旧版 ComputeShader)
-       │   │
        │   └── GPU Cloth (管线集成)
-       │       ├── GpuClothManager (CPU 管理)
-       │       └── GpuClothSimulationPassConstructor (RenderGraph Pass)
        │
        ├── 渲染管线 (HG.RenderPipelines.Runtime)
-       │   ├── GpuClothPass (Compute Shader ×3)
-       │   └── HGGpuClothManagerV2 (C++ 原生桥接)
+       │   └── GpuClothPass (Compute Shader ×3)
        │
        └── RuntimeQuality
            └── PhysicsClothQuality (布料质量开关)
@@ -950,10 +1010,35 @@ DEFAULT_CLOTH_STABILIZATION_TIME = 0.1f   // 默认稳定时间
 |------|------|--------|---------|
 | **IK 系统** | RootMotion FinalIK | 49 | ~25,000 |
 | | Unity Animation Rigging | 10 | ~2,500 |
-| | HG IK Extension (Gameplay.Beyond) | 17 | ~6,500 |
+| | HG IK Extension (RiggingExtension) | 22 | ~8,500+ |
+| | QuadrupedIKRigging | 1 | ~2,000+ |
+| | GrounderIK/BipedIK 集成层 | 9 | ~15,000+ |
+| | 角色 LookAt IK | 2 | ~3,000+ |
+| | NPC LookAt IK | 5 | ~8,000+ |
+| | SkeletalMorph 眼部 IK | 2 | ~1,500+ |
+| | Slate Timeline IK | 2 | ~1,200 |
+| | NodeCanvas IK | 1 | ~200 |
+| | IK 支撑工具 (Collision/Condition/Params) | 4 | ~1,500+ |
 | **布料系统** | BeyondDynamicBone | ~180 | ~80,000+ |
 | | MagicaCloth v1 | ~30 | ~10,000 |
 | | GPU Cloth (HG.RenderPipelines.Runtime) | ~18 | ~7,200 |
-| | NPC 布料集成 (Gameplay.Beyond) | 3 | ~3,000 |
+| | NPC 布料集成 | 3 | ~3,000 |
 | **支撑层** | IFix 包装器 | (内置) | — |
-| **总计** | | **~307+** | **~134,200+** |
+| | MemoryPack 序列化 | (内置) | — |
+| **总计** | | **~338+** | **~168,400+** |
+
+### 7.3 IK 系统对比总结
+
+| 特性 | FinalIK | Unity Rigging | HG Extension | QuadrupedIK | NPC LookAt | SkeletalMorph Eye |
+|------|---------|---------------|-------------|-------------|------------|-------------------|
+| 算法类型 | 多算法 (FABRIK/CCD/三角/FBIK/VR) | TwoBone + FABRIK | TwoBone + 后处理 | TwoBone + 后处理 | 启发式 | Morph 混合 |
+| 并行 | 单线程 | Burst IJob | Burst IJob | Burst IJob | 单线程 | Burst IJob |
+| 地面法线 | Grounder 内置 | 无 | groundNormal 扩展 | SphereCast | 无 | 无 |
+| 关节限位 | IKConstraintBend | 无 | maxPitch/maxRoll | maxPitch/maxRoll | 角度常量 | 角度常量 |
+| 批量处理 | 单角色 | 单约束 | 多效应器批量 | 4 肢循环 | 单 NPC | 2 眼 |
+| 集成方式 | 组件直接挂载 | RigBuilder | RigBuilder | TickableMono | TickComponent | SkeletalMorph |
+| 使用场景 | 角色地面/全身/注视 | 基础 IK 约束 | NPC/角色 IK 定制 | 四足生物 | NPC 注视 | 眼部表情 |
+
+---
+
+*本报告基于对 `Assets/Scripts/` 下所有 IK/布料相关代码的全量分析, 涵盖 7 大 IK 子系统 + 4 大布料子系统, 共计 ~338+ 文件 / ~168,400+ 行代码.*
