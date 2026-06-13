@@ -1,4 +1,4 @@
-# 净室实现文档: 预渲染Passes（Binning/Shadow/Culling）
+# 技术架构文档: 预渲染Passes(Binning/Shadow/Culling)
 
 ## 概述
 

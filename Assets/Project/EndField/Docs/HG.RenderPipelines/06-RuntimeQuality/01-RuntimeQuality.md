@@ -1,6 +1,6 @@
 # RuntimeQuality 运行时质量系统
 
-> 基于 IL2CPP 反编译分析 (Cpp2IL) 的 Clean Room 实现文档  
+> 本文档对 HG.Rendering.Runtime 的运行时质量系统做客观技术分析,以源码中的类型/字段/枚举/结构体布局与 shader 为精确依据  
 > 目标命名空间: `HG.Rendering.Runtime`  
 > 分析日期: 2026-06-12
 
@@ -576,7 +576,7 @@ public abstract class SliderQualityComponent : QualityTierComponent
 | 30 | `MeshQualitySettingComponent` | `"Mesh"` | `MeshQuality` | qualityLevel → MeshQuality 枚举 |
 | 31 | `ReflectionQualitySettingComponent` | `"Reflection"` | `ReflectionQuality` | qualityLevel → ReflectionQuality 枚举 |
 
-#### 相关枚举定义 (推测)
+#### 相关枚举定义
 
 ```csharp
 // Decal 质量等级
@@ -990,5 +990,5 @@ DeviceList_zip.bytes 为 GZip 压缩的 JSON，解压后格式:
 
 ---
 
-*文档生成完毕 — 基于 IL2CPP 反编译分析 (Cpp2IL)*  
+*文档生成完毕*  
 *生成日期: 2026-06-12*

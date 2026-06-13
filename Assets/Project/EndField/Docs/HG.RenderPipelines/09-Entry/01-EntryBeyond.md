@@ -1,4 +1,4 @@
-﻿# 模块一：Entry.Beyond 净室实现文档
+﻿# 模块一：Entry.Beyond 技术架构分析
 
 **分析日期：** 2026-06-12
 **模块路径：** `Assets/Project/EndField/Assets/Scripts/Entry.Beyond/`
@@ -62,7 +62,7 @@ ISimpleStateNode<GameState> (interface, extends ILuaCallCSharp)
        └─ GameQuitState
             └─ 退出游戏、清理资源
 ```
-# 模块一：Entry.Beyond 净室实现文档
+# 模块一：Entry.Beyond 技术架构分析
 
 **分析日期：** 2026-06-12
 **模块路径：** `Assets/Project/EndField/Assets/Scripts/Entry.Beyond/`

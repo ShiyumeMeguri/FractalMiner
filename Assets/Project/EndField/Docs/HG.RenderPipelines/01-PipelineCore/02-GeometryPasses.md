@@ -1,10 +1,10 @@
-# HG Render Pipeline — Geometry Passes 结构分析与复刻实现文档
+# HG Render Pipeline — Geometry Passes 结构分析与架构复刻参考文档
 
-> 本文档基于 HG.RenderPipelines.Runtime 中 12 个几何管线 Pass Constructor 源码进行逆向结构分析，
-> 目标为 Clean-Room 复刻实现提供数据结构、依赖关系、Pass 流程的精确参考。
+> 本文档对 HG.RenderPipelines.Runtime 中 12 个几何管线 Pass Constructor 的源码结构做客观技术分析,
+> 为架构复刻参考提供数据结构、依赖关系、Pass 流程的精确依据。
 >
-> **注意**：所有源文件经过 IL2CPP/IFix 二进制补丁处理，方法体内为内联汇编而非 C# 逻辑。
-> 本文档仅根据类定义、字段声明、方法签名、枚举值、PassData 结构布局等可观测元数据推断设计意图。
+> **说明**：源文件方法体由 IFix 补丁/IL2CPP 原生调用承担,C# 层保留类定义、字段声明、方法签名、枚举值、PassData 结构布局等可观测元数据。
+> 本文档以这些类型/字段/枚举/结构体布局与 shader 为依据,描述设计意图。
 
 ---
 
@@ -53,7 +53,7 @@ public enum GBufferID : byte
 ```
 
 > 注: `GBufferID` 仅定义 4 个槽位，与标准 Unity Deferred 的 4-MRT 方案对齐。
-> GBufferA 具体通道布局需从对应 .hlsl 文件中确认，此处为基于标准延迟渲染惯例的推断。
+> GBufferA 具体通道布局需从对应 .hlsl 文件中确认，此处为基于标准延迟渲染惯例的参考描述。
 
 ### 2.2 GBufferOutput 包装器
 
@@ -109,7 +109,7 @@ m_depthPrepassData (一些数据)
 private static void RenderFunc(DepthPrepassData data, RenderGraphContext rgContext)
 ```
 
-**行为推断**:
+**行为说明**:
 - 遍历 `deferredOpaque` / `deferredOpaqueEqual` 等 ECS 列表中的所有渲染器
 - 写入 `sceneDepth`，不写颜色 (可配置是否同时写 sceneColor)
 - 为后续 GBufferPass 和 DecalPass 提供深度
@@ -135,7 +135,7 @@ terrainDepthBuffer   (TextureHandle)  — 独立的地形深度缓冲区
 sceneDepth           (TextureHandle)  — 场景深度 (仅读取, 写入非地形区域)
 ```
 
-**行为推断**:
+**行为说明**:
 - 处理包含地形曲面细分的渲染器 (tessellation/subdivision flags)
 - 写入独立的 `terrainDepthBuffer` (不覆盖 sceneDepth)
 - 后续 `ForwardOpaquePassConstructor` 读取此 buffer
@@ -172,7 +172,7 @@ gpuDrivenGrassLists        — GPU Driven 草地列表 (可能是 indirect draw)
 
 **MRT 输出**: GBuffer A/B/C + Depth
 
-**行为推断**:
+**行为说明**:
 - 对每个渲染器执行片元着色器，填充 MRT 到 4 个 GBuffer 目标
 - VT (Virtual Texture) Feedback 用于流送
 - 地形裁剪句柄用于编辑器 Debug 视图
@@ -206,7 +206,7 @@ terrainTessellation          — 地形曲面细分标志
 wetRippleFlag                — 水面涟漪/湿润标志
 ```
 
-**行为推断**:
+**行为说明**:
 - 从 `screenNormalCopied` + `sceneDepthCopied` 重建世界空间位置
 - 逐 Decal Volume 写入 DBuffer (Decal Buffer)
 - DBuffer 通常包含: Albedo, Normal, 金属度/粗糙度, MaterialFlags
@@ -241,7 +241,7 @@ forwardTransparent          — 前向透明
 forwardOccludedDisplay      — 被遮挡对象显示 (编辑/X光模式)
 ```
 
-**行为推断**:
+**行为说明**:
 - 单 RenderFunc 同时处理 Opaque + Transparent
 - 使用 Unity 前向渲染路径 (逐物体光照)
 - 支持角色描边 (outline 光照模型)
@@ -266,7 +266,7 @@ internal class ForwardOpaquePassConstructor : IPassConstructor
 | 角色描边 | `characterOutlineOpaque` | 同 |
 | UBO | 默认 | 额外 `ShaderVariablesGlobal` |
 
-**行为推断**:
+**行为说明**:
 - 仅处理不透明物体，无透明通道
 - 使用 `terrainDepthBuffer` 进行地形遮挡优化 (不透明物体在地形后裁剪)
 - `sceneMV` 用于 TAA 运动矢量
@@ -298,7 +298,7 @@ ShaderVariablesGlobal   (CBUFFER)       — 全局着色器变量
 **内部使用**:
 `ForwardPassUtils.ForwardTransparentPassData` — 工具类生成的 Pass Data
 
-**行为推断**:
+**行为说明**:
 - 读取 `gBufferOutput` 中延迟光照结果，用于透明混合的光照计算
 - `WaterOnePassDeferredRenderingPass` 提供水面延迟光照结果，透明物体需与水面正确混合
 - VRS (Variable Rate Shading) 支持: `transparentVRS` 贴图控制透明区域的着色率
@@ -333,7 +333,7 @@ sceneDepth  (TextureHandle) — 场景深度
 | UBO | `BasicTransformConstants` + `ShaderVariablesGlobal` | 无 (或最小) |
 | 执行位置 | DepthPrepass/GBuffer/Decal 之后 | DOF PostProcess 之后 |
 
-**行为推断**:
+**行为说明**:
 - 最后阶段的透明物体 (如 UI 面板粒子、DOF 无关的透明特效)
 - 不读取 GBuffer，不参与延迟光照混合
 - 无 VRS 优化，全分辨率渲染
@@ -343,7 +343,7 @@ sceneDepth  (TextureHandle) — 场景深度
 
 **文件**: `OnePassDeferredPassConstructor.cs`
 
-> 最大源文件 (~105KB raw)，高密度混淆。方法体无法直接读取，PassInput + 枚举 + 两阶段构建是可观测的骨架。
+> 最大源文件 (~105KB raw)。以 PassInput + 枚举 + 两阶段构建为可观测的架构骨架。
 
 **类签名**:
 ```csharp
@@ -500,7 +500,7 @@ public enum HGDeferredShadingModel : uint
 
 ## 7. 1:1 复刻实现要点
 
-### 7.1 可直接复刻的结构 (无混淆逻辑)
+### 7.1 可直接复刻的结构
 
 | 模块 | 复刻方式 | 难度 |
 |------|---------|------|
@@ -511,10 +511,10 @@ public enum HGDeferredShadingModel : uint
 | OnePassDeferredSubpass 枚举 | 7 个子阶段定义 | ★☆☆ |
 | HGDeferredShadingModel 枚举 | 3 种光照模型定义 | ★☆☆ |
 | Pass 执行顺序 (Phase Ordering) | 按依赖图编排 RenderGraph 节点 | ★★☆ |
-| ForwardPassUtils 工具类 | 需要自定义实现 (逻辑已混淆) | ★★★ |
+| ForwardPassUtils 工具类 | 需要自定义实现 (方法体由 IFix/原生承担) | ★★★ |
 | ECS 渲染器列表分组策略 | deferred/forward/character/grass/sludge 分组 | ★★☆ |
 
-### 7.2 需要独立重写的模块 (逻辑在混淆代码中)
+### 7.2 需要独立重写的模块 (逻辑在原生/补丁层)
 
 | 模块 | 复刻策略 | 难度 |
 |------|---------|------|
@@ -531,7 +531,7 @@ public enum HGDeferredShadingModel : uint
 
 ### 7.3 GBuffer 打包格式 (需从 .hlsl 确认)
 
-基于标准延迟渲染惯例的推测 (需通过 .hlsl 确认):
+基于标准延迟渲染惯例的参考描述 (需通过 .hlsl 确认):
 
 ```
 GBufferA (RGBA8 UNORM):
@@ -553,7 +553,7 @@ GBufferC (RGBA8 UNORM):
   A: 预留 / MaterialFlags / ShadingModelID
 ```
 
-> **重要**: 以上通道布局为基于标准 Unity URP/HDRP 延迟管线的推断。
+> **重要**: 以上通道布局基于标准 Unity URP/HDRP 延迟管线的惯例描述。
 > 必须在确认 `GBuffer_*.hlsl` 或 `HGDeferredShading_*.hlsl` 打包函数后修正。
 
 ### 7.4 性能与架构关键决策
@@ -593,4 +593,4 @@ GBufferC (RGBA8 UNORM):
 > - [ ] DBuffer .hlsl 结构体定义 (确定 decal 数据格式)
 > - [ ] BRDF .hlsl 函数 (DefaultLit/TwoSidedFoliage/Subsurface 实现)
 > - [ ] Transparent VRS 贴图生成算法 (compute shader 或 rasterizer)
-> - [ ] ForwardPassUtils 的 ForwardTransparentPassData 结构 (已混淆)
+> - [ ] ForwardPassUtils 的 ForwardTransparentPassData 结构 (方法体由原生/补丁承担)

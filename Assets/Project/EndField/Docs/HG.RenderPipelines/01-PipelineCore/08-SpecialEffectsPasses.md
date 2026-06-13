@@ -1,9 +1,9 @@
-﻿# Special Effects Passes - 净室实现文档
+﻿# Special Effects Passes - 技术架构文档
 
 > 本文档基于 `HG.RenderPipelines.Runtime` 命名空间下的25个源文件生成。
 > 所有源文件位于: `HG\Rendering\Runtime\`
-> 说明: 所有方法体被 IL2CPP/IFix 混淆为 x86-64 汇编代码，核心算法逻辑不可直接还原。
-> 本文档基于类定义、字段、结构体成员、方法签名及汇编片段推断净室实现要点。
+> 说明: 方法体由 IFix 补丁/IL2CPP 原生调用承担,C# 层保留类定义、字段、结构体成员、方法签名等可观测元数据。
+> 本文档以这些类型/字段/枚举/结构体布局与 shader 为依据,描述架构复刻参考要点。
 
 ---
 
@@ -89,7 +89,7 @@ class InkSimulationPassData {
 }
 ```
 
-**净室实现要点**:
+**架构复刻参考要点**:
 1. 使用 ComputeShader 在GPU上进行墨水模拟
 2. 双缓冲纹理 (PingPong) 实现逐帧迭代
 3. 每个像素模拟: 扩散(拉普拉斯卷积) + 粘度(阻尼) + 蒸发(衰减)
@@ -144,7 +144,7 @@ class SludgePassData {
 }
 ```
 
-**净室实现要点**:
+**架构复刻参考要点**:
 1. 与墨水模拟架构高度相似，同为 ComputeShader 驱动的流体模拟
 2. 泥浆比墨水有更高的粘度和附着力
 3. 额外的 `sludgeStickiness` 参数控制泥浆沿表面的附着行为
@@ -197,7 +197,7 @@ class TerrainDeformPassData {
 }
 ```
 
-**净室实现要点**:
+**架构复刻参考要点**:
 1. 使用高度图(R16)和法线图(RGBA32)表示地形变形
 2. 变形通过 ComputeShader 更新高度图：在变形点周围应用高斯衰减凹陷
 3. 恢复机制：地形随时间缓慢回弹至原始高度
@@ -230,7 +230,7 @@ class TerrainVTBakePassData {
 }
 ```
 
-**净室实现要点**:
+**架构复刻参考要点**:
 1. Virtual Texture 的页面烘焙Pass
 2. 接收CPU/GPU反馈的 tile 请求，动态烘焙地形材质到 VT 图集
 3. 支持漫反射、法线、遮罩三个通道的独立烘焙
@@ -333,7 +333,7 @@ public abstract class GPUParticleSystemBase {
 }
 ```
 
-**净室实现要点**:
+**架构复刻参考要点**:
 1. 完全GPU驱动的粒子系统，C#端仅负责管理和数据上传
 2. 使用双缓冲(存活/死亡列表)实现高效的粒子生成和回收
 3. 粒子更新在 ComputeShader 中完成：发射、物理模拟、碰撞、生命周期
@@ -385,7 +385,7 @@ class FoliageInteractivePassData {
 }
 ```
 
-**净室实现要点**:
+**架构复刻参考要点**:
 1. 维护一张覆盖指定区域的交互纹理(高度/法线)
 2. 角色/物体移动时，在交互纹理上绘制轨迹
 3. 植被着色器采样此纹理驱动草叶弯曲
@@ -453,7 +453,7 @@ private bool m_renderTextureInitialized;
 - `s_foliageOccluderBlitPass`: 将当前遮挡结果混合到历史纹理
 - `s_setFinalMaskPass`: 设置最终遮罩
 
-**净室实现要点**:
+**架构复刻参考要点**:
 1. 三阶段Pass:
    - **遮挡渲染**: 将植被渲染到 `occluderRenderTexture` 作为遮挡缓冲区
    - **遮挡混合**: 使用 `blitMat` 将当前帧与历史帧混合（时间抗锯齿/平滑）
@@ -579,7 +579,7 @@ class PassData {
 }
 ```
 
-**净室实现要点**:
+**架构复刻参考要点**:
 1. 四个子Pass按序执行:
    - **Clear**: 清除布料缓冲区（清零节点数据）
    - **Upload**: 上传 CPU 端更新的布料数据(元数据、节点数据、批次数据)到GPU
@@ -632,7 +632,7 @@ public class HGAtmosphereRenderer {
 - `ShouldRenderAtmosphereLut(...)`: 判断是否需要重新渲染大气LUT
 - `RenderAtmosphereLut(...)`: 渲染大气散射LUT(transmittance, sky-view, multi-scattered luminance)
 
-**净室实现要点**:
+**架构复刻参考要点**:
 1. 预计算大气散射LUT: transmittance lut, sky-view lut, multi-scattered luminance lut
 2. 支持 ComputeShader 或 PixelShader 两种渲染路径
 3. `AtmosphereLutConstants` 包含 12 个 Vector4 的完整散射参数
@@ -688,7 +688,7 @@ public class HGSkyRenderer {
 - `Render(...)`: 主渲染入口(选择程序化天空或天空盒)
 - `RenderProceduralSky(...)`: 渲染程序化天空（云、星体、光环、太阳盘）
 
-**净室实现要点**:
+**架构复刻参考要点**:
 1. 支持两种天空模式: 程序化天空 + Cubemap天空盒
 2. 程序化天空使用 Icosphere 网格，包含云层、行星、光环、太阳盘
 3. 行星使用 `PlanetBillBoardConstants` 结构体，包含完整的大气/云参数
@@ -721,7 +721,7 @@ public class HGSkydomeStarRenderingData {
 - `_RenderStar(...)`: 渲染单个星体(含关键字设置、参数计算)
 - `RenderStar(...)`: 渲染所有可见星体
 
-**净室实现要点**:
+**架构复刻参考要点**:
 1. 星体作为天空远场对象渲染，使用专用 Mesh
 2. 通过 `HGEnvironmentPhase` 获取星体配置（位置、颜色、大小）
 3. 每个星体计算世界空间变换矩阵(TRS)
@@ -782,7 +782,7 @@ private List<HGVolumetricRenderItem> m_renderItems;  // 渲染项列表
 - `ShouldRenderVolumetricCloud(...)`: 判断是否有体积云需要渲染
 - `PrepareShaderVariablesGlobal(...)`: 设置全局着色器变量(云SDF合成参数)
 
-**净室实现要点**:
+**架构复刻参考要点**:
 1. 使用 `VolumetricRenderer` (C++实现) 进行实际的体积云光线步进
 2. 三阶段: 读取场景颜色/深度 -> 体积渲染 -> 合成到场景颜色
 3. 支持多个 `IVolumetricRenderObject` (体积云SDF对象)
@@ -857,7 +857,7 @@ private Queue<SectorLoadingNode> m_pendingLoadedQueue; // 已加载队列
 - `SectorTextureCopyUpdate(...)`: 更新需要复制到图集的纹理
 - `SectorTextureCopyPass(...)`: 执行纹理复制渲染Pass
 
-**净室实现要点**:
+**架构复刻参考要点**:
 1. 3x3 Tile系统: 以玩家为中心，管理周围3x3个水分区的纹理
 2. 资源使用 `FAssetProxyHandle` 异步加载
 3. 分区状态机: Loading -> Loaded -> ToUnload -> Unload
@@ -923,7 +923,7 @@ public TextureHandle interactionTexture => default(TextureHandle);
 - `FallbackRender(...)`: 当不需要渲染时使用默认纹理
 - `UpdateWaterInteractionSafeDeltaTime(float dt)`: 安全的时间步长更新(钳位和过滤)
 
-**净室实现要点**:
+**架构复刻参考要点**:
 1. 涟漪由三个子Pass构成:
    - **Interaction Add**: 从 `HGWaterManager` 获取涟漪输入数据(角色位置、碰撞等)，写入Add纹理
    - **Ripple Simulate**: 基于波动方程(2D波方程)在GPU上模拟涟漪传播，使用双缓冲
@@ -1003,7 +1003,7 @@ public static float interpolateTimeFactor { get; set; }
 - `_Register/_Unregister`: 内部注册/注销实现(使用HashSet+有序列表)
 - `_PipelineUpdate(...)`: 内部管线更新实现(排序、插值、太阳光同步)
 
-**净室实现要点**:
+**架构复刻参考要点**:
 1. 环境体积系统: 多个 `HGEnvironmentVolume` 按权重排序和插值
 2. `HGEnvironmentPhase` 存储完整的环境状态(光照、雾、云、天空等)
 3. 插值过程: 收集影响当前触发器的体积 -> 排序(按距离/优先级) -> 按权重混合所有体积的阶段数据

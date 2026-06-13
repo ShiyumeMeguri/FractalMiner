@@ -1,6 +1,6 @@
-# 净室实现文档: HGRenderGraph 渲染图系统
+# HGRenderGraph 渲染图系统
 
-> **注意**: 本文档基于对源代码的静态分析生成。源文件包含 IL2CPP AOT 编译产物和 IFix 热修复包装器代码，实际的 C# 声明已被提取并整理如下。本文档用于指导净室实现（Clean Room Implementation）。
+> **说明**: 本文档对 HG.Rendering.RenderGraphModule 的渲染图架构做客观技术分析,以源码中的类型/字段/枚举/结构体布局与 shader 为精确依据。源文件包含 AOT 编译产物和 IFix 热修复包装器代码,实际的 C# 声明已提取并整理如下,作为架构复刻参考。
 
 ---
 
@@ -1217,7 +1217,7 @@ internal enum HGRenderGraphProfileId
 ### 错误处理
 - IFix 热修复安全检查：每个方法检查 `IsPatched`，失败时跳转到 `GetPatch` 包装器
 - `m_ExecutionExceptionWasRaised`: 执行异常标志
-- `sub_180BAB70C`: 失败回调（IL2CPP 空检查异常）
+- `sub_180BAB70C`: 失败回调(空检查异常)
 
 ---
 

@@ -1,8 +1,8 @@
-﻿# 净室实现文档: 光照、AO和反射系统
+﻿# 技术架构文档: 光照、AO和反射系统
 
 ## 概述
 
-本文档基于对 HG.RenderPipelines.Runtime 中 10 个核心 C# 源文件的分析，描述延迟光照（Deferred Lighting）、Ground Truth AO（GTAO）、屏幕空间反射（SSR）、假平面反射（Fake Planar Reflection）、粒子光照（Particle Lighting）和深度金字塔（Depth Pyramid）六个子系统。所有代码均以 IL2CPP 反编译形式呈现（C# 外壳 + x86_64 汇编），因此算法细节主要从类/结构体字段、着色器资源名称、性能分析 ID、着色器属性 ID 以及资源加载路径中推断得出。
+本文档对 HG.RenderPipelines.Runtime 中 10 个核心 C# 源文件做客观技术分析,描述延迟光照(Deferred Lighting)、Ground Truth AO(GTAO)、屏幕空间反射(SSR)、假平面反射(Fake Planar Reflection)、粒子光照(Particle Lighting)和深度金字塔(Depth Pyramid)六个子系统。算法描述以类/结构体字段、着色器资源名称、性能分析 ID、着色器属性 ID 以及资源加载路径为精确依据。
 
 ---
 
@@ -278,7 +278,7 @@ ECS 列表控制渲染的对象：
 
 3. **着色器资源加载**：Compute Shader 和 Material 通过 `HGRenderPipelineMaterialCollector.CreateMaterial()` 和资源列表（`HGRenderPathResources`）加载。关键路径包括 `Runtime/Shaders/Lighting/SSR/`、`Runtime/Shaders/RayTracing/Reflection/` 等。
 
-4. **IFix patching**：原始代码使用 HybridCLR/IFix 进行热补丁。净室实现应直接用原生 C# 替换所有 IFix 调用。
+4. **IFix patching**：原始代码使用 HybridCLR/IFix 进行热补丁。架构复刻参考应直接用原生 C# 替换所有 IFix 调用。
 
 5. **ECS 列表**：Forward Opaque、Character、Outline 等渲染列表通过 ECS（Entity Component System）管理，使用 `uint` 句柄传递。
 

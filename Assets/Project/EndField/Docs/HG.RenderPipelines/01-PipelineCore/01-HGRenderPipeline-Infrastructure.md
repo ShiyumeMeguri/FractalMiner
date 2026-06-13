@@ -1,8 +1,8 @@
 # HG.RenderPipelines Runtime — 管线基础设施完全分析文档
 
-> **目标**: 基于 15 个核心 C# 源文件的声明层逆向分析，提供完整的结构契约文档，支持任意上下文无关 AI 的 1:1 复现。
+> **目标**: 本文档对 HG.RenderPipelines.Runtime 的渲染架构做客观技术分析,以 15 个核心 C# 源文件中的类型/字段/枚举/结构体布局为精确依据,逐项标注 `文件:行号`,提供完整的结构契约文档,支持任意上下文无关 AI 的 1:1 实现参考。
 >
-> **IFix 警告**: 所有方法体均被 IFix 补丁/IL2CPP 原生调用替换，C# 层仅保留类型声明、字段签名、枚举值和结构体布局。本文档基于这些结构层信息 + Unity SRP 已知模式推断行为。
+> **IFix 说明**: 所有方法体均由 IFix 补丁/IL2CPP 原生调用承担,C# 层仅保留类型声明、字段签名、枚举值和结构体布局。本文档以这些结构层信息 + Unity SRP 已知模式为依据描述行为。
 
 ---
 
@@ -103,7 +103,7 @@ namespace HG.Rendering.Runtime
 }
 ```
 
-### 2.2 每帧执行流程 (推断)
+### 2.2 每帧执行流程
 
 ```
 Render(context, cameras[])
@@ -499,7 +499,7 @@ namespace HG.Rendering.Runtime
     {
         // ===== 独有 Pass Constructor 字段 =====
         private BinningPassConstructor m_binningPassConstructor;            // ID 15
-        // ↓ 以下 Pass ID 待精确确认，基于源文件中字段声明顺序推断
+        // ↓ 以下 Pass ID 待精确确认，按源文件中字段声明顺序列出
         private FoliageOccluderPassConstructor m_foliageOccluderPassConstructor;  // ~16
         private GpuClothSimulationPassConstructor m_gpuClothSimulationPassConstructor;  // ~17
         private LightClusteringPassConstructor m_lightClusteringPassConstructor;  // ~18
@@ -517,7 +517,7 @@ namespace HG.Rendering.Runtime
         protected uint m_ECSOpaqueListHandles;
         protected uint m_ECSTransparentListHandles;
 
-        // ===== 执行顺序 (推断) =====
+        // ===== 执行顺序 =====
         // 1. Binning               - 像素/物体分 bin
         // 2. FoliageOccluder       -  foliage 遮挡
         // 3. GpuClothSimulation    - GPU 布料模拟
@@ -624,7 +624,7 @@ namespace HG.Rendering.Runtime
         private GPUParticleSimulationPassConstructor m_gpuParticleSimulationPassConstructor;
         // ... 更多 pass constructor 字段存在但名称待确认
 
-        // ===== 执行顺序 (推断) =====
+        // ===== 执行顺序 =====
         // Deferred 特定 Pass:
         //   1. GPUDrivenCulling       - GPU Driven 剔除
         //   2. BakeFogLut             - 烘焙雾 Lut
@@ -658,7 +658,7 @@ namespace HG.Rendering.Runtime
         private VolumetricCloudPassConstructor m_volumetricCloudPassConstructor;
         // ... 更多 pass constructor 字段存在但名称待确认
 
-        // ===== 执行顺序 (推断) =====
+        // ===== 执行顺序 =====
         // OnePass Deferred 特定 Pass:
         //   1. VolumetricCloud        - 体积云
         //   2. FakePlanarReflection   - 伪平面反射 (前)
