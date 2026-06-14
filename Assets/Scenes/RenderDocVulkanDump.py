@@ -13,12 +13,12 @@ import os, math, re
 
 # ===================== 配置 =====================
 OUTPUT_DIR   = r"D:\Ruri\02.Unity\Project\AzureNihil\Assets\Screenshots\RenderPipelineDumpOutput"
-TARGET_RANGE = "all"   # "all" | "0"(当前选中Event) | "120-400" | "120-400,900-950"
-DUMP_OUTPUTS = True    # dump 光栅 RT 输出 + compute UAV 输出 (= 各 pass 写出的内容, 看场景如何演变)
-DUMP_INPUTS  = True    # dump 采样输入 (仅匹配 INPUT_FILTER 的 pass, 防爆量)
 INPUT_FILTER = ["bloom","uber","prefilter","tsr","blit","copy","deferred","cluster",
                 "gi","voxel","exposure","tonemap","fog","cloud","atmos","reflect","upsample","final"]
-SAVE_EXR     = True    # float 贴图额外存 EXR (HDR 精确, PNG 会钳 [0,1] 把 >1 的都显示成白)
+TARGET_RANGE = "all"   # "all" | "0"(当前选中Event) | "120-400"
+DUMP_OUTPUTS = False   # ★ 输出上轮已 dump 过; 这轮只补"输入", 专看 bloom prefilter 的 _BlitTexture 到底绑了哪张图
+DUMP_INPUTS  = True
+SAVE_EXR     = True    # float 贴图额外存 EXR (HDR 精确, PNG 会钳 [0,1])
 MAX_DUMP     = 8000
 # ================================================
 
@@ -26,16 +26,28 @@ _manifest = []
 _dump_count = 0
 RES_NAME = {}     # resourceId -> 名字
 TEX_DESC = {}     # resourceId -> TextureDescription
+LABEL_MAP = {}    # eventId -> 上层 debug marker 标签 (如 "EndFieldBloom Prefilter"); draw 命令名常是 vkCmdDraw 无语义
 
 def log(s):
     print(s)
     _manifest.append(s)
 
-def flatten(actions, out):
+def action_name(a, sdfile):
+    try:
+        return a.GetName(sdfile)
+    except Exception:
+        return a.customName if getattr(a, 'customName', None) else ("Action_%d" % a.eventId)
+
+def flatten(actions, out, sdfile, parent_label=""):
+    # 记录每个 action 的"祖先 debug 标签路径"(累积整条): 语义标签 "EndFieldBloom_Prefilter" 常是 draw 的祖父
+    # (中间隔着 vkCmdBeginRenderPass), 只取父级会漏 → 累积全路径, 过滤时子串匹配即可命中.
     for a in actions:
+        LABEL_MAP[a.eventId] = parent_label
         out.append(a)
         if a.children:
-            flatten(a.children, out)
+            nm = action_name(a, sdfile)
+            my = (parent_label + " > " + nm) if parent_label else nm
+            flatten(a.children, out, sdfile, my)
 
 def sanitize(s):
     return re.sub(r'[^A-Za-z0-9_.\-]', '_', str(s))[:90]
@@ -220,17 +232,16 @@ def rw_var_names(state, stage):
 
 def process_event(controller, action):
     eid = action.eventId
-    try:
-        name = action.GetName(controller.GetStructuredFile())
-    except Exception:
-        name = action.customName if getattr(action, 'customName', None) else ("Action_%d" % eid)
+    raw_name = action_name(action, controller.GetStructuredFile())
+    label = LABEL_MAP.get(eid, "")
+    name = (label + " / " + raw_name) if label else raw_name   # 显示名带 debug 标签 (dump_one 直接用 name)
     controller.SetFrameEvent(eid, True)
     state = controller.GetPipelineState()
     stages = active_stages(state)
     if not stages:
         return  # marker / 非绘制
-    low_name = name.lower()
-    want_inputs = DUMP_INPUTS and (not INPUT_FILTER or any(k in low_name for k in INPUT_FILTER))
+    match_str = (label + " " + raw_name).lower()               # 过滤: 标签 + 命令名一起匹配
+    want_inputs = DUMP_INPUTS and (not INPUT_FILTER or any(k in match_str for k in INPUT_FILTER))
 
     # --- 输出: 光栅 RT (color outputs) ---
     if DUMP_OUTPUTS:
@@ -298,7 +309,7 @@ def main(controller):
         TEX_DESC[t.resourceId] = t
 
     all_actions = []
-    flatten(controller.GetRootActions(), all_actions)
+    flatten(controller.GetRootActions(), all_actions, controller.GetStructuredFile())
     targets = parse_range(all_actions)
 
     log("# RenderDocVulkanDump — %d 个 pass 待处理, 输出目录: %s" % (len(targets), OUTPUT_DIR))
