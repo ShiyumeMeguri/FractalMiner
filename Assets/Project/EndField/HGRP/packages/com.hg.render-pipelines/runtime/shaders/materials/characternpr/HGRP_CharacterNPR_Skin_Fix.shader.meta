@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: c4d8e2f1a3b5067890a1b2c3d4e5f6a7
+ShaderImporter:
+  externalObjects: {}
+  defaultTextures:
+  - _BaseMap: {instanceID: 0}
+  - _ShadowLutTex: {instanceID: 0}
+  - _BumpMap: {instanceID: 0}
+  - _DiffRampMap: {instanceID: 0}
+  - _SDFLightmap: {instanceID: 0}
+  - _SDFMask: {instanceID: 0}
+  - _EmotionMap: {instanceID: 0}
+  - _HighlightMap: {instanceID: 0}
+  - _OutlineMask: {instanceID: 0}
+  - _MainTex: {instanceID: 0}
+  nonModifiableTextures: []
+  userData:
+  assetBundleName:
+  assetBundleVariant:

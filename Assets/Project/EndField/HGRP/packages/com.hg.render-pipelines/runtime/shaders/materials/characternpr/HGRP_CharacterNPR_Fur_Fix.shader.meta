@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: c8b6ea24149943908a9ff5e9d6ebd778
+ShaderImporter:
+  externalObjects: {}
+  defaultTextures:
+  - _BaseMap: {instanceID: 0}
+  - _BumpMap: {instanceID: 0}
+  - _MetallicGlossMap: {instanceID: 0}
+  - _DiffRampMap: {instanceID: 0}
+  - _SpecRampMap: {instanceID: 0}
+  - _FurMap: {instanceID: 0}
+  - _FurDirMap: {instanceID: 0}
+  - _MainTex: {instanceID: 0}
+  nonModifiableTextures: []
+  userData:
+  assetBundleName:
+  assetBundleVariant:
