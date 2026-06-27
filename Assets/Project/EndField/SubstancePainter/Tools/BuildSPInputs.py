@@ -33,6 +33,11 @@ What the batch pipeline does (per character):
       standard OpenGL tangent-space normal with reconstructed blue channel,
       matching the shader's decode  X = R*A, Y = G, Z = sqrt(1 - X^2 - Y^2).
       A pre-decoded `_N_Unpack.png` (if present) is preferred and copied as-is.
+    * HAIR: splits the packed _SplitNormalMap (RG = diffuse normal, BA = spec normal)
+      into two standard OpenGL normals: _normal (-> SP Normal channel, paintable/bakeable)
+      and _specnormal (-> shader _SpecNormalMap param). Replaces the old raw-RGBA copy.
+    * PARALLAX: exports _ParallaxTex.r as _height (-> SP Height channel, paintable/bakeable).
+      Raw bytes kept (shader still sRGB-decodes); _ParallaxTex_ST tiling stays shader-side.
     * Copies _EmissionMap and the HGRP-only aux textures.
     * Dumps all material parameters (Floats/Colors) to params.json.
 
@@ -259,6 +264,41 @@ def build_normal(src: Path, out_dir: Path, prefix: str, suffix: str = 'normal',
     Image.fromarray(out, 'RGB').save(dst)
     return (f'reconstructed blue channel (RG->RGB, flip_green={flip_green}; '
             f'B {arr[..., 2].mean():.0f}->{out[..., 2].mean():.0f})')
+
+
+def split_hair_normal(src: Path, out_dir: Path, prefix: str,
+                      flip_green: bool = False) -> tuple[str, str]:
+    """Hair `_SplitNormalMap`: RG = diffuse 法线 XY, BA = spec 法线 XY (均为裸 [0,1], 无 AG)。
+    拆成两张标准 OpenGL 法线 (重建蓝通道):
+        {prefix}_normal.png      <- RG  (进 SP Normal 通道, 可绘制/可烘焙)
+        {prefix}_specnormal.png  <- BA  (进 EndField_Uber.glsl 的 _SpecNormalMap 参数)
+    decode 与 shadeHair 逐位一致 (X=R, Y=G, 不乘 alpha; Z 由 XY 重建)。"""
+    img = _open_rgba(src)
+    arr = np.asarray(img)  # HxWx4 uint8
+    zeros = np.zeros_like(arr[..., 0])
+
+    # diffuse: 取 R,G 当 X,Y (use_ag=False — 这里的 A 是 spec.Y, 绝不能当 AG 乘子)
+    diffuse_in = np.stack([arr[..., 0], arr[..., 1], zeros], axis=-1)
+    diffuse = reconstruct_normal_arr(diffuse_in, flip_green=flip_green, use_ag=False)
+    Image.fromarray(diffuse, 'RGB').save(out_dir / f'{prefix}_normal.png')
+
+    # spec: 取 B,A 当 X,Y
+    spec_in = np.stack([arr[..., 2], arr[..., 3], zeros], axis=-1)
+    spec = reconstruct_normal_arr(spec_in, flip_green=flip_green, use_ag=False)
+    Image.fromarray(spec, 'RGB').save(out_dir / f'{prefix}_specnormal.png')
+
+    return 'RG->_normal (SP Normal 通道)', 'BA->_specnormal (_SpecNormalMap 参数)'
+
+
+def build_parallax_height(src: Path, out_dir: Path, prefix: str) -> str:
+    """Standard `_ParallaxTex`: 高度在 .r。导出成 SP Height 通道输入 `{prefix}_height.png`。
+    保留"原始 sRGB 字节"(L8, 不做 sRGB->linear) — EndField_Uber.glsl 的 marching 仍在
+    着色器端用 SRGBToLinear_Custom 解码 (与 _ParallaxTex 参数版逐位一致; Height 是数据通道,
+    SP 导入不做色彩管理, 字节原样进 height_tex.tex)。"""
+    img = _open_rgba(src)
+    arr = np.asarray(img)
+    Image.fromarray(arr[:, :, 0], mode='L').save(out_dir / f'{prefix}_height.png')
+    return 'R->_height (SP Height 通道, 原 sRGB 字节; 着色器端解码不变)'
 
 
 def copy_aux(src: Path, out_dir: Path, prefix: str, suffix: str) -> None:
@@ -492,10 +532,9 @@ EF_TEX_PARAM_MAP = {
     '_EmotionMap':         ('_EmotionMap',         'emotionmap'),
     '_HighlightMap':       ('_HighlightMap',       'highlightmap'),
     '_MatcapTex':          ('_MatcapTex',          'matcaptex'),
-    '_SplitNormalMap':     ('_SplitNormalMap',     'splitnormalmap'),
+    '_SplitNormalMap':     ('_SpecNormalMap',      'specnormal'),  # diffuse(RG) 走 Normal 通道; 此处只接 spec(BA)
     '_StrokeMap':          ('_StrokeMap',          'strokemap'),
     '_LineMap':            ('_LineMap',            'linemap'),
-    '_ParallaxTex':        ('_ParallaxTex',        'parallaxtex'),
     '_FurMap':             ('_FurMap',             'furmap'),
     '_FurDirMap':          ('_FurDirMap',          'furdirmap'),
     '_FurDyeMap':          ('_FurDyeMap',          'furdyemap'),
@@ -516,9 +555,10 @@ EF_CHANNEL_FILES = [
     ('specularlevel', 'specularlevel'),
     ('roughness',     'roughness'),
     ('ambientocclusion', 'ao'),
+    ('height',        'height'),   # Standard 视差高度 (原 _ParallaxTex)
     ('normal',        'normal'),
     ('emissive',      'emissive'),
-    ('user1',         'user1'),   # ClearCoat Mask (Standard)
+    ('user1',         'user1'),         # ClearCoat Mask (Standard)
 ]
 
 
@@ -634,7 +674,6 @@ AUX_TEXTURE_MAP = {
     '_ShadowLutTex':  'shadowlut',
     '_OutlineMask':   'outlinemask',
     '_ClearCoatMask': 'user1',         # clearcoat -> SP user1
-    '_ParallaxTex':   'parallaxtex',
 }
 
 
@@ -684,15 +723,23 @@ def process_material(mat_file: Path, guid_index: dict, out_root: Path,
         done.add('_EmissionMap')
         print(f'    _EmissionMap -> {prefix}_emissive')
 
-    # --- _SplitNormalMap: RG=diffuse XY, BA=spec XY 的裸 [0,1] 数据 —
-    #     必须原样 RGBA 拷贝。绝不能走 build_normal (重建蓝通道会覆盖 spec X,
-    #     .convert('RGB') 还会直接丢掉 Alpha = spec Y)。EndField_Uber.glsl 的
-    #     _SplitNormalMap 参数按裸 RGBA 解码 (与 HGRP_Hair_Fix 一致)。
+    # --- _SplitNormalMap: RG=diffuse 法线 XY, BA=spec 法线 XY (裸 [0,1]) — 拆成两张标准
+    #     OpenGL 法线: diffuse 进 SP Normal 通道 (可绘制/可烘焙), spec 进 _SpecNormalMap 参数。
+    #     decode 与 EndField_Uber.glsl shadeHair 逐位一致。仍把 _SplitNormalMap 记进 done —
+    #     部位推断 infer_chara_part 靠 .mat 里的它判 Hair, 且防后面的法线泛化循环重复处理。
     p = resolve('_SplitNormalMap')
     if p:
-        _open_rgba(p).save(mat_out / f'{prefix}_splitnormalmap.png')
+        diff_status, spec_status = split_hair_normal(p, mat_out, prefix, flip_green=flip_green)
         done.add('_SplitNormalMap')
-        print(f'    _SplitNormalMap -> {prefix}_splitnormalmap.png   [raw RGBA copy]')
+        print(f'    _SplitNormalMap -> {prefix}_normal.png + {prefix}_specnormal.png   [{diff_status}; {spec_status}]')
+
+    # --- _ParallaxTex: Standard 视差高度 (.r) — 迁入 SP Height 通道 (可绘制/可烘焙)。
+    #     _ParallaxTex_ST 平铺仍由着色器 marching 处理 (调查: 156 材质里仅 lastrite 2 件 4x 平铺)。
+    p = resolve('_ParallaxTex')
+    if p:
+        status = build_parallax_height(p, mat_out, prefix)
+        done.add('_ParallaxTex')
+        print(f'    _ParallaxTex -> {prefix}_height.png   [{status}]')
 
     # --- ALL normal-type maps (_BumpMap, ...) -> reconstruct blue ---
     for prop in list(textures):

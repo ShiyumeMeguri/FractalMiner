@@ -66,6 +66,8 @@ CHANNEL_SUFFIX_MAP = {
     "metallic":      (("Metallic",), False, ("metallic",), "L8", None),
     "specularlevel": (("SpecularLevel", "Specularlevel"), False, ("specularlevel",), "L8", None),
     "roughness":     (("Roughness",), False, ("roughness",), "L8", None),
+    # Standard 视差高度 (原 _ParallaxTex) → SP Height 通道; 原 sRGB 字节, 着色器端解码
+    "height":        (("Height",), False, ("height",), "L8", None),
     "normal":        (("Normal",), False, ("normal",), "RGB16F", None),
     "emissive":      (("Emissive",), True, ("emissive",), "sRGB8", None),
     # RMOS .b 阴影遮罩 → AO 通道 (EndField_Uber [H1]: shadowMask = getAO)
@@ -74,6 +76,9 @@ CHANNEL_SUFFIX_MAP = {
     "user0":         (("AO", "AmbientOcclusion", "Ao"), False, ("ambientOcclusion", "ambientocclusion"), "L8", None),
     # ClearCoat 遮罩 → User1 通道 (可绘制)
     "user1":         (("User1",), False, ("user1",), "L8", "ClearCoatMask"),
+    # 注: Face/Fur 的 RGB 数据图 (SDFMask/SDFLightmap/Highlight/Emotion/FurDir/FurDye) 不入通道 —
+    # SP 对 RGB(颜色)通道强制色彩管理(sRGB→linear)会篡改线性数据, 且无 API 可改; 它们走 PARAM_SUFFIX_MAP
+    # 的 sampler 参数(原始采样=字节等价)。
 }
 
 PARAM_SUFFIX_MAP = {
@@ -86,10 +91,11 @@ PARAM_SUFFIX_MAP = {
     "emotionmap":         "_EmotionMap",
     "highlightmap":       "_HighlightMap",
     "matcaptex":          "_MatcapTex",
-    "splitnormalmap":     "_SplitNormalMap",
+    "specnormal":         "_SpecNormalMap",   # Hair spec 法线 (原 SplitNormalMap.BA); diffuse 走 Normal 通道
+    "splitnormalmap":     None,               # 旧版导出名 — 已拆成 normal 通道 + specnormal 参数, 忽略
     "strokemap":          "_StrokeMap",
     "linemap":            "_LineMap",
-    "parallaxtex":        "_ParallaxTex",
+    "parallaxtex":        None,               # 已迁到 SP Height 通道 (见 CHANNEL_SUFFIX_MAP["height"])
     "furmap":             "_FurMap",
     "furdirmap":          "_FurDirMap",
     "furdyemap":          "_FurDyeMap",
@@ -340,7 +346,7 @@ def guess_part(mat_name, params, file_suffixes):
         return 6
     if "furmap" in file_suffixes or "furdirmap" in file_suffixes or "furdyemap" in file_suffixes:
         return 4
-    if "splitnormalmap" in file_suffixes:
+    if "specnormal" in file_suffixes or "splitnormalmap" in file_suffixes:
         return 3
     if "matcaptex" in file_suffixes:
         return 2

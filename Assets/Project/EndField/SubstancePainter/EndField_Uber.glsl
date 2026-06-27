@@ -8,12 +8,12 @@
     metallic  → RMOS Metal(.r)   specularlevel → RMOS Spec(.g)
     roughness → 1-Smooth(.a)     AO → RMOS Shadow(.b) [H1]
     normal    → _BumpMap         emissive → _EmissionMap
+    height    → _ParallaxTex (Standard 视差高度; 迁入 SP Height 通道, 可绘制/可烘焙)
   user 通道：
     user1 = Standard: ClearCoat Mask (.r, 可绘制)
-    (SP 通道无 Alpha — SDF Mask/Split Normal/Fur Direction 等 RGBA 资产走 sampler 参数)
-  自定义贴图参数（共享资产 / RGBA 完整 / 需任意 UV 变换，不可绘制）：
+  自定义贴图参数（LUT/视空间/SDF/滚动/RGB数据 等不可绘制，或 SP 对 RGB 通道强制色彩管理会篡改 → 保持参数）：
     _RampMap _SpecRampMap _ShadowLutTex _SDFMask _SDFLightmap _EmotionMap _HighlightMap
-    _MatcapTex _SplitNormalMap _StrokeMap _LineMap _ParallaxTex _FurMap _FurDirMap _FurDyeMap
+    _MatcapTex _SpecNormalMap _StrokeMap _LineMap _FurMap _FurDirMap _FurDyeMap _VFX* 系
     _VFXSpecialMainTex _VFXSpecialBlendTex (Fur烬火)
     _VFXMainTex _VFXMaskTex _VFXBlendTex _VFXDisturbTex _VFXNormalMap (VFX part)
 
@@ -177,8 +177,8 @@
   //- region Parallax (Standard)
     //: param custom { "default": false, "label": "启用视差 _PARALLAX_MAP", "group": "8 Parallax" }
     uniform bool u_UseParallax;
-    //: param custom { "default": "", "default_color": [0.0,0.0,0.0,1.0], "label": "视差高度图 ParallaxTex (R)", "usage": "texture", "group": "8 Parallax" }
-    uniform sampler2D _ParallaxTex;
+    //- 视差高度图已迁入 SP 的 Height 通道 (可绘制/可烘焙; 见引擎通道区 height_tex)。
+    //- _ParallaxTex_ST 平铺仍在 marching 时作用于采样 UV (与 Unity 一致); 高度数据按原 sRGB 字节解码。
     //: param custom { "default": [1.0, 1.0, 0.0, 0.0], "label": "ParallaxTex_ST", "group": "8 Parallax" }
     uniform vec4 _ParallaxTex_ST;
     //: param custom { "default": 2.0, "label": "步进次数 ParallaxMarchNum", "min": 1.0, "max": 5.0, "group": "8 Parallax" }
@@ -251,9 +251,9 @@
   //- endregion
 
   //- region Hair (Part 3)
-    //: param custom { "default": "", "default_color": [0.5,0.5,0.5,0.5], "label": "Split Normal Map (RG=diffuse BA=spec 裸[0,1])", "usage": "texture", "group": "C Hair" }
-    uniform sampler2D _SplitNormalMap;
-    //: param custom { "default": true, "label": "拆分高光法线 _SPECULAR_NORMALMAP (.ba)", "group": "C Hair" }
+    //: param custom { "default": "", "default_color": [0.5,0.5,1.0,1.0], "label": "高光法线图 SpecNormalMap (标准OpenGL RGB; diffuse 法线请画在 SP 的 Normal 通道)", "usage": "texture", "group": "C Hair" }
+    uniform sampler2D _SpecNormalMap;
+    //: param custom { "default": true, "label": "启用高光法线 _SPECULAR_NORMALMAP (独立 SpecNormalMap)", "group": "C Hair" }
     uniform bool u_UseSpecBumpMap;
     //: param custom { "default": 1.0, "label": "高光法线强度 SpecBumpScale", "min": 0.0, "max": 4.0, "group": "C Hair" }
     uniform float _SpecBumpScale;
@@ -581,11 +581,15 @@
   uniform SamplerSparse specularlevel_tex;
   //: param auto channel_opacity
   uniform SamplerSparse opacity_tex;
+  //: param auto channel_height
+  uniform SamplerSparse height_tex;   // Standard 视差高度 (原 _ParallaxTex 迁来); 经 .tex 按 _ParallaxTex_ST 采样
   // emissive_tex 由 lib-emissive.glsl 提供
 
   //- user1 = Standard: ClearCoat Mask (.r, 可绘制)。
-  //- 注: SP 通道无 Alpha — Face SDF Mask(.w)/Hair SplitNormal(.ba)/Fur Direction 改走
-  //-     sampler2D 参数 (_SDFMask/_SplitNormalMap/_FurDirMap), 保证 RGBA 完整 (BuildSPInputs 原样导出)。
+  //- 注: Face/Fur 的 RGB 数据图 (SDFMask/SDFLightmap/Highlight/Emotion/FurDir/FurDye) 无法做成
+  //-     字节等价的 User 通道 —— SP 对"颜色(RGB)通道"强制色彩管理 (sRGB→linear), 会篡改线性的
+  //-     SDF/数据值 (实测: SDF 变暗、鼻侧多出阴影), 且 Python/JS API 无法改源色彩空间。故这些回退为
+  //-     sampler2D 参数: 参数走原始采样、零色彩管理 = 字节等价, 且参数自带 label 在 shader 面板可辨识。
   //: param auto channel_user1
   uniform SamplerSparse slot_user1_tex;
 //- }
@@ -845,7 +849,7 @@
 
       // ---- Steep Parallax Mapping (SampleGrad → textureGrad, 数学不变) ----
       float parallaxSample = 0.0;
-      if (u_UseParallax) {
+      if (u_UseParallax && height_tex.is_set) {
           float3 pxNrm = normalize(normalWS_raw);
           float3 pxTan = normalize(tangentWS.xyz);
           float3 pxBit = cross(pxNrm, pxTan) * tangentWS.w;
@@ -867,7 +871,7 @@
           float pxHitH = 0.0;
           bool pxHit = false;
           for (float pxi = 0.0; pxi < pxSteps + 1.0; pxi += 1.0) {
-              float pxTexH = SRGBToLinear_Custom(textureGrad(_ParallaxTex, pxUV + pxAccum, pxDxUV, pxDyUV).r); // sRGBTexture=1
+              float pxTexH = SRGBToLinear_Custom(textureGrad(height_tex.tex, pxUV + pxAccum, pxDxUV, pxDyUV).r); // Height 通道 .tex, 原 sRGB 字节
               if (pxLayerH < pxTexH) { pxHitH = pxTexH; pxHit = true; break; }
               pxPrevOff = pxAccum;
               pxAccum += pxUVDelta;
@@ -879,7 +883,7 @@
           float pxT = (pxPrevH - pxPrevLayerH)
                     / (-pxPrevLayerH + pxLayerH + pxPrevH - pxHitH);
           float2 pxFinalUV = pxUV + pxUVDelta * pxT + pxPrevOff;
-          parallaxSample = SRGBToLinear_Custom(texture(_ParallaxTex, pxFinalUV).r); // sRGBTexture=1
+          parallaxSample = SRGBToLinear_Custom(texture(height_tex.tex, pxFinalUV).r); // Height 通道 .tex
       }
 
       // ---- Flat direction ----
@@ -1832,7 +1836,7 @@
 
 //----------------------------------------------------------------------region Part 3 Hair — HGRP_CharacterNPR_Hair_Fix.shader computeNPRLighting 逐行移植
 //- {
-  // Split Normal = _SplitNormalMap 贴图参数 (RG=diffuse BA=spec, 裸 [0,1], 不走 DXT5nm); Stroke/Line = 贴图参数。
+  // Diffuse 法线 = SP Normal 通道 (原 _SplitNormalMap.RG 解包导入); Spec 法线 = _SpecNormalMap 参数 (原 .BA 解包); Stroke/Line = 贴图参数。
   // [H11] 皮肤高光的深度边缘检测 → f_HairDepthEdgeMask 直接替代 depthSmooth。
   // 注: HGRP Hair 的 minShadow 不乘 castShadow (charShadow=1 路径), 逐行保留。
   float3 shadeHair(V2F inputs, float3 positionWS, float3 normalWS_raw, float4 tangentWS, float faceSign, float3 albedo, float baseAlpha) {
@@ -1856,36 +1860,35 @@
           shadowColor = ComputeShadowColorBrightSat(albedo);
       }
 
-      // ---- Split Normal Map (user1: RG=diffuse BA=spec, 裸 [0,1]) ----
+      // ---- 法线: diffuse 走 SP Normal 通道 (BuildSPInputs 把原 _SplitNormalMap.RG
+      //      解包成标准 OpenGL 法线导入); spec 走独立 _SpecNormalMap 参数 (原 .BA 解包)。
+      //      decode 与原打包版逐位一致 (dnZ/snZ 由"未缩放"XY 重建, X=R/Y=G 不乘 alpha),
+      //      仅换数据来源 — 渲染结果不变, 但 diffuse 法线现在可在 SP 直接绘制/烘焙。----
       float3 nrmWS = normalize(normalWS_raw);
       float3 tanWS = normalize(tangentWS.xyz);
       float3 bitWS = cross(nrmWS, tanWS) * tangentWS.w;
 
       float3 N;
       float3 specN;
-      if (u_UseSpecBumpMap && u_UseBumpMap) {
-          float4 nrmSmp = texture(_SplitNormalMap, uv);
-          float dnRawX = nrmSmp.x * 2.0 - 1.0;
-          float dnRawY = nrmSmp.y * 2.0 - 1.0;
+      if (u_UseBumpMap) {
+          float3 dnTS = getTSNormal(inputs.sparse_coord); // SP 法线通道 = 解包后的 diffuse 切线法线 [-1,1]
+          float dnRawX = dnTS.x;
+          float dnRawY = dnTS.y;
           float dnZ = max(sqrt(1.0 - saturate(dnRawX*dnRawX + dnRawY*dnRawY)), 1e-16);
           float dnX = dnRawX * _BumpScale;
           float dnY = dnRawY * _BumpScale;
           N = faceSign * normalize(dnX * tanWS + dnY * bitWS + dnZ * nrmWS);
-          float snRawX = nrmSmp.z * 2.0 - 1.0;
-          float snRawY = nrmSmp.w * 2.0 - 1.0;
-          float snZ = max(sqrt(1.0 - saturate(snRawX*snRawX + snRawY*snRawY)), 1e-16);
-          float snX = snRawX * _SpecBumpScale;
-          float snY = snRawY * _SpecBumpScale;
-          specN = normalize(snX * tanWS + snY * bitWS + snZ * nrmWS);
-      } else if (u_UseBumpMap) {
-          float4 nrmSmp = texture(_SplitNormalMap, uv);
-          float dnRawX = nrmSmp.x * 2.0 - 1.0;
-          float dnRawY = nrmSmp.y * 2.0 - 1.0;
-          float dnZ = max(sqrt(1.0 - saturate(dnRawX*dnRawX + dnRawY*dnRawY)), 1e-16);
-          float dnX = dnRawX * _BumpScale;
-          float dnY = dnRawY * _BumpScale;
-          N = faceSign * normalize(dnX * tanWS + dnY * bitWS + dnZ * nrmWS);
-          specN = N;
+          if (u_UseSpecBumpMap) {
+              float4 snSmp = texture(_SpecNormalMap, uv); // RG = spec 法线 XY (裸 [0,1], 蓝通道仅供 SP 预览)
+              float snRawX = snSmp.x * 2.0 - 1.0;
+              float snRawY = snSmp.y * 2.0 - 1.0;
+              float snZ = max(sqrt(1.0 - saturate(snRawX*snRawX + snRawY*snRawY)), 1e-16);
+              float snX = snRawX * _SpecBumpScale;
+              float snY = snRawY * _SpecBumpScale;
+              specN = normalize(snX * tanWS + snY * bitWS + snZ * nrmWS);
+          } else {
+              specN = N;
+          }
       } else {
           N = faceSign * nrmWS;
           specN = N;
