@@ -1,0 +1,5057 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
+using UnityEngine;
+using UnityEngine.HyperGryphEngineCode;
+using UnityEngine.Rendering;
+
+namespace HG.Rendering.Runtime
+{
+	public class HGSkyRenderer
+	{
+		public HGSkyRenderer()
+		{
+		}
+
+		public static float GetSkyDistance(HGCamera camera)
+		{
+			// // Single GetSkyDistance(HGCamera)
+			// float HG::Rendering::Runtime::HGSkyRenderer::GetSkyDistance(HGCamera *camera, MethodInfo *method)
+			// {
+			//   struct ILFixDynamicMethodWrapper_2__Class *v3; // rcx
+			//   ILFixDynamicMethodWrapper_2__Array *wrapperArray; // rdx
+			//   HGEnvironmentVolumeCameraComponent *m_envVolumeCameraComponent; // rax
+			//   HGEnvironmentPhase *m_interpolatedPhase; // rax
+			//   ILFixDynamicMethodWrapper_2 *v8; // rax
+			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
+			// 
+			//   if ( !byte_18D8EDC76 )
+			//   {
+			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
+			//     byte_18D8EDC76 = 1;
+			//   }
+			//   if ( !byte_18D8EDC37 )
+			//   {
+			//     sub_18003C530(&TypeInfo::IFix::ILFixDynamicMethodWrapper);
+			//     byte_18D8EDC37 = 1;
+			//   }
+			//   v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+			//   if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper._1.cctor_finished_or_no_cctor )
+			//   {
+			//     il2cpp_runtime_class_init_0(TypeInfo::IFix::ILFixDynamicMethodWrapper, method);
+			//     v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+			//   }
+			//   wrapperArray = v3.static_fields.wrapperArray;
+			//   if ( !wrapperArray )
+			//     goto LABEL_25;
+			//   if ( wrapperArray.max_length.size <= 1213 )
+			//     goto LABEL_46;
+			//   if ( !v3._1.cctor_finished_or_no_cctor )
+			//   {
+			//     il2cpp_runtime_class_init_0(v3, wrapperArray);
+			//     v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+			//   }
+			//   wrapperArray = v3.static_fields.wrapperArray;
+			//   if ( !wrapperArray )
+			//     goto LABEL_25;
+			//   if ( wrapperArray.max_length.size <= 0x4BDu )
+			//     goto LABEL_40;
+			//   if ( !wrapperArray[33].vector[25] )
+			//   {
+			// LABEL_46:
+			//     if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager._1.cctor_finished_or_no_cctor )
+			//     {
+			//       il2cpp_runtime_class_init_0(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager, wrapperArray);
+			//       v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+			//     }
+			//     if ( !byte_18D8EDC5D )
+			//     {
+			//       sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
+			//       v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+			//       byte_18D8EDC5D = 1;
+			//     }
+			//     if ( !byte_18D8EDC37 )
+			//     {
+			//       sub_18003C530(&TypeInfo::IFix::ILFixDynamicMethodWrapper);
+			//       v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+			//       byte_18D8EDC37 = 1;
+			//     }
+			//     if ( !v3._1.cctor_finished_or_no_cctor )
+			//     {
+			//       il2cpp_runtime_class_init_0(v3, wrapperArray);
+			//       v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+			//     }
+			//     wrapperArray = v3.static_fields.wrapperArray;
+			//     if ( !wrapperArray )
+			//       goto LABEL_25;
+			//     if ( wrapperArray.max_length.size <= 439 )
+			//       goto LABEL_19;
+			//     if ( !v3._1.cctor_finished_or_no_cctor )
+			//     {
+			//       il2cpp_runtime_class_init_0(v3, wrapperArray);
+			//       v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+			//     }
+			//     v3 = (struct ILFixDynamicMethodWrapper_2__Class *)v3.static_fields.wrapperArray;
+			//     if ( !v3 )
+			//       goto LABEL_25;
+			//     if ( LODWORD(v3._0.namespaze) > 0x1B7 )
+			//     {
+			//       if ( v3[9]._0.nestedTypes )
+			//       {
+			//         Patch = IFix::WrappersManagerImpl::GetPatch(439, 0LL);
+			//         if ( !Patch )
+			//           goto LABEL_25;
+			//         m_interpolatedPhase = IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_199(Patch, (Object *)camera, 0LL);
+			// LABEL_23:
+			//         if ( m_interpolatedPhase )
+			//           return m_interpolatedPhase.fields.skyConfig.skyDistance;
+			// LABEL_25:
+			//         sub_180B536AC(v3, wrapperArray);
+			//       }
+			// LABEL_19:
+			//       if ( !camera )
+			//         goto LABEL_25;
+			//       m_envVolumeCameraComponent = camera.fields.m_envVolumeCameraComponent;
+			//       if ( !m_envVolumeCameraComponent )
+			//         goto LABEL_25;
+			//       if ( m_envVolumeCameraComponent.fields.m_useEnvVolumeInterpolatedPhase )
+			//       {
+			//         m_interpolatedPhase = m_envVolumeCameraComponent.fields.m_interpolatedPhase;
+			//       }
+			//       else
+			//       {
+			//         if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager._1.cctor_finished_or_no_cctor )
+			//           il2cpp_runtime_class_init_0(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager, wrapperArray);
+			//         m_interpolatedPhase = HG::Rendering::Runtime::HGEnvironmentManager::get_s_interpolatedPhase(0LL);
+			//       }
+			//       goto LABEL_23;
+			//     }
+			// LABEL_40:
+			//     sub_180070270(v3, wrapperArray);
+			//   }
+			//   v8 = IFix::WrappersManagerImpl::GetPatch(1213, 0LL);
+			//   if ( !v8 )
+			//     goto LABEL_25;
+			//   return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_43((ILFixDynamicMethodWrapper_16 *)v8, (Object *)camera, 0LL);
+			// }
+			// 
+			return 0f;
+		}
+
+		public static Vector3 GetSkyScale(HGCamera camera)
+		{
+			// // Vector3 GetSkyScale(HGCamera)
+			// Vector3 *HG::Rendering::Runtime::HGSkyRenderer::GetSkyScale(
+			//         Vector3 *__return_ptr retstr,
+			//         HGCamera *camera,
+			//         MethodInfo *method)
+			// {
+			//   struct ILFixDynamicMethodWrapper_2__Class *v5; // rcx
+			//   ILFixDynamicMethodWrapper_2__Array *wrapperArray; // rdx
+			//   float SkyDistance; // xmm0_4
+			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
+			//   Vector3 *v10; // rax
+			//   __int64 v11; // xmm0_8
+			//   Vector3 v12[2]; // [rsp+20h] [rbp-18h] BYREF
+			// 
+			//   if ( !byte_18D8EDC77 )
+			//   {
+			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGSkyRenderer);
+			//     byte_18D8EDC77 = 1;
+			//   }
+			//   if ( !byte_18D8EDC37 )
+			//   {
+			//     sub_18003C530(&TypeInfo::IFix::ILFixDynamicMethodWrapper);
+			//     byte_18D8EDC37 = 1;
+			//   }
+			//   v5 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+			//   if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper._1.cctor_finished_or_no_cctor )
+			//   {
+			//     il2cpp_runtime_class_init_0(TypeInfo::IFix::ILFixDynamicMethodWrapper, camera);
+			//     v5 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+			//   }
+			//   wrapperArray = v5.static_fields.wrapperArray;
+			//   if ( !wrapperArray )
+			//     goto LABEL_13;
+			//   if ( wrapperArray.max_length.size > 1252 )
+			//   {
+			//     if ( !v5._1.cctor_finished_or_no_cctor )
+			//     {
+			//       il2cpp_runtime_class_init_0(v5, wrapperArray);
+			//       v5 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+			//     }
+			//     v5 = (struct ILFixDynamicMethodWrapper_2__Class *)v5.static_fields.wrapperArray;
+			//     if ( v5 )
+			//     {
+			//       if ( LODWORD(v5._0.namespaze) <= 0x4E4 )
+			//         sub_180070270(v5, wrapperArray);
+			//       if ( !*(_QWORD *)&v5[26]._1.thread_static_fields_offset )
+			//         goto LABEL_9;
+			//       Patch = IFix::WrappersManagerImpl::GetPatch(1252, 0LL);
+			//       if ( Patch )
+			//       {
+			//         v10 = IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_328(v12, Patch, (Object *)camera, 0LL);
+			//         v11 = *(_QWORD *)&v10.x;
+			//         *(float *)&v10 = v10.z;
+			//         *(_QWORD *)&retstr.x = v11;
+			//         LODWORD(retstr.z) = (_DWORD)v10;
+			//         return retstr;
+			//       }
+			//     }
+			// LABEL_13:
+			//     sub_180B536AC(v5, wrapperArray);
+			//   }
+			// LABEL_9:
+			//   if ( !TypeInfo::HG::Rendering::Runtime::HGSkyRenderer._1.cctor_finished_or_no_cctor )
+			//     il2cpp_runtime_class_init_0(TypeInfo::HG::Rendering::Runtime::HGSkyRenderer, wrapperArray);
+			//   SkyDistance = HG::Rendering::Runtime::HGSkyRenderer::GetSkyDistance(camera, 0LL);
+			//   retstr.x = SkyDistance;
+			//   retstr.y = SkyDistance;
+			//   retstr.z = SkyDistance;
+			//   return retstr;
+			// }
+			// 
+			return null;
+		}
+
+		public static float GetProceduralSkyMeshRadius()
+		{
+			// // Single GetProceduralSkyMeshRadius()
+			// float HG::Rendering::Runtime::HGSkyRenderer::GetProceduralSkyMeshRadius(MethodInfo *method)
+			// {
+			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
+			//   __int64 v3; // rdx
+			//   __int64 v4; // rcx
+			// 
+			//   if ( !IFix::WrappersManagerImpl::IsPatched(1250, 0LL) )
+			//     return 2000.0;
+			//   Patch = IFix::WrappersManagerImpl::GetPatch(1250, 0LL);
+			//   if ( !Patch )
+			//     sub_180B536AC(v4, v3);
+			//   return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_16((ILFixDynamicMethodWrapper_28 *)Patch, 0LL);
+			// }
+			// 
+			return 0f;
+		}
+
+		internal void PrepareMaterials(HGRenderPipelineRuntimeResources defaultResources)
+		{
+		}
+
+		private void SetCloudKeyword(Material mat, HGCloudConfig.CloudFlowType cloudFlowType, HGCamera hgCamera)
+		{
+			// // Void SetCloudKeyword(Material, HGCloudConfig+CloudFlowType, HGCamera)
+			// void HG::Rendering::Runtime::HGSkyRenderer::SetCloudKeyword(
+			//         HGSkyRenderer *this,
+			//         Material *mat,
+			//         HGCloudConfig_CloudFlowType__Enum cloudFlowType,
+			//         HGCamera *hgCamera,
+			//         MethodInfo *method)
+			// {
+			//   bool v5; // di
+			//   HGEnvironmentPhase *InterpolatedPhase; // rax
+			//   __int64 v11; // rdx
+			//   __int64 v12; // rcx
+			//   bool enable; // r14
+			//   bool v14; // bp
+			//   int v15; // esi
+			//   bool v16; // cl
+			//   bool v17; // r15
+			//   Object_1 *cloudFlowMap; // rbx
+			//   bool v19; // cl
+			//   bool v20; // si
+			//   String *s_Cloud; // rbx
+			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
+			// 
+			//   v5 = 0;
+			//   if ( !byte_18D919D7F )
+			//   {
+			//     sub_18003C530(&TypeInfo::UnityEngine::Rendering::CoreUtils);
+			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
+			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGShaderKeyWords);
+			//     sub_18003C530(&TypeInfo::UnityEngine::Object);
+			//     byte_18D919D7F = 1;
+			//   }
+			//   if ( IFix::WrappersManagerImpl::IsPatched(1254, 0LL) )
+			//   {
+			//     Patch = IFix::WrappersManagerImpl::GetPatch(1254, 0LL);
+			//     if ( Patch )
+			//     {
+			//       IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_326(
+			//         (ILFixDynamicMethodWrapper_3 *)Patch,
+			//         (Object *)this,
+			//         (Object *)mat,
+			//         (Formatting__Enum)cloudFlowType,
+			//         (Object *)hgCamera,
+			//         0LL);
+			//       return;
+			//     }
+			// LABEL_22:
+			//     sub_180B536AC(v12, v11);
+			//   }
+			//   sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
+			//   InterpolatedPhase = HG::Rendering::Runtime::HGEnvironmentManager::GetInterpolatedPhase(hgCamera, 0LL);
+			//   if ( !InterpolatedPhase )
+			//     goto LABEL_22;
+			//   enable = InterpolatedPhase.fields.cloudConfig.enable;
+			//   v14 = InterpolatedPhase.fields.cloudConfig.flowSpeed != 0.0;
+			//   if ( InterpolatedPhase.fields.cloudConfig.flowDirectionX != 0.0
+			//     || (v15 = 0, InterpolatedPhase.fields.cloudConfig.flowDirectionY != 0.0) )
+			//   {
+			//     v15 = 1;
+			//   }
+			//   v16 = enable && cloudFlowType == HGCloudConfig_CloudFlowType__Enum_FlowMap;
+			//   if ( v14 && v16 )
+			//   {
+			//     cloudFlowMap = (Object_1 *)InterpolatedPhase.fields.cloudConfig.cloudFlowMap;
+			//     sub_180002C70(TypeInfo::UnityEngine::Object);
+			//     v17 = UnityEngine::Object::op_Inequality(cloudFlowMap, 0LL, 0LL);
+			//   }
+			//   else
+			//   {
+			//     v17 = 0;
+			//   }
+			//   v19 = enable && cloudFlowType == HGCloudConfig_CloudFlowType__Enum_Procedural;
+			//   v20 = v14 && v15 != 0 && v19;
+			//   if ( enable && !v17 )
+			//     v5 = !v20;
+			//   sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGShaderKeyWords);
+			//   s_Cloud = TypeInfo::HG::Rendering::Runtime::HGShaderKeyWords.static_fields.s_Cloud;
+			//   sub_180002C70(TypeInfo::UnityEngine::Rendering::CoreUtils);
+			//   VLB::Utils::SetKeywordEnabled(mat, s_Cloud, v5, 0LL);
+			//   VLB::Utils::SetKeywordEnabled(
+			//     mat,
+			//     TypeInfo::HG::Rendering::Runtime::HGShaderKeyWords.static_fields.s_CloudFlowMap,
+			//     v17,
+			//     0LL);
+			//   VLB::Utils::SetKeywordEnabled(
+			//     mat,
+			//     TypeInfo::HG::Rendering::Runtime::HGShaderKeyWords.static_fields.s_CloudProceduralFlow,
+			//     v20,
+			//     0LL);
+			// }
+			// 
+		}
+
+		internal bool ShouldRenderSkybox()
+		{
+			// // Boolean ShouldRenderSkybox()
+			// bool HG::Rendering::Runtime::HGSkyRenderer::ShouldRenderSkybox(HGSkyRenderer *this, MethodInfo *method)
+			// {
+			//   struct ILFixDynamicMethodWrapper_2__Class *v3; // rax
+			//   ILFixDynamicMethodWrapper_2__StaticFields *static_fields; // rcx
+			//   ILFixDynamicMethodWrapper_2__Array *wrapperArray; // rdx
+			//   ILFixDynamicMethodWrapper_2__Array *v7; // rax
+			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
+			// 
+			//   if ( !byte_18D8EDC37 )
+			//   {
+			//     sub_18003C530(&TypeInfo::IFix::ILFixDynamicMethodWrapper);
+			//     byte_18D8EDC37 = 1;
+			//   }
+			//   v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+			//   if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper._1.cctor_finished_or_no_cctor )
+			//   {
+			//     il2cpp_runtime_class_init_0(TypeInfo::IFix::ILFixDynamicMethodWrapper, method);
+			//     v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+			//   }
+			//   static_fields = v3.static_fields;
+			//   wrapperArray = static_fields.wrapperArray;
+			//   if ( !static_fields.wrapperArray )
+			//     goto LABEL_8;
+			//   if ( wrapperArray.max_length.size <= 1255 )
+			//     return 1;
+			//   if ( !v3._1.cctor_finished_or_no_cctor )
+			//   {
+			//     il2cpp_runtime_class_init_0(v3, wrapperArray);
+			//     v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+			//   }
+			//   static_fields = v3.static_fields;
+			//   v7 = static_fields.wrapperArray;
+			//   if ( !static_fields.wrapperArray )
+			//     goto LABEL_8;
+			//   if ( v7.max_length.size <= 0x4E7u )
+			//     sub_180070270(static_fields, wrapperArray);
+			//   if ( !v7[34].vector[31] )
+			//     return 1;
+			//   Patch = IFix::WrappersManagerImpl::GetPatch(1255, 0LL);
+			//   if ( !Patch )
+			// LABEL_8:
+			//     sub_180B536AC(static_fields, wrapperArray);
+			//   return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_8((ILFixDynamicMethodWrapper_27 *)Patch, (Object *)this, 0LL);
+			// }
+			// 
+			return default(bool);
+		}
+
+		internal bool ShouldRenderSkyCelestial()
+		{
+			// // Boolean ShouldRenderSkyCelestial()
+			// bool HG::Rendering::Runtime::HGSkyRenderer::ShouldRenderSkyCelestial(HGSkyRenderer *this, MethodInfo *method)
+			// {
+			//   struct ILFixDynamicMethodWrapper_2__Class *v3; // rax
+			//   ILFixDynamicMethodWrapper_2__StaticFields *static_fields; // rcx
+			//   ILFixDynamicMethodWrapper_2__Array *wrapperArray; // rdx
+			//   ILFixDynamicMethodWrapper_2__Array *v7; // rax
+			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
+			// 
+			//   if ( !byte_18D8EDC37 )
+			//   {
+			//     sub_18003C530(&TypeInfo::IFix::ILFixDynamicMethodWrapper);
+			//     byte_18D8EDC37 = 1;
+			//   }
+			//   v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+			//   if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper._1.cctor_finished_or_no_cctor )
+			//   {
+			//     il2cpp_runtime_class_init_0(TypeInfo::IFix::ILFixDynamicMethodWrapper, method);
+			//     v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+			//   }
+			//   static_fields = v3.static_fields;
+			//   wrapperArray = static_fields.wrapperArray;
+			//   if ( !static_fields.wrapperArray )
+			//     goto LABEL_8;
+			//   if ( wrapperArray.max_length.size <= 1256 )
+			//     return 1;
+			//   if ( !v3._1.cctor_finished_or_no_cctor )
+			//   {
+			//     il2cpp_runtime_class_init_0(v3, wrapperArray);
+			//     v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+			//   }
+			//   static_fields = v3.static_fields;
+			//   v7 = static_fields.wrapperArray;
+			//   if ( !static_fields.wrapperArray )
+			//     goto LABEL_8;
+			//   if ( v7.max_length.size <= 0x4E8u )
+			//     sub_180070270(static_fields, wrapperArray);
+			//   if ( !v7[35].klass )
+			//     return 1;
+			//   Patch = IFix::WrappersManagerImpl::GetPatch(1256, 0LL);
+			//   if ( !Patch )
+			// LABEL_8:
+			//     sub_180B536AC(static_fields, wrapperArray);
+			//   return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_8((ILFixDynamicMethodWrapper_27 *)Patch, (Object *)this, 0LL);
+			// }
+			// 
+			return default(bool);
+		}
+
+		internal bool ShouldRenderSkyCloud(HGEnvironmentPhase phase)
+		{
+			// // Boolean ShouldRenderSkyCloud(HGEnvironmentPhase)
+			// bool HG::Rendering::Runtime::HGSkyRenderer::ShouldRenderSkyCloud(
+			//         HGSkyRenderer *this,
+			//         HGEnvironmentPhase *phase,
+			//         MethodInfo *method)
+			// {
+			//   struct ILFixDynamicMethodWrapper_2__Class *v5; // rcx
+			//   ILFixDynamicMethodWrapper_2__Array *wrapperArray; // rdx
+			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
+			// 
+			//   if ( !byte_18D8EDC37 )
+			//   {
+			//     sub_18003C530(&TypeInfo::IFix::ILFixDynamicMethodWrapper);
+			//     byte_18D8EDC37 = 1;
+			//   }
+			//   v5 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+			//   if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper._1.cctor_finished_or_no_cctor )
+			//   {
+			//     il2cpp_runtime_class_init_0(TypeInfo::IFix::ILFixDynamicMethodWrapper, phase);
+			//     v5 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+			//   }
+			//   wrapperArray = v5.static_fields.wrapperArray;
+			//   if ( !wrapperArray )
+			//     goto LABEL_13;
+			//   if ( wrapperArray.max_length.size <= 1257 )
+			//     goto LABEL_7;
+			//   if ( !v5._1.cctor_finished_or_no_cctor )
+			//   {
+			//     il2cpp_runtime_class_init_0(v5, wrapperArray);
+			//     v5 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+			//   }
+			//   v5 = (struct ILFixDynamicMethodWrapper_2__Class *)v5.static_fields.wrapperArray;
+			//   if ( !v5 )
+			// LABEL_13:
+			//     sub_180B536AC(v5, wrapperArray);
+			//   if ( LODWORD(v5._0.namespaze) <= 0x4E9 )
+			//     sub_180070270(v5, wrapperArray);
+			//   if ( v5[26].vtable.Equals.methodPtr )
+			//   {
+			//     Patch = IFix::WrappersManagerImpl::GetPatch(1257, 0LL);
+			//     if ( Patch )
+			//       return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_0(
+			//                (ILFixDynamicMethodWrapper_36 *)Patch,
+			//                (Object *)this,
+			//                (Object *)phase,
+			//                0LL);
+			//     goto LABEL_13;
+			//   }
+			// LABEL_7:
+			//   if ( !phase )
+			//     goto LABEL_13;
+			//   return phase.fields.cloudConfig.enable
+			//       && phase.fields.cloudConfig.drawCloudAfterPlanet
+			//       && phase.fields.celestialConfig.planetConfig.drawPlanetInSkydome;
+			// }
+			// 
+			return default(bool);
+		}
+
+		public unsafe SkyRendererInput* PrepareCPPInput(HGCamera hgCamera, Shader proceduralSkyPS, Shader skyBoxCubemapPS)
+		{
+			// // SkyRendererInput* PrepareCPPInput(HGCamera, Shader, Shader)
+			// SkyRendererInput *HG::Rendering::Runtime::HGSkyRenderer::PrepareCPPInput(
+			//         HGSkyRenderer *this,
+			//         HGCamera *hgCamera,
+			//         Shader *proceduralSkyPS,
+			//         Shader *skyBoxCubemapPS,
+			//         MethodInfo *method)
+			// {
+			//   __int64 (__fastcall *v9)(__int64); // rax
+			//   __int64 v10; // rdx
+			//   __int64 v11; // rbx
+			//   __int64 v12; // rdx
+			//   _QWORD **v13; // rcx
+			//   Mesh *m_IcosphereMesh; // rax
+			//   HGEnvironmentPhase *InterpolatedPhase; // r13
+			//   Material *m_skyboxMaterialCPP; // r14
+			//   Material *v17; // rax
+			//   Material *m_skyCloudMaterialCPP; // r14
+			//   Material *v19; // rax
+			//   bool v20; // zf
+			//   Camera *camera; // r14
+			//   __int64 (__fastcall *v22)(Camera *); // rax
+			//   __int64 v23; // r14
+			//   void (__fastcall *v24)(__int64, MethodInfo **); // rax
+			//   MethodInfo *v25; // rdx
+			//   __int64 v26; // rdx
+			//   Quaternion v27; // xmm6
+			//   Vector3 *SkyScale; // rax
+			//   MethodInfo *v29; // xmm0_8
+			//   void (__fastcall *v30)(MethodInfo **, Quaternion *, MethodInfo **, __int128 *); // rax
+			//   __int128 v31; // xmm1
+			//   __int128 v32; // xmm0
+			//   __int128 v33; // xmm1
+			//   Camera *v34; // r14
+			//   __int64 (__fastcall *v35)(Camera *); // rax
+			//   __int64 v36; // r14
+			//   void (__fastcall *v37)(__int64, MethodInfo **); // rax
+			//   int v38; // eax
+			//   Camera *v39; // rsi
+			//   __int64 (__fastcall *v40)(Camera *); // rax
+			//   __int64 v41; // rsi
+			//   void (__fastcall *v42)(__int64, MethodInfo **); // rax
+			//   MethodInfo *v43; // rdx
+			//   __int64 v44; // rdx
+			//   Quaternion v45; // xmm6
+			//   Vector3 *v46; // rax
+			//   MethodInfo *v47; // xmm0_8
+			//   void (__fastcall *v48)(MethodInfo **, Quaternion *, MethodInfo **, __int128 *); // rax
+			//   __int128 v49; // xmm1
+			//   __int128 v50; // xmm0
+			//   __int128 v51; // xmm1
+			//   SkyRendererInput *result; // rax
+			//   HGRenderPathBase_HGRenderPathResources *v53; // rdx
+			//   PassConstructorID__Enum__Array *v54; // r8
+			//   HGCamera *v55; // r9
+			//   HGRenderPathBase_HGRenderPathResources *v56; // rdx
+			//   PassConstructorID__Enum__Array *v57; // r8
+			//   HGCamera *v58; // r9
+			//   __int64 v59; // rax
+			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
+			//   __int64 v61; // rax
+			//   __int64 v62; // rax
+			//   __int64 v63; // rax
+			//   ILFixDynamicMethodWrapper_2 *v64; // rax
+			//   __int64 v65; // rax
+			//   __int64 v66; // rax
+			//   __int64 v67; // rax
+			//   __int64 v68; // rax
+			//   __int64 v69; // rax
+			//   MethodInfo *v70; // [rsp+20h] [rbp-71h] BYREF
+			//   MethodInfo *v71; // [rsp+28h] [rbp-69h]
+			//   MethodInfo *v72; // [rsp+30h] [rbp-61h] BYREF
+			//   int v73; // [rsp+38h] [rbp-59h]
+			//   MethodInfo *v74; // [rsp+40h] [rbp-51h] BYREF
+			//   int v75; // [rsp+48h] [rbp-49h]
+			//   Quaternion v76; // [rsp+50h] [rbp-41h] BYREF
+			//   __int128 v77; // [rsp+60h] [rbp-31h] BYREF
+			//   __int128 v78; // [rsp+70h] [rbp-21h]
+			//   __int128 v79; // [rsp+80h] [rbp-11h]
+			//   __int128 v80; // [rsp+90h] [rbp-1h]
+			//   Vector3 v81; // [rsp+A0h] [rbp+Fh] BYREF
+			// 
+			//   if ( !byte_18D8EDC7A )
+			//   {
+			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
+			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGRenderPipelineMaterialCollector);
+			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGSkyRenderer);
+			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGUtils);
+			//     sub_18003C530(&TypeInfo::UnityEngine::Object);
+			//     byte_18D8EDC7A = 1;
+			//   }
+			//   v9 = (__int64 (__fastcall *)(__int64))qword_18D8F57F8;
+			//   if ( !qword_18D8F57F8 )
+			//   {
+			//     v9 = (__int64 (__fastcall *)(__int64))il2cpp_resolve_icall_0(
+			//                                             "UnityEngine.HyperGryphEngineCode.HGRenderGraphCPP::AllocateTempFromCSharp(System.Int64)");
+			//     if ( !v9 )
+			//     {
+			//       v59 = sub_1802DBBE8("UnityEngine.HyperGryphEngineCode.HGRenderGraphCPP::AllocateTempFromCSharp(System.Int64)");
+			//       sub_18000F750(v59, 0LL);
+			//     }
+			//     qword_18D8F57F8 = (__int64)v9;
+			//   }
+			//   v11 = v9(176LL);
+			//   if ( !TypeInfo::HG::Rendering::Runtime::HGUtils._1.cctor_finished_or_no_cctor )
+			//     il2cpp_runtime_class_init_0(TypeInfo::HG::Rendering::Runtime::HGUtils, v10);
+			//   if ( !HG::Rendering::Runtime::HGUtils::IsSkyboxRenderingEnabled(hgCamera, 0LL) )
+			//   {
+			//     if ( v11 )
+			//     {
+			//       *(_BYTE *)v11 = 0;
+			//       goto LABEL_74;
+			//     }
+			// LABEL_84:
+			//     sub_180B536AC(v13, v12);
+			//   }
+			//   if ( !v11 )
+			//     goto LABEL_84;
+			//   *(_BYTE *)v11 = 1;
+			//   m_IcosphereMesh = this.fields.m_IcosphereMesh;
+			//   if ( !m_IcosphereMesh )
+			//     goto LABEL_84;
+			//   *(_QWORD *)(v11 + 168) = m_IcosphereMesh.fields._.m_CachedPtr;
+			//   if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager._1.cctor_finished_or_no_cctor )
+			//     il2cpp_runtime_class_init_0(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager, v12);
+			//   InterpolatedPhase = HG::Rendering::Runtime::HGEnvironmentManager::GetInterpolatedPhase(hgCamera, 0LL);
+			//   m_skyboxMaterialCPP = this.fields.m_skyboxMaterialCPP;
+			//   if ( !TypeInfo::UnityEngine::Object._1.cctor_finished_or_no_cctor )
+			//     il2cpp_runtime_class_init_0(TypeInfo::UnityEngine::Object, v12);
+			//   if ( !byte_18D8F4EFA )
+			//   {
+			//     sub_18003C530(&TypeInfo::UnityEngine::Object);
+			//     byte_18D8F4EFA = 1;
+			//   }
+			//   if ( !TypeInfo::UnityEngine::Object._1.cctor_finished_or_no_cctor )
+			//     il2cpp_runtime_class_init_0(TypeInfo::UnityEngine::Object, v12);
+			//   if ( !byte_18D8F4EAF )
+			//   {
+			//     sub_18003C530(&TypeInfo::UnityEngine::Object);
+			//     byte_18D8F4EAF = 1;
+			//   }
+			//   if ( !m_skyboxMaterialCPP )
+			//     goto LABEL_131;
+			//   v13 = (_QWORD **)TypeInfo::UnityEngine::Object;
+			//   if ( !TypeInfo::UnityEngine::Object._1.cctor_finished_or_no_cctor )
+			//     il2cpp_runtime_class_init_0(TypeInfo::UnityEngine::Object, v12);
+			//   if ( !m_skyboxMaterialCPP.fields._.m_CachedPtr )
+			//   {
+			// LABEL_131:
+			//     if ( !TypeInfo::HG::Rendering::Runtime::HGRenderPipelineMaterialCollector._1.cctor_finished_or_no_cctor )
+			//       il2cpp_runtime_class_init_0(TypeInfo::HG::Rendering::Runtime::HGRenderPipelineMaterialCollector, v12);
+			//     this.fields.m_skyboxMaterialCPP = HG::Rendering::Runtime::HGRenderPipelineMaterialCollector::CreateStaticMaterial(
+			//                                          skyBoxCubemapPS,
+			//                                          0,
+			//                                          0LL);
+			//     sub_1800054D0((HGRenderPathScene *)&this.fields.m_skyboxMaterialCPP, v53, v54, v55, v70, v71);
+			//   }
+			//   v17 = this.fields.m_skyboxMaterialCPP;
+			//   if ( !v17 )
+			//     goto LABEL_84;
+			//   *(_QWORD *)(v11 + 152) = v17.fields._.m_CachedPtr;
+			//   m_skyCloudMaterialCPP = this.fields.m_skyCloudMaterialCPP;
+			//   if ( !TypeInfo::UnityEngine::Object._1.cctor_finished_or_no_cctor )
+			//     il2cpp_runtime_class_init_0(TypeInfo::UnityEngine::Object, v12);
+			//   if ( !byte_18D8F4EFA )
+			//   {
+			//     sub_18003C530(&TypeInfo::UnityEngine::Object);
+			//     byte_18D8F4EFA = 1;
+			//   }
+			//   if ( !TypeInfo::UnityEngine::Object._1.cctor_finished_or_no_cctor )
+			//     il2cpp_runtime_class_init_0(TypeInfo::UnityEngine::Object, v12);
+			//   if ( !byte_18D8F4EAF )
+			//   {
+			//     sub_18003C530(&TypeInfo::UnityEngine::Object);
+			//     byte_18D8F4EAF = 1;
+			//   }
+			//   if ( !m_skyCloudMaterialCPP )
+			//     goto LABEL_132;
+			//   v13 = (_QWORD **)TypeInfo::UnityEngine::Object;
+			//   if ( !TypeInfo::UnityEngine::Object._1.cctor_finished_or_no_cctor )
+			//     il2cpp_runtime_class_init_0(TypeInfo::UnityEngine::Object, v12);
+			//   if ( !m_skyCloudMaterialCPP.fields._.m_CachedPtr )
+			//   {
+			// LABEL_132:
+			//     if ( !TypeInfo::HG::Rendering::Runtime::HGRenderPipelineMaterialCollector._1.cctor_finished_or_no_cctor )
+			//       il2cpp_runtime_class_init_0(TypeInfo::HG::Rendering::Runtime::HGRenderPipelineMaterialCollector, v12);
+			//     this.fields.m_skyCloudMaterialCPP = HG::Rendering::Runtime::HGRenderPipelineMaterialCollector::CreateStaticMaterial(
+			//                                            proceduralSkyPS,
+			//                                            0,
+			//                                            0LL);
+			//     sub_1800054D0((HGRenderPathScene *)&this.fields.m_skyCloudMaterialCPP, v56, v57, v58, v70, v71);
+			//   }
+			//   v19 = this.fields.m_skyCloudMaterialCPP;
+			//   if ( !v19 )
+			//     goto LABEL_84;
+			//   v20 = byte_18D8EDC37 == 0;
+			//   *(_QWORD *)(v11 + 160) = v19.fields._.m_CachedPtr;
+			//   if ( v20 )
+			//   {
+			//     sub_18003C530(&TypeInfo::IFix::ILFixDynamicMethodWrapper);
+			//     byte_18D8EDC37 = 1;
+			//   }
+			//   v13 = (_QWORD **)TypeInfo::IFix::ILFixDynamicMethodWrapper;
+			//   if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper._1.cctor_finished_or_no_cctor )
+			//   {
+			//     il2cpp_runtime_class_init_0(TypeInfo::IFix::ILFixDynamicMethodWrapper, v12);
+			//     v13 = (_QWORD **)TypeInfo::IFix::ILFixDynamicMethodWrapper;
+			//   }
+			//   v12 = *v13[23];
+			//   if ( !v12 )
+			//     goto LABEL_84;
+			//   if ( *(int *)(v12 + 24) <= 1255 )
+			//     goto LABEL_43;
+			//   if ( !*((_DWORD *)v13 + 56) )
+			//   {
+			//     il2cpp_runtime_class_init_0(v13, v12);
+			//     v13 = (_QWORD **)TypeInfo::IFix::ILFixDynamicMethodWrapper;
+			//   }
+			//   v12 = *v13[23];
+			//   if ( !v12 )
+			//     goto LABEL_84;
+			//   if ( *(_DWORD *)(v12 + 24) <= 0x4E7u )
+			//     goto LABEL_113;
+			//   if ( !*(_QWORD *)(v12 + 10072) )
+			//     goto LABEL_43;
+			//   Patch = IFix::WrappersManagerImpl::GetPatch(1255, 0LL);
+			//   if ( !Patch )
+			//     goto LABEL_84;
+			//   if ( IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_8((ILFixDynamicMethodWrapper_27 *)Patch, (Object *)this, 0LL) )
+			//   {
+			// LABEL_43:
+			//     *(_BYTE *)(v11 + 1) = 1;
+			//     if ( !hgCamera )
+			//       goto LABEL_84;
+			//     camera = hgCamera.fields.camera;
+			//     if ( !camera )
+			//       goto LABEL_84;
+			//     v22 = (__int64 (__fastcall *)(Camera *))qword_18D8F4D40;
+			//     if ( !qword_18D8F4D40 )
+			//     {
+			//       v22 = (__int64 (__fastcall *)(Camera *))il2cpp_resolve_icall_0("UnityEngine.Component::get_transform()");
+			//       if ( !v22 )
+			//       {
+			//         v61 = sub_1802DBBE8("UnityEngine.Component::get_transform()");
+			//         sub_18000F750(v61, 0LL);
+			//       }
+			//       qword_18D8F4D40 = (__int64)v22;
+			//     }
+			//     v23 = v22(camera);
+			//     if ( !v23 )
+			//       goto LABEL_84;
+			//     v70 = 0LL;
+			//     LODWORD(v71) = 0;
+			//     v24 = (void (__fastcall *)(__int64, MethodInfo **))qword_18D8F52E0;
+			//     if ( !qword_18D8F52E0 )
+			//     {
+			//       v24 = (void (__fastcall *)(__int64, MethodInfo **))il2cpp_resolve_icall_0(
+			//                                                            "UnityEngine.Transform::get_position_Injected(UnityEngine.Vector3&)");
+			//       if ( !v24 )
+			//       {
+			//         v62 = sub_1802DBBE8("UnityEngine.Transform::get_position_Injected(UnityEngine.Vector3&)");
+			//         sub_18000F750(v62, 0LL);
+			//       }
+			//       qword_18D8F52E0 = (__int64)v24;
+			//     }
+			//     v24(v23, &v70);
+			//     v27 = *UnityEngine::Quaternion::get_identity(&v76, v25);
+			//     if ( !TypeInfo::HG::Rendering::Runtime::HGSkyRenderer._1.cctor_finished_or_no_cctor )
+			//       il2cpp_runtime_class_init_0(TypeInfo::HG::Rendering::Runtime::HGSkyRenderer, v26);
+			//     SkyScale = HG::Rendering::Runtime::HGSkyRenderer::GetSkyScale(&v81, hgCamera, 0LL);
+			//     v76 = v27;
+			//     v29 = *(MethodInfo **)&SkyScale.x;
+			//     *(float *)&SkyScale = SkyScale.z;
+			//     v72 = v29;
+			//     v73 = (int)SkyScale;
+			//     v75 = (int)v71;
+			//     v30 = (void (__fastcall *)(MethodInfo **, Quaternion *, MethodInfo **, __int128 *))qword_18D8F4BC8;
+			//     v74 = v70;
+			//     v77 = 0LL;
+			//     v78 = 0LL;
+			//     v79 = 0LL;
+			//     v80 = 0LL;
+			//     if ( !qword_18D8F4BC8 )
+			//     {
+			//       v30 = (void (__fastcall *)(MethodInfo **, Quaternion *, MethodInfo **, __int128 *))il2cpp_resolve_icall_0(
+			//                                                                                            "UnityEngine.Matrix4x4::TRS_In"
+			//                                                                                            "jected(UnityEngine.Vector3&,U"
+			//                                                                                            "nityEngine.Quaternion&,UnityE"
+			//                                                                                            "ngine.Vector3&,UnityEngine.Matrix4x4&)");
+			//       if ( !v30 )
+			//       {
+			//         v63 = sub_1802DBBE8(
+			//                 "UnityEngine.Matrix4x4::TRS_Injected(UnityEngine.Vector3&,UnityEngine.Quaternion&,UnityEngine.Vector3&,Un"
+			//                 "ityEngine.Matrix4x4&)");
+			//         sub_18000F750(v63, 0LL);
+			//       }
+			//       qword_18D8F4BC8 = (__int64)v30;
+			//     }
+			//     v30(&v74, &v76, &v72, &v77);
+			//     v31 = v78;
+			//     *(_OWORD *)(v11 + 20) = v77;
+			//     v32 = v79;
+			//     *(_OWORD *)(v11 + 36) = v31;
+			//     v33 = v80;
+			//     *(_OWORD *)(v11 + 52) = v32;
+			//     *(_OWORD *)(v11 + 68) = v33;
+			//   }
+			//   else
+			//   {
+			//     *(_BYTE *)(v11 + 1) = 0;
+			//   }
+			//   if ( !byte_18D8EDC37 )
+			//   {
+			//     sub_18003C530(&TypeInfo::IFix::ILFixDynamicMethodWrapper);
+			//     byte_18D8EDC37 = 1;
+			//   }
+			//   v13 = (_QWORD **)TypeInfo::IFix::ILFixDynamicMethodWrapper;
+			//   if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper._1.cctor_finished_or_no_cctor )
+			//   {
+			//     il2cpp_runtime_class_init_0(TypeInfo::IFix::ILFixDynamicMethodWrapper, v12);
+			//     v13 = (_QWORD **)TypeInfo::IFix::ILFixDynamicMethodWrapper;
+			//   }
+			//   v12 = *v13[23];
+			//   if ( !v12 )
+			//     goto LABEL_84;
+			//   if ( *(int *)(v12 + 24) <= 1256 )
+			//     goto LABEL_58;
+			//   if ( !*((_DWORD *)v13 + 56) )
+			//   {
+			//     il2cpp_runtime_class_init_0(v13, v12);
+			//     v13 = (_QWORD **)TypeInfo::IFix::ILFixDynamicMethodWrapper;
+			//   }
+			//   v13 = (_QWORD **)*v13[23];
+			//   if ( !v13 )
+			//     goto LABEL_84;
+			//   if ( *((_DWORD *)v13 + 6) <= 0x4E8u )
+			// LABEL_113:
+			//     sub_180070270(v13, v12);
+			//   if ( v13[1260] )
+			//   {
+			//     v64 = IFix::WrappersManagerImpl::GetPatch(1256, 0LL);
+			//     if ( !v64 )
+			//       goto LABEL_84;
+			//     if ( !IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_8((ILFixDynamicMethodWrapper_27 *)v64, (Object *)this, 0LL) )
+			//     {
+			//       *(_BYTE *)(v11 + 2) = 0;
+			//       goto LABEL_64;
+			//     }
+			//   }
+			// LABEL_58:
+			//   *(_BYTE *)(v11 + 2) = 1;
+			//   if ( !hgCamera )
+			//     goto LABEL_84;
+			//   v34 = hgCamera.fields.camera;
+			//   if ( !v34 )
+			//     goto LABEL_84;
+			//   v35 = (__int64 (__fastcall *)(Camera *))qword_18D8F4D40;
+			//   if ( !qword_18D8F4D40 )
+			//   {
+			//     v35 = (__int64 (__fastcall *)(Camera *))il2cpp_resolve_icall_0("UnityEngine.Component::get_transform()");
+			//     if ( !v35 )
+			//     {
+			//       v65 = sub_1802DBBE8("UnityEngine.Component::get_transform()");
+			//       sub_18000F750(v65, 0LL);
+			//     }
+			//     qword_18D8F4D40 = (__int64)v35;
+			//   }
+			//   v36 = v35(v34);
+			//   if ( !v36 )
+			//     goto LABEL_84;
+			//   v70 = 0LL;
+			//   LODWORD(v71) = 0;
+			//   v37 = (void (__fastcall *)(__int64, MethodInfo **))qword_18D8F52E0;
+			//   if ( !qword_18D8F52E0 )
+			//   {
+			//     v37 = (void (__fastcall *)(__int64, MethodInfo **))il2cpp_resolve_icall_0(
+			//                                                          "UnityEngine.Transform::get_position_Injected(UnityEngine.Vector3&)");
+			//     if ( !v37 )
+			//     {
+			//       v66 = sub_1802DBBE8("UnityEngine.Transform::get_position_Injected(UnityEngine.Vector3&)");
+			//       sub_18000F750(v66, 0LL);
+			//     }
+			//     qword_18D8F52E0 = (__int64)v37;
+			//   }
+			//   v37(v36, &v70);
+			//   v38 = (int)v71;
+			//   *(_QWORD *)(v11 + 8) = v70;
+			//   *(_DWORD *)(v11 + 16) = v38;
+			// LABEL_64:
+			//   if ( !HG::Rendering::Runtime::HGSkyRenderer::ShouldRenderSkyCloud(this, InterpolatedPhase, 0LL) )
+			//   {
+			//     *(_BYTE *)(v11 + 3) = 0;
+			//     goto LABEL_74;
+			//   }
+			//   *(_BYTE *)(v11 + 3) = 1;
+			//   if ( !hgCamera )
+			//     goto LABEL_84;
+			//   v39 = hgCamera.fields.camera;
+			//   if ( !v39 )
+			//     goto LABEL_84;
+			//   v40 = (__int64 (__fastcall *)(Camera *))qword_18D8F4D40;
+			//   if ( !qword_18D8F4D40 )
+			//   {
+			//     v40 = (__int64 (__fastcall *)(Camera *))il2cpp_resolve_icall_0("UnityEngine.Component::get_transform()");
+			//     if ( !v40 )
+			//     {
+			//       v67 = sub_1802DBBE8("UnityEngine.Component::get_transform()");
+			//       sub_18000F750(v67, 0LL);
+			//     }
+			//     qword_18D8F4D40 = (__int64)v40;
+			//   }
+			//   v41 = v40(v39);
+			//   if ( !v41 )
+			//     goto LABEL_84;
+			//   v70 = 0LL;
+			//   LODWORD(v71) = 0;
+			//   v42 = (void (__fastcall *)(__int64, MethodInfo **))qword_18D8F52E0;
+			//   if ( !qword_18D8F52E0 )
+			//   {
+			//     v42 = (void (__fastcall *)(__int64, MethodInfo **))il2cpp_resolve_icall_0(
+			//                                                          "UnityEngine.Transform::get_position_Injected(UnityEngine.Vector3&)");
+			//     if ( !v42 )
+			//     {
+			//       v68 = sub_1802DBBE8("UnityEngine.Transform::get_position_Injected(UnityEngine.Vector3&)");
+			//       sub_18000F750(v68, 0LL);
+			//     }
+			//     qword_18D8F52E0 = (__int64)v42;
+			//   }
+			//   v42(v41, &v70);
+			//   v45 = *UnityEngine::Quaternion::get_identity(&v76, v43);
+			//   if ( !TypeInfo::HG::Rendering::Runtime::HGSkyRenderer._1.cctor_finished_or_no_cctor )
+			//     il2cpp_runtime_class_init_0(TypeInfo::HG::Rendering::Runtime::HGSkyRenderer, v44);
+			//   v46 = HG::Rendering::Runtime::HGSkyRenderer::GetSkyScale(&v81, hgCamera, 0LL);
+			//   v76 = v45;
+			//   v47 = *(MethodInfo **)&v46.x;
+			//   *(float *)&v46 = v46.z;
+			//   v74 = v47;
+			//   v75 = (int)v46;
+			//   v73 = (int)v71;
+			//   v48 = (void (__fastcall *)(MethodInfo **, Quaternion *, MethodInfo **, __int128 *))qword_18D8F4BC8;
+			//   v72 = v70;
+			//   v77 = 0LL;
+			//   v78 = 0LL;
+			//   v79 = 0LL;
+			//   v80 = 0LL;
+			//   if ( !qword_18D8F4BC8 )
+			//   {
+			//     v48 = (void (__fastcall *)(MethodInfo **, Quaternion *, MethodInfo **, __int128 *))il2cpp_resolve_icall_0(
+			//                                                                                          "UnityEngine.Matrix4x4::TRS_Inje"
+			//                                                                                          "cted(UnityEngine.Vector3&,Unity"
+			//                                                                                          "Engine.Quaternion&,UnityEngine."
+			//                                                                                          "Vector3&,UnityEngine.Matrix4x4&)");
+			//     if ( !v48 )
+			//     {
+			//       v69 = sub_1802DBBE8(
+			//               "UnityEngine.Matrix4x4::TRS_Injected(UnityEngine.Vector3&,UnityEngine.Quaternion&,UnityEngine.Vector3&,Unit"
+			//               "yEngine.Matrix4x4&)");
+			//       sub_18000F750(v69, 0LL);
+			//     }
+			//     qword_18D8F4BC8 = (__int64)v48;
+			//   }
+			//   v48(&v72, &v76, &v74, &v77);
+			//   v49 = v78;
+			//   *(_OWORD *)(v11 + 84) = v77;
+			//   v50 = v79;
+			//   *(_OWORD *)(v11 + 100) = v49;
+			//   v51 = v80;
+			//   *(_OWORD *)(v11 + 116) = v50;
+			//   *(_OWORD *)(v11 + 132) = v51;
+			// LABEL_74:
+			//   result = (SkyRendererInput *)v11;
+			//   *(_BYTE *)(v11 + 4) = 0;
+			//   return result;
+			// }
+			// 
+			return null;
+		}
+
+		internal void Render(CommandBuffer cmd, HGCamera hgCamera, ScriptableRenderContext renderContext, [MetadataOffset(Offset = "0x01F90CB7")] bool useFullScreenDebug = false)
+		{
+			// // Void Render(CommandBuffer, HGCamera, ScriptableRenderContext, Boolean)
+			// void HG::Rendering::Runtime::HGSkyRenderer::Render(
+			//         HGSkyRenderer *this,
+			//         CommandBuffer *cmd,
+			//         HGCamera *hgCamera,
+			//         ScriptableRenderContext renderContext,
+			//         bool useFullScreenDebug,
+			//         MethodInfo *method)
+			// {
+			//   HGEnvironmentPhase *InterpolatedPhase; // rax
+			//   __int64 v11; // rdx
+			//   ILFixDynamicMethodWrapper_2 *Patch; // rcx
+			//   HGEnvironmentPhase *v13; // rbp
+			// 
+			//   if ( !byte_18D919D80 )
+			//   {
+			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
+			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGUtils);
+			//     byte_18D919D80 = 1;
+			//   }
+			//   if ( IFix::WrappersManagerImpl::IsPatched(1258, 0LL) )
+			//   {
+			//     Patch = IFix::WrappersManagerImpl::GetPatch(1258, 0LL);
+			//     if ( Patch )
+			//     {
+			//       IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_484(
+			//         Patch,
+			//         (Object *)this,
+			//         (Object *)cmd,
+			//         (Object *)hgCamera,
+			//         renderContext,
+			//         useFullScreenDebug,
+			//         0LL);
+			//       return;
+			//     }
+			// LABEL_12:
+			//     sub_180B536AC(Patch, v11);
+			//   }
+			//   sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGUtils);
+			//   if ( !HG::Rendering::Runtime::HGUtils::IsSkyboxRenderingEnabled(hgCamera, 0LL) )
+			//     return;
+			//   sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
+			//   InterpolatedPhase = HG::Rendering::Runtime::HGEnvironmentManager::GetInterpolatedPhase(hgCamera, 0LL);
+			//   v13 = InterpolatedPhase;
+			//   if ( !InterpolatedPhase )
+			//     goto LABEL_12;
+			//   HG::Rendering::Runtime::HGSkyRenderer::SetCloudKeyword(
+			//     this,
+			//     this.fields.m_proceduralSkyMaterial,
+			//     (HGCloudConfig_CloudFlowType__Enum)InterpolatedPhase.fields.cloudConfig.cloudFlowType,
+			//     hgCamera,
+			//     0LL);
+			//   if ( HG::Rendering::Runtime::HGSkyRenderer::ShouldRenderSkybox(this, 0LL) )
+			//   {
+			//     if ( v13.fields.skyConfig.skyMaterialType )
+			//     {
+			//       if ( v13.fields.skyConfig.skyMaterialType == 1 )
+			//         HG::Rendering::Runtime::HGSkyRenderer::RenderSkybox(
+			//           this,
+			//           cmd,
+			//           this.fields.m_skyBoxCubemapMaterial,
+			//           hgCamera,
+			//           useFullScreenDebug,
+			//           0LL);
+			//     }
+			//     else
+			//     {
+			//       HG::Rendering::Runtime::HGSkyRenderer::RenderProceduralSky(
+			//         this,
+			//         cmd,
+			//         this.fields.m_proceduralSkyMaterial,
+			//         hgCamera,
+			//         renderContext,
+			//         useFullScreenDebug,
+			//         0LL);
+			//     }
+			//   }
+			// }
+			// 
+		}
+
+		private void RenderProceduralSky(CommandBuffer cmd, Material mat, HGCamera hgCamera, ScriptableRenderContext context, bool useFullScreenDebug)
+		{
+			// // Void RenderProceduralSky(CommandBuffer, Material, HGCamera, ScriptableRenderContext, Boolean)
+			// void HG::Rendering::Runtime::HGSkyRenderer::RenderProceduralSky(
+			//         HGSkyRenderer *this,
+			//         CommandBuffer *cmd,
+			//         Material *mat,
+			//         HGCamera *hgCamera,
+			//         ScriptableRenderContext context,
+			//         bool useFullScreenDebug,
+			//         MethodInfo *method)
+			// {
+			//   __int64 v11; // rdx
+			//   Component *camera; // rcx
+			//   Transform *transform; // rax
+			//   Vector3 *position; // rax
+			//   __int64 v15; // xmm7_8
+			//   float z; // ebx
+			//   MethodInfo *v17; // rdx
+			//   __m128i v18; // xmm6
+			//   Vector3 *SkyScale; // rax
+			//   __int64 v20; // xmm0_8
+			//   Matrix4x4 *v21; // rax
+			//   __int128 v22; // xmm6
+			//   __int128 v23; // xmm7
+			//   __int128 v24; // xmm8
+			//   __int128 v25; // xmm9
+			//   MaterialPropertyBlock *m_propertyBlock; // rbx
+			//   HGEnvironmentPhase *InterpolatedPhase; // rbx
+			//   MaterialPropertyBlock *v28; // rax
+			//   Mesh *m_IcosphereMesh; // rdx
+			//   Vector3 v30; // [rsp+48h] [rbp-81h] BYREF
+			//   Vector3 v31; // [rsp+58h] [rbp-71h] BYREF
+			//   __m128i v32; // [rsp+68h] [rbp-61h] BYREF
+			//   Matrix4x4 v33[2]; // [rsp+78h] [rbp-51h] BYREF
+			// 
+			//   if ( !byte_18D919D81 )
+			//   {
+			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
+			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGShaderIDs);
+			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGSkyRenderer);
+			//     byte_18D919D81 = 1;
+			//   }
+			//   if ( !IFix::WrappersManagerImpl::IsPatched(1259, 0LL) )
+			//   {
+			//     if ( hgCamera )
+			//     {
+			//       camera = (Component *)hgCamera.fields.camera;
+			//       if ( camera )
+			//       {
+			//         transform = UnityEngine::Component::get_transform(camera, 0LL);
+			//         if ( transform )
+			//         {
+			//           position = UnityEngine::Transform::get_position(&v31, transform, 0LL);
+			//           v15 = *(_QWORD *)&position.x;
+			//           z = position.z;
+			//           v18 = _mm_loadu_si128((const __m128i *)UnityEngine::Quaternion::get_identity((Quaternion *)&v32, v17));
+			//           sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGSkyRenderer);
+			//           SkyScale = HG::Rendering::Runtime::HGSkyRenderer::GetSkyScale(&v31, hgCamera, 0LL);
+			//           v32 = v18;
+			//           v20 = *(_QWORD *)&SkyScale.x;
+			//           *(float *)&SkyScale = SkyScale.z;
+			//           *(_QWORD *)&v30.x = v20;
+			//           LODWORD(v30.z) = (_DWORD)SkyScale;
+			//           *(_QWORD *)&v31.x = v15;
+			//           v31.z = z;
+			//           v21 = UnityEngine::Matrix4x4::TRS(v33, &v31, (Quaternion *)&v32, &v30, 0LL);
+			//           camera = (Component *)this.fields.m_propertyBlock;
+			//           v22 = *(_OWORD *)&v21.m00;
+			//           v23 = *(_OWORD *)&v21.m01;
+			//           v24 = *(_OWORD *)&v21.m02;
+			//           v25 = *(_OWORD *)&v21.m03;
+			//           if ( camera )
+			//           {
+			//             UnityEngine::MaterialPropertyBlock::Clear((MaterialPropertyBlock *)camera, 1, 0LL);
+			//             m_propertyBlock = this.fields.m_propertyBlock;
+			//             sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGShaderIDs);
+			//             HG::Rendering::Runtime::HGEnvironmentUtils::SetTextureIfNotNull(
+			//               m_propertyBlock,
+			//               TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields._SkyViewLut,
+			//               (Texture *)hgCamera.fields.atmosphereSkyViewLutTexture,
+			//               0LL);
+			//             sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
+			//             InterpolatedPhase = HG::Rendering::Runtime::HGEnvironmentManager::GetInterpolatedPhase(hgCamera, 0LL);
+			//             HG::Rendering::Runtime::HGSkyRenderer::SetupCloudParam(
+			//               this,
+			//               this.fields.m_propertyBlock,
+			//               InterpolatedPhase,
+			//               0LL);
+			//             HG::Rendering::Runtime::HGSkyRenderer::SetProceduralRingMaterial(
+			//               this,
+			//               this.fields.m_propertyBlock,
+			//               InterpolatedPhase,
+			//               0LL);
+			//             HG::Rendering::Runtime::HGSkyRenderer::SetupSunDiscParam(
+			//               this,
+			//               this.fields.m_propertyBlock,
+			//               InterpolatedPhase,
+			//               mat,
+			//               0LL);
+			//             HG::Rendering::Runtime::HGSkyRenderer::SetupStarParam(
+			//               this,
+			//               this.fields.m_propertyBlock,
+			//               InterpolatedPhase,
+			//               mat,
+			//               0LL);
+			//             HG::Rendering::Runtime::HGSkyRenderer::SetupPlanets(
+			//               this,
+			//               context,
+			//               hgCamera,
+			//               this.fields.m_propertyBlock,
+			//               mat,
+			//               0LL);
+			//             v28 = this.fields.m_propertyBlock;
+			//             if ( cmd )
+			//             {
+			//               m_IcosphereMesh = this.fields.m_IcosphereMesh;
+			//               *(_OWORD *)&v33[0].m00 = v22;
+			//               *(_OWORD *)&v33[0].m01 = v23;
+			//               *(_OWORD *)&v33[0].m02 = v24;
+			//               *(_OWORD *)&v33[0].m03 = v25;
+			//               UnityEngine::Rendering::CommandBuffer::DrawMesh(cmd, m_IcosphereMesh, v33, mat, 0, 0, v28, 0LL);
+			//               return;
+			//             }
+			//           }
+			//         }
+			//       }
+			//     }
+			// LABEL_11:
+			//     sub_180B536AC(camera, v11);
+			//   }
+			//   camera = (Component *)IFix::WrappersManagerImpl::GetPatch(1259, 0LL);
+			//   if ( !camera )
+			//     goto LABEL_11;
+			//   IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_482(
+			//     (ILFixDynamicMethodWrapper_2 *)camera,
+			//     (Object *)this,
+			//     (Object *)cmd,
+			//     (Object *)mat,
+			//     (Object *)hgCamera,
+			//     context,
+			//     useFullScreenDebug,
+			//     0LL);
+			// }
+			// 
+		}
+
+		private void SetupCloudParamCPP(Material mat, HGEnvironmentPhase envPhase)
+		{
+			// // Void SetupCloudParamCPP(Material, HGEnvironmentPhase)
+			// void HG::Rendering::Runtime::HGSkyRenderer::SetupCloudParamCPP(
+			//         HGSkyRenderer *this,
+			//         Material *mat,
+			//         HGEnvironmentPhase *envPhase,
+			//         MethodInfo *method)
+			// {
+			//   int v7; // r14d
+			//   __int64 v8; // rdx
+			//   HGShaderIDs__StaticFields *static_fields; // rcx
+			//   Texture *cloudTexture; // rbx
+			//   MethodInfo *v11; // r9
+			//   __m128i v12; // xmm5
+			//   float proceduralSkyLuxFactor; // xmm7_4
+			//   float cloudAbsoluteBrightness; // xmm6_4
+			//   float cloudFadeAlpha; // xmm2_4
+			//   MethodInfo *v16; // r9
+			//   MethodInfo *v17; // r9
+			//   Vector4 *v18; // rax
+			//   __m128 v19; // xmm5
+			//   bool v20; // zf
+			//   __m128 v21; // xmm4
+			//   unsigned __int32 v22; // xmm4_4
+			//   MethodInfo *v23; // r8
+			//   Color *v24; // rax
+			//   int32_t v25; // r10d
+			//   MethodInfo *v26; // rdx
+			//   float cloudOpacityG; // xmm1_4
+			//   __m128i v28; // xmm6
+			//   float cloudContrast; // xmm1_4
+			//   int32_t CloudParam; // edx
+			//   int32_t rotation; // ebx
+			//   float flowSpeed; // xmm8_4
+			//   float flowDirectionX; // xmm6_4
+			//   float flowDirectionY; // xmm7_4
+			//   int32_t CloudFlowParam; // edx
+			//   Object_1 *cloudFlowMap; // rbx
+			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
+			//   __m128i v38; // [rsp+30h] [rbp-50h] BYREF
+			//   Vector4 v39[2]; // [rsp+40h] [rbp-40h] BYREF
+			// 
+			//   v7 = 1;
+			//   if ( !byte_18D919D82 )
+			//   {
+			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGShaderIDs);
+			//     sub_18003C530(&TypeInfo::UnityEngine::Object);
+			//     byte_18D919D82 = 1;
+			//   }
+			//   if ( IFix::WrappersManagerImpl::IsPatched(1271, 0LL) )
+			//   {
+			//     Patch = IFix::WrappersManagerImpl::GetPatch(1271, 0LL);
+			//     if ( Patch )
+			//     {
+			//       IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_11(
+			//         (ILFixDynamicMethodWrapper_28 *)Patch,
+			//         (Object *)this,
+			//         (Object *)mat,
+			//         (Object *)envPhase,
+			//         0LL);
+			//       return;
+			//     }
+			//     goto LABEL_22;
+			//   }
+			//   if ( !envPhase )
+			//     goto LABEL_22;
+			//   cloudTexture = envPhase.fields.cloudConfig.cloudTexture;
+			//   sub_180002C70(TypeInfo::UnityEngine::Object);
+			//   if ( UnityEngine::Object::op_Inequality((Object_1 *)cloudTexture, 0LL, 0LL) )
+			//   {
+			//     sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGShaderIDs);
+			//     static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//     if ( !mat )
+			//       goto LABEL_22;
+			//     UnityEngine::Material::SetTextureImpl(mat, static_fields._CloudTexture, cloudTexture, 0LL);
+			//   }
+			//   v12 = _mm_loadu_si128((const __m128i *)&envPhase.fields.cloudConfig.cloudTint);
+			//   proceduralSkyLuxFactor = 1.0;
+			//   if ( envPhase.fields.cloudConfig.lightAffectCloud )
+			//   {
+			//     cloudAbsoluteBrightness = envPhase.fields.lightConfig.directIntensityDividePi
+			//                             + envPhase.fields.cloudConfig.cloudBrightness;
+			//     proceduralSkyLuxFactor = envPhase.fields.skyConfig.proceduralSkyLuxFactor;
+			//   }
+			//   else
+			//   {
+			//     cloudAbsoluteBrightness = envPhase.fields.cloudConfig.cloudAbsoluteBrightness;
+			//   }
+			//   cloudFadeAlpha = envPhase.fields.cloudConfig.cloudFadeAlpha;
+			//   v38 = v12;
+			//   v38 = *(__m128i *)UnityEngine::Vector4::op_Multiply(v39, (Vector4 *)&v38, cloudFadeAlpha, v11);
+			//   v38 = *(__m128i *)UnityEngine::Vector4::op_Multiply(v39, (Vector4 *)&v38, proceduralSkyLuxFactor, v16);
+			//   v18 = UnityEngine::Vector4::op_Multiply(v39, (Vector4 *)&v38, cloudAbsoluteBrightness, v17);
+			//   v20 = !envPhase.fields.cloudConfig.brightnessAffectCloudAlpha;
+			//   v21 = (__m128)_mm_loadu_si128((const __m128i *)v18);
+			//   v38 = (__m128i)v21;
+			//   if ( v20 )
+			//     v22 = _mm_shuffle_ps(v19, v19, 255).m128_u32[0];
+			//   else
+			//     v22 = _mm_shuffle_ps(v21, v21, 255).m128_u32[0];
+			//   v38.m128i_i32[3] = v22;
+			//   sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGShaderIDs);
+			//   v24 = UnityEngine::Color::op_Implicit((Color *)v39, (Vector4 *)&v38, v23);
+			//   if ( !mat )
+			// LABEL_22:
+			//     sub_180B536AC(static_fields, v8);
+			//   v38 = *(__m128i *)v24;
+			//   UnityEngine::Material::SetVector(mat, v25, (Vector4 *)&v38, 0LL);
+			//   if ( envPhase.fields.cloudConfig.cloudTextureMode )
+			//   {
+			//     v7 = 0;
+			//     v28 = _mm_loadu_si128((const __m128i *)UnityEngine::Vector4::get_one(v39, v26));
+			//   }
+			//   else
+			//   {
+			//     cloudOpacityG = envPhase.fields.cloudConfig.cloudOpacityG;
+			//     v38.m128i_i32[0] = LODWORD(envPhase.fields.cloudConfig.cloudOpacityR);
+			//     *(float *)&v38.m128i_i32[1] = cloudOpacityG;
+			//     v38.m128i_i64[1] = 0x3F8000003F800000LL;
+			//     v28 = v38;
+			//   }
+			//   sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGShaderIDs);
+			//   v38 = v28;
+			//   UnityEngine::Material::SetVector(
+			//     mat,
+			//     TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields._CloudOpacities,
+			//     (Vector4 *)&v38,
+			//     0LL);
+			//   cloudContrast = envPhase.fields.cloudConfig.cloudContrast;
+			//   v38.m128i_i32[3] = 0;
+			//   *(__int64 *)((char *)v38.m128i_i64 + 4) = LODWORD(cloudContrast);
+			//   CloudParam = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields._CloudParam;
+			//   *(float *)v38.m128i_i32 = (float)v7;
+			//   UnityEngine::Material::SetVector(mat, CloudParam, (Vector4 *)&v38, 0LL);
+			//   rotation = envPhase.fields.cloudConfig.rotation;
+			//   flowSpeed = envPhase.fields.cloudConfig.flowSpeed;
+			//   flowDirectionX = envPhase.fields.cloudConfig.flowDirectionX;
+			//   flowDirectionY = envPhase.fields.cloudConfig.flowDirectionY;
+			//   sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGShaderIDs);
+			//   *(float *)v38.m128i_i32 = flowDirectionX;
+			//   *(float *)&v38.m128i_i32[1] = flowDirectionY;
+			//   *(float *)&v38.m128i_i32[2] = flowSpeed;
+			//   CloudFlowParam = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields._CloudFlowParam;
+			//   *(float *)&v38.m128i_i32[3] = (float)rotation;
+			//   UnityEngine::Material::SetVector(mat, CloudFlowParam, (Vector4 *)&v38, 0LL);
+			//   if ( envPhase.fields.cloudConfig.cloudFlowType == 2 )
+			//   {
+			//     cloudFlowMap = (Object_1 *)envPhase.fields.cloudConfig.cloudFlowMap;
+			//     sub_180002C70(TypeInfo::UnityEngine::Object);
+			//     if ( UnityEngine::Object::op_Inequality(cloudFlowMap, 0LL, 0LL) )
+			//     {
+			//       sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGShaderIDs);
+			//       UnityEngine::Material::SetTextureImpl(
+			//         mat,
+			//         TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields._CloudFlowMap,
+			//         envPhase.fields.cloudConfig.cloudFlowMap,
+			//         0LL);
+			//     }
+			//   }
+			// }
+			// 
+		}
+
+		private void SetupCloudParam(MaterialPropertyBlock propertyBlock, HGEnvironmentPhase envPhase)
+		{
+			// // Void SetupCloudParam(MaterialPropertyBlock, HGEnvironmentPhase)
+			// void HG::Rendering::Runtime::HGSkyRenderer::SetupCloudParam(
+			//         HGSkyRenderer *this,
+			//         MaterialPropertyBlock *propertyBlock,
+			//         HGEnvironmentPhase *envPhase,
+			//         MethodInfo *method)
+			// {
+			//   int v7; // r14d
+			//   __int64 v8; // rdx
+			//   __int64 v9; // rcx
+			//   Texture *cloudTexture; // rbx
+			//   MethodInfo *v11; // r9
+			//   __m128i v12; // xmm5
+			//   float proceduralSkyLuxFactor; // xmm7_4
+			//   float cloudAbsoluteBrightness; // xmm6_4
+			//   float cloudFadeAlpha; // xmm2_4
+			//   MethodInfo *v16; // r9
+			//   MethodInfo *v17; // r9
+			//   Vector4 *v18; // rax
+			//   __m128 v19; // xmm5
+			//   bool v20; // zf
+			//   __m128 v21; // xmm4
+			//   float v22; // xmm4_4
+			//   MethodInfo *v23; // r8
+			//   Color *v24; // rax
+			//   int32_t v25; // r10d
+			//   MethodInfo *v26; // rdx
+			//   float cloudOpacityG; // xmm1_4
+			//   __m128i v28; // xmm6
+			//   float cloudContrast; // xmm1_4
+			//   int32_t CloudParam; // edx
+			//   int32_t rotation; // ebx
+			//   float flowSpeed; // xmm8_4
+			//   float flowDirectionX; // xmm6_4
+			//   float flowDirectionY; // xmm7_4
+			//   int32_t CloudFlowParam; // edx
+			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
+			//   __m128i v37; // [rsp+30h] [rbp-50h] BYREF
+			//   Vector4 v38[2]; // [rsp+40h] [rbp-40h] BYREF
+			// 
+			//   v7 = 1;
+			//   if ( !byte_18D919D83 )
+			//   {
+			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGShaderIDs);
+			//     byte_18D919D83 = 1;
+			//   }
+			//   if ( IFix::WrappersManagerImpl::IsPatched(1260, 0LL) )
+			//   {
+			//     Patch = IFix::WrappersManagerImpl::GetPatch(1260, 0LL);
+			//     if ( Patch )
+			//     {
+			//       IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_11(
+			//         (ILFixDynamicMethodWrapper_28 *)Patch,
+			//         (Object *)this,
+			//         (Object *)propertyBlock,
+			//         (Object *)envPhase,
+			//         0LL);
+			//       return;
+			//     }
+			// LABEL_18:
+			//     sub_180B536AC(v9, v8);
+			//   }
+			//   if ( !envPhase )
+			//     goto LABEL_18;
+			//   cloudTexture = envPhase.fields.cloudConfig.cloudTexture;
+			//   sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGShaderIDs);
+			//   HG::Rendering::Runtime::HGEnvironmentUtils::SetTextureIfNotNull(
+			//     propertyBlock,
+			//     TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields._CloudTexture,
+			//     cloudTexture,
+			//     0LL);
+			//   v12 = _mm_loadu_si128((const __m128i *)&envPhase.fields.cloudConfig.cloudTint);
+			//   proceduralSkyLuxFactor = 1.0;
+			//   if ( envPhase.fields.cloudConfig.lightAffectCloud )
+			//   {
+			//     cloudAbsoluteBrightness = envPhase.fields.lightConfig.directIntensityDividePi
+			//                             + envPhase.fields.cloudConfig.cloudBrightness;
+			//     proceduralSkyLuxFactor = envPhase.fields.skyConfig.proceduralSkyLuxFactor;
+			//   }
+			//   else
+			//   {
+			//     cloudAbsoluteBrightness = envPhase.fields.cloudConfig.cloudAbsoluteBrightness;
+			//   }
+			//   cloudFadeAlpha = envPhase.fields.cloudConfig.cloudFadeAlpha;
+			//   v37 = v12;
+			//   v37 = *(__m128i *)UnityEngine::Vector4::op_Multiply(v38, (Vector4 *)&v37, cloudFadeAlpha, v11);
+			//   v37 = *(__m128i *)UnityEngine::Vector4::op_Multiply(v38, (Vector4 *)&v37, proceduralSkyLuxFactor, v16);
+			//   v18 = UnityEngine::Vector4::op_Multiply(v38, (Vector4 *)&v37, cloudAbsoluteBrightness, v17);
+			//   v20 = !envPhase.fields.cloudConfig.brightnessAffectCloudAlpha;
+			//   v21 = (__m128)_mm_loadu_si128((const __m128i *)v18);
+			//   v37 = (__m128i)v21;
+			//   if ( v20 )
+			//     v22 = _mm_shuffle_ps(v19, v19, 255).m128_f32[0] * envPhase.fields.cloudConfig.cloudFadeAlpha;
+			//   else
+			//     LODWORD(v22) = _mm_shuffle_ps(v21, v21, 255).m128_u32[0];
+			//   *(float *)&v37.m128i_i32[3] = v22;
+			//   sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGShaderIDs);
+			//   v24 = UnityEngine::Color::op_Implicit((Color *)v38, (Vector4 *)&v37, v23);
+			//   if ( !propertyBlock )
+			//     goto LABEL_18;
+			//   v37 = *(__m128i *)v24;
+			//   UnityEngine::MaterialPropertyBlock::SetVector(propertyBlock, v25, (Vector4 *)&v37, 0LL);
+			//   if ( envPhase.fields.cloudConfig.cloudTextureMode )
+			//   {
+			//     v7 = 0;
+			//     v28 = _mm_loadu_si128((const __m128i *)UnityEngine::Vector4::get_one(v38, v26));
+			//   }
+			//   else
+			//   {
+			//     cloudOpacityG = envPhase.fields.cloudConfig.cloudOpacityG;
+			//     v37.m128i_i32[0] = LODWORD(envPhase.fields.cloudConfig.cloudOpacityR);
+			//     *(float *)&v37.m128i_i32[1] = cloudOpacityG;
+			//     v37.m128i_i64[1] = 0x3F8000003F800000LL;
+			//     v28 = v37;
+			//   }
+			//   sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGShaderIDs);
+			//   v37 = v28;
+			//   UnityEngine::MaterialPropertyBlock::SetVector(
+			//     propertyBlock,
+			//     TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields._CloudOpacities,
+			//     (Vector4 *)&v37,
+			//     0LL);
+			//   cloudContrast = envPhase.fields.cloudConfig.cloudContrast;
+			//   v37.m128i_i32[3] = 0;
+			//   *(__int64 *)((char *)v37.m128i_i64 + 4) = LODWORD(cloudContrast);
+			//   CloudParam = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields._CloudParam;
+			//   *(float *)v37.m128i_i32 = (float)v7;
+			//   UnityEngine::MaterialPropertyBlock::SetVector(propertyBlock, CloudParam, (Vector4 *)&v37, 0LL);
+			//   rotation = envPhase.fields.cloudConfig.rotation;
+			//   flowSpeed = envPhase.fields.cloudConfig.flowSpeed;
+			//   flowDirectionX = envPhase.fields.cloudConfig.flowDirectionX;
+			//   flowDirectionY = envPhase.fields.cloudConfig.flowDirectionY;
+			//   sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGShaderIDs);
+			//   *(float *)v37.m128i_i32 = flowDirectionX;
+			//   *(float *)&v37.m128i_i32[1] = flowDirectionY;
+			//   *(float *)&v37.m128i_i32[2] = flowSpeed;
+			//   CloudFlowParam = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields._CloudFlowParam;
+			//   *(float *)&v37.m128i_i32[3] = (float)rotation;
+			//   UnityEngine::MaterialPropertyBlock::SetVector(propertyBlock, CloudFlowParam, (Vector4 *)&v37, 0LL);
+			//   if ( envPhase.fields.cloudConfig.cloudFlowType == 2 )
+			//   {
+			//     sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGShaderIDs);
+			//     HG::Rendering::Runtime::HGEnvironmentUtils::SetTextureIfNotNull(
+			//       propertyBlock,
+			//       TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields._CloudFlowMap,
+			//       envPhase.fields.cloudConfig.cloudFlowMap,
+			//       0LL);
+			//   }
+			// }
+			// 
+		}
+
+		private void SetupSunDiscParam(MaterialPropertyBlock propertyBlock, HGEnvironmentPhase envPhase, Material mat)
+		{
+			// // Void SetupSunDiscParam(MaterialPropertyBlock, HGEnvironmentPhase, Material)
+			// void HG::Rendering::Runtime::HGSkyRenderer::SetupSunDiscParam(
+			//         HGSkyRenderer *this,
+			//         MaterialPropertyBlock *propertyBlock,
+			//         HGEnvironmentPhase *envPhase,
+			//         Material *mat,
+			//         MethodInfo *method)
+			// {
+			//   __int64 v9; // rdx
+			//   __int64 v10; // rcx
+			//   float sunDiscRampIntensity; // xmm8_4
+			//   __m128 v12; // xmm7
+			//   float sunDiscRadius; // xmm6_4
+			//   float proceduralSkyLuxFactor; // xmm9_4
+			//   float directIntensityDividePi; // xmm10_4
+			//   int32_t SunDiscParam0; // ebx
+			//   Vector4 *v17; // rax
+			//   int32_t SunDiscParam1; // ebx
+			//   int32_t SunDiscParam2; // ebx
+			//   MethodInfo *v20; // rdx
+			//   Vector3 *fwd; // rax
+			//   Quaternion rotationSunDisc; // xmm0
+			//   __int64 v23; // xmm3_8
+			//   Vector3 *v24; // rax
+			//   MethodInfo *v25; // r8
+			//   Vector3 *v26; // rax
+			//   __int64 v27; // xmm4_8
+			//   String *SUNDISC_HQ; // rdi
+			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
+			//   Vector3 v30; // [rsp+38h] [rbp-31h] BYREF
+			//   Vector4 v31; // [rsp+48h] [rbp-21h] BYREF
+			//   Quaternion v32[6]; // [rsp+58h] [rbp-11h] BYREF
+			// 
+			//   if ( !byte_18D919D84 )
+			//   {
+			//     sub_18003C530(&TypeInfo::UnityEngine::Rendering::CoreUtils);
+			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGShaderIDs);
+			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGShaderKeyWords);
+			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGUtils);
+			//     byte_18D919D84 = 1;
+			//   }
+			//   if ( !IFix::WrappersManagerImpl::IsPatched(1262, 0LL) )
+			//   {
+			//     if ( envPhase )
+			//     {
+			//       sunDiscRampIntensity = envPhase.fields.skyConfig.sunDiscRampIntensity;
+			//       v12 = (__m128)_mm_loadu_si128((const __m128i *)&envPhase.fields.skyConfig.sunDiscColor);
+			//       sunDiscRadius = envPhase.fields.skyConfig.sunDiscRadius;
+			//       proceduralSkyLuxFactor = envPhase.fields.skyConfig.proceduralSkyLuxFactor;
+			//       directIntensityDividePi = envPhase.fields.lightConfig.directIntensityDividePi;
+			//       sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGShaderIDs);
+			//       SunDiscParam0 = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields._SunDiscParam0;
+			//       sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGUtils);
+			//       v17 = HG::Rendering::Runtime::HGUtils::PackVector4(
+			//               (Vector4 *)v32,
+			//               v12.m128_f32[0],
+			//               _mm_shuffle_ps(v12, v12, 85).m128_f32[0],
+			//               _mm_shuffle_ps(v12, v12, 170).m128_f32[0],
+			//               sunDiscRadius,
+			//               0LL);
+			//       if ( propertyBlock )
+			//       {
+			//         v31 = *v17;
+			//         UnityEngine::MaterialPropertyBlock::SetVector(propertyBlock, SunDiscParam0, &v31, 0LL);
+			//         SunDiscParam1 = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields._SunDiscParam1;
+			//         v31 = *HG::Rendering::Runtime::HGUtils::PackVector4(
+			//                  (Vector4 *)v32,
+			//                  20.0,
+			//                  sunDiscRampIntensity,
+			//                  0.0,
+			//                  directIntensityDividePi,
+			//                  0LL);
+			//         UnityEngine::MaterialPropertyBlock::SetVector(propertyBlock, SunDiscParam1, &v31, 0LL);
+			//         SunDiscParam2 = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields._SunDiscParam2;
+			//         fwd = UnityEngine::Vector3::get_fwd((Vector3 *)&v31, v20);
+			//         rotationSunDisc = envPhase.fields.lightConfig.rotationSunDisc;
+			//         v23 = *(_QWORD *)&fwd.x;
+			//         *(float *)&fwd = fwd.z;
+			//         *(_QWORD *)&v30.x = v23;
+			//         LODWORD(v30.z) = (_DWORD)fwd;
+			//         v32[0] = rotationSunDisc;
+			//         v24 = UnityEngine::Quaternion::op_Multiply((Vector3 *)&v31, v32, &v30, 0LL);
+			//         *(_QWORD *)&rotationSunDisc.x = *(_QWORD *)&v24.x;
+			//         *(float *)&v24 = v24.z;
+			//         *(_QWORD *)&v30.x = *(_QWORD *)&rotationSunDisc.x;
+			//         LODWORD(v30.z) = (_DWORD)v24;
+			//         v26 = UnityEngine::Vector3::op_UnaryNegation((Vector3 *)&v31, &v30, v25);
+			//         v27 = *(_QWORD *)&v26.x;
+			//         *(float *)&v26 = v26.z;
+			//         *(_QWORD *)&v30.x = v27;
+			//         LODWORD(v30.z) = (_DWORD)v26;
+			//         v32[0] = *(Quaternion *)HG::Rendering::Runtime::HGUtils::PackVector4(
+			//                                   (Vector4 *)v32,
+			//                                   &v30,
+			//                                   proceduralSkyLuxFactor,
+			//                                   0LL);
+			//         UnityEngine::MaterialPropertyBlock::SetVector(propertyBlock, SunDiscParam2, (Vector4 *)v32, 0LL);
+			//         sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGShaderKeyWords);
+			//         LOBYTE(SunDiscParam2) = envPhase.fields.skyConfig.enableSunDisc;
+			//         SUNDISC_HQ = TypeInfo::HG::Rendering::Runtime::HGShaderKeyWords.static_fields.SUNDISC_HQ;
+			//         sub_180002C70(TypeInfo::UnityEngine::Rendering::CoreUtils);
+			//         VLB::Utils::SetKeywordEnabled(mat, SUNDISC_HQ, SunDiscParam2, 0LL);
+			//         return;
+			//       }
+			//     }
+			// LABEL_8:
+			//     sub_180B536AC(v10, v9);
+			//   }
+			//   Patch = IFix::WrappersManagerImpl::GetPatch(1262, 0LL);
+			//   if ( !Patch )
+			//     goto LABEL_8;
+			//   IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_7(
+			//     (ILFixDynamicMethodWrapper_20 *)Patch,
+			//     (Object *)this,
+			//     (Object *)propertyBlock,
+			//     (Object *)envPhase,
+			//     (Object *)mat,
+			//     0LL);
+			// }
+			// 
+		}
+
+		private void SetupSunDiscParamCPP(Material mat, HGEnvironmentPhase envPhase)
+		{
+			// // Void SetupSunDiscParamCPP(Material, HGEnvironmentPhase)
+			// void HG::Rendering::Runtime::HGSkyRenderer::SetupSunDiscParamCPP(
+			//         HGSkyRenderer *this,
+			//         Material *mat,
+			//         HGEnvironmentPhase *envPhase,
+			//         MethodInfo *method)
+			// {
+			//   __int64 v7; // rdx
+			//   __int64 v8; // rcx
+			//   float sunDiscRampIntensity; // xmm8_4
+			//   __m128 v10; // xmm7
+			//   float sunDiscRadius; // xmm6_4
+			//   float proceduralSkyLuxFactor; // xmm9_4
+			//   float directIntensityDividePi; // xmm10_4
+			//   int32_t SunDiscParam0; // ebx
+			//   Vector4 *v15; // rax
+			//   int32_t SunDiscParam1; // ebx
+			//   int32_t SunDiscParam2; // ebx
+			//   MethodInfo *v18; // rdx
+			//   Vector3 *fwd; // rax
+			//   Quaternion rotationSunDisc; // xmm0
+			//   __int64 v21; // xmm3_8
+			//   Vector3 *v22; // rax
+			//   MethodInfo *v23; // r8
+			//   Vector3 *v24; // rax
+			//   __int64 v25; // xmm4_8
+			//   String *SUNDISC_HQ; // rdi
+			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
+			//   Vector3 v28; // [rsp+38h] [rbp-29h] BYREF
+			//   Vector4 v29; // [rsp+48h] [rbp-19h] BYREF
+			//   Quaternion v30[6]; // [rsp+58h] [rbp-9h] BYREF
+			// 
+			//   if ( !byte_18D919D85 )
+			//   {
+			//     sub_18003C530(&TypeInfo::UnityEngine::Rendering::CoreUtils);
+			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGShaderIDs);
+			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGShaderKeyWords);
+			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGUtils);
+			//     byte_18D919D85 = 1;
+			//   }
+			//   if ( !IFix::WrappersManagerImpl::IsPatched(1272, 0LL) )
+			//   {
+			//     if ( envPhase )
+			//     {
+			//       sunDiscRampIntensity = envPhase.fields.skyConfig.sunDiscRampIntensity;
+			//       v10 = (__m128)_mm_loadu_si128((const __m128i *)&envPhase.fields.skyConfig.sunDiscColor);
+			//       sunDiscRadius = envPhase.fields.skyConfig.sunDiscRadius;
+			//       proceduralSkyLuxFactor = envPhase.fields.skyConfig.proceduralSkyLuxFactor;
+			//       directIntensityDividePi = envPhase.fields.lightConfig.directIntensityDividePi;
+			//       sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGShaderIDs);
+			//       SunDiscParam0 = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields._SunDiscParam0;
+			//       sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGUtils);
+			//       v15 = HG::Rendering::Runtime::HGUtils::PackVector4(
+			//               (Vector4 *)v30,
+			//               v10.m128_f32[0],
+			//               _mm_shuffle_ps(v10, v10, 85).m128_f32[0],
+			//               _mm_shuffle_ps(v10, v10, 170).m128_f32[0],
+			//               sunDiscRadius,
+			//               0LL);
+			//       if ( mat )
+			//       {
+			//         v29 = *v15;
+			//         UnityEngine::Material::SetVector(mat, SunDiscParam0, &v29, 0LL);
+			//         SunDiscParam1 = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields._SunDiscParam1;
+			//         v29 = *HG::Rendering::Runtime::HGUtils::PackVector4(
+			//                  (Vector4 *)v30,
+			//                  20.0,
+			//                  sunDiscRampIntensity,
+			//                  0.0,
+			//                  directIntensityDividePi,
+			//                  0LL);
+			//         UnityEngine::Material::SetVector(mat, SunDiscParam1, &v29, 0LL);
+			//         SunDiscParam2 = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields._SunDiscParam2;
+			//         fwd = UnityEngine::Vector3::get_fwd((Vector3 *)&v29, v18);
+			//         rotationSunDisc = envPhase.fields.lightConfig.rotationSunDisc;
+			//         v21 = *(_QWORD *)&fwd.x;
+			//         *(float *)&fwd = fwd.z;
+			//         *(_QWORD *)&v28.x = v21;
+			//         LODWORD(v28.z) = (_DWORD)fwd;
+			//         v30[0] = rotationSunDisc;
+			//         v22 = UnityEngine::Quaternion::op_Multiply((Vector3 *)&v29, v30, &v28, 0LL);
+			//         *(_QWORD *)&rotationSunDisc.x = *(_QWORD *)&v22.x;
+			//         *(float *)&v22 = v22.z;
+			//         *(_QWORD *)&v28.x = *(_QWORD *)&rotationSunDisc.x;
+			//         LODWORD(v28.z) = (_DWORD)v22;
+			//         v24 = UnityEngine::Vector3::op_UnaryNegation((Vector3 *)&v29, &v28, v23);
+			//         v25 = *(_QWORD *)&v24.x;
+			//         *(float *)&v24 = v24.z;
+			//         *(_QWORD *)&v28.x = v25;
+			//         LODWORD(v28.z) = (_DWORD)v24;
+			//         v30[0] = *(Quaternion *)HG::Rendering::Runtime::HGUtils::PackVector4(
+			//                                   (Vector4 *)v30,
+			//                                   &v28,
+			//                                   proceduralSkyLuxFactor,
+			//                                   0LL);
+			//         UnityEngine::Material::SetVector(mat, SunDiscParam2, (Vector4 *)v30, 0LL);
+			//         sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGShaderKeyWords);
+			//         LOBYTE(SunDiscParam2) = envPhase.fields.skyConfig.enableSunDisc;
+			//         SUNDISC_HQ = TypeInfo::HG::Rendering::Runtime::HGShaderKeyWords.static_fields.SUNDISC_HQ;
+			//         sub_180002C70(TypeInfo::UnityEngine::Rendering::CoreUtils);
+			//         VLB::Utils::SetKeywordEnabled(mat, SUNDISC_HQ, SunDiscParam2, 0LL);
+			//         return;
+			//       }
+			//     }
+			// LABEL_8:
+			//     sub_180B536AC(v8, v7);
+			//   }
+			//   Patch = IFix::WrappersManagerImpl::GetPatch(1272, 0LL);
+			//   if ( !Patch )
+			//     goto LABEL_8;
+			//   IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_11(
+			//     (ILFixDynamicMethodWrapper_28 *)Patch,
+			//     (Object *)this,
+			//     (Object *)mat,
+			//     (Object *)envPhase,
+			//     0LL);
+			// }
+			// 
+		}
+
+		private void SetupStarParamCPP(Material mat, HGEnvironmentPhase envPhase)
+		{
+			// // Void SetupStarParamCPP(Material, HGEnvironmentPhase)
+			// void HG::Rendering::Runtime::HGSkyRenderer::SetupStarParamCPP(
+			//         HGSkyRenderer *this,
+			//         Material *mat,
+			//         HGEnvironmentPhase *envPhase,
+			//         MethodInfo *method)
+			// {
+			//   __int64 v7; // rdx
+			//   __int64 v8; // rcx
+			//   bool enableStars; // bl
+			//   String *HG_SKYBOX_STAR; // rdi
+			//   float starsDensity; // xmm9_4
+			//   float starsExposure; // xmm8_4
+			//   float starsSize; // xmm7_4
+			//   float starsFlickerSpeed; // xmm6_4
+			//   int32_t SkyBoxStarParam0; // ebx
+			//   Vector4 *v16; // rax
+			//   HGShaderIDs__StaticFields *static_fields; // rcx
+			//   int32_t SkyBoxStarParam1; // ebx
+			//   int32_t SkyBoxStarParam2; // ebx
+			//   HGShaderIDs__StaticFields *v20; // rcx
+			//   int32_t SkyBoxStarParam3; // ebx
+			//   int32_t SkyBoxStarParam4; // ebx
+			//   HGShaderIDs__StaticFields *v23; // rcx
+			//   int32_t SkyBoxStarParam5; // ebx
+			//   int32_t SkyBoxStarParam6; // ebx
+			//   HGShaderIDs__StaticFields *v26; // rcx
+			//   int32_t SkyBoxStarParam7; // ebx
+			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
+			//   Vector4 starsTint; // [rsp+38h] [rbp-9h] BYREF
+			//   Vector4 v30[2]; // [rsp+48h] [rbp+7h] BYREF
+			// 
+			//   if ( !byte_18D919D86 )
+			//   {
+			//     sub_18003C530(&TypeInfo::UnityEngine::Rendering::CoreUtils);
+			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGShaderIDs);
+			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGShaderKeyWords);
+			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGUtils);
+			//     byte_18D919D86 = 1;
+			//   }
+			//   if ( !IFix::WrappersManagerImpl::IsPatched(1273, 0LL) )
+			//   {
+			//     if ( envPhase )
+			//     {
+			//       sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGShaderKeyWords);
+			//       enableStars = envPhase.fields.starConfig.enableStars;
+			//       HG_SKYBOX_STAR = TypeInfo::HG::Rendering::Runtime::HGShaderKeyWords.static_fields.HG_SKYBOX_STAR;
+			//       sub_180002C70(TypeInfo::UnityEngine::Rendering::CoreUtils);
+			//       VLB::Utils::SetKeywordEnabled(mat, HG_SKYBOX_STAR, enableStars, 0LL);
+			//       VLB::Utils::SetKeywordEnabled(
+			//         mat,
+			//         TypeInfo::HG::Rendering::Runtime::HGShaderKeyWords.static_fields.HG_SKYBOX_NEBULA,
+			//         envPhase.fields.starConfig.enableNebula,
+			//         0LL);
+			//       sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGShaderIDs);
+			//       starsDensity = envPhase.fields.starConfig.starsDensity;
+			//       starsExposure = envPhase.fields.starConfig.starsExposure;
+			//       starsSize = envPhase.fields.starConfig.starsSize;
+			//       starsFlickerSpeed = envPhase.fields.starConfig.starsFlickerSpeed;
+			//       SkyBoxStarParam0 = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields._SkyBoxStarParam0;
+			//       sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGUtils);
+			//       v16 = HG::Rendering::Runtime::HGUtils::PackVector4(
+			//               &starsTint,
+			//               starsDensity,
+			//               starsExposure,
+			//               starsSize,
+			//               starsFlickerSpeed,
+			//               0LL);
+			//       if ( mat )
+			//       {
+			//         starsTint = *v16;
+			//         UnityEngine::Material::SetVector(mat, SkyBoxStarParam0, &starsTint, 0LL);
+			//         static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//         starsTint = (Vector4)envPhase.fields.starConfig.starsTint;
+			//         SkyBoxStarParam1 = static_fields._SkyBoxStarParam1;
+			//         starsTint = *HG::Rendering::Runtime::HGUtils::PackVector4(v30, (Color *)&starsTint, 0LL);
+			//         UnityEngine::Material::SetVector(mat, SkyBoxStarParam1, &starsTint, 0LL);
+			//         SkyBoxStarParam2 = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields._SkyBoxStarParam2;
+			//         starsTint = *HG::Rendering::Runtime::HGUtils::PackVector4(
+			//                        v30,
+			//                        envPhase.fields.starConfig.starsDensity1,
+			//                        envPhase.fields.starConfig.starsExposure1,
+			//                        envPhase.fields.starConfig.starsDensityR,
+			//                        envPhase.fields.starConfig.starsDensityG,
+			//                        0LL);
+			//         UnityEngine::Material::SetVector(mat, SkyBoxStarParam2, &starsTint, 0LL);
+			//         v20 = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//         starsTint = (Vector4)envPhase.fields.starConfig.starsTint1;
+			//         SkyBoxStarParam3 = v20._SkyBoxStarParam3;
+			//         starsTint = *HG::Rendering::Runtime::HGUtils::PackVector4(v30, (Color *)&starsTint, 0LL);
+			//         UnityEngine::Material::SetVector(mat, SkyBoxStarParam3, &starsTint, 0LL);
+			//         SkyBoxStarParam4 = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields._SkyBoxStarParam4;
+			//         starsTint = *HG::Rendering::Runtime::HGUtils::PackVector4(
+			//                        v30,
+			//                        envPhase.fields.starConfig.starsDensity2,
+			//                        envPhase.fields.starConfig.starsExposure2,
+			//                        envPhase.fields.starConfig.starsDensityB,
+			//                        envPhase.fields.starConfig.skyBoxStarDensityMapRotation,
+			//                        0LL);
+			//         UnityEngine::Material::SetVector(mat, SkyBoxStarParam4, &starsTint, 0LL);
+			//         v23 = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//         starsTint = (Vector4)envPhase.fields.starConfig.starsTint2;
+			//         SkyBoxStarParam5 = v23._SkyBoxStarParam5;
+			//         starsTint = *HG::Rendering::Runtime::HGUtils::PackVector4(v30, (Color *)&starsTint, 0LL);
+			//         UnityEngine::Material::SetVector(mat, SkyBoxStarParam5, &starsTint, 0LL);
+			//         SkyBoxStarParam6 = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields._SkyBoxStarParam6;
+			//         starsTint = *HG::Rendering::Runtime::HGUtils::PackVector4(
+			//                        v30,
+			//                        (float)envPhase.fields.starConfig.starLayerViewMode,
+			//                        (float)envPhase.fields.starConfig.debugMode,
+			//                        envPhase.fields.starConfig.nebulaMapRotation,
+			//                        envPhase.fields.starConfig.nebulaStarConverage,
+			//                        0LL);
+			//         UnityEngine::Material::SetVector(mat, SkyBoxStarParam6, &starsTint, 0LL);
+			//         v26 = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//         starsTint = (Vector4)envPhase.fields.starConfig.nebulaTint;
+			//         SkyBoxStarParam7 = v26._SkyBoxStarParam7;
+			//         starsTint = *HG::Rendering::Runtime::HGUtils::PackVector4(v30, (Color *)&starsTint, 0.0, 0LL);
+			//         UnityEngine::Material::SetVector(mat, SkyBoxStarParam7, &starsTint, 0LL);
+			//         UnityEngine::Material::SetTextureImpl(
+			//           mat,
+			//           TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields._SkyBoxStarTexture,
+			//           envPhase.fields.starConfig.skyboxStarNoiseMap,
+			//           0LL);
+			//         UnityEngine::Material::SetTextureImpl(
+			//           mat,
+			//           TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields._SkyBoxStarDensityTexture,
+			//           envPhase.fields.starConfig.skyBoxStarRangeMap,
+			//           0LL);
+			//         UnityEngine::Material::SetTextureImpl(
+			//           mat,
+			//           TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields._SkyBoxNebulaTexture,
+			//           envPhase.fields.starConfig.nebulaMap,
+			//           0LL);
+			//         return;
+			//       }
+			//     }
+			// LABEL_8:
+			//     sub_180B536AC(v8, v7);
+			//   }
+			//   Patch = IFix::WrappersManagerImpl::GetPatch(1273, 0LL);
+			//   if ( !Patch )
+			//     goto LABEL_8;
+			//   IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_11(
+			//     (ILFixDynamicMethodWrapper_28 *)Patch,
+			//     (Object *)this,
+			//     (Object *)mat,
+			//     (Object *)envPhase,
+			//     0LL);
+			// }
+			// 
+		}
+
+		private void SetupStarParam(MaterialPropertyBlock propertyBlock, HGEnvironmentPhase envPhase, Material mat)
+		{
+			// // Void SetupStarParam(MaterialPropertyBlock, HGEnvironmentPhase, Material)
+			// void HG::Rendering::Runtime::HGSkyRenderer::SetupStarParam(
+			//         HGSkyRenderer *this,
+			//         MaterialPropertyBlock *propertyBlock,
+			//         HGEnvironmentPhase *envPhase,
+			//         Material *mat,
+			//         MethodInfo *method)
+			// {
+			//   __int64 v9; // rdx
+			//   __int64 v10; // rcx
+			//   bool enableStars; // bl
+			//   String *HG_SKYBOX_STAR; // rdi
+			//   float starsDensity; // xmm7_4
+			//   float starsExposure; // xmm9_4
+			//   float starsSize; // xmm8_4
+			//   float starsFlickerSpeed; // xmm6_4
+			//   int32_t SkyBoxStarParam0; // ebx
+			//   Vector4 *v18; // rax
+			//   HGShaderIDs__StaticFields *static_fields; // rcx
+			//   int32_t SkyBoxStarParam1; // ebx
+			//   int32_t SkyBoxStarParam2; // ebx
+			//   HGShaderIDs__StaticFields *v22; // rcx
+			//   int32_t SkyBoxStarParam3; // ebx
+			//   int32_t SkyBoxStarParam4; // ebx
+			//   int32_t SkyBoxStarParam5; // ebx
+			//   int32_t SkyBoxStarParam6; // ebx
+			//   HGShaderIDs__StaticFields *v27; // rcx
+			//   int32_t SkyBoxStarParam7; // ebx
+			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
+			//   Vector4 starsTint; // [rsp+38h] [rbp-21h] BYREF
+			//   Vector4 v31[6]; // [rsp+48h] [rbp-11h] BYREF
+			// 
+			//   if ( !byte_18D919D87 )
+			//   {
+			//     sub_18003C530(&TypeInfo::UnityEngine::Rendering::CoreUtils);
+			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGShaderIDs);
+			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGShaderKeyWords);
+			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGUtils);
+			//     byte_18D919D87 = 1;
+			//   }
+			//   if ( !IFix::WrappersManagerImpl::IsPatched(1263, 0LL) )
+			//   {
+			//     if ( envPhase )
+			//     {
+			//       sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGShaderKeyWords);
+			//       enableStars = envPhase.fields.starConfig.enableStars;
+			//       HG_SKYBOX_STAR = TypeInfo::HG::Rendering::Runtime::HGShaderKeyWords.static_fields.HG_SKYBOX_STAR;
+			//       sub_180002C70(TypeInfo::UnityEngine::Rendering::CoreUtils);
+			//       VLB::Utils::SetKeywordEnabled(mat, HG_SKYBOX_STAR, enableStars, 0LL);
+			//       VLB::Utils::SetKeywordEnabled(
+			//         mat,
+			//         TypeInfo::HG::Rendering::Runtime::HGShaderKeyWords.static_fields.HG_SKYBOX_NEBULA,
+			//         envPhase.fields.starConfig.enableNebula,
+			//         0LL);
+			//       sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGShaderIDs);
+			//       starsDensity = envPhase.fields.starConfig.starsDensity;
+			//       starsExposure = envPhase.fields.starConfig.starsExposure;
+			//       starsSize = envPhase.fields.starConfig.starsSize;
+			//       starsFlickerSpeed = envPhase.fields.starConfig.starsFlickerSpeed;
+			//       SkyBoxStarParam0 = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields._SkyBoxStarParam0;
+			//       sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGUtils);
+			//       v18 = HG::Rendering::Runtime::HGUtils::PackVector4(
+			//               &starsTint,
+			//               1.0 - starsDensity,
+			//               starsExposure,
+			//               starsSize,
+			//               starsFlickerSpeed,
+			//               0LL);
+			//       if ( mat )
+			//       {
+			//         starsTint = *v18;
+			//         UnityEngine::Material::SetVector(mat, SkyBoxStarParam0, &starsTint, 0LL);
+			//         static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//         starsTint = (Vector4)envPhase.fields.starConfig.starsTint;
+			//         SkyBoxStarParam1 = static_fields._SkyBoxStarParam1;
+			//         starsTint = *HG::Rendering::Runtime::HGUtils::PackVector4(v31, (Color *)&starsTint, 0LL);
+			//         UnityEngine::Material::SetVector(mat, SkyBoxStarParam1, &starsTint, 0LL);
+			//         SkyBoxStarParam2 = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields._SkyBoxStarParam2;
+			//         starsTint = *HG::Rendering::Runtime::HGUtils::PackVector4(
+			//                        v31,
+			//                        1.0 - envPhase.fields.starConfig.starsDensity1,
+			//                        envPhase.fields.starConfig.starsExposure1,
+			//                        envPhase.fields.starConfig.starsDensityR,
+			//                        envPhase.fields.starConfig.starsDensityG,
+			//                        0LL);
+			//         UnityEngine::Material::SetVector(mat, SkyBoxStarParam2, &starsTint, 0LL);
+			//         v22 = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//         starsTint = (Vector4)envPhase.fields.starConfig.starsTint1;
+			//         SkyBoxStarParam3 = v22._SkyBoxStarParam3;
+			//         starsTint = *HG::Rendering::Runtime::HGUtils::PackVector4(v31, (Color *)&starsTint, 0LL);
+			//         UnityEngine::Material::SetVector(mat, SkyBoxStarParam3, &starsTint, 0LL);
+			//         SkyBoxStarParam4 = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields._SkyBoxStarParam4;
+			//         starsTint = *HG::Rendering::Runtime::HGUtils::PackVector4(
+			//                        v31,
+			//                        1.0 - envPhase.fields.starConfig.starsDensity2,
+			//                        envPhase.fields.starConfig.starsExposure2,
+			//                        envPhase.fields.starConfig.starsDensityB,
+			//                        envPhase.fields.starConfig.skyBoxStarDensityMapRotation,
+			//                        0LL);
+			//         UnityEngine::Material::SetVector(mat, SkyBoxStarParam4, &starsTint, 0LL);
+			//         SkyBoxStarParam5 = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields._SkyBoxStarParam5;
+			//         starsTint = (Vector4)envPhase.fields.starConfig.starsTint2;
+			//         starsTint = *HG::Rendering::Runtime::HGUtils::PackVector4(v31, (Color *)&starsTint, 0LL);
+			//         UnityEngine::Material::SetVector(mat, SkyBoxStarParam5, &starsTint, 0LL);
+			//         SkyBoxStarParam6 = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields._SkyBoxStarParam6;
+			//         starsTint = *HG::Rendering::Runtime::HGUtils::PackVector4(
+			//                        v31,
+			//                        (float)envPhase.fields.starConfig.starLayerViewMode,
+			//                        (float)envPhase.fields.starConfig.debugMode,
+			//                        envPhase.fields.starConfig.nebulaMapRotation,
+			//                        envPhase.fields.starConfig.nebulaStarConverage,
+			//                        0LL);
+			//         UnityEngine::Material::SetVector(mat, SkyBoxStarParam6, &starsTint, 0LL);
+			//         v27 = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//         starsTint = (Vector4)envPhase.fields.starConfig.nebulaTint;
+			//         SkyBoxStarParam7 = v27._SkyBoxStarParam7;
+			//         starsTint = *HG::Rendering::Runtime::HGUtils::PackVector4(v31, (Color *)&starsTint, 0.0, 0LL);
+			//         UnityEngine::Material::SetVector(mat, SkyBoxStarParam7, &starsTint, 0LL);
+			//         UnityEngine::Material::SetTextureImpl(
+			//           mat,
+			//           TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields._SkyBoxStarTexture,
+			//           envPhase.fields.starConfig.skyboxStarNoiseMap,
+			//           0LL);
+			//         UnityEngine::Material::SetTextureImpl(
+			//           mat,
+			//           TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields._SkyBoxStarDensityTexture,
+			//           envPhase.fields.starConfig.skyBoxStarRangeMap,
+			//           0LL);
+			//         UnityEngine::Material::SetTextureImpl(
+			//           mat,
+			//           TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields._SkyBoxNebulaTexture,
+			//           envPhase.fields.starConfig.nebulaMap,
+			//           0LL);
+			//         return;
+			//       }
+			//     }
+			// LABEL_8:
+			//     sub_180B536AC(v10, v9);
+			//   }
+			//   Patch = IFix::WrappersManagerImpl::GetPatch(1263, 0LL);
+			//   if ( !Patch )
+			//     goto LABEL_8;
+			//   IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_7(
+			//     (ILFixDynamicMethodWrapper_20 *)Patch,
+			//     (Object *)this,
+			//     (Object *)propertyBlock,
+			//     (Object *)envPhase,
+			//     (Object *)mat,
+			//     0LL);
+			// }
+			// 
+		}
+
+		private void SetupPlanets(ScriptableRenderContext context, HGCamera hgCamera, MaterialPropertyBlock propertyBlock, Material mat)
+		{
+			// // Void SetupPlanets(ScriptableRenderContext, HGCamera, MaterialPropertyBlock, Material)
+			// void HG::Rendering::Runtime::HGSkyRenderer::SetupPlanets(
+			//         HGSkyRenderer *this,
+			//         ScriptableRenderContext context,
+			//         HGCamera *hgCamera,
+			//         MaterialPropertyBlock *propertyBlock,
+			//         Material *mat,
+			//         MethodInfo *method)
+			// {
+			//   ILFixDynamicMethodWrapper_2__Class *v10; // rdx
+			//   ILFixDynamicMethodWrapper_2 *Patch; // rcx
+			//   ILFixDynamicMethodWrapper_2__Class *klass; // rax
+			//   HGEnvironmentPhase *InterpolatedPhase; // rax
+			//   HGCelestialConfig *moon; // rsi
+			// 
+			//   if ( !byte_18D919D88 )
+			//   {
+			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
+			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGShaderIDs);
+			//     byte_18D919D88 = 1;
+			//   }
+			//   if ( IFix::WrappersManagerImpl::IsPatched(1265, 0LL) )
+			//   {
+			//     Patch = IFix::WrappersManagerImpl::GetPatch(1265, 0LL);
+			//     if ( Patch )
+			//     {
+			//       IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_481(
+			//         Patch,
+			//         (Object *)this,
+			//         context,
+			//         (Object *)hgCamera,
+			//         (Object *)propertyBlock,
+			//         (Object *)mat,
+			//         0LL);
+			//       return;
+			//     }
+			//     goto LABEL_18;
+			//   }
+			//   sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGShaderIDs);
+			//   Patch = (ILFixDynamicMethodWrapper_2 *)TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//   klass = Patch[33].klass;
+			//   if ( !klass )
+			//     goto LABEL_18;
+			//   if ( !LODWORD(klass._0.namespaze) )
+			//     goto LABEL_16;
+			//   if ( !mat )
+			//     goto LABEL_18;
+			//   UnityEngine::Material::SetFloatImpl(mat, klass._0.byval_arg.data.__klassIndex, 0.0, 0LL);
+			//   Patch = (ILFixDynamicMethodWrapper_2 *)TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//   v10 = Patch[33].klass;
+			//   if ( !v10 )
+			//     goto LABEL_18;
+			//   if ( LODWORD(v10._0.namespaze) <= 1 )
+			// LABEL_16:
+			//     sub_180070270(Patch, v10);
+			//   UnityEngine::Material::SetFloatImpl(mat, HIDWORD(v10._0.byval_arg.data.type), 0.0, 0LL);
+			//   if ( !HG::Rendering::Runtime::HGSkyRenderer::ShouldRenderSkyCelestial(this, 0LL) )
+			//     return;
+			//   sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
+			//   InterpolatedPhase = HG::Rendering::Runtime::HGEnvironmentManager::GetInterpolatedPhase(hgCamera, 0LL);
+			//   if ( !InterpolatedPhase )
+			// LABEL_18:
+			//     sub_180B536AC(Patch, v10);
+			//   moon = &InterpolatedPhase.fields.celestialConfig;
+			//   if ( InterpolatedPhase.fields.celestialConfig.planetConfig.drawPlanetInSkydome )
+			//     HG::Rendering::Runtime::HGSkyRenderer::SetupPlanet(
+			//       this,
+			//       hgCamera,
+			//       mat,
+			//       &InterpolatedPhase.fields.celestialConfig.planetConfig,
+			//       &InterpolatedPhase.fields.celestialConfig.moonConfig,
+			//       0,
+			//       0LL);
+			//   if ( moon.talosAlphaConfig.drawPlanetInSkydome )
+			//     HG::Rendering::Runtime::HGSkyRenderer::SetupPlanet(
+			//       this,
+			//       hgCamera,
+			//       mat,
+			//       &moon.talosAlphaConfig,
+			//       &moon.moonConfig,
+			//       1,
+			//       0LL);
+			//   HG::Rendering::Runtime::HGSkyRenderer::SetupAdvancedPlanet(this, propertyBlock, context, hgCamera, mat, 0LL);
+			// }
+			// 
+		}
+
+		private void SetupPlanet(HGCamera hgCamera, Material mat, ref HGCelestialConfig.HGCelestialAtmosphereObjectConfig planet, ref HGCelestialConfig.HGCelestialObjectConfig moon, int i)
+		{
+			// // Void SetupPlanet(HGCamera, Material, HGCelestialConfig+HGCelestialAtmosphereObjectConfig ByRef, HGCelestialConfig+HGCelestialObjectConfig ByRef, Int32)
+			// void HG::Rendering::Runtime::HGSkyRenderer::SetupPlanet(
+			//         HGSkyRenderer *this,
+			//         HGCamera *hgCamera,
+			//         Material *mat,
+			//         HGCelestialConfig_HGCelestialAtmosphereObjectConfig *planet,
+			//         HGCelestialConfig_HGCelestialObjectConfig *moon,
+			//         int32_t i,
+			//         MethodInfo *method)
+			// {
+			//   Int32__Array *PlanetBaseMap01; // rdx
+			//   void *static_fields; // rcx
+			//   Quaternion v13; // xmm8
+			//   Component *camera; // rdi
+			//   Object_1 *v15; // r12
+			//   __m128i v16; // xmm10
+			//   MethodInfo *v17; // rdx
+			//   Vector3 *fwd; // rax
+			//   __int64 v19; // xmm3_8
+			//   Vector3 *v20; // rax
+			//   __int64 v21; // xmm9_8
+			//   MethodInfo *v22; // rax
+			//   Vector3 *v23; // rax
+			//   Quaternion *v24; // rdx
+			//   Quaternion v25; // xmm0
+			//   __int64 v26; // xmm3_8
+			//   Vector3 *v27; // rax
+			//   MethodInfo *v28; // r9
+			//   float ProceduralSkyMeshRadius; // xmm7_4
+			//   float outerRadius; // xmm12_4
+			//   float radius; // xmm6_4
+			//   Vector3 *v32; // rax
+			//   __int64 v33; // xmm15_8
+			//   Transform *transform; // rax
+			//   Vector3 *position; // rax
+			//   float v36; // xmm1_4
+			//   __int64 v37; // xmm8_8
+			//   float3 *v38; // rdx
+			//   float3 *v39; // rcx
+			//   float3 *v40; // r8
+			//   float3 *v41; // r9
+			//   float v42; // xmm0_4
+			//   float v43; // edi
+			//   MethodInfo *v44; // rdx
+			//   Vector3 *one; // rax
+			//   __int64 v46; // xmm1_8
+			//   MethodInfo *v47; // r9
+			//   Vector3 *v48; // rax
+			//   __int64 v49; // xmm3_8
+			//   MethodInfo *v50; // r9
+			//   float v51; // xmm4_4
+			//   Vector3 *v52; // rax
+			//   __int64 v53; // xmm3_8
+			//   MethodInfo *v54; // r9
+			//   Vector3 *v55; // rax
+			//   __int64 v56; // xmm3_8
+			//   Matrix4x4 *v57; // rax
+			//   __int128 v58; // xmm1
+			//   __int128 v59; // xmm0
+			//   __int128 v60; // xmm1
+			//   float width; // xmm7_4
+			//   float v62; // xmm9_4
+			//   float v63; // xmm10_4
+			//   Vector4 *v64; // rax
+			//   __m128i v65; // xmm10
+			//   MethodInfo *v66; // r9
+			//   Vector3 *v67; // rax
+			//   __int64 v68; // xmm3_8
+			//   __m128i v69; // xmm9
+			//   Animator *v70; // rdx
+			//   int32_t v71; // r8d
+			//   MethodInfo *v72; // r9
+			//   Vector3 *Vector; // rax
+			//   __int64 v74; // xmm1_8
+			//   Animator *v75; // rdx
+			//   int32_t v76; // r8d
+			//   MethodInfo *v77; // r9
+			//   Vector3 *v78; // rax
+			//   __int64 v79; // xmm1_8
+			//   Animator *v80; // rdx
+			//   int32_t v81; // r8d
+			//   MethodInfo *v82; // r9
+			//   Vector3 *v83; // rax
+			//   __m128 selfTiltX_low; // xmm6
+			//   __m128 selfRotationY_low; // xmm7
+			//   __int64 v86; // xmm1_8
+			//   float selfTiltZ; // xmm8_4
+			//   __m128i v88; // xmm6
+			//   Vector4 *v89; // rax
+			//   __m128i v90; // xmm7
+			//   Vector4 *v91; // rax
+			//   __m128i v92; // xmm8
+			//   Vector4 *v93; // rax
+			//   __m128i v94; // xmm12
+			//   __m128i v95; // xmm15
+			//   __int64 v96; // rdi
+			//   String *v97; // rdi
+			//   bool enableRing; // bl
+			//   __int64 v99; // rax
+			//   int32_t v100; // edx
+			//   int32_t v101; // edx
+			//   int32_t v102; // edx
+			//   int32_t v103; // edx
+			//   int32_t v104; // edx
+			//   int32_t v105; // edx
+			//   int32_t v106; // edx
+			//   int32_t v107; // ebx
+			//   __int64 v108; // rbx
+			//   int32_t v109; // ebx
+			//   float Float; // xmm0_4
+			//   __int64 v111; // rbx
+			//   int32_t v112; // ebx
+			//   __int64 v113; // rbx
+			//   int32_t v114; // ebx
+			//   float v115; // xmm0_4
+			//   __int64 v116; // rbx
+			//   int32_t v117; // ebx
+			//   float v118; // xmm0_4
+			//   Texture *Texture; // rbx
+			//   Object_1 *blackTexture; // rbx
+			//   int32_t v121; // edi
+			//   int32_t v122; // edx
+			//   Texture *v123; // rbx
+			//   float numInscatteredSamplePoints; // xmm8_4
+			//   float numOpticalDepthSamplePoints; // xmm9_4
+			//   float atmosphereHeight; // xmm7_4
+			//   float coff_R; // xmm6_4
+			//   Vector4 *v128; // rax
+			//   float v129; // xmm2_4
+			//   __m128i v130; // xmm8
+			//   Vector4 *v131; // rax
+			//   bool enableAtmosphere; // bl
+			//   __m128i v133; // xmm9
+			//   float bakeFaceVisibility; // xmm7_4
+			//   float drawPlanetBelowHorizon; // xmm6_4
+			//   __m128i v136; // xmm6
+			//   int32_t v137; // edx
+			//   int32_t v138; // edx
+			//   int32_t v139; // edx
+			//   Vector3 v140; // [rsp+48h] [rbp-C0h] BYREF
+			//   Vector3 v141; // [rsp+58h] [rbp-B0h] BYREF
+			//   Quaternion v142[2]; // [rsp+68h] [rbp-A0h] BYREF
+			//   float v143; // [rsp+88h] [rbp-80h]
+			//   float v144; // [rsp+8Ch] [rbp-7Ch]
+			//   __m128i v145; // [rsp+98h] [rbp-70h] BYREF
+			//   Vector3 v146; // [rsp+A8h] [rbp-60h] BYREF
+			//   Vector3 v147; // [rsp+B8h] [rbp-50h] BYREF
+			//   float z; // [rsp+C8h] [rbp-40h]
+			//   float v149; // [rsp+CCh] [rbp-3Ch]
+			//   float v150; // [rsp+D0h] [rbp-38h]
+			//   __int64 v151; // [rsp+D8h] [rbp-30h]
+			//   __int64 v152; // [rsp+E0h] [rbp-28h]
+			//   Matrix4x4 v153; // [rsp+E8h] [rbp-20h] BYREF
+			//   Matrix4x4 v154[3]; // [rsp+128h] [rbp+20h] BYREF
+			// 
+			//   if ( !byte_18D919D89 )
+			//   {
+			//     sub_18003C530(&TypeInfo::UnityEngine::Rendering::CoreUtils);
+			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGCelestialConfig);
+			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGShaderIDs);
+			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGShaderKeyWords);
+			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGSkyRenderer);
+			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGUtils);
+			//     sub_18003C530(&TypeInfo::UnityEngine::Object);
+			//     sub_18003C530(&off_18D5E4CA8);
+			//     sub_18003C530(&off_18D5E4CA0);
+			//     sub_18003C530(&off_18D60F098);
+			//     sub_18003C530(&off_18C9CB878);
+			//     sub_18003C530(&off_18D5E4CD8);
+			//     sub_18003C530(&off_18C8F12C0);
+			//     sub_18003C530(&off_18D5E4CC8);
+			//     sub_18003C530(&off_18D5E4CC0);
+			//     byte_18D919D89 = 1;
+			//   }
+			//   if ( !IFix::WrappersManagerImpl::IsPatched(1266, 0LL) )
+			//   {
+			//     if ( hgCamera )
+			//     {
+			//       v13 = *(Quaternion *)&planet.skydomeDrawer.pitchYaw.x;
+			//       camera = (Component *)hgCamera.fields.camera;
+			//       v142[0] = *(Quaternion *)&planet.skydomeDrawer.drawMode;
+			//       v142[1] = v13;
+			//       sub_180002C70(TypeInfo::UnityEngine::Object);
+			//       v15 = (Object_1 *)_mm_srli_si128((__m128i)v142[0], 8).m128i_u64[0];
+			//       if ( UnityEngine::Object::op_Equality(v15, 0LL, 0LL) )
+			//         return;
+			//       v16 = _mm_loadu_si128((const __m128i *)sub_182504D40(v142));
+			//       fwd = UnityEngine::Vector3::get_fwd(&v140, v17);
+			//       v145 = v16;
+			//       v19 = *(_QWORD *)&fwd.x;
+			//       v141.z = fwd.z;
+			//       *(_QWORD *)&v141.x = v19;
+			//       v20 = UnityEngine::Quaternion::op_Multiply(&v140, (Quaternion *)&v145, &v141, 0LL);
+			//       v21 = *(_QWORD *)&v20.x;
+			//       *(float *)&v20 = v20.z;
+			//       v151 = v21;
+			//       v144 = *(float *)&v20;
+			//       v22 = (MethodInfo *)sub_182504D40(v142);
+			//       v23 = UnityEngine::Vector3::get_fwd(&v140, v22);
+			//       v25 = *v24;
+			//       v26 = *(_QWORD *)&v23.x;
+			//       v141.z = v23.z;
+			//       *(_QWORD *)&v141.x = v26;
+			//       v145 = (__m128i)v25;
+			//       v27 = UnityEngine::Quaternion::op_Multiply(&v140, (Quaternion *)&v145, &v141, 0LL);
+			//       *(_QWORD *)&v25.x = *(_QWORD *)&v27.x;
+			//       *(float *)&v27 = v27.z;
+			//       v152 = *(_QWORD *)&v25.x;
+			//       v149 = *(float *)&v27;
+			//       sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGSkyRenderer);
+			//       ProceduralSkyMeshRadius = HG::Rendering::Runtime::HGSkyRenderer::GetProceduralSkyMeshRadius(0LL);
+			//       outerRadius = planet.ring.outerRadius;
+			//       if ( (float)((float)(moon.orbitRadius - moon.radius) - 10.0) <= outerRadius )
+			//         outerRadius = (float)(moon.orbitRadius - moon.radius) - 10.0;
+			//       if ( planet.enableRing )
+			//         radius = outerRadius;
+			//       else
+			//         radius = planet.objectProperty.radius;
+			//       if ( (float)((float)((float)((float)(moon.orbitRadius / 5000.0) * planet.atmosphere.atmosphereHeight)
+			//                          * (float)((float)(planet.atmosphere.heightScale_R / 15.0) + 1.0))
+			//                  + planet.objectProperty.radius) > radius )
+			//         radius = (float)((float)((float)(moon.orbitRadius / 5000.0) * planet.atmosphere.atmosphereHeight)
+			//                        * (float)((float)(planet.atmosphere.heightScale_R / 15.0) + 1.0))
+			//                + planet.objectProperty.radius;
+			//       v141.z = v144;
+			//       *(_QWORD *)&v141.x = v21;
+			//       v32 = UnityEngine::Vector3::op_Multiply(&v140, &v141, ProceduralSkyMeshRadius, v28);
+			//       v33 = *(_QWORD *)&v32.x;
+			//       z = v32.z;
+			//       if ( camera )
+			//       {
+			//         transform = UnityEngine::Component::get_transform(camera, 0LL);
+			//         if ( transform )
+			//         {
+			//           position = UnityEngine::Transform::get_position(&v140, transform, 0LL);
+			//           v36 = moon.orbitRadius - moon.radius;
+			//           v37 = *(_QWORD *)&position.x;
+			//           *(float *)&position = position.z;
+			//           *(_QWORD *)&v147.x = v37;
+			//           v143 = *(float *)&position;
+			//           HG::Rendering::Runtime::HGEnvironmentUtils::SkydomeStarHalfFovCos(radius, v36, 0LL);
+			//           v42 = sub_1802ECED0(v39, v38, v40, v41);
+			//           v43 = z;
+			//           v150 = v42;
+			//           *(_QWORD *)&v146.x = v33;
+			//           v146.z = z;
+			//           *(_QWORD *)&v140.x = v37;
+			//           v140.z = v143;
+			//           one = UnityEngine::Vector3::get_one((Vector3 *)&v145, v44);
+			//           v46 = *(_QWORD *)&one.x;
+			//           *(float *)&one = one.z;
+			//           *(_QWORD *)&v141.x = v46;
+			//           LODWORD(v141.z) = (_DWORD)one;
+			//           v48 = UnityEngine::Vector3::op_Multiply((Vector3 *)&v145, &v141, ProceduralSkyMeshRadius, v47);
+			//           v49 = *(_QWORD *)&v48.x;
+			//           *(float *)&v48 = v48.z;
+			//           *(_QWORD *)&v141.x = v49;
+			//           LODWORD(v141.z) = (_DWORD)v48;
+			//           v52 = UnityEngine::Vector3::op_Multiply((Vector3 *)&v145, &v141, v51, v50);
+			//           v142[0] = (Quaternion)v16;
+			//           v53 = *(_QWORD *)&v52.x;
+			//           *(float *)&v52 = v52.z;
+			//           *(_QWORD *)&v141.x = v53;
+			//           LODWORD(v141.z) = (_DWORD)v52;
+			//           v55 = UnityEngine::Vector3::op_Addition((Vector3 *)&v145, &v140, &v146, v54);
+			//           v56 = *(_QWORD *)&v55.x;
+			//           *(float *)&v55 = v55.z;
+			//           *(_QWORD *)&v140.x = v56;
+			//           LODWORD(v140.z) = (_DWORD)v55;
+			//           v57 = UnityEngine::Matrix4x4::TRS(v154, &v140, v142, &v141, 0LL);
+			//           v58 = *(_OWORD *)&v57.m01;
+			//           *(_OWORD *)&v153.m00 = *(_OWORD *)&v57.m00;
+			//           v59 = *(_OWORD *)&v57.m02;
+			//           *(_OWORD *)&v153.m01 = v58;
+			//           v60 = *(_OWORD *)&v57.m03;
+			//           *(_OWORD *)&v153.m02 = v59;
+			//           *(_OWORD *)&v153.m03 = v60;
+			//           if ( !HG::Rendering::Runtime::HGSkyRenderer::CheckPlanetVisibility(this, hgCamera, &v153, 0LL) )
+			//             return;
+			//           width = planet.ring.width;
+			//           v62 = moon.orbitRadius - moon.radius;
+			//           v63 = planet.objectProperty.radius;
+			//           sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGUtils);
+			//           v64 = HG::Rendering::Runtime::HGUtils::PackVector4(
+			//                   (Vector4 *)v142,
+			//                   v63 / v62,
+			//                   v62 / outerRadius,
+			//                   v62 / width,
+			//                   (float)(width - outerRadius) / width,
+			//                   0LL);
+			//           *(_QWORD *)&v140.x = v33;
+			//           v140.z = v43;
+			//           v65 = _mm_loadu_si128((const __m128i *)v64);
+			//           v141.z = v143;
+			//           *(_QWORD *)&v141.x = *(_QWORD *)&v147.x;
+			//           v67 = UnityEngine::Vector3::op_Addition((Vector3 *)&v145, &v141, &v140, v66);
+			//           v68 = *(_QWORD *)&v67.x;
+			//           *(float *)&v67 = v67.z;
+			//           *(_QWORD *)&v140.x = v68;
+			//           LODWORD(v140.z) = (_DWORD)v67;
+			//           v69 = _mm_loadu_si128((const __m128i *)HG::Rendering::Runtime::HGUtils::PackVector4(
+			//                                                    (Vector4 *)v142,
+			//                                                    &v140,
+			//                                                    0.0,
+			//                                                    0LL));
+			//           Vector = UnityEngine::Animator::GetVector((Vector3 *)&v145, v70, v71, v72);
+			//           v74 = *(_QWORD *)&Vector.x;
+			//           *(float *)&Vector = Vector.z;
+			//           *(_QWORD *)&v147.x = v74;
+			//           LODWORD(v147.z) = (_DWORD)Vector;
+			//           v78 = UnityEngine::Animator::GetVector((Vector3 *)&v145, v75, v76, v77);
+			//           v79 = *(_QWORD *)&v78.x;
+			//           *(float *)&v78 = v78.z;
+			//           *(_QWORD *)&v141.x = v79;
+			//           LODWORD(v141.z) = (_DWORD)v78;
+			//           v83 = UnityEngine::Animator::GetVector((Vector3 *)&v145, v80, v81, v82);
+			//           selfTiltX_low = (__m128)LODWORD(planet.objectProperty.selfTiltX);
+			//           selfRotationY_low = (__m128)LODWORD(planet.objectProperty.selfRotationY);
+			//           v86 = *(_QWORD *)&v83.x;
+			//           *(float *)&v83 = v83.z;
+			//           selfTiltZ = planet.objectProperty.selfTiltZ;
+			//           *(_QWORD *)&v146.x = v86;
+			//           LODWORD(v146.z) = (_DWORD)v83;
+			//           sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGCelestialConfig);
+			//           *(_QWORD *)&v140.x = _mm_unpacklo_ps(selfTiltX_low, selfRotationY_low).m128_u64[0];
+			//           v140.z = selfTiltZ;
+			//           HG::Rendering::Runtime::HGCelestialConfig::CreateBasisFromRotation(&v140, &v147, &v146, &v141, 0LL);
+			//           *(_QWORD *)&v140.x = v151;
+			//           v140.z = v144;
+			//           v88 = _mm_loadu_si128((const __m128i *)HG::Rendering::Runtime::HGUtils::PackVector4(
+			//                                                    (Vector4 *)v142,
+			//                                                    &v140,
+			//                                                    0.0,
+			//                                                    0LL));
+			//           *(_QWORD *)&v140.x = v152;
+			//           v140.z = v149;
+			//           v89 = HG::Rendering::Runtime::HGUtils::PackVector4((Vector4 *)v142, &v140, 0.0, 0LL);
+			//           *(_QWORD *)&v140.x = *(_QWORD *)&v147.x;
+			//           v90 = _mm_loadu_si128((const __m128i *)v89);
+			//           v140.z = v147.z;
+			//           v91 = HG::Rendering::Runtime::HGUtils::PackVector4((Vector4 *)v142, &v140, 0.0, 0LL);
+			//           *(_QWORD *)&v140.x = *(_QWORD *)&v146.x;
+			//           v92 = _mm_loadu_si128((const __m128i *)v91);
+			//           v140.z = v146.z;
+			//           v93 = HG::Rendering::Runtime::HGUtils::PackVector4((Vector4 *)v142, &v140, 0.0, 0LL);
+			//           *(_QWORD *)&v140.x = *(_QWORD *)&v141.x;
+			//           v94 = _mm_loadu_si128((const __m128i *)v93);
+			//           v140.z = v141.z;
+			//           v95 = _mm_loadu_si128((const __m128i *)HG::Rendering::Runtime::HGUtils::PackVector4(
+			//                                                    (Vector4 *)v142,
+			//                                                    &v140,
+			//                                                    0.0,
+			//                                                    0LL));
+			//           sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGShaderIDs);
+			//           static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//           PlanetBaseMap01 = (Int32__Array *)*((_QWORD *)static_fields + 165);
+			//           if ( PlanetBaseMap01 )
+			//           {
+			//             if ( (unsigned int)i >= PlanetBaseMap01.max_length.size )
+			//               goto LABEL_79;
+			//             if ( mat )
+			//             {
+			//               UnityEngine::Material::SetFloatImpl(mat, PlanetBaseMap01.vector[i], 1.0, 0LL);
+			//               sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGShaderKeyWords);
+			//               static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderKeyWords.static_fields;
+			//               v96 = *((_QWORD *)static_fields + 62);
+			//               if ( v96 )
+			//               {
+			//                 if ( (unsigned int)i >= *(_DWORD *)(v96 + 24) )
+			//                   goto LABEL_79;
+			//                 v97 = *(String **)(v96 + 8LL * i + 32);
+			//                 enableRing = planet.enableRing;
+			//                 sub_180002C70(TypeInfo::UnityEngine::Rendering::CoreUtils);
+			//                 VLB::Utils::SetKeywordEnabled(mat, v97, enableRing, 0LL);
+			//                 static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderKeyWords.static_fields;
+			//                 v99 = *((_QWORD *)static_fields + 63);
+			//                 if ( v99 )
+			//                 {
+			//                   if ( (unsigned int)i >= *(_DWORD *)(v99 + 24) )
+			//                     goto LABEL_79;
+			//                   VLB::Utils::SetKeywordEnabled(mat, *(String **)(v99 + 8LL * i + 32), planet.enableAtmosphere, 0LL);
+			//                   static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                   PlanetBaseMap01 = (Int32__Array *)*((_QWORD *)static_fields + 166);
+			//                   if ( PlanetBaseMap01 )
+			//                   {
+			//                     if ( (unsigned int)i >= PlanetBaseMap01.max_length.size )
+			//                       goto LABEL_79;
+			//                     v100 = PlanetBaseMap01.vector[i];
+			//                     v142[0] = (Quaternion)v69;
+			//                     UnityEngine::Material::SetVector(mat, v100, (Vector4 *)v142, 0LL);
+			//                     static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                     PlanetBaseMap01 = (Int32__Array *)*((_QWORD *)static_fields + 167);
+			//                     if ( PlanetBaseMap01 )
+			//                     {
+			//                       if ( (unsigned int)i >= PlanetBaseMap01.max_length.size )
+			//                         goto LABEL_79;
+			//                       v101 = PlanetBaseMap01.vector[i];
+			//                       v142[0] = (Quaternion)v88;
+			//                       UnityEngine::Material::SetVector(mat, v101, (Vector4 *)v142, 0LL);
+			//                       static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                       PlanetBaseMap01 = (Int32__Array *)*((_QWORD *)static_fields + 168);
+			//                       if ( PlanetBaseMap01 )
+			//                       {
+			//                         if ( (unsigned int)i >= PlanetBaseMap01.max_length.size )
+			//                           goto LABEL_79;
+			//                         v102 = PlanetBaseMap01.vector[i];
+			//                         v142[0] = (Quaternion)v90;
+			//                         UnityEngine::Material::SetVector(mat, v102, (Vector4 *)v142, 0LL);
+			//                         static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                         PlanetBaseMap01 = (Int32__Array *)*((_QWORD *)static_fields + 169);
+			//                         if ( PlanetBaseMap01 )
+			//                         {
+			//                           if ( (unsigned int)i >= PlanetBaseMap01.max_length.size )
+			//                             goto LABEL_79;
+			//                           v103 = PlanetBaseMap01.vector[i];
+			//                           v142[0] = (Quaternion)v65;
+			//                           UnityEngine::Material::SetVector(mat, v103, (Vector4 *)v142, 0LL);
+			//                           static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                           PlanetBaseMap01 = (Int32__Array *)*((_QWORD *)static_fields + 170);
+			//                           if ( PlanetBaseMap01 )
+			//                           {
+			//                             if ( (unsigned int)i >= PlanetBaseMap01.max_length.size )
+			//                               goto LABEL_79;
+			//                             v104 = PlanetBaseMap01.vector[i];
+			//                             v142[0] = (Quaternion)v92;
+			//                             UnityEngine::Material::SetVector(mat, v104, (Vector4 *)v142, 0LL);
+			//                             static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                             PlanetBaseMap01 = (Int32__Array *)*((_QWORD *)static_fields + 171);
+			//                             if ( PlanetBaseMap01 )
+			//                             {
+			//                               if ( (unsigned int)i >= PlanetBaseMap01.max_length.size )
+			//                                 goto LABEL_79;
+			//                               v105 = PlanetBaseMap01.vector[i];
+			//                               v142[0] = (Quaternion)v94;
+			//                               UnityEngine::Material::SetVector(mat, v105, (Vector4 *)v142, 0LL);
+			//                               static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                               PlanetBaseMap01 = (Int32__Array *)*((_QWORD *)static_fields + 172);
+			//                               if ( PlanetBaseMap01 )
+			//                               {
+			//                                 if ( (unsigned int)i >= PlanetBaseMap01.max_length.size )
+			//                                   goto LABEL_79;
+			//                                 v106 = PlanetBaseMap01.vector[i];
+			//                                 v142[0] = (Quaternion)v95;
+			//                                 UnityEngine::Material::SetVector(mat, v106, (Vector4 *)v142, 0LL);
+			//                                 static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                                 PlanetBaseMap01 = (Int32__Array *)*((_QWORD *)static_fields + 173);
+			//                                 if ( PlanetBaseMap01 )
+			//                                 {
+			//                                   if ( (unsigned int)i >= PlanetBaseMap01.max_length.size )
+			//                                     goto LABEL_79;
+			//                                   v107 = PlanetBaseMap01.vector[i];
+			//                                   if ( v15 )
+			//                                   {
+			//                                     v142[0] = *(Quaternion *)UnityEngine::Material::GetColor(
+			//                                                                (Color *)v142,
+			//                                                                (Material *)v15,
+			//                                                                (String *)"_Color",
+			//                                                                0LL);
+			//                                     UnityEngine::Material::SetColor(mat, v107, (Color *)v142, 0LL);
+			//                                     static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                                     v108 = *((_QWORD *)static_fields + 174);
+			//                                     if ( v108 )
+			//                                     {
+			//                                       if ( (unsigned int)i >= *(_DWORD *)(v108 + 24) )
+			//                                         goto LABEL_79;
+			//                                       v109 = *(_DWORD *)(v108 + 4LL * i + 32);
+			//                                       Float = UnityEngine::Material::GetFloat(
+			//                                                 (Material *)v15,
+			//                                                 (String *)"_RingShadowSoftness",
+			//                                                 0LL);
+			//                                       UnityEngine::Material::SetFloatImpl(mat, v109, Float, 0LL);
+			//                                       static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                                       v111 = *((_QWORD *)static_fields + 176);
+			//                                       if ( v111 )
+			//                                       {
+			//                                         if ( (unsigned int)i >= *(_DWORD *)(v111 + 24) )
+			//                                           goto LABEL_79;
+			//                                         v112 = *(_DWORD *)(v111 + 4LL * i + 32);
+			//                                         v142[0] = *(Quaternion *)UnityEngine::Material::GetColor(
+			//                                                                    (Color *)v142,
+			//                                                                    (Material *)v15,
+			//                                                                    (String *)"_PlanetEmissive",
+			//                                                                    0LL);
+			//                                         UnityEngine::Material::SetColor(mat, v112, (Color *)v142, 0LL);
+			//                                         static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                                         v113 = *((_QWORD *)static_fields + 177);
+			//                                         if ( v113 )
+			//                                         {
+			//                                           if ( (unsigned int)i >= *(_DWORD *)(v113 + 24) )
+			//                                             goto LABEL_79;
+			//                                           v114 = *(_DWORD *)(v113 + 4LL * i + 32);
+			//                                           v115 = UnityEngine::Material::GetFloat(
+			//                                                    (Material *)v15,
+			//                                                    (String *)"_StarNdlSharp",
+			//                                                    0LL);
+			//                                           UnityEngine::Material::SetFloatImpl(mat, v114, v115, 0LL);
+			//                                           static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                                           v116 = *((_QWORD *)static_fields + 178);
+			//                                           if ( v116 )
+			//                                           {
+			//                                             if ( (unsigned int)i >= *(_DWORD *)(v116 + 24) )
+			//                                               goto LABEL_79;
+			//                                             v117 = *(_DWORD *)(v116 + 4LL * i + 32);
+			//                                             v118 = UnityEngine::Material::GetFloat(
+			//                                                      (Material *)v15,
+			//                                                      (String *)"_StarBackFaceAlpha",
+			//                                                      0LL);
+			//                                             UnityEngine::Material::SetFloatImpl(mat, v117, v118, 0LL);
+			//                                             Texture = UnityEngine::Material::GetTexture(
+			//                                                         (Material *)v15,
+			//                                                         (String *)"_MainTex",
+			//                                                         0LL);
+			//                                             sub_180002C70(TypeInfo::UnityEngine::Object);
+			//                                             if ( UnityEngine::Object::op_Inequality((Object_1 *)Texture, 0LL, 0LL) )
+			//                                             {
+			//                                               sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGShaderIDs);
+			//                                               static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs;
+			//                                               PlanetBaseMap01 = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields._PlanetBaseMap01;
+			//                                               if ( !PlanetBaseMap01 )
+			//                                                 goto LABEL_81;
+			//                                               if ( (unsigned int)i >= PlanetBaseMap01.max_length.size )
+			//                                                 goto LABEL_79;
+			//                                               UnityEngine::Material::SetTextureImpl(
+			//                                                 mat,
+			//                                                 PlanetBaseMap01.vector[i],
+			//                                                 Texture,
+			//                                                 0LL);
+			//                                             }
+			//                                             blackTexture = (Object_1 *)UnityEngine::Material::GetTexture(
+			//                                                                          (Material *)v15,
+			//                                                                          (String *)"_EmissiveTex",
+			//                                                                          0LL);
+			//                                             sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGShaderIDs);
+			//                                             static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                                             PlanetBaseMap01 = (Int32__Array *)*((_QWORD *)static_fields + 180);
+			//                                             if ( PlanetBaseMap01 )
+			//                                             {
+			//                                               if ( (unsigned int)i >= PlanetBaseMap01.max_length.size )
+			//                                                 goto LABEL_79;
+			//                                               v121 = PlanetBaseMap01.vector[i];
+			//                                               sub_180002C70(TypeInfo::UnityEngine::Object);
+			//                                               if ( !UnityEngine::Object::op_Inequality(blackTexture, 0LL, 0LL) )
+			//                                                 blackTexture = (Object_1 *)UnityEngine::Texture2D::get_blackTexture(0LL);
+			//                                               UnityEngine::Material::SetTextureImpl(
+			//                                                 mat,
+			//                                                 v121,
+			//                                                 (Texture *)blackTexture,
+			//                                                 0LL);
+			//                                               sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGShaderIDs);
+			//                                               static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                                               PlanetBaseMap01 = (Int32__Array *)*((_QWORD *)static_fields + 175);
+			//                                               if ( PlanetBaseMap01 )
+			//                                               {
+			//                                                 if ( (unsigned int)i >= PlanetBaseMap01.max_length.size )
+			//                                                   goto LABEL_79;
+			//                                                 v122 = PlanetBaseMap01.vector[i];
+			//                                                 v142[0] = (Quaternion)planet.ring.ringColor;
+			//                                                 UnityEngine::Material::SetColor(mat, v122, (Color *)v142, 0LL);
+			//                                                 v123 = UnityEngine::Material::GetTexture(
+			//                                                          (Material *)v15,
+			//                                                          (String *)"_RingTex",
+			//                                                          0LL);
+			//                                                 sub_180002C70(TypeInfo::UnityEngine::Object);
+			//                                                 if ( UnityEngine::Object::op_Inequality((Object_1 *)v123, 0LL, 0LL) )
+			//                                                 {
+			//                                                   sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGShaderIDs);
+			//                                                   static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs;
+			//                                                   PlanetBaseMap01 = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields._PlanetRingTex01;
+			//                                                   if ( !PlanetBaseMap01 )
+			//                                                     goto LABEL_81;
+			//                                                   if ( (unsigned int)i >= PlanetBaseMap01.max_length.size )
+			//                                                     goto LABEL_79;
+			//                                                   UnityEngine::Material::SetTextureImpl(
+			//                                                     mat,
+			//                                                     PlanetBaseMap01.vector[i],
+			//                                                     v123,
+			//                                                     0LL);
+			//                                                 }
+			//                                                 numInscatteredSamplePoints = (float)planet.atmosphere.numInscatteredSamplePoints;
+			//                                                 if ( numInscatteredSamplePoints < 0.0 )
+			//                                                 {
+			//                                                   numInscatteredSamplePoints = 0.0;
+			//                                                 }
+			//                                                 else if ( numInscatteredSamplePoints > 10.0 )
+			//                                                 {
+			//                                                   numInscatteredSamplePoints = 10.0;
+			//                                                 }
+			//                                                 numOpticalDepthSamplePoints = (float)planet.atmosphere.numOpticalDepthSamplePoints;
+			//                                                 if ( numOpticalDepthSamplePoints < 0.0 )
+			//                                                 {
+			//                                                   numOpticalDepthSamplePoints = 0.0;
+			//                                                 }
+			//                                                 else if ( numOpticalDepthSamplePoints > 5.0 )
+			//                                                 {
+			//                                                   numOpticalDepthSamplePoints = 5.0;
+			//                                                 }
+			//                                                 atmosphereHeight = planet.atmosphere.atmosphereHeight;
+			//                                                 coff_R = planet.atmosphere.coff_R;
+			//                                                 sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGUtils);
+			//                                                 v128 = HG::Rendering::Runtime::HGUtils::PackVector4(
+			//                                                          (Vector4 *)v142,
+			//                                                          atmosphereHeight,
+			//                                                          numInscatteredSamplePoints,
+			//                                                          coff_R,
+			//                                                          *(float *)v65.m128i_i32 * 2000.0,
+			//                                                          0LL);
+			//                                                 v129 = 30.0 - planet.atmosphere.heightScale_R;
+			//                                                 v130 = _mm_loadu_si128((const __m128i *)v128);
+			//                                                 if ( v129 <= 0.000099999997 )
+			//                                                   v129 = 0.000099999997;
+			//                                                 v131 = HG::Rendering::Runtime::HGUtils::PackVector4(
+			//                                                          (Vector4 *)v142,
+			//                                                          numOpticalDepthSamplePoints,
+			//                                                          v129,
+			//                                                          planet.atmosphere.atmosphereBrightness,
+			//                                                          planet.atmosphere.atmosphereHueshift,
+			//                                                          0LL);
+			//                                                 enableAtmosphere = planet.enableAtmosphere;
+			//                                                 v133 = _mm_loadu_si128((const __m128i *)v131);
+			//                                                 bakeFaceVisibility = planet.atmosphere.bakeFaceVisibility;
+			//                                                 drawPlanetBelowHorizon = planet.drawPlanetBelowHorizon;
+			//                                                 sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGUtils);
+			//                                                 v136 = _mm_loadu_si128((const __m128i *)HG::Rendering::Runtime::HGUtils::PackVector4(
+			//                                                                                           (Vector4 *)v142,
+			//                                                                                           (float)enableAtmosphere,
+			//                                                                                           bakeFaceVisibility,
+			//                                                                                           v150,
+			//                                                                                           drawPlanetBelowHorizon,
+			//                                                                                           0LL));
+			//                                                 sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGShaderIDs);
+			//                                                 static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                                                 PlanetBaseMap01 = (Int32__Array *)*((_QWORD *)static_fields + 212);
+			//                                                 if ( PlanetBaseMap01 )
+			//                                                 {
+			//                                                   if ( (unsigned int)i >= PlanetBaseMap01.max_length.size )
+			//                                                     goto LABEL_79;
+			//                                                   v137 = PlanetBaseMap01.vector[i];
+			//                                                   v142[0] = (Quaternion)v130;
+			//                                                   UnityEngine::Material::SetVector(mat, v137, (Vector4 *)v142, 0LL);
+			//                                                   static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                                                   PlanetBaseMap01 = (Int32__Array *)*((_QWORD *)static_fields + 213);
+			//                                                   if ( PlanetBaseMap01 )
+			//                                                   {
+			//                                                     if ( (unsigned int)i >= PlanetBaseMap01.max_length.size )
+			//                                                       goto LABEL_79;
+			//                                                     v138 = PlanetBaseMap01.vector[i];
+			//                                                     v142[0] = (Quaternion)v133;
+			//                                                     UnityEngine::Material::SetVector(mat, v138, (Vector4 *)v142, 0LL);
+			//                                                     static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                                                     PlanetBaseMap01 = (Int32__Array *)*((_QWORD *)static_fields + 214);
+			//                                                     if ( PlanetBaseMap01 )
+			//                                                     {
+			//                                                       if ( (unsigned int)i < PlanetBaseMap01.max_length.size )
+			//                                                       {
+			//                                                         v139 = PlanetBaseMap01.vector[i];
+			//                                                         v142[0] = (Quaternion)v136;
+			//                                                         UnityEngine::Material::SetVector(
+			//                                                           mat,
+			//                                                           v139,
+			//                                                           (Vector4 *)v142,
+			//                                                           0LL);
+			//                                                         return;
+			//                                                       }
+			// LABEL_79:
+			//                                                       sub_180070270(static_fields, PlanetBaseMap01);
+			//                                                     }
+			//                                                   }
+			//                                                 }
+			//                                               }
+			//                                             }
+			//                                           }
+			//                                         }
+			//                                       }
+			//                                     }
+			//                                   }
+			//                                 }
+			//                               }
+			//                             }
+			//                           }
+			//                         }
+			//                       }
+			//                     }
+			//                   }
+			//                 }
+			//               }
+			//             }
+			//           }
+			//         }
+			//       }
+			//     }
+			// LABEL_81:
+			//     sub_180B536AC(static_fields, PlanetBaseMap01);
+			//   }
+			//   static_fields = IFix::WrappersManagerImpl::GetPatch(1266, 0LL);
+			//   if ( !static_fields )
+			//     goto LABEL_81;
+			//   IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_479(
+			//     (ILFixDynamicMethodWrapper_2 *)static_fields,
+			//     (Object *)this,
+			//     (Object *)hgCamera,
+			//     (Object *)mat,
+			//     planet,
+			//     moon,
+			//     i,
+			//     0LL);
+			// }
+			// 
+		}
+
+		private List<Vector3> ClipQuadWithNearPlane(Vector3[] quadPos, Camera camera)
+		{
+			// // List`1[UnityEngine.Vector3] ClipQuadWithNearPlane(Vector3[], Camera)
+			// List_1_UnityEngine_Vector3_ *HG::Rendering::Runtime::HGSkyRenderer::ClipQuadWithNearPlane(
+			//         HGSkyRenderer *this,
+			//         Vector3__Array *quadPos,
+			//         Camera *camera,
+			//         MethodInfo *method)
+			// {
+			//   _QWORD *p_quadWorld; // rcx
+			//   __int64 v8; // rdx
+			//   Transform *transform; // rax
+			//   Vector3 *forward; // rax
+			//   __int64 v11; // xmm8_8
+			//   float z; // r15d
+			//   Transform *v13; // rax
+			//   Vector3 *position; // rax
+			//   __int64 v15; // xmm7_8
+			//   float v16; // r14d
+			//   Transform *v17; // rax
+			//   Vector3 *v18; // rax
+			//   __int64 v19; // xmm6_8
+			//   float v20; // ebx
+			//   float v21; // xmm0_4
+			//   MethodInfo *v22; // r9
+			//   Vector3 *v23; // rax
+			//   __int64 v24; // xmm3_8
+			//   MethodInfo *v25; // r9
+			//   Vector3 *v26; // rax
+			//   __int64 v27; // xmm3_8
+			//   int32_t v28; // ebx
+			//   __int64 v29; // xmm6_8
+			//   __int64 v30; // xmm7_8
+			//   float v31; // r14d
+			//   float v32; // r12d
+			//   char Side; // r15
+			//   char v34; // di
+			//   MethodInfo *v35; // r9
+			//   Vector3 *v36; // rax
+			//   __int64 v37; // xmm3_8
+			//   __int64 v38; // rax
+			//   __int64 v39; // xmm0_8
+			//   MethodInfo *v40; // r9
+			//   Vector3 *v41; // rax
+			//   __int64 v42; // xmm3_8
+			//   __int64 v43; // rax
+			//   __int64 v44; // xmm0_8
+			//   MethodInfo *v45; // r9
+			//   Vector3 *v46; // rax
+			//   __int64 v47; // xmm3_8
+			//   MethodInfo *v48; // r9
+			//   Vector3 *v49; // rax
+			//   __int64 v50; // xmm6_8
+			//   float v51; // edi
+			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
+			//   Vector3 v54; // [rsp+38h] [rbp-D0h] BYREF
+			//   float v55[4]; // [rsp+48h] [rbp-C0h] BYREF
+			//   Vector3 v56; // [rsp+58h] [rbp-B0h] BYREF
+			//   Vector3 v57; // [rsp+68h] [rbp-A0h] BYREF
+			//   Plane v58; // [rsp+78h] [rbp-90h] BYREF
+			//   Vector3 v59; // [rsp+88h] [rbp-80h] BYREF
+			//   Vector3 v60; // [rsp+98h] [rbp-70h] BYREF
+			//   Vector3 v61; // [rsp+A8h] [rbp-60h] BYREF
+			//   __int64 v62; // [rsp+B8h] [rbp-50h] BYREF
+			//   float v63; // [rsp+C0h] [rbp-48h]
+			//   Vector3 v64; // [rsp+C8h] [rbp-40h] BYREF
+			//   Vector3 v65; // [rsp+D8h] [rbp-30h] BYREF
+			//   Vector3 v66; // [rsp+E8h] [rbp-20h] BYREF
+			//   Vector3 v67; // [rsp+F8h] [rbp-10h] BYREF
+			//   Vector3 v68; // [rsp+108h] [rbp+0h] BYREF
+			//   Vector3 v69; // [rsp+118h] [rbp+10h] BYREF
+			//   Vector3 v70; // [rsp+128h] [rbp+20h] BYREF
+			//   Vector3 v71; // [rsp+138h] [rbp+30h] BYREF
+			//   Vector3 v72; // [rsp+148h] [rbp+40h] BYREF
+			//   Ray v73; // [rsp+158h] [rbp+50h] BYREF
+			//   Ray v74; // [rsp+178h] [rbp+70h] BYREF
+			//   Vector3 v75; // [rsp+198h] [rbp+90h] BYREF
+			//   _BYTE v76[16]; // [rsp+1A8h] [rbp+A0h] BYREF
+			//   Vector3 v77; // [rsp+1B8h] [rbp+B0h] BYREF
+			//   _BYTE v78[16]; // [rsp+1C8h] [rbp+C0h] BYREF
+			//   Vector3 v79; // [rsp+1D8h] [rbp+D0h] BYREF
+			//   Vector3 v80[5]; // [rsp+1E8h] [rbp+E0h] BYREF
+			// 
+			//   if ( !byte_18D919D8A )
+			//   {
+			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGSkyRenderer);
+			//     sub_18003C530(&MethodInfo::System::Collections::Generic::List<UnityEngine::Vector3>::Add);
+			//     sub_18003C530(&MethodInfo::System::Collections::Generic::List<UnityEngine::Vector3>::Clear);
+			//     byte_18D919D8A = 1;
+			//   }
+			//   v55[0] = 0.0;
+			//   v58 = 0LL;
+			//   if ( IFix::WrappersManagerImpl::IsPatched(1268, 0LL) )
+			//   {
+			//     Patch = IFix::WrappersManagerImpl::GetPatch(1268, 0LL);
+			//     if ( Patch )
+			//       return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_477(
+			//                Patch,
+			//                (Object *)this,
+			//                (Object *)quadPos,
+			//                (Object *)camera,
+			//                0LL);
+			// LABEL_20:
+			//     sub_180B536AC(p_quadWorld, v8);
+			//   }
+			//   sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGSkyRenderer);
+			//   p_quadWorld = &TypeInfo::HG::Rendering::Runtime::HGSkyRenderer.static_fields.quadWorld;
+			//   v8 = p_quadWorld[1];
+			//   if ( !v8 )
+			//     goto LABEL_20;
+			//   ++*(_DWORD *)(v8 + 28);
+			//   *(_DWORD *)(v8 + 24) = 0;
+			//   if ( !camera )
+			//     goto LABEL_20;
+			//   transform = UnityEngine::Component::get_transform((Component *)camera, 0LL);
+			//   if ( !transform )
+			//     goto LABEL_20;
+			//   forward = UnityEngine::Transform::get_forward(&v57, transform, 0LL);
+			//   v11 = *(_QWORD *)&forward.x;
+			//   z = forward.z;
+			//   v13 = UnityEngine::Component::get_transform((Component *)camera, 0LL);
+			//   if ( !v13 )
+			//     goto LABEL_20;
+			//   position = UnityEngine::Transform::get_position(&v57, v13, 0LL);
+			//   v15 = *(_QWORD *)&position.x;
+			//   v16 = position.z;
+			//   v17 = UnityEngine::Component::get_transform((Component *)camera, 0LL);
+			//   if ( !v17 )
+			//     goto LABEL_20;
+			//   v18 = UnityEngine::Transform::get_forward(&v57, v17, 0LL);
+			//   v19 = *(_QWORD *)&v18.x;
+			//   v20 = v18.z;
+			//   v21 = UnityEngine::Camera::get_nearClipPlane(camera, 0LL);
+			//   *(_QWORD *)&v54.x = v19;
+			//   v54.z = v20;
+			//   v23 = UnityEngine::Vector3::op_Multiply(&v57, &v54, v21, v22);
+			//   *(_QWORD *)&v56.x = v15;
+			//   v56.z = v16;
+			//   v24 = *(_QWORD *)&v23.x;
+			//   *(float *)&v23 = v23.z;
+			//   *(_QWORD *)&v54.x = v24;
+			//   LODWORD(v54.z) = (_DWORD)v23;
+			//   v26 = UnityEngine::Vector3::op_Addition(&v57, &v56, &v54, v25);
+			//   *(_QWORD *)&v54.x = v11;
+			//   v54.z = z;
+			//   v27 = *(_QWORD *)&v26.x;
+			//   *(float *)&v26 = v26.z;
+			//   *(_QWORD *)&v56.x = v27;
+			//   LODWORD(v56.z) = (_DWORD)v26;
+			//   UnityEngine::Plane::Plane(&v58, &v54, &v56, 0LL);
+			//   v28 = 0;
+			//   if ( !quadPos )
+			//     goto LABEL_20;
+			//   while ( v28 < quadPos.max_length.size )
+			//   {
+			//     sub_180040F70(quadPos, &v56, v28);
+			//     sub_180040F70(quadPos, &v59, (v28 + 1) % quadPos.max_length.size);
+			//     v29 = *(_QWORD *)&v56.x;
+			//     v30 = *(_QWORD *)&v59.x;
+			//     v31 = v56.z;
+			//     v32 = v59.z;
+			//     v61 = v56;
+			//     v60 = v59;
+			//     Side = UnityEngine::Plane::GetSide(&v58, &v60, 0LL);
+			//     v34 = UnityEngine::Plane::GetSide(&v58, &v61, 0LL);
+			//     if ( v34 )
+			//     {
+			//       sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGSkyRenderer);
+			//       p_quadWorld = &TypeInfo::HG::Rendering::Runtime::HGSkyRenderer.static_fields.clippedPoints.klass;
+			//       if ( !p_quadWorld )
+			//         goto LABEL_20;
+			//       v62 = v29;
+			//       v63 = v31;
+			//       sub_180315038(p_quadWorld, &v62, MethodInfo::System::Collections::Generic::List<UnityEngine::Vector3>::Add);
+			//     }
+			//     if ( v34 != Side )
+			//     {
+			//       *(_QWORD *)&v64.x = v29;
+			//       v64.z = v31;
+			//       *(_QWORD *)&v65.x = v30;
+			//       v65.z = v32;
+			//       v36 = UnityEngine::Vector3::op_Subtraction(&v75, &v65, &v64, v35);
+			//       memset(&v73, 0, sizeof(v73));
+			//       v37 = *(_QWORD *)&v36.x;
+			//       v54.z = v36.z;
+			//       *(_QWORD *)&v54.x = v37;
+			//       v38 = sub_182413270(v76, &v54);
+			//       *(_QWORD *)&v67.x = v29;
+			//       v67.z = v31;
+			//       v39 = *(_QWORD *)v38;
+			//       LODWORD(v38) = *(_DWORD *)(v38 + 8);
+			//       *(_QWORD *)&v66.x = v39;
+			//       LODWORD(v66.z) = v38;
+			//       UnityEngine::Ray::Ray(&v73, &v67, &v66, 0LL);
+			//       v74 = v73;
+			//       UnityEngine::Plane::Raycast(&v58, &v74, v55, 0LL);
+			//       *(_QWORD *)&v68.x = v29;
+			//       v68.z = v31;
+			//       *(_QWORD *)&v69.x = v30;
+			//       v69.z = v32;
+			//       v41 = UnityEngine::Vector3::op_Subtraction(&v77, &v69, &v68, v40);
+			//       v42 = *(_QWORD *)&v41.x;
+			//       *(float *)&v41 = v41.z;
+			//       *(_QWORD *)&v54.x = v42;
+			//       LODWORD(v54.z) = (_DWORD)v41;
+			//       v43 = sub_182413270(v78, &v54);
+			//       v44 = *(_QWORD *)v43;
+			//       LODWORD(v43) = *(_DWORD *)(v43 + 8);
+			//       *(_QWORD *)&v70.x = v44;
+			//       LODWORD(v70.z) = v43;
+			//       v46 = UnityEngine::Vector3::op_Multiply(&v79, &v70, v55[0], v45);
+			//       *(_QWORD *)&v72.x = v29;
+			//       v72.z = v31;
+			//       v47 = *(_QWORD *)&v46.x;
+			//       *(float *)&v46 = v46.z;
+			//       *(_QWORD *)&v71.x = v47;
+			//       LODWORD(v71.z) = (_DWORD)v46;
+			//       v49 = UnityEngine::Vector3::op_Addition(v80, &v72, &v71, v48);
+			//       v50 = *(_QWORD *)&v49.x;
+			//       v51 = v49.z;
+			//       sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGSkyRenderer);
+			//       p_quadWorld = &TypeInfo::HG::Rendering::Runtime::HGSkyRenderer.static_fields.clippedPoints.klass;
+			//       if ( !p_quadWorld )
+			//         goto LABEL_20;
+			//       *(_QWORD *)&v57.x = v50;
+			//       v57.z = v51;
+			//       sub_180315038(p_quadWorld, &v57, MethodInfo::System::Collections::Generic::List<UnityEngine::Vector3>::Add);
+			//     }
+			//     ++v28;
+			//   }
+			//   sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGSkyRenderer);
+			//   return TypeInfo::HG::Rendering::Runtime::HGSkyRenderer.static_fields.clippedPoints;
+			// }
+			// 
+			return null;
+		}
+
+		private bool CheckPlanetVisibility(HGCamera hgCamera, Matrix4x4 matrix)
+		{
+			// // Boolean CheckPlanetVisibility(HGCamera, Matrix4x4)
+			// // Hidden C++ exception states: #wind=1
+			// bool HG::Rendering::Runtime::HGSkyRenderer::CheckPlanetVisibility(
+			//         HGSkyRenderer *this,
+			//         HGCamera *hgCamera,
+			//         Matrix4x4 *matrix,
+			//         MethodInfo *method)
+			// {
+			//   __int64 v7; // rdx
+			//   __int64 v8; // rcx
+			//   Camera *camera; // rsi
+			//   __int64 v10; // rbx
+			//   __int64 v11; // r15
+			//   __int64 v12; // rdx
+			//   HGSkyRenderer__StaticFields *static_fields; // rcx
+			//   Vector3__Array *quadWorld; // r13
+			//   Vector3 *v15; // rax
+			//   __int64 v16; // rdx
+			//   __int64 v17; // rcx
+			//   float z; // r12d
+			//   List_1_UnityEngine_Vector3_ *v19; // rax
+			//   __int64 v20; // rdx
+			//   __int64 v21; // rcx
+			//   float v22; // xmm7_4
+			//   float v23; // xmm9_4
+			//   float v24; // xmm6_4
+			//   float v25; // xmm8_4
+			//   __int64 v26; // rdx
+			//   __int64 v27; // rcx
+			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
+			//   __int64 v30; // rdx
+			//   __int64 v31; // rcx
+			//   int v32; // [rsp+30h] [rbp-108h]
+			//   int v33; // [rsp+34h] [rbp-104h]
+			//   int v34; // [rsp+38h] [rbp-100h]
+			//   int v35; // [rsp+3Ch] [rbp-FCh]
+			//   __int64 v36; // [rsp+40h] [rbp-F8h] BYREF
+			//   float v37; // [rsp+48h] [rbp-F0h]
+			//   Vector3 v38; // [rsp+50h] [rbp-E8h] BYREF
+			//   Matrix4x4 v39; // [rsp+60h] [rbp-D8h] BYREF
+			//   Vector3 v40; // [rsp+A0h] [rbp-98h] BYREF
+			//   List_1_T_Enumerator_UnityEngine_Vector3_ v41; // [rsp+B0h] [rbp-88h] BYREF
+			//   Il2CppExceptionWrapper *v42; // [rsp+D0h] [rbp-68h] BYREF
+			// 
+			//   if ( !byte_18D919D8B )
+			//   {
+			//     sub_18003C530(&MethodInfo::System::Collections::Generic::List_1_T_::Enumerator<UnityEngine::Vector3>::Dispose);
+			//     sub_18003C530(&MethodInfo::System::Collections::Generic::List_1_T_::Enumerator<UnityEngine::Vector3>::MoveNext);
+			//     sub_18003C530(&MethodInfo::System::Collections::Generic::List_1_T_::Enumerator<UnityEngine::Vector3>::get_Current);
+			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGSkyRenderer);
+			//     sub_18003C530(&MethodInfo::System::Collections::Generic::List<UnityEngine::Vector3>::GetEnumerator);
+			//     sub_18003C530(&MethodInfo::System::Collections::Generic::List<UnityEngine::Vector3>::get_Count);
+			//     byte_18D919D8B = 1;
+			//   }
+			//   if ( IFix::WrappersManagerImpl::IsPatched(1267, 0LL) )
+			//   {
+			//     Patch = IFix::WrappersManagerImpl::GetPatch(1267, 0LL);
+			//     if ( !Patch )
+			//       sub_180B536AC(v31, v30);
+			//     v39 = *matrix;
+			//     return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_478(Patch, (Object *)this, (Object *)hgCamera, &v39, 0LL);
+			//   }
+			//   else
+			//   {
+			//     if ( !hgCamera )
+			//       sub_180B536AC(v8, v7);
+			//     camera = hgCamera.fields.camera;
+			//     v10 = 0LL;
+			//     v11 = 4LL;
+			//     do
+			//     {
+			//       sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGSkyRenderer);
+			//       static_fields = TypeInfo::HG::Rendering::Runtime::HGSkyRenderer.static_fields;
+			//       quadWorld = static_fields.quadWorld;
+			//       if ( !this.fields.starQuadPoints )
+			//         sub_180B536AC(static_fields, v12);
+			//       sub_180040F70(this.fields.starQuadPoints, &v36, v10);
+			//       *(_QWORD *)&v39.m00 = v36;
+			//       v39.m20 = v37;
+			//       v15 = UnityEngine::Matrix4x4::MultiplyPoint3x4(&v40, matrix, (Vector3 *)&v39, 0LL);
+			//       z = v15.z;
+			//       if ( !quadWorld )
+			//         sub_180B536AC(v17, v16);
+			//       *(_QWORD *)&v38.x = *(_QWORD *)&v15.x;
+			//       v38.z = z;
+			//       sub_180040FA0(quadWorld, v10++, &v38);
+			//       --v11;
+			//     }
+			//     while ( v11 );
+			//     sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGSkyRenderer);
+			//     v19 = HG::Rendering::Runtime::HGSkyRenderer::ClipQuadWithNearPlane(
+			//             this,
+			//             TypeInfo::HG::Rendering::Runtime::HGSkyRenderer.static_fields.quadWorld,
+			//             camera,
+			//             0LL);
+			//     if ( !v19 )
+			//       sub_180B536AC(v21, v20);
+			//     if ( !v19.fields._size )
+			//       return 0;
+			//     v22 = 3.4028235e38;
+			//     *(float *)&v32 = 3.4028235e38;
+			//     v23 = 3.4028235e38;
+			//     *(float *)&v33 = 3.4028235e38;
+			//     v24 = -3.4028235e38;
+			//     *(float *)&v34 = -3.4028235e38;
+			//     v25 = -3.4028235e38;
+			//     *(float *)&v35 = -3.4028235e38;
+			//     System::Collections::Generic::List<UnityEngine::Vector3>::GetEnumerator(
+			//       (List_1_T_Enumerator_UnityEngine_Vector3_ *)&v39,
+			//       v19,
+			//       MethodInfo::System::Collections::Generic::List<UnityEngine::Vector3>::GetEnumerator);
+			//     *(_OWORD *)&v41._list = *(_OWORD *)&v39.m00;
+			//     *(_OWORD *)&v41._current.x = *(_OWORD *)&v39.m01;
+			//     *(_QWORD *)&v39.m00 = 0LL;
+			//     *(_QWORD *)&v39.m20 = &v41;
+			//     try
+			//     {
+			//       while ( System::Collections::Generic::List_1_T_::Enumerator<UnityEngine::Vector3>::MoveNext(
+			//                 &v41,
+			//                 MethodInfo::System::Collections::Generic::List_1_T_::Enumerator<UnityEngine::Vector3>::MoveNext) )
+			//       {
+			//         if ( !camera )
+			//           sub_1802DC2C8(v27, v26);
+			//         *(_QWORD *)&v38.x = *(_QWORD *)&v41._current.x;
+			//         LODWORD(v38.z) = _mm_cvtsi128_si32(_mm_srli_si128(*(__m128i *)&v41._current.x, 8));
+			//         v36 = *(_QWORD *)&UnityEngine::Camera::WorldToViewportPoint(&v40, camera, &v38, 0LL).x;
+			//         if ( *(float *)&v36 <= v22 )
+			//           v22 = *(float *)&v36;
+			//         *(float *)&v32 = v22;
+			//         if ( v24 <= *(float *)&v36 )
+			//           v24 = *(float *)&v36;
+			//         *(float *)&v34 = v24;
+			//         if ( *((float *)&v36 + 1) <= v23 )
+			//           v23 = *((float *)&v36 + 1);
+			//         *(float *)&v33 = v23;
+			//         if ( v25 <= *((float *)&v36 + 1) )
+			//           v25 = *((float *)&v36 + 1);
+			//         *(float *)&v35 = v25;
+			//       }
+			//     }
+			//     catch ( Il2CppExceptionWrapper *v42 )
+			//     {
+			//       *(Il2CppExceptionWrapper *)&v39.m00 = (Il2CppExceptionWrapper)v42.ex;
+			//       if ( *(_QWORD *)&v39.m00 )
+			//         sub_18000F780(*(_QWORD *)&v39.m00);
+			//       v22 = *(float *)&v32;
+			//       v23 = *(float *)&v33;
+			//       v24 = *(float *)&v34;
+			//       v25 = *(float *)&v35;
+			//     }
+			//     return v24 >= 0.0 && v22 <= 1.0 && v25 >= 0.0 && v23 <= 1.0;
+			//   }
+			// }
+			// 
+			return default(bool);
+		}
+
+		private void SetupAdvancedPlanet(MaterialPropertyBlock propertyBlock, ScriptableRenderContext context, HGCamera hgCamera, Material mat)
+		{
+			// // Void SetupAdvancedPlanet(MaterialPropertyBlock, ScriptableRenderContext, HGCamera, Material)
+			// void HG::Rendering::Runtime::HGSkyRenderer::SetupAdvancedPlanet(
+			//         HGSkyRenderer *this,
+			//         MaterialPropertyBlock *propertyBlock,
+			//         ScriptableRenderContext context,
+			//         HGCamera *hgCamera,
+			//         Material *mat,
+			//         MethodInfo *method)
+			// {
+			//   HGEnvironmentPhase *InterpolatedPhase; // rax
+			//   void *static_fields; // rdx
+			//   void *Patch; // rcx
+			//   HGEnvironmentPhase *v12; // rdi
+			//   Object_1 *advancedPlanetMat; // rbx
+			//   Material *v14; // rbx
+			//   float FloatImpl; // xmm0_4
+			//   float v16; // xmm0_4
+			//   float v17; // xmm0_4
+			//   float v18; // xmm0_4
+			//   float v19; // xmm0_4
+			//   float v20; // xmm0_4
+			//   float v21; // xmm0_4
+			//   float v22; // xmm0_4
+			//   float v23; // xmm0_4
+			//   float v24; // xmm0_4
+			//   float v25; // xmm0_4
+			//   float v26; // xmm0_4
+			//   float v27; // xmm0_4
+			//   float v28; // xmm0_4
+			//   float v29; // xmm0_4
+			//   float v30; // xmm0_4
+			//   float v31; // xmm0_4
+			//   float v32; // xmm0_4
+			//   float v33; // xmm0_4
+			//   float v34; // xmm0_4
+			//   float v35; // xmm0_4
+			//   float v36; // xmm0_4
+			//   float v37; // xmm0_4
+			//   float v38; // xmm0_4
+			//   float v39; // xmm0_4
+			//   float v40; // xmm0_4
+			//   float v41; // xmm0_4
+			//   float v42; // xmm0_4
+			//   float v43; // xmm0_4
+			//   float v44; // xmm0_4
+			//   float v45; // xmm0_4
+			//   float v46; // xmm0_4
+			//   float v47; // xmm0_4
+			//   float v48; // xmm0_4
+			//   float v49; // xmm0_4
+			//   float v50; // xmm0_4
+			//   MethodInfo *v51; // r8
+			//   Color *v52; // rax
+			//   MethodInfo *v53; // r8
+			//   Color *v54; // rax
+			//   MethodInfo *v55; // r8
+			//   Color *v56; // rax
+			//   Vector4 *Vector; // rax
+			//   Vector4 *v58; // rax
+			//   Vector4 *v59; // rax
+			//   MethodInfo *v60; // r8
+			//   Color *v61; // rax
+			//   MethodInfo *v62; // r8
+			//   Color *v63; // rax
+			//   MethodInfo *v64; // r8
+			//   Color *v65; // rax
+			//   MethodInfo *v66; // r8
+			//   Color *v67; // rax
+			//   MethodInfo *v68; // r8
+			//   Color *v69; // rax
+			//   Vector4 *v70; // rax
+			//   MethodInfo *v71; // r8
+			//   Color *v72; // rax
+			//   MethodInfo *v73; // r8
+			//   Color *v74; // rax
+			//   Vector4 *v75; // rax
+			//   Vector4 *v76; // rax
+			//   __int64 v77; // rdx
+			//   _OWORD *v78; // rcx
+			//   Vector4 v79; // xmm0
+			//   Void *p_source; // rax
+			//   __int128 v81; // xmm1
+			//   __int128 v82; // xmm0
+			//   __int128 v83; // xmm1
+			//   __int128 v84; // xmm0
+			//   __int128 v85; // xmm1
+			//   __int128 v86; // xmm0
+			//   __int128 v87; // xmm1
+			//   __int128 v88; // xmm0
+			//   struct ScriptableRenderContext__Class *v89; // rcx
+			//   CBHandle *v90; // rax
+			//   __m128i v91; // xmm6
+			//   __m128i v92; // xmm1
+			//   int32_t TransmittanceLLUT; // ebx
+			//   Texture *TextureImpl; // rax
+			//   int32_t BaseColorMap; // ebx
+			//   Texture *v96; // rax
+			//   int32_t RSM; // ebx
+			//   Texture *v98; // rax
+			//   int32_t CloudsTexMain; // ebx
+			//   Texture *v100; // rax
+			//   int32_t CloudsCap; // ebx
+			//   Texture *v102; // rax
+			//   int32_t CloudsFlowMap; // ebx
+			//   Texture *v104; // rax
+			//   int32_t ErosionMap; // ebx
+			//   Texture *v106; // rax
+			//   HGShaderKeyWords__StaticFields *v107; // rax
+			//   String *DRAW_ADVANCED_PLANET_CLOUDS_FLOWMAP; // rsi
+			//   bool IsKeywordEnabled; // bl
+			//   bool v110; // r8
+			//   Material *v111; // rbx
+			//   HGShaderKeyWords__StaticFields *v112; // rax
+			//   String *DRAW_ADVANCED_PLANET_CLOUDS_SHADOW; // rsi
+			//   bool v114; // al
+			//   String *DRAW_ADVANCED_PLANET; // rbx
+			//   CBHandle v116; // [rsp+48h] [rbp-C0h] BYREF
+			//   Vector4 v117; // [rsp+68h] [rbp-A0h] BYREF
+			//   Void *destination; // [rsp+78h] [rbp-90h]
+			//   _DWORD v119[36]; // [rsp+88h] [rbp-80h] BYREF
+			//   _OWORD v120[16]; // [rsp+118h] [rbp+10h] BYREF
+			//   Void source; // [rsp+218h] [rbp+110h] BYREF
+			//   ScriptableRenderContext P2; // [rsp+3D8h] [rbp+2D0h] BYREF
+			// 
+			//   P2.m_Ptr = context.m_Ptr;
+			//   if ( !byte_18D919D8C )
+			//   {
+			//     sub_18003C530(&TypeInfo::UnityEngine::Rendering::CoreUtils);
+			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
+			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGShaderIDs);
+			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGShaderKeyWords);
+			//     sub_18003C530(&TypeInfo::UnityEngine::Object);
+			//     sub_18003C530(&TypeInfo::UnityEngine::Rendering::ScriptableRenderContext);
+			//     byte_18D919D8C = 1;
+			//   }
+			//   if ( IFix::WrappersManagerImpl::IsPatched(1269, 0LL) )
+			//   {
+			//     Patch = IFix::WrappersManagerImpl::GetPatch(1269, 0LL);
+			//     if ( !Patch )
+			//       goto LABEL_75;
+			//     IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_480(
+			//       (ILFixDynamicMethodWrapper_2 *)Patch,
+			//       (Object *)this,
+			//       (Object *)propertyBlock,
+			//       P2,
+			//       (Object *)hgCamera,
+			//       (Object *)mat,
+			//       0LL);
+			//   }
+			//   else
+			//   {
+			//     sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
+			//     InterpolatedPhase = HG::Rendering::Runtime::HGEnvironmentManager::GetInterpolatedPhase(hgCamera, 0LL);
+			//     v12 = InterpolatedPhase;
+			//     if ( !InterpolatedPhase )
+			//       goto LABEL_75;
+			//     if ( InterpolatedPhase.fields.celestialConfig.advancedPlanetConfig.drawAdvancedPlanet )
+			//     {
+			//       advancedPlanetMat = (Object_1 *)InterpolatedPhase.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//       sub_180002C70(TypeInfo::UnityEngine::Object);
+			//       if ( !UnityEngine::Object::op_Equality(advancedPlanetMat, 0LL, 0LL) )
+			//       {
+			//         sub_1802F01E0(v120, 0LL, 256LL);
+			//         v14 = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//         sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGShaderIDs);
+			//         static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//         if ( v14 )
+			//         {
+			//           FloatImpl = UnityEngine::Material::GetFloatImpl(v14, *((_DWORD *)static_fields + 365), 0LL);
+			//           Patch = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//           *(float *)v119 = FloatImpl;
+			//           static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//           if ( Patch )
+			//           {
+			//             v16 = UnityEngine::Material::GetFloatImpl((Material *)Patch, *((_DWORD *)static_fields + 366), 0LL);
+			//             Patch = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//             *(float *)&v119[1] = v16;
+			//             static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//             if ( Patch )
+			//             {
+			//               v17 = UnityEngine::Material::GetFloatImpl((Material *)Patch, *((_DWORD *)static_fields + 367), 0LL);
+			//               Patch = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//               *(float *)&v119[2] = v17;
+			//               static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//               if ( Patch )
+			//               {
+			//                 v18 = UnityEngine::Material::GetFloatImpl((Material *)Patch, *((_DWORD *)static_fields + 368), 0LL);
+			//                 Patch = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//                 *(float *)&v119[3] = v18;
+			//                 static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                 if ( Patch )
+			//                 {
+			//                   v19 = UnityEngine::Material::GetFloatImpl((Material *)Patch, *((_DWORD *)static_fields + 369), 0LL);
+			//                   Patch = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//                   *(float *)&v119[4] = v19;
+			//                   static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                   if ( Patch )
+			//                   {
+			//                     v20 = UnityEngine::Material::GetFloatImpl((Material *)Patch, *((_DWORD *)static_fields + 370), 0LL);
+			//                     Patch = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//                     *(float *)&v119[5] = v20;
+			//                     static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                     if ( Patch )
+			//                     {
+			//                       v21 = UnityEngine::Material::GetFloatImpl(
+			//                               (Material *)Patch,
+			//                               *((_DWORD *)static_fields + 371),
+			//                               0LL);
+			//                       Patch = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//                       *(float *)&v119[6] = v21;
+			//                       static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                       if ( Patch )
+			//                       {
+			//                         v22 = UnityEngine::Material::GetFloatImpl(
+			//                                 (Material *)Patch,
+			//                                 *((_DWORD *)static_fields + 372),
+			//                                 0LL);
+			//                         Patch = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//                         *(float *)&v119[7] = v22;
+			//                         static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                         if ( Patch )
+			//                         {
+			//                           v23 = UnityEngine::Material::GetFloatImpl(
+			//                                   (Material *)Patch,
+			//                                   *((_DWORD *)static_fields + 373),
+			//                                   0LL);
+			//                           Patch = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//                           *(float *)&v119[8] = v23;
+			//                           static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                           if ( Patch )
+			//                           {
+			//                             v24 = UnityEngine::Material::GetFloatImpl(
+			//                                     (Material *)Patch,
+			//                                     *((_DWORD *)static_fields + 374),
+			//                                     0LL);
+			//                             Patch = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//                             *(float *)&v119[9] = v24;
+			//                             static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                             if ( Patch )
+			//                             {
+			//                               v25 = UnityEngine::Material::GetFloatImpl(
+			//                                       (Material *)Patch,
+			//                                       *((_DWORD *)static_fields + 375),
+			//                                       0LL);
+			//                               Patch = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//                               *(float *)&v119[10] = v25;
+			//                               static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                               if ( Patch )
+			//                               {
+			//                                 v26 = UnityEngine::Material::GetFloatImpl(
+			//                                         (Material *)Patch,
+			//                                         *((_DWORD *)static_fields + 376),
+			//                                         0LL);
+			//                                 Patch = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//                                 *(float *)&v119[11] = v26;
+			//                                 static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                                 if ( Patch )
+			//                                 {
+			//                                   v27 = UnityEngine::Material::GetFloatImpl(
+			//                                           (Material *)Patch,
+			//                                           *((_DWORD *)static_fields + 377),
+			//                                           0LL);
+			//                                   Patch = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//                                   *(float *)&v119[12] = v27;
+			//                                   static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                                   if ( Patch )
+			//                                   {
+			//                                     v28 = UnityEngine::Material::GetFloatImpl(
+			//                                             (Material *)Patch,
+			//                                             *((_DWORD *)static_fields + 378),
+			//                                             0LL);
+			//                                     Patch = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//                                     *(float *)&v119[13] = v28;
+			//                                     static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                                     if ( Patch )
+			//                                     {
+			//                                       v29 = UnityEngine::Material::GetFloatImpl(
+			//                                               (Material *)Patch,
+			//                                               *((_DWORD *)static_fields + 379),
+			//                                               0LL);
+			//                                       Patch = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//                                       *(float *)&v119[14] = v29;
+			//                                       static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                                       if ( Patch )
+			//                                       {
+			//                                         v30 = UnityEngine::Material::GetFloatImpl(
+			//                                                 (Material *)Patch,
+			//                                                 *((_DWORD *)static_fields + 380),
+			//                                                 0LL);
+			//                                         Patch = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//                                         *(float *)&v119[15] = v30;
+			//                                         static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                                         if ( Patch )
+			//                                         {
+			//                                           v31 = UnityEngine::Material::GetFloatImpl(
+			//                                                   (Material *)Patch,
+			//                                                   *((_DWORD *)static_fields + 381),
+			//                                                   0LL);
+			//                                           Patch = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//                                           *(float *)&v119[16] = v31;
+			//                                           static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                                           if ( Patch )
+			//                                           {
+			//                                             v32 = UnityEngine::Material::GetFloatImpl(
+			//                                                     (Material *)Patch,
+			//                                                     *((_DWORD *)static_fields + 382),
+			//                                                     0LL);
+			//                                             Patch = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//                                             *(float *)&v119[17] = v32;
+			//                                             static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                                             if ( Patch )
+			//                                             {
+			//                                               v33 = UnityEngine::Material::GetFloatImpl(
+			//                                                       (Material *)Patch,
+			//                                                       *((_DWORD *)static_fields + 383),
+			//                                                       0LL);
+			//                                               Patch = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//                                               *(float *)&v119[18] = v33;
+			//                                               static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                                               if ( Patch )
+			//                                               {
+			//                                                 v34 = UnityEngine::Material::GetFloatImpl(
+			//                                                         (Material *)Patch,
+			//                                                         *((_DWORD *)static_fields + 384),
+			//                                                         0LL);
+			//                                                 Patch = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//                                                 *(float *)&v119[19] = v34;
+			//                                                 static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                                                 if ( Patch )
+			//                                                 {
+			//                                                   v35 = UnityEngine::Material::GetFloatImpl(
+			//                                                           (Material *)Patch,
+			//                                                           *((_DWORD *)static_fields + 385),
+			//                                                           0LL);
+			//                                                   Patch = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//                                                   *(float *)&v119[20] = v35;
+			//                                                   static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                                                   if ( Patch )
+			//                                                   {
+			//                                                     v36 = UnityEngine::Material::GetFloatImpl(
+			//                                                             (Material *)Patch,
+			//                                                             *((_DWORD *)static_fields + 386),
+			//                                                             0LL);
+			//                                                     Patch = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//                                                     *(float *)&v119[21] = v36;
+			//                                                     static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                                                     if ( Patch )
+			//                                                     {
+			//                                                       v37 = UnityEngine::Material::GetFloatImpl(
+			//                                                               (Material *)Patch,
+			//                                                               *((_DWORD *)static_fields + 387),
+			//                                                               0LL);
+			//                                                       Patch = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//                                                       *(float *)&v119[22] = v37;
+			//                                                       static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                                                       if ( Patch )
+			//                                                       {
+			//                                                         v38 = UnityEngine::Material::GetFloatImpl(
+			//                                                                 (Material *)Patch,
+			//                                                                 *((_DWORD *)static_fields + 388),
+			//                                                                 0LL);
+			//                                                         Patch = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//                                                         *(float *)&v119[23] = v38;
+			//                                                         static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                                                         if ( Patch )
+			//                                                         {
+			//                                                           v39 = UnityEngine::Material::GetFloatImpl(
+			//                                                                   (Material *)Patch,
+			//                                                                   *((_DWORD *)static_fields + 389),
+			//                                                                   0LL);
+			//                                                           Patch = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//                                                           *(float *)&v119[24] = v39;
+			//                                                           static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                                                           if ( Patch )
+			//                                                           {
+			//                                                             v40 = UnityEngine::Material::GetFloatImpl(
+			//                                                                     (Material *)Patch,
+			//                                                                     *((_DWORD *)static_fields + 390),
+			//                                                                     0LL);
+			//                                                             Patch = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//                                                             *(float *)&v119[25] = v40;
+			//                                                             static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                                                             if ( Patch )
+			//                                                             {
+			//                                                               v41 = UnityEngine::Material::GetFloatImpl(
+			//                                                                       (Material *)Patch,
+			//                                                                       *((_DWORD *)static_fields + 391),
+			//                                                                       0LL);
+			//                                                               Patch = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//                                                               *(float *)&v119[26] = v41;
+			//                                                               static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                                                               if ( Patch )
+			//                                                               {
+			//                                                                 v42 = UnityEngine::Material::GetFloatImpl(
+			//                                                                         (Material *)Patch,
+			//                                                                         *((_DWORD *)static_fields + 392),
+			//                                                                         0LL);
+			//                                                                 Patch = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//                                                                 *(float *)&v119[27] = v42;
+			//                                                                 static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                                                                 if ( Patch )
+			//                                                                 {
+			//                                                                   v43 = UnityEngine::Material::GetFloatImpl(
+			//                                                                           (Material *)Patch,
+			//                                                                           *((_DWORD *)static_fields + 393),
+			//                                                                           0LL);
+			//                                                                   Patch = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//                                                                   *(float *)&v119[28] = v43;
+			//                                                                   static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                                                                   if ( Patch )
+			//                                                                   {
+			//                                                                     v44 = UnityEngine::Material::GetFloatImpl(
+			//                                                                             (Material *)Patch,
+			//                                                                             *((_DWORD *)static_fields + 394),
+			//                                                                             0LL);
+			//                                                                     Patch = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//                                                                     *(float *)&v119[29] = v44;
+			//                                                                     static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                                                                     if ( Patch )
+			//                                                                     {
+			//                                                                       v45 = UnityEngine::Material::GetFloatImpl(
+			//                                                                               (Material *)Patch,
+			//                                                                               *((_DWORD *)static_fields + 395),
+			//                                                                               0LL);
+			//                                                                       Patch = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//                                                                       *(float *)&v119[30] = v45;
+			//                                                                       static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                                                                       if ( Patch )
+			//                                                                       {
+			//                                                                         v46 = UnityEngine::Material::GetFloatImpl(
+			//                                                                                 (Material *)Patch,
+			//                                                                                 *((_DWORD *)static_fields + 396),
+			//                                                                                 0LL);
+			//                                                                         Patch = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//                                                                         *(float *)&v119[31] = v46;
+			//                                                                         static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                                                                         if ( Patch )
+			//                                                                         {
+			//                                                                           v47 = UnityEngine::Material::GetFloatImpl(
+			//                                                                                   (Material *)Patch,
+			//                                                                                   *((_DWORD *)static_fields + 397),
+			//                                                                                   0LL);
+			//                                                                           Patch = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//                                                                           *(float *)&v119[32] = v47;
+			//                                                                           static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                                                                           if ( Patch )
+			//                                                                           {
+			//                                                                             v48 = UnityEngine::Material::GetFloatImpl(
+			//                                                                                     (Material *)Patch,
+			//                                                                                     *((_DWORD *)static_fields + 398),
+			//                                                                                     0LL);
+			//                                                                             Patch = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//                                                                             *(float *)&v119[33] = v48;
+			//                                                                             static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                                                                             if ( Patch )
+			//                                                                             {
+			//                                                                               v49 = UnityEngine::Material::GetFloatImpl(
+			//                                                                                       (Material *)Patch,
+			//                                                                                       *((_DWORD *)static_fields + 399),
+			//                                                                                       0LL);
+			//                                                                               Patch = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//                                                                               *(float *)&v119[34] = v49;
+			//                                                                               static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                                                                               if ( Patch )
+			//                                                                               {
+			//                                                                                 v50 = UnityEngine::Material::GetFloatImpl(
+			//                                                                                         (Material *)Patch,
+			//                                                                                         *((_DWORD *)static_fields + 400),
+			//                                                                                         0LL);
+			//                                                                                 static_fields = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//                                                                                 *(float *)&v119[35] = v50;
+			//                                                                                 Patch = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                                                                                 if ( static_fields )
+			//                                                                                 {
+			//                                                                                   *(Color *)&v116.bufferId = *UnityEngine::Material::GetColor((Color *)&v116, (Material *)static_fields, *((_DWORD *)Patch + 401), 0LL);
+			//                                                                                   *(_OWORD *)&v116.bufferId = *(_OWORD *)sub_182F8C840(&v117, &v116);
+			//                                                                                   v52 = UnityEngine::Color::op_Implicit(
+			//                                                                                           (Color *)&v117,
+			//                                                                                           (Vector4 *)&v116,
+			//                                                                                           v51);
+			//                                                                                   static_fields = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//                                                                                   v120[0] = *v52;
+			//                                                                                   Patch = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                                                                                   if ( static_fields )
+			//                                                                                   {
+			//                                                                                     *(Color *)&v116.bufferId = *UnityEngine::Material::GetColor((Color *)&v117, (Material *)static_fields, *((_DWORD *)Patch + 402), 0LL);
+			//                                                                                     *(_OWORD *)&v116.bufferId = *(_OWORD *)sub_182F8C840(&v117, &v116);
+			//                                                                                     v54 = UnityEngine::Color::op_Implicit(
+			//                                                                                             (Color *)&v117,
+			//                                                                                             (Vector4 *)&v116,
+			//                                                                                             v53);
+			//                                                                                     static_fields = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//                                                                                     v120[1] = *v54;
+			//                                                                                     Patch = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                                                                                     if ( static_fields )
+			//                                                                                     {
+			//                                                                                       *(Color *)&v116.bufferId = *UnityEngine::Material::GetColor((Color *)&v117, (Material *)static_fields, *((_DWORD *)Patch + 403), 0LL);
+			//                                                                                       *(_OWORD *)&v116.bufferId = *(_OWORD *)sub_182F8C840(&v117, &v116);
+			//                                                                                       v56 = UnityEngine::Color::op_Implicit(
+			//                                                                                               (Color *)&v117,
+			//                                                                                               (Vector4 *)&v116,
+			//                                                                                               v55);
+			//                                                                                       static_fields = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//                                                                                       v120[2] = *v56;
+			//                                                                                       Patch = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                                                                                       if ( static_fields )
+			//                                                                                       {
+			//                                                                                         Vector = UnityEngine::Material::GetVector(
+			//                                                                                                    &v117,
+			//                                                                                                    (Material *)static_fields,
+			//                                                                                                    *((_DWORD *)Patch + 404),
+			//                                                                                                    0LL);
+			//                                                                                         static_fields = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//                                                                                         v120[3] = *Vector;
+			//                                                                                         Patch = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                                                                                         if ( static_fields )
+			//                                                                                         {
+			//                                                                                           v58 = UnityEngine::Material::GetVector(
+			//                                                                                                   &v117,
+			//                                                                                                   (Material *)static_fields,
+			//                                                                                                   *((_DWORD *)Patch + 405),
+			//                                                                                                   0LL);
+			//                                                                                           static_fields = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//                                                                                           v120[4] = *v58;
+			//                                                                                           Patch = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                                                                                           if ( static_fields )
+			//                                                                                           {
+			//                                                                                             v59 = UnityEngine::Material::GetVector(
+			//                                                                                                     &v117,
+			//                                                                                                     (Material *)static_fields,
+			//                                                                                                     *((_DWORD *)Patch + 406),
+			//                                                                                                     0LL);
+			//                                                                                             static_fields = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//                                                                                             v120[5] = *v59;
+			//                                                                                             Patch = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                                                                                             if ( static_fields )
+			//                                                                                             {
+			//                                                                                               *(Color *)&v116.bufferId = *UnityEngine::Material::GetColor((Color *)&v117, (Material *)static_fields, *((_DWORD *)Patch + 407), 0LL);
+			//                                                                                               *(_OWORD *)&v116.bufferId = *(_OWORD *)sub_182F8C840(&v117, &v116);
+			//                                                                                               v61 = UnityEngine::Color::op_Implicit((Color *)&v117, (Vector4 *)&v116, v60);
+			//                                                                                               static_fields = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//                                                                                               v120[6] = *v61;
+			//                                                                                               Patch = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                                                                                               if ( static_fields )
+			//                                                                                               {
+			//                                                                                                 *(Color *)&v116.bufferId = *UnityEngine::Material::GetColor((Color *)&v117, (Material *)static_fields, *((_DWORD *)Patch + 408), 0LL);
+			//                                                                                                 *(_OWORD *)&v116.bufferId = *(_OWORD *)sub_182F8C840(&v117, &v116);
+			//                                                                                                 v63 = UnityEngine::Color::op_Implicit((Color *)&v117, (Vector4 *)&v116, v62);
+			//                                                                                                 static_fields = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//                                                                                                 v120[7] = *v63;
+			//                                                                                                 Patch = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                                                                                                 if ( static_fields )
+			//                                                                                                 {
+			//                                                                                                   *(Color *)&v116.bufferId = *UnityEngine::Material::GetColor((Color *)&v117, (Material *)static_fields, *((_DWORD *)Patch + 409), 0LL);
+			//                                                                                                   *(_OWORD *)&v116.bufferId = *(_OWORD *)sub_182F8C840(&v117, &v116);
+			//                                                                                                   v65 = UnityEngine::Color::op_Implicit((Color *)&v117, (Vector4 *)&v116, v64);
+			//                                                                                                   static_fields = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//                                                                                                   v120[8] = *v65;
+			//                                                                                                   Patch = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                                                                                                   if ( static_fields )
+			//                                                                                                   {
+			//                                                                                                     *(Color *)&v116.bufferId = *UnityEngine::Material::GetColor((Color *)&v117, (Material *)static_fields, *((_DWORD *)Patch + 410), 0LL);
+			//                                                                                                     *(_OWORD *)&v116.bufferId = *(_OWORD *)sub_182F8C840(&v117, &v116);
+			//                                                                                                     v67 = UnityEngine::Color::op_Implicit((Color *)&v117, (Vector4 *)&v116, v66);
+			//                                                                                                     static_fields = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//                                                                                                     v120[9] = *v67;
+			//                                                                                                     Patch = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                                                                                                     if ( static_fields )
+			//                                                                                                     {
+			//                                                                                                       *(Color *)&v116.bufferId = *UnityEngine::Material::GetColor((Color *)&v117, (Material *)static_fields, *((_DWORD *)Patch + 411), 0LL);
+			//                                                                                                       *(_OWORD *)&v116.bufferId = *(_OWORD *)sub_182F8C840(&v117, &v116);
+			//                                                                                                       v69 = UnityEngine::Color::op_Implicit((Color *)&v117, (Vector4 *)&v116, v68);
+			//                                                                                                       static_fields = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//                                                                                                       v120[10] = *v69;
+			//                                                                                                       Patch = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                                                                                                       if ( static_fields )
+			//                                                                                                       {
+			//                                                                                                         v70 = UnityEngine::Material::GetVector(&v117, (Material *)static_fields, *((_DWORD *)Patch + 412), 0LL);
+			//                                                                                                         static_fields = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//                                                                                                         v120[11] = *v70;
+			//                                                                                                         Patch = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                                                                                                         if ( static_fields )
+			//                                                                                                         {
+			//                                                                                                           *(Color *)&v116.bufferId = *UnityEngine::Material::GetColor((Color *)&v117, (Material *)static_fields, *((_DWORD *)Patch + 413), 0LL);
+			//                                                                                                           *(_OWORD *)&v116.bufferId = *(_OWORD *)sub_182F8C840(&v117, &v116);
+			//                                                                                                           v72 = UnityEngine::Color::op_Implicit((Color *)&v117, (Vector4 *)&v116, v71);
+			//                                                                                                           static_fields = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//                                                                                                           v120[12] = *v72;
+			//                                                                                                           Patch = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                                                                                                           if ( static_fields )
+			//                                                                                                           {
+			//                                                                                                             *(Color *)&v116.bufferId = *UnityEngine::Material::GetColor((Color *)&v117, (Material *)static_fields, *((_DWORD *)Patch + 414), 0LL);
+			//                                                                                                             *(_OWORD *)&v116.bufferId = *(_OWORD *)sub_182F8C840(&v117, &v116);
+			//                                                                                                             v74 = UnityEngine::Color::op_Implicit((Color *)&v117, (Vector4 *)&v116, v73);
+			//                                                                                                             static_fields = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//                                                                                                             v120[13] = *v74;
+			//                                                                                                             Patch = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                                                                                                             if ( static_fields )
+			//                                                                                                             {
+			//                                                                                                               v75 = UnityEngine::Material::GetVector(&v117, (Material *)static_fields, *((_DWORD *)Patch + 415), 0LL);
+			//                                                                                                               static_fields = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//                                                                                                               v120[14] = *v75;
+			//                                                                                                               Patch = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                                                                                                               if ( static_fields )
+			//                                                                                                               {
+			//                                                                                                                 v76 = UnityEngine::Material::GetVector(&v117, (Material *)static_fields, *((_DWORD *)Patch + 416), 0LL);
+			//                                                                                                                 v77 = 3LL;
+			//                                                                                                                 v78 = v119;
+			//                                                                                                                 v79 = *v76;
+			//                                                                                                                 p_source = &source;
+			//                                                                                                                 v120[15] = v79;
+			//                                                                                                                 do
+			//                                                                                                                 {
+			//                                                                                                                   v81 = v78[1];
+			//                                                                                                                   *(_OWORD *)p_source = *v78;
+			//                                                                                                                   v82 = v78[2];
+			//                                                                                                                   *(_OWORD *)&p_source[16] = v81;
+			//                                                                                                                   v83 = v78[3];
+			//                                                                                                                   *(_OWORD *)&p_source[32] = v82;
+			//                                                                                                                   v84 = v78[4];
+			//                                                                                                                   *(_OWORD *)&p_source[48] = v83;
+			//                                                                                                                   v85 = v78[5];
+			//                                                                                                                   *(_OWORD *)&p_source[64] = v84;
+			//                                                                                                                   v86 = v78[6];
+			//                                                                                                                   *(_OWORD *)&p_source[80] = v85;
+			//                                                                                                                   v87 = v78[7];
+			//                                                                                                                   v78 += 8;
+			//                                                                                                                   *(_OWORD *)&p_source[96] = v86;
+			//                                                                                                                   p_source += 128;
+			//                                                                                                                   *(_OWORD *)&p_source[-16] = v87;
+			//                                                                                                                   --v77;
+			//                                                                                                                 }
+			//                                                                                                                 while ( v77 );
+			//                                                                                                                 v88 = *v78;
+			//                                                                                                                 v89 = TypeInfo::UnityEngine::Rendering::ScriptableRenderContext;
+			//                                                                                                                 *(_OWORD *)p_source = v88;
+			//                                                                                                                 sub_180002C70(v89);
+			//                                                                                                                 v90 = UnityEngine::Rendering::ScriptableRenderContext::AllocateConstantBuffer(&v116, &P2, 400, 0LL);
+			//                                                                                                                 v91 = *(__m128i *)&v90.bufferId;
+			//                                                                                                                 v92 = *(__m128i *)&v90.bufferId;
+			//                                                                                                                 destination = (Void *)v90.ptr;
+			//                                                                                                                 Unity::Collections::LowLevel::Unsafe::UnsafeUtility::MemCpy(destination, &source, (unsigned int)_mm_cvtsi128_si32(_mm_srli_si128(v92, 8)), 0LL);
+			//                                                                                                                 Patch = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                                                                                                                 if ( propertyBlock )
+			//                                                                                                                 {
+			//                                                                                                                   UnityEngine::MaterialPropertyBlock::SetConstantBufferImpl0(propertyBlock, *((_DWORD *)Patch + 364), _mm_cvtsi128_si32(v91), _mm_cvtsi128_si32(_mm_srli_si128(v91, 4)), _mm_cvtsi128_si32(_mm_srli_si128(v91, 8)), 0LL);
+			//                                                                                                                   Patch = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//                                                                                                                   TransmittanceLLUT = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields._TransmittanceLLUT;
+			//                                                                                                                   if ( Patch )
+			//                                                                                                                   {
+			//                                                                                                                     TextureImpl = UnityEngine::Material::GetTextureImpl((Material *)Patch, TransmittanceLLUT, 0LL);
+			//                                                                                                                     HG::Rendering::Runtime::HGEnvironmentUtils::SetTextureIfNotNull(propertyBlock, TransmittanceLLUT, TextureImpl, 0LL);
+			//                                                                                                                     Patch = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//                                                                                                                     BaseColorMap = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields._BaseColorMap;
+			//                                                                                                                     if ( Patch )
+			//                                                                                                                     {
+			//                                                                                                                       v96 = UnityEngine::Material::GetTextureImpl((Material *)Patch, BaseColorMap, 0LL);
+			//                                                                                                                       HG::Rendering::Runtime::HGEnvironmentUtils::SetTextureIfNotNull(propertyBlock, BaseColorMap, v96, 0LL);
+			//                                                                                                                       Patch = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//                                                                                                                       RSM = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields._RSM;
+			//                                                                                                                       if ( Patch )
+			//                                                                                                                       {
+			//                                                                                                                         v98 = UnityEngine::Material::GetTextureImpl((Material *)Patch, RSM, 0LL);
+			//                                                                                                                         HG::Rendering::Runtime::HGEnvironmentUtils::SetTextureIfNotNull(propertyBlock, RSM, v98, 0LL);
+			//                                                                                                                         Patch = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//                                                                                                                         CloudsTexMain = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields._CloudsTexMain;
+			//                                                                                                                         if ( Patch )
+			//                                                                                                                         {
+			//                                                                                                                           v100 = UnityEngine::Material::GetTextureImpl((Material *)Patch, CloudsTexMain, 0LL);
+			//                                                                                                                           HG::Rendering::Runtime::HGEnvironmentUtils::SetTextureIfNotNull(propertyBlock, CloudsTexMain, v100, 0LL);
+			//                                                                                                                           Patch = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//                                                                                                                           CloudsCap = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields._CloudsCap;
+			//                                                                                                                           if ( Patch )
+			//                                                                                                                           {
+			//                                                                                                                             v102 = UnityEngine::Material::GetTextureImpl((Material *)Patch, CloudsCap, 0LL);
+			//                                                                                                                             HG::Rendering::Runtime::HGEnvironmentUtils::SetTextureIfNotNull(propertyBlock, CloudsCap, v102, 0LL);
+			//                                                                                                                             Patch = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//                                                                                                                             CloudsFlowMap = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields._CloudsFlowMap;
+			//                                                                                                                             if ( Patch )
+			//                                                                                                                             {
+			//                                                                                                                               v104 = UnityEngine::Material::GetTextureImpl((Material *)Patch, CloudsFlowMap, 0LL);
+			//                                                                                                                               HG::Rendering::Runtime::HGEnvironmentUtils::SetTextureIfNotNull(propertyBlock, CloudsFlowMap, v104, 0LL);
+			//                                                                                                                               Patch = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//                                                                                                                               ErosionMap = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields._ErosionMap;
+			//                                                                                                                               if ( Patch )
+			//                                                                                                                               {
+			//                                                                                                                                 v106 = UnityEngine::Material::GetTextureImpl((Material *)Patch, ErosionMap, 0LL);
+			//                                                                                                                                 HG::Rendering::Runtime::HGEnvironmentUtils::SetTextureIfNotNull(propertyBlock, ErosionMap, v106, 0LL);
+			//                                                                                                                                 sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGShaderKeyWords);
+			//                                                                                                                                 Patch = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//                                                                                                                                 v107 = TypeInfo::HG::Rendering::Runtime::HGShaderKeyWords.static_fields;
+			//                                                                                                                                 DRAW_ADVANCED_PLANET_CLOUDS_FLOWMAP = v107.DRAW_ADVANCED_PLANET_CLOUDS_FLOWMAP;
+			//                                                                                                                                 if ( Patch )
+			//                                                                                                                                 {
+			//                                                                                                                                   IsKeywordEnabled = UnityEngine::Material::IsKeywordEnabled((Material *)Patch, v107.CLOUDS_FLOWMAP, 0LL);
+			//                                                                                                                                   sub_180002C70(TypeInfo::UnityEngine::Rendering::CoreUtils);
+			//                                                                                                                                   v110 = IsKeywordEnabled;
+			//                                                                                                                                   v111 = mat;
+			//                                                                                                                                   VLB::Utils::SetKeywordEnabled(mat, DRAW_ADVANCED_PLANET_CLOUDS_FLOWMAP, v110, 0LL);
+			//                                                                                                                                   Patch = v12.fields.celestialConfig.advancedPlanetConfig.advancedPlanetMat;
+			//                                                                                                                                   v112 = TypeInfo::HG::Rendering::Runtime::HGShaderKeyWords.static_fields;
+			//                                                                                                                                   DRAW_ADVANCED_PLANET_CLOUDS_SHADOW = v112.DRAW_ADVANCED_PLANET_CLOUDS_SHADOW;
+			//                                                                                                                                   if ( Patch )
+			//                                                                                                                                   {
+			//                                                                                                                                     v114 = UnityEngine::Material::IsKeywordEnabled((Material *)Patch, v112.ENABLE_CLOUDS_SHADOW, 0LL);
+			//                                                                                                                                     VLB::Utils::SetKeywordEnabled(v111, DRAW_ADVANCED_PLANET_CLOUDS_SHADOW, v114, 0LL);
+			//                                                                                                                                     static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderKeyWords.static_fields;
+			//                                                                                                                                     if ( v111 )
+			//                                                                                                                                     {
+			//                                                                                                                                       UnityEngine::Material::EnableKeyword(v111, *((String **)static_fields + 66), 0LL);
+			//                                                                                                                                       return;
+			//                                                                                                                                     }
+			//                                                                                                                                   }
+			//                                                                                                                                 }
+			//                                                                                                                               }
+			//                                                                                                                             }
+			//                                                                                                                           }
+			//                                                                                                                         }
+			//                                                                                                                       }
+			//                                                                                                                     }
+			//                                                                                                                   }
+			//                                                                                                                 }
+			//                                                                                                               }
+			//                                                                                                             }
+			//                                                                                                           }
+			//                                                                                                         }
+			//                                                                                                       }
+			//                                                                                                     }
+			//                                                                                                   }
+			//                                                                                                 }
+			//                                                                                               }
+			//                                                                                             }
+			//                                                                                           }
+			//                                                                                         }
+			//                                                                                       }
+			//                                                                                     }
+			//                                                                                   }
+			//                                                                                 }
+			//                                                                               }
+			//                                                                             }
+			//                                                                           }
+			//                                                                         }
+			//                                                                       }
+			//                                                                     }
+			//                                                                   }
+			//                                                                 }
+			//                                                               }
+			//                                                             }
+			//                                                           }
+			//                                                         }
+			//                                                       }
+			//                                                     }
+			//                                                   }
+			//                                                 }
+			//                                               }
+			//                                             }
+			//                                           }
+			//                                         }
+			//                                       }
+			//                                     }
+			//                                   }
+			//                                 }
+			//                               }
+			//                             }
+			//                           }
+			//                         }
+			//                       }
+			//                     }
+			//                   }
+			//                 }
+			//               }
+			//             }
+			//           }
+			//         }
+			// LABEL_75:
+			//         sub_180B536AC(Patch, static_fields);
+			//       }
+			//     }
+			//     sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGShaderKeyWords);
+			//     DRAW_ADVANCED_PLANET = TypeInfo::HG::Rendering::Runtime::HGShaderKeyWords.static_fields.DRAW_ADVANCED_PLANET;
+			//     sub_180002C70(TypeInfo::UnityEngine::Rendering::CoreUtils);
+			//     VLB::Utils::SetKeywordEnabled(mat, DRAW_ADVANCED_PLANET, 0, 0LL);
+			//   }
+			// }
+			// 
+		}
+
+		private void RenderSkybox(CommandBuffer cmd, Material skyBoxMaterial, HGCamera hgCamera, bool useFullScreenDebug)
+		{
+			// // Void RenderSkybox(CommandBuffer, Material, HGCamera, Boolean)
+			// void HG::Rendering::Runtime::HGSkyRenderer::RenderSkybox(
+			//         HGSkyRenderer *this,
+			//         CommandBuffer *cmd,
+			//         Material *skyBoxMaterial,
+			//         HGCamera *hgCamera,
+			//         bool useFullScreenDebug,
+			//         MethodInfo *method)
+			// {
+			//   HGShaderIDs__StaticFields *Tint; // rdx
+			//   Component *camera; // rcx
+			//   Transform *transform; // rax
+			//   Vector3 *position; // rax
+			//   __int64 v14; // xmm7_8
+			//   float z; // ebx
+			//   MethodInfo *v16; // rdx
+			//   __m128i v17; // xmm6
+			//   Vector3 *SkyScale; // rax
+			//   __int64 v19; // xmm0_8
+			//   Matrix4x4 *v20; // rax
+			//   __int128 v21; // xmm6
+			//   __int128 v22; // xmm7
+			//   __int128 v23; // xmm8
+			//   __int128 v24; // xmm9
+			//   HGEnvironmentPhase *InterpolatedPhase; // rax
+			//   HGEnvironmentPhase *v26; // rbx
+			//   MaterialPropertyBlock *m_propertyBlock; // rsi
+			//   MaterialPropertyBlock *v28; // rax
+			//   Mesh *m_IcosphereMesh; // rdx
+			//   Vector3 v30; // [rsp+48h] [rbp-79h] BYREF
+			//   Vector3 v31; // [rsp+58h] [rbp-69h] BYREF
+			//   __m128i skyboxTintColor; // [rsp+68h] [rbp-59h] BYREF
+			//   Matrix4x4 v33[2]; // [rsp+78h] [rbp-49h] BYREF
+			// 
+			//   if ( !byte_18D919D8D )
+			//   {
+			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
+			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGShaderIDs);
+			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGSkyRenderer);
+			//     byte_18D919D8D = 1;
+			//   }
+			//   if ( !IFix::WrappersManagerImpl::IsPatched(1270, 0LL) )
+			//   {
+			//     if ( hgCamera )
+			//     {
+			//       camera = (Component *)hgCamera.fields.camera;
+			//       if ( camera )
+			//       {
+			//         transform = UnityEngine::Component::get_transform(camera, 0LL);
+			//         if ( transform )
+			//         {
+			//           position = UnityEngine::Transform::get_position(&v31, transform, 0LL);
+			//           v14 = *(_QWORD *)&position.x;
+			//           z = position.z;
+			//           v17 = _mm_loadu_si128((const __m128i *)UnityEngine::Quaternion::get_identity(
+			//                                                    (Quaternion *)&skyboxTintColor,
+			//                                                    v16));
+			//           sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGSkyRenderer);
+			//           SkyScale = HG::Rendering::Runtime::HGSkyRenderer::GetSkyScale(&v31, hgCamera, 0LL);
+			//           skyboxTintColor = v17;
+			//           v19 = *(_QWORD *)&SkyScale.x;
+			//           *(float *)&SkyScale = SkyScale.z;
+			//           *(_QWORD *)&v30.x = v19;
+			//           LODWORD(v30.z) = (_DWORD)SkyScale;
+			//           *(_QWORD *)&v31.x = v14;
+			//           v31.z = z;
+			//           v20 = UnityEngine::Matrix4x4::TRS(v33, &v31, (Quaternion *)&skyboxTintColor, &v30, 0LL);
+			//           v21 = *(_OWORD *)&v20.m00;
+			//           v22 = *(_OWORD *)&v20.m01;
+			//           v23 = *(_OWORD *)&v20.m02;
+			//           v24 = *(_OWORD *)&v20.m03;
+			//           sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
+			//           InterpolatedPhase = HG::Rendering::Runtime::HGEnvironmentManager::GetInterpolatedPhase(hgCamera, 0LL);
+			//           camera = (Component *)this.fields.m_propertyBlock;
+			//           v26 = InterpolatedPhase;
+			//           if ( camera )
+			//           {
+			//             UnityEngine::MaterialPropertyBlock::Clear((MaterialPropertyBlock *)camera, 1, 0LL);
+			//             m_propertyBlock = this.fields.m_propertyBlock;
+			//             sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGShaderIDs);
+			//             Tint = (HGShaderIDs__StaticFields *)(unsigned int)TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields._Tint;
+			//             if ( v26 )
+			//             {
+			//               if ( m_propertyBlock )
+			//               {
+			//                 skyboxTintColor = (__m128i)v26.fields.skyConfig.skyboxTintColor;
+			//                 UnityEngine::MaterialPropertyBlock::SetColor(
+			//                   m_propertyBlock,
+			//                   (int32_t)Tint,
+			//                   (Color *)&skyboxTintColor,
+			//                   0LL);
+			//                 camera = (Component *)this.fields.m_propertyBlock;
+			//                 Tint = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                 if ( camera )
+			//                 {
+			//                   UnityEngine::MaterialPropertyBlock::SetFloatImpl(
+			//                     (MaterialPropertyBlock *)camera,
+			//                     Tint._Exposure,
+			//                     v26.fields.lightConfig.preExposure * v26.fields.skyConfig.skyboxBrightness,
+			//                     0LL);
+			//                   camera = (Component *)this.fields.m_propertyBlock;
+			//                   Tint = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
+			//                   if ( camera )
+			//                   {
+			//                     UnityEngine::MaterialPropertyBlock::SetFloatImpl(
+			//                       (MaterialPropertyBlock *)camera,
+			//                       Tint._Rotation,
+			//                       v26.fields.skyConfig.skyboxRotation,
+			//                       0LL);
+			//                     HG::Rendering::Runtime::HGEnvironmentUtils::SetTextureIfNotNull(
+			//                       this.fields.m_propertyBlock,
+			//                       TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields._Tex,
+			//                       (Texture *)v26.fields.skyConfig.skyboxCubeMap,
+			//                       0LL);
+			//                     v28 = this.fields.m_propertyBlock;
+			//                     if ( cmd )
+			//                     {
+			//                       m_IcosphereMesh = this.fields.m_IcosphereMesh;
+			//                       *(_OWORD *)&v33[0].m00 = v21;
+			//                       *(_OWORD *)&v33[0].m01 = v22;
+			//                       *(_OWORD *)&v33[0].m02 = v23;
+			//                       *(_OWORD *)&v33[0].m03 = v24;
+			//                       UnityEngine::Rendering::CommandBuffer::DrawMesh(
+			//                         cmd,
+			//                         m_IcosphereMesh,
+			//                         v33,
+			//                         skyBoxMaterial,
+			//                         0,
+			//                         0,
+			//                         v28,
+			//                         0LL);
+			//                       return;
+			//                     }
+			//                   }
+			//                 }
+			//               }
+			//             }
+			//           }
+			//         }
+			//       }
+			//     }
+			// LABEL_15:
+			//     sub_180B536AC(camera, Tint);
+			//   }
+			//   camera = (Component *)IFix::WrappersManagerImpl::GetPatch(1270, 0LL);
+			//   if ( !camera )
+			//     goto LABEL_15;
+			//   IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_975(
+			//     (ILFixDynamicMethodWrapper_3 *)camera,
+			//     (Object *)this,
+			//     (Object *)cmd,
+			//     (Object *)skyBoxMaterial,
+			//     (Object *)hgCamera,
+			//     useFullScreenDebug,
+			//     0LL);
+			// }
+			// 
+		}
+
+		private void SetProceduralRingMaterial(MaterialPropertyBlock propertyBlock, HGEnvironmentPhase envPhase)
+		{
+			// // Void SetProceduralRingMaterial(MaterialPropertyBlock, HGEnvironmentPhase)
+			// void HG::Rendering::Runtime::HGSkyRenderer::SetProceduralRingMaterial(
+			//         HGSkyRenderer *this,
+			//         MaterialPropertyBlock *propertyBlock,
+			//         HGEnvironmentPhase *envPhase,
+			//         MethodInfo *method)
+			// {
+			//   MethodInfo *v7; // rdx
+			//   __int64 v8; // rcx
+			//   __m128 v9; // xmm6
+			//   __m128i v10; // xmm7
+			//   __m128 v11; // xmm11
+			//   float width; // xmm2_4
+			//   Quaternion v13; // xmm1
+			//   int v14; // r8d
+			//   Material *m_proceduralSkyMaterial; // rdi
+			//   String *s_Ring; // rsi
+			//   TileBase *v17; // rdx
+			//   Vector3Int *v18; // r8
+			//   ITilemap *v19; // r9
+			//   float v20; // xmm1_4
+			//   MethodInfo *v21; // r8
+			//   Color *v22; // rax
+			//   int32_t v23; // r10d
+			//   __int64 v24; // xmm9_8
+			//   __int64 v25; // xmm8_8
+			//   float z; // r14d
+			//   float v27; // esi
+			//   __int64 v28; // xmm7_8
+			//   float v29; // edi
+			//   MethodInfo *v30; // rdx
+			//   Vector3 *v31; // rax
+			//   __int64 v32; // xmm3_8
+			//   Vector3 *v33; // rax
+			//   __int64 v34; // xmm10_8
+			//   float v35; // r15d
+			//   MethodInfo *v36; // rdx
+			//   Vector3 *fwd; // rax
+			//   __int64 v38; // xmm3_8
+			//   Vector3 *v39; // rax
+			//   __int64 v40; // xmm6_8
+			//   float v41; // ebx
+			//   MethodInfo *v42; // rdx
+			//   Vector3 *v43; // rax
+			//   __int64 v44; // xmm1_8
+			//   Vector3 *v45; // rax
+			//   __int64 v46; // xmm7_8
+			//   float v47; // edi
+			//   __m128i v48; // xmm6
+			//   int32_t RingUpWithBelow; // ebx
+			//   MethodInfo *v50; // r8
+			//   int32_t v51; // r10d
+			//   String *v52; // rbx
+			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
+			//   MethodInfo *v54; // [rsp+20h] [rbp-E0h]
+			//   Vector4 v55; // [rsp+30h] [rbp-D0h] BYREF
+			//   Color v56; // [rsp+40h] [rbp-C0h] BYREF
+			//   Vector3 right; // [rsp+50h] [rbp-B0h] BYREF
+			//   Vector3 forward; // [rsp+60h] [rbp-A0h] BYREF
+			//   Vector3 up; // [rsp+70h] [rbp-90h] BYREF
+			//   Vector4 v60[3]; // [rsp+80h] [rbp-80h] BYREF
+			//   __m256i v61; // [rsp+B0h] [rbp-50h]
+			//   __m256i v62; // [rsp+F0h] [rbp-10h]
+			// 
+			//   if ( !byte_18D919D8E )
+			//   {
+			//     sub_18003C530(&TypeInfo::UnityEngine::Rendering::CoreUtils);
+			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGCelestialConfig);
+			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGShaderIDs);
+			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGShaderKeyWords);
+			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGUtils);
+			//     byte_18D919D8E = 1;
+			//   }
+			//   *(_QWORD *)&up.x = 0LL;
+			//   up.z = 0.0;
+			//   *(_QWORD *)&forward.x = 0LL;
+			//   forward.z = 0.0;
+			//   *(_QWORD *)&right.x = 0LL;
+			//   right.z = 0.0;
+			//   if ( IFix::WrappersManagerImpl::IsPatched(1261, 0LL) )
+			//   {
+			//     Patch = IFix::WrappersManagerImpl::GetPatch(1261, 0LL);
+			//     if ( !Patch )
+			//       goto LABEL_15;
+			//     IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_11(
+			//       (ILFixDynamicMethodWrapper_28 *)Patch,
+			//       (Object *)this,
+			//       (Object *)propertyBlock,
+			//       (Object *)envPhase,
+			//       0LL);
+			//   }
+			//   else
+			//   {
+			//     if ( !envPhase )
+			//       goto LABEL_15;
+			//     v9 = *(__m128 *)&envPhase.fields.celestialConfig.moonConfig.ring.outerRadius;
+			//     v10 = *(__m128i *)&envPhase.fields.celestialConfig.moonConfig.ring.ringColor.b;
+			//     v11 = *(__m128 *)&envPhase.fields.celestialConfig.moonConfig.radius;
+			//     *(__m128 *)v62.m256i_i8 = v9;
+			//     *(__m128i *)&v62.m256i_u64[2] = v10;
+			//     *(__m128 *)v61.m256i_i8 = v9;
+			//     *(__m128i *)&v61.m256i_u64[2] = v10;
+			//     if ( !envPhase.fields.celestialConfig.moonConfig.enableRing
+			//       || (width = envPhase.fields.celestialConfig.moonConfig.ring.width,
+			//           *(__m128i *)&v61.m256i_u64[2] = v10,
+			//           width == 0.0) )
+			//     {
+			//       v14 = 0;
+			//     }
+			//     else
+			//     {
+			//       *(__m128 *)v61.m256i_i8 = v9;
+			//       *(__m128i *)&v61.m256i_u64[2] = v10;
+			//       v13 = *UnityEngine::Quaternion::get_identity((Quaternion *)&v55, v7);
+			//       v60[0] = *(Vector4 *)&v61.m256i_u64[1];
+			//       v55 = (Vector4)v13;
+			//       v14 = (unsigned __int8)sub_182F6C030(v60, &v55);
+			//     }
+			//     m_proceduralSkyMaterial = this.fields.m_proceduralSkyMaterial;
+			//     if ( v14 )
+			//     {
+			//       sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGShaderKeyWords);
+			//       s_Ring = TypeInfo::HG::Rendering::Runtime::HGShaderKeyWords.static_fields.s_Ring;
+			//       sub_180002C70(TypeInfo::UnityEngine::Rendering::CoreUtils);
+			//       if ( m_proceduralSkyMaterial )
+			//       {
+			//         UnityEngine::Material::EnableKeyword(m_proceduralSkyMaterial, s_Ring, 0LL);
+			//         UnityEngine::Tilemaps::TileBase::GetTileAnimationDataNoRef((TileAnimationData *)&v55, v17, v18, v19, v54);
+			//         *(_QWORD *)&v55.z = 0x3F8000003F800000LL;
+			//         v20 = _mm_shuffle_ps(v9, v9, 85).m128_f32[0];
+			//         v55.x = v11.m128_f32[0] / v20;
+			//         v55.y = (float)-(float)(v9.m128_f32[0] - v20) / v20;
+			//         sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGShaderIDs);
+			//         v60[0] = *(Vector4 *)&v62.m256i_u64[1];
+			//         v22 = UnityEngine::Color::op_Implicit(&v56, v60, v21);
+			//         if ( propertyBlock )
+			//         {
+			//           v60[0] = *(Vector4 *)v22;
+			//           UnityEngine::MaterialPropertyBlock::SetVector(propertyBlock, v23, v60, 0LL);
+			//           HG::Rendering::Runtime::HGEnvironmentUtils::SetTextureIfNotNull(
+			//             propertyBlock,
+			//             TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields._RingAlbedoTexture,
+			//             (Texture *)_mm_srli_si128(v10, 8).m128i_i64[0],
+			//             0LL);
+			//           sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGCelestialConfig);
+			//           HG::Rendering::Runtime::HGCelestialConfig::GetMapWorldSpaceBasisInPlanetSpace(
+			//             &envPhase.fields.celestialConfig,
+			//             &up,
+			//             &forward,
+			//             &right,
+			//             0LL);
+			//           v24 = *(_QWORD *)&right.x;
+			//           v25 = *(_QWORD *)&forward.x;
+			//           z = right.z;
+			//           v27 = forward.z;
+			//           v28 = *(_QWORD *)&up.x;
+			//           v29 = up.z;
+			//           *(_QWORD *)&v56.r = *(_QWORD *)&right.x;
+			//           v56.b = right.z;
+			//           right = forward;
+			//           forward = up;
+			//           v31 = UnityEngine::Vector3::get_up((Vector3 *)v60, v30);
+			//           v32 = *(_QWORD *)&v31.x;
+			//           up.z = v31.z;
+			//           *(_QWORD *)&up.x = v32;
+			//           v33 = HG::Rendering::Runtime::HGEnvironmentUtils::Transform3x3(
+			//                   (Vector3 *)v60,
+			//                   &up,
+			//                   &forward,
+			//                   &right,
+			//                   (Vector3 *)&v56,
+			//                   0LL);
+			//           *(_QWORD *)&v56.r = v24;
+			//           v56.b = z;
+			//           *(_QWORD *)&up.x = v25;
+			//           v34 = *(_QWORD *)&v33.x;
+			//           v35 = v33.z;
+			//           up.z = v27;
+			//           *(_QWORD *)&forward.x = v28;
+			//           forward.z = v29;
+			//           fwd = UnityEngine::Vector3::get_fwd((Vector3 *)v60, v36);
+			//           v38 = *(_QWORD *)&fwd.x;
+			//           right.z = fwd.z;
+			//           *(_QWORD *)&right.x = v38;
+			//           v39 = HG::Rendering::Runtime::HGEnvironmentUtils::Transform3x3(
+			//                   (Vector3 *)v60,
+			//                   &right,
+			//                   &forward,
+			//                   &up,
+			//                   (Vector3 *)&v56,
+			//                   0LL);
+			//           *(_QWORD *)&v56.r = v24;
+			//           v56.b = z;
+			//           *(_QWORD *)&up.x = v25;
+			//           v40 = *(_QWORD *)&v39.x;
+			//           v41 = v39.z;
+			//           up.z = v27;
+			//           *(_QWORD *)&forward.x = v28;
+			//           forward.z = v29;
+			//           v43 = UnityEngine::Vector3::get_right((Vector3 *)v60, v42);
+			//           v44 = *(_QWORD *)&v43.x;
+			//           right.z = v43.z;
+			//           *(_QWORD *)&right.x = v44;
+			//           v45 = HG::Rendering::Runtime::HGEnvironmentUtils::Transform3x3(
+			//                   (Vector3 *)v60,
+			//                   &right,
+			//                   &forward,
+			//                   &up,
+			//                   (Vector3 *)&v56,
+			//                   0LL);
+			//           v46 = *(_QWORD *)&v45.x;
+			//           v47 = v45.z;
+			//           sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGUtils);
+			//           *(_QWORD *)&v56.r = v40;
+			//           v56.b = v41;
+			//           v48 = _mm_loadu_si128((const __m128i *)HG::Rendering::Runtime::HGUtils::PackVector4(
+			//                                                    v60,
+			//                                                    (Vector3 *)&v56,
+			//                                                    1.0,
+			//                                                    0LL));
+			//           UnityEngine::MaterialPropertyBlock::SetVector(
+			//             propertyBlock,
+			//             TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields._RingParams,
+			//             &v55,
+			//             0LL);
+			//           *(_QWORD *)&v56.r = v34;
+			//           v56.b = v35;
+			//           RingUpWithBelow = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields._RingUpWithBelow;
+			//           v55 = *HG::Rendering::Runtime::HGUtils::PackVector4(
+			//                    &v55,
+			//                    (Vector3 *)&v56,
+			//                    _mm_shuffle_ps(v11, v11, 255).m128_f32[0],
+			//                    0LL);
+			//           UnityEngine::MaterialPropertyBlock::SetVector(propertyBlock, RingUpWithBelow, &v55, 0LL);
+			//           v55 = (Vector4)v48;
+			//           UnityEngine::MaterialPropertyBlock::SetVector(
+			//             propertyBlock,
+			//             TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields._RingFoward,
+			//             &v55,
+			//             0LL);
+			//           *(_QWORD *)&v56.r = v46;
+			//           v56.b = v47;
+			//           v55 = *UnityEngine::Vector4::op_Implicit(&v55, (Vector3 *)&v56, v50);
+			//           UnityEngine::MaterialPropertyBlock::SetVector(propertyBlock, v51, &v55, 0LL);
+			//           return;
+			//         }
+			//       }
+			// LABEL_15:
+			//       sub_180B536AC(v8, v7);
+			//     }
+			//     sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGShaderKeyWords);
+			//     v52 = TypeInfo::HG::Rendering::Runtime::HGShaderKeyWords.static_fields.s_Ring;
+			//     sub_180002C70(TypeInfo::UnityEngine::Rendering::CoreUtils);
+			//     VLB::Utils::SetKeywordEnabled(m_proceduralSkyMaterial, v52, 0, 0LL);
+			//   }
+			// }
+			// 
+		}
+
+		private void SetProceduralRingMaterialCPP(Material mat, HGEnvironmentPhase envPhase)
+		{
+			// // Void SetProceduralRingMaterialCPP(Material, HGEnvironmentPhase)
+			// void HG::Rendering::Runtime::HGSkyRenderer::SetProceduralRingMaterialCPP(
+			//         HGSkyRenderer *this,
+			//         Material *mat,
+			//         HGEnvironmentPhase *envPhase,
+			//         MethodInfo *method)
+			// {
+			//   MethodInfo *v7; // rdx
+			//   __int64 v8; // rcx
+			//   __m128 v9; // xmm6
+			//   __m128i v10; // xmm7
+			//   __m128 v11; // xmm11
+			//   float width; // xmm2_4
+			//   Quaternion v13; // xmm1
+			//   int v14; // r8d
+			//   Material *m_proceduralSkyMaterial; // rdi
+			//   String *v16; // rsi
+			//   TileBase *v17; // rdx
+			//   Vector3Int *v18; // r8
+			//   ITilemap *v19; // r9
+			//   float v20; // xmm1_4
+			//   MethodInfo *v21; // r8
+			//   Color *v22; // rax
+			//   int32_t v23; // r10d
+			//   Texture *v24; // xmm7_8
+			//   __int64 v25; // xmm9_8
+			//   __int64 v26; // xmm8_8
+			//   float z; // r14d
+			//   float v28; // esi
+			//   __int64 v29; // xmm7_8
+			//   float v30; // edi
+			//   MethodInfo *v31; // rdx
+			//   Vector3 *v32; // rax
+			//   __int64 v33; // xmm3_8
+			//   Vector3 *v34; // rax
+			//   __int64 v35; // xmm10_8
+			//   float v36; // r15d
+			//   MethodInfo *v37; // rdx
+			//   Vector3 *fwd; // rax
+			//   __int64 v39; // xmm3_8
+			//   Vector3 *v40; // rax
+			//   __int64 v41; // xmm6_8
+			//   float v42; // ebx
+			//   MethodInfo *v43; // rdx
+			//   Vector3 *v44; // rax
+			//   __int64 v45; // xmm1_8
+			//   Vector3 *v46; // rax
+			//   __int64 v47; // xmm7_8
+			//   float v48; // edi
+			//   __m128i v49; // xmm6
+			//   int32_t RingUpWithBelow; // ebx
+			//   MethodInfo *v51; // r8
+			//   int32_t v52; // r10d
+			//   String *s_Ring; // rbx
+			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
+			//   MethodInfo *v55; // [rsp+20h] [rbp-E0h]
+			//   Vector4 v56; // [rsp+30h] [rbp-D0h] BYREF
+			//   Color v57; // [rsp+40h] [rbp-C0h] BYREF
+			//   Vector3 right; // [rsp+50h] [rbp-B0h] BYREF
+			//   Vector3 forward; // [rsp+60h] [rbp-A0h] BYREF
+			//   Vector3 up; // [rsp+70h] [rbp-90h] BYREF
+			//   Vector4 v61[3]; // [rsp+80h] [rbp-80h] BYREF
+			//   __m256i v62; // [rsp+B0h] [rbp-50h]
+			//   __m256i v63; // [rsp+F0h] [rbp-10h]
+			// 
+			//   if ( !byte_18D919D8F )
+			//   {
+			//     sub_18003C530(&TypeInfo::UnityEngine::Rendering::CoreUtils);
+			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGCelestialConfig);
+			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGShaderIDs);
+			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGShaderKeyWords);
+			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGUtils);
+			//     sub_18003C530(&TypeInfo::UnityEngine::Object);
+			//     byte_18D919D8F = 1;
+			//   }
+			//   *(_QWORD *)&up.x = 0LL;
+			//   up.z = 0.0;
+			//   *(_QWORD *)&forward.x = 0LL;
+			//   forward.z = 0.0;
+			//   *(_QWORD *)&right.x = 0LL;
+			//   right.z = 0.0;
+			//   if ( IFix::WrappersManagerImpl::IsPatched(1274, 0LL) )
+			//   {
+			//     Patch = IFix::WrappersManagerImpl::GetPatch(1274, 0LL);
+			//     if ( Patch )
+			//     {
+			//       IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_11(
+			//         (ILFixDynamicMethodWrapper_28 *)Patch,
+			//         (Object *)this,
+			//         (Object *)mat,
+			//         (Object *)envPhase,
+			//         0LL);
+			//       return;
+			//     }
+			// LABEL_17:
+			//     sub_180B536AC(v8, v7);
+			//   }
+			//   if ( !envPhase )
+			//     goto LABEL_17;
+			//   v9 = *(__m128 *)&envPhase.fields.celestialConfig.moonConfig.ring.outerRadius;
+			//   v10 = *(__m128i *)&envPhase.fields.celestialConfig.moonConfig.ring.ringColor.b;
+			//   v11 = *(__m128 *)&envPhase.fields.celestialConfig.moonConfig.radius;
+			//   *(__m128 *)v63.m256i_i8 = v9;
+			//   *(__m128i *)&v63.m256i_u64[2] = v10;
+			//   *(__m128 *)v62.m256i_i8 = v9;
+			//   *(__m128i *)&v62.m256i_u64[2] = v10;
+			//   if ( !envPhase.fields.celestialConfig.moonConfig.enableRing
+			//     || (width = envPhase.fields.celestialConfig.moonConfig.ring.width, *(__m128i *)&v62.m256i_u64[2] = v10,
+			//                                                                         width == 0.0) )
+			//   {
+			//     v14 = 0;
+			//   }
+			//   else
+			//   {
+			//     *(__m128 *)v62.m256i_i8 = v9;
+			//     *(__m128i *)&v62.m256i_u64[2] = v10;
+			//     v13 = *UnityEngine::Quaternion::get_identity((Quaternion *)&v56, v7);
+			//     v61[0] = *(Vector4 *)&v62.m256i_u64[1];
+			//     v56 = (Vector4)v13;
+			//     v14 = (unsigned __int8)sub_182F6C030(v61, &v56);
+			//   }
+			//   m_proceduralSkyMaterial = this.fields.m_proceduralSkyMaterial;
+			//   if ( !v14 )
+			//   {
+			//     sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGShaderKeyWords);
+			//     s_Ring = TypeInfo::HG::Rendering::Runtime::HGShaderKeyWords.static_fields.s_Ring;
+			//     sub_180002C70(TypeInfo::UnityEngine::Rendering::CoreUtils);
+			//     VLB::Utils::SetKeywordEnabled(m_proceduralSkyMaterial, s_Ring, 0, 0LL);
+			//     return;
+			//   }
+			//   sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGShaderKeyWords);
+			//   v16 = TypeInfo::HG::Rendering::Runtime::HGShaderKeyWords.static_fields.s_Ring;
+			//   sub_180002C70(TypeInfo::UnityEngine::Rendering::CoreUtils);
+			//   if ( !m_proceduralSkyMaterial )
+			//     goto LABEL_17;
+			//   UnityEngine::Material::EnableKeyword(m_proceduralSkyMaterial, v16, 0LL);
+			//   UnityEngine::Tilemaps::TileBase::GetTileAnimationDataNoRef((TileAnimationData *)&v56, v17, v18, v19, v55);
+			//   *(_QWORD *)&v56.z = 0x3F8000003F800000LL;
+			//   v20 = _mm_shuffle_ps(v9, v9, 85).m128_f32[0];
+			//   v56.x = v11.m128_f32[0] / v20;
+			//   v56.y = (float)-(float)(v9.m128_f32[0] - v20) / v20;
+			//   sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGShaderIDs);
+			//   v61[0] = *(Vector4 *)&v63.m256i_u64[1];
+			//   v22 = UnityEngine::Color::op_Implicit(&v57, v61, v21);
+			//   if ( !mat )
+			//     goto LABEL_17;
+			//   v61[0] = *(Vector4 *)v22;
+			//   UnityEngine::Material::SetVector(mat, v23, v61, 0LL);
+			//   sub_180002C70(TypeInfo::UnityEngine::Object);
+			//   v24 = (Texture *)_mm_srli_si128(v10, 8).m128i_u64[0];
+			//   if ( UnityEngine::Object::op_Inequality((Object_1 *)v24, 0LL, 0LL) )
+			//   {
+			//     sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGShaderIDs);
+			//     UnityEngine::Material::SetTextureImpl(
+			//       mat,
+			//       TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields._RingAlbedoTexture,
+			//       v24,
+			//       0LL);
+			//   }
+			//   sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGCelestialConfig);
+			//   HG::Rendering::Runtime::HGCelestialConfig::GetMapWorldSpaceBasisInPlanetSpace(
+			//     &envPhase.fields.celestialConfig,
+			//     &up,
+			//     &forward,
+			//     &right,
+			//     0LL);
+			//   v25 = *(_QWORD *)&right.x;
+			//   v26 = *(_QWORD *)&forward.x;
+			//   z = right.z;
+			//   v28 = forward.z;
+			//   v29 = *(_QWORD *)&up.x;
+			//   v30 = up.z;
+			//   *(_QWORD *)&v57.r = *(_QWORD *)&right.x;
+			//   v57.b = right.z;
+			//   right = forward;
+			//   forward = up;
+			//   v32 = UnityEngine::Vector3::get_up((Vector3 *)v61, v31);
+			//   v33 = *(_QWORD *)&v32.x;
+			//   up.z = v32.z;
+			//   *(_QWORD *)&up.x = v33;
+			//   v34 = HG::Rendering::Runtime::HGEnvironmentUtils::Transform3x3(
+			//           (Vector3 *)v61,
+			//           &up,
+			//           &forward,
+			//           &right,
+			//           (Vector3 *)&v57,
+			//           0LL);
+			//   *(_QWORD *)&v57.r = v25;
+			//   v57.b = z;
+			//   *(_QWORD *)&up.x = v26;
+			//   v35 = *(_QWORD *)&v34.x;
+			//   v36 = v34.z;
+			//   up.z = v28;
+			//   *(_QWORD *)&forward.x = v29;
+			//   forward.z = v30;
+			//   fwd = UnityEngine::Vector3::get_fwd((Vector3 *)v61, v37);
+			//   v39 = *(_QWORD *)&fwd.x;
+			//   right.z = fwd.z;
+			//   *(_QWORD *)&right.x = v39;
+			//   v40 = HG::Rendering::Runtime::HGEnvironmentUtils::Transform3x3(
+			//           (Vector3 *)v61,
+			//           &right,
+			//           &forward,
+			//           &up,
+			//           (Vector3 *)&v57,
+			//           0LL);
+			//   *(_QWORD *)&v57.r = v25;
+			//   v57.b = z;
+			//   *(_QWORD *)&up.x = v26;
+			//   v41 = *(_QWORD *)&v40.x;
+			//   v42 = v40.z;
+			//   up.z = v28;
+			//   *(_QWORD *)&forward.x = v29;
+			//   forward.z = v30;
+			//   v44 = UnityEngine::Vector3::get_right((Vector3 *)v61, v43);
+			//   v45 = *(_QWORD *)&v44.x;
+			//   right.z = v44.z;
+			//   *(_QWORD *)&right.x = v45;
+			//   v46 = HG::Rendering::Runtime::HGEnvironmentUtils::Transform3x3(
+			//           (Vector3 *)v61,
+			//           &right,
+			//           &forward,
+			//           &up,
+			//           (Vector3 *)&v57,
+			//           0LL);
+			//   v47 = *(_QWORD *)&v46.x;
+			//   v48 = v46.z;
+			//   sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGUtils);
+			//   *(_QWORD *)&v57.r = v41;
+			//   v57.b = v42;
+			//   v49 = _mm_loadu_si128((const __m128i *)HG::Rendering::Runtime::HGUtils::PackVector4(v61, (Vector3 *)&v57, 1.0, 0LL));
+			//   sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGShaderIDs);
+			//   UnityEngine::Material::SetVector(
+			//     mat,
+			//     TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields._RingParams,
+			//     &v56,
+			//     0LL);
+			//   *(_QWORD *)&v57.r = v35;
+			//   v57.b = v36;
+			//   RingUpWithBelow = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields._RingUpWithBelow;
+			//   v56 = *HG::Rendering::Runtime::HGUtils::PackVector4(
+			//            &v56,
+			//            (Vector3 *)&v57,
+			//            _mm_shuffle_ps(v11, v11, 255).m128_f32[0],
+			//            0LL);
+			//   UnityEngine::Material::SetVector(mat, RingUpWithBelow, &v56, 0LL);
+			//   v56 = (Vector4)v49;
+			//   UnityEngine::Material::SetVector(
+			//     mat,
+			//     TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields._RingFoward,
+			//     &v56,
+			//     0LL);
+			//   *(_QWORD *)&v57.r = v47;
+			//   v57.b = v48;
+			//   v56 = *UnityEngine::Vector4::op_Implicit(&v56, (Vector3 *)&v57, v51);
+			//   UnityEngine::Material::SetVector(mat, v52, &v56, 0LL);
+			// }
+			// 
+		}
+
+		internal void SetupShaderVariablesGlobalCloudShadow(ref ShaderVariablesGlobal cb, HGEnvironmentPhase envPhase)
+		{
+			// // Void SetupShaderVariablesGlobalCloudShadow(ShaderVariablesGlobal ByRef, HGEnvironmentPhase)
+			// void HG::Rendering::Runtime::HGSkyRenderer::SetupShaderVariablesGlobalCloudShadow(
+			//         HGSkyRenderer *this,
+			//         ShaderVariablesGlobal *cb,
+			//         HGEnvironmentPhase *envPhase,
+			//         MethodInfo *method)
+			// {
+			//   TileBase *v7; // rdx
+			//   __int64 v8; // rcx
+			//   Vector3Int *v9; // r8
+			//   ITilemap *v10; // r9
+			//   MethodInfo *v11; // rdx
+			//   float v12; // xmm0_4
+			//   float v13; // xmm15_4
+			//   Vector3 *fwd; // rax
+			//   __int64 v15; // xmm3_8
+			//   Quaternion rotationCloudShadow; // xmm0
+			//   Vector3 *v17; // rax
+			//   MethodInfo *v18; // r9
+			//   Vector3 *v19; // rax
+			//   __m128 v20; // xmm14
+			//   float z; // ebx
+			//   __int64 v22; // rax
+			//   float cloudShadowCoverage; // xmm2_4
+			//   __int64 v24; // xmm1_8
+			//   __m128 v25; // xmm13
+			//   __m128 v26; // xmm12
+			//   __int64 v27; // rcx
+			//   __m128 x_low; // xmm11
+			//   __m128 y_low; // xmm10
+			//   __m128d v30; // xmm6
+			//   __m128i v31; // xmm7
+			//   Vector4 *v32; // rax
+			//   float v33; // xmm2_4
+			//   Vector4 *v34; // rax
+			//   __m128i v35; // xmm1
+			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
+			//   MethodInfo *v37; // [rsp+28h] [rbp-E0h]
+			//   Vector3 v38; // [rsp+38h] [rbp-D0h] BYREF
+			//   Vector3 v39; // [rsp+48h] [rbp-C0h] BYREF
+			//   Quaternion v40[4]; // [rsp+58h] [rbp-B0h] BYREF
+			//   float v41[56]; // [rsp+98h] [rbp-70h]
+			// 
+			//   if ( !byte_18D919D90 )
+			//   {
+			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGUtils);
+			//     byte_18D919D90 = 1;
+			//   }
+			//   if ( IFix::WrappersManagerImpl::IsPatched(1275, 0LL) )
+			//   {
+			//     Patch = IFix::WrappersManagerImpl::GetPatch(1275, 0LL);
+			//     if ( Patch )
+			//     {
+			//       IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_333(Patch, (Object *)this, cb, (Object *)envPhase, 0LL);
+			//       return;
+			//     }
+			// LABEL_14:
+			//     sub_180B536AC(v8, v7);
+			//   }
+			//   if ( !envPhase )
+			//     goto LABEL_14;
+			//   if ( envPhase.fields.cloudConfig.enable && envPhase.fields.cloudConfig.enableCloudShadow )
+			//   {
+			//     v12 = fabs(COERCE_FLOAT(COERCE_UNSIGNED_INT64(Beyond::DampingMath::cosf())));
+			//     if ( v12 < 0.001 )
+			//     {
+			//       v12 = 0.001;
+			//     }
+			//     else if ( v12 > 1.0 )
+			//     {
+			//       v12 = 1.0;
+			//     }
+			//     v13 = 1.0 / v12;
+			//     fwd = UnityEngine::Vector3::get_fwd(&v38, v11);
+			//     v15 = *(_QWORD *)&fwd.x;
+			//     rotationCloudShadow = envPhase.fields.lightConfig.rotationCloudShadow;
+			//     *(float *)&fwd = fwd.z;
+			//     *(_QWORD *)&v39.x = v15;
+			//     LODWORD(v39.z) = (_DWORD)fwd;
+			//     v40[0] = rotationCloudShadow;
+			//     v17 = UnityEngine::Quaternion::op_Multiply(&v38, v40, &v39, 0LL);
+			//     *(_QWORD *)&rotationCloudShadow.x = *(_QWORD *)&v17.x;
+			//     *(float *)&v17 = v17.z;
+			//     *(_QWORD *)&v39.x = *(_QWORD *)&rotationCloudShadow.x;
+			//     LODWORD(v39.z) = (_DWORD)v17;
+			//     v19 = UnityEngine::Vector3::op_Multiply(&v38, v13, &v39, v18);
+			//     v20 = *(__m128 *)&envPhase.fields.cloudConfig.cloudShadowConfig.cloudShadowFlowDirection.y;
+			//     z = v19.z;
+			//     *(_QWORD *)&v39.x = *(_QWORD *)&v19.x;
+			//     *(_QWORD *)v41 = *(_QWORD *)&envPhase.fields.cloudConfig.cloudShadowConfig.cloudShadowScaleEndDistance;
+			//     v22 = sub_182C9F010(_mm_unpacklo_ps((__m128)0x3F800000u, (__m128)0x3F800000u).m128_u64[0]);
+			//     cloudShadowCoverage = envPhase.fields.cloudConfig.cloudShadowConfig.cloudShadowCoverage;
+			//     v24 = *(_QWORD *)&envPhase.fields.cloudConfig.cloudShadowConfig.cloudShadowScaleEndDistance;
+			//     *(_QWORD *)&v38.x = v22;
+			//     v25 = (__m128)(unsigned int)v22;
+			//     v26 = (__m128)HIDWORD(v22);
+			//     v25.m128_f32[0] = *(float *)&v22 / cloudShadowCoverage;
+			//     v26.m128_f32[0] = *((float *)&v22 + 1) / cloudShadowCoverage;
+			//     *(_QWORD *)v41 = v24;
+			//     *(_QWORD *)&v38.x = sub_184D03A3C(
+			//                           v27,
+			//                           _mm_unpacklo_ps(
+			//                             (__m128)LODWORD(envPhase.fields.cloudConfig.cloudShadowConfig.cloudShadowFlowDirection.x),
+			//                             v20).m128_u64[0]);
+			//     x_low = (__m128)LODWORD(v38.x);
+			//     y_low = (__m128)LODWORD(v38.y);
+			//     x_low.m128_f32[0] = v38.x / 1000.0;
+			//     y_low.m128_f32[0] = v38.y / 1000.0;
+			//     v30 = *(__m128d *)&envPhase.fields.cloudConfig.cloudShadowConfig.cloudShadowTexture;
+			//     v31 = *(__m128i *)&envPhase.fields.cloudConfig.cloudShadowConfig.cloudShadowEnvCenter.z;
+			//     *(_QWORD *)v41 = *(_QWORD *)&envPhase.fields.cloudConfig.cloudShadowConfig.cloudShadowScaleEndDistance;
+			//     sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGUtils);
+			//     *(_QWORD *)&v38.x = *(_OWORD *)&_mm_unpackhi_pd(v30, v30);
+			//     LODWORD(v38.z) = _mm_cvtsi128_si32(v31);
+			//     v32 = HG::Rendering::Runtime::HGUtils::PackVector4((Vector4 *)v40, &v38, v13, 0LL);
+			//     v33 = v41[0] + _mm_shuffle_ps(v20, v20, 255).m128_f32[0];
+			//     *(__m128i *)&cb._IVParam2.y = _mm_loadu_si128((const __m128i *)v32);
+			//     *(__m128i *)&cb._IVDefaultSHAr.y = _mm_loadu_si128((const __m128i *)HG::Rendering::Runtime::HGUtils::PackVector4(
+			//                                                                            (Vector4 *)v40,
+			//                                                                            _mm_shuffle_ps(v20, v20, 255).m128_f32[0],
+			//                                                                            v33,
+			//                                                                            (Vector2)*(_OWORD *)&_mm_unpacklo_ps(
+			//                                                                                                   v25,
+			//                                                                                                   v26),
+			//                                                                            0LL));
+			//     v34 = HG::Rendering::Runtime::HGUtils::PackVector4(
+			//             (Vector4 *)v40,
+			//             (Vector2)*(_OWORD *)&_mm_unpacklo_ps(x_low, y_low),
+			//             _mm_shuffle_ps(v20, v20, 85).m128_f32[0],
+			//             1.0 / _mm_shuffle_ps(v20, v20, 170).m128_f32[0],
+			//             0LL);
+			//     v39.z = z;
+			//     *(__m128i *)&cb._IVDefaultshAg.y = _mm_loadu_si128((const __m128i *)v34);
+			//     *(__m128i *)&cb._IVDefaultshAb.y = _mm_loadu_si128((const __m128i *)HG::Rendering::Runtime::HGUtils::PackVector4(
+			//                                                                            (Vector4 *)v40,
+			//                                                                            &v39,
+			//                                                                            1.0,
+			//                                                                            0LL));
+			//   }
+			//   else
+			//   {
+			//     *(__m128i *)&cb._IVParam2.y = _mm_load_si128((const __m128i *)&xmmword_18A3576A0);
+			//     v35 = _mm_loadu_si128((const __m128i *)UnityEngine::Tilemaps::TileBase::GetTileAnimationDataNoRef(
+			//                                              (TileAnimationData *)v40,
+			//                                              v7,
+			//                                              v9,
+			//                                              v10,
+			//                                              v37));
+			//     *(__m128i *)&cb._IVDefaultshAg.y = _mm_load_si128((const __m128i *)&xmmword_18A357460);
+			//     *(__m128i *)&cb._IVDefaultSHAr.y = v35;
+			//   }
+			// }
+			// 
+		}
+
+		private const float PROCEDURAL_SKY_SCALE = 2000f;
+
+		private readonly Mesh m_IcosphereMesh;
+
+		private readonly Vector3[] starQuadPoints;
+
+		[StaticFieldOffset(ThreadStatic = false, Offset = "0x00")]
+		private static readonly Vector3[] quadWorld;
+
+		[StaticFieldOffset(ThreadStatic = false, Offset = "0x08")]
+		private static readonly List<Vector3> clippedPoints;
+
+		private Material m_renderAtmosphereLutMaterial;
+
+		private Material m_proceduralSkyMaterial;
+
+		private Material m_skyBoxCubemapMaterial;
+
+		private readonly MaterialPropertyBlock m_propertyBlock;
+
+		private Material m_skyboxMaterialCPP;
+
+		private Material m_skyCloudMaterialCPP;
+
+		public const int TALOS_RT_RESOLUTION = 2048;
+
+		public const int PLANET_ALPHA_RT_RESOLUTION = 1024;
+
+		private const float PLANET_RADIUS_TO_ATMOSPHERE_SCALE = 2000f;
+
+		private const float ATMOSPHERE_HEIGHT_INVERT_NUMBER = 30f;
+
+		private const float ATMOSPHERE_OUTER_SCATTER_SAMPLE_STEP_PC = 10f;
+
+		private const float ATMOSPHERE_INNER_SCATTER_SAMPLE_STEP_PC = 5f;
+
+		private const float ATMOSPHERE_OUTER_SCATTER_SAMPLE_STEP_MOBILE = 5f;
+
+		private const float ATMOSPHERE_INNER_SCATTER_SAMPLE_STEP_MOBILE = 2f;
+
+		[StructLayout(LayoutKind.Sequential, Pack = 1, Size = 400)]
+		public struct PlanetBillBoardConstants
+		{
+			public float _RealPlanetRadius;
+
+			public float _AtmosphereRatios;
+
+			public float _GlobalRadiusOffset;
+
+			public float _Density_Multiplier;
+
+			public float _g;
+
+			public float _StepsI;
+
+			public float _StepsL;
+
+			public float _Mie_Height_Scale;
+
+			public float _Pitch;
+
+			public float _Roll;
+
+			public float _Phi2;
+
+			public float _Theta2;
+
+			public float _Dist;
+
+			public float _CapThreshold;
+
+			public float _Roughness;
+
+			public float _BBRadius;
+
+			public float _Erosion;
+
+			public float _ErosionThreshold;
+
+			public float _CloudsAlphaMain;
+
+			public float _CloudsSpeedMain;
+
+			public float _IndirectIntensity;
+
+			public float _DirectLightIntensityBillboard;
+
+			public float _Light_Intensity_Multiplier;
+
+			public float _Light_Intensity_Clouds_Multiplier;
+
+			public float _PlanetRotateStart;
+
+			public float _PlanetRotateSpeed;
+
+			public float _CapTransition;
+
+			public float _CloudsFlowStrength;
+
+			public float _CloudsHeight;
+
+			public float _CloudsFlowSpeed;
+
+			public float _Use_Lut;
+
+			public float _CustomLightColorPla;
+
+			public float _CustomLightDirection;
+
+			public float _UseRoughnessMap;
+
+			public float _EnablePolarCap;
+
+			public float _UseErosionMap;
+
+			public Vector4 _Ray;
+
+			public Vector4 _Mie;
+
+			public Vector4 _Ambient;
+
+			public Vector4 _PlanetWSBase;
+
+			public Vector4 _BBWSBase;
+
+			public Vector4 _PlanetScale;
+
+			public Vector4 _FresnelColor;
+
+			public Vector4 _TintColor;
+
+			public Vector4 _SeaDeep;
+
+			public Vector4 _SeaShallow;
+
+			public Vector4 _IndirectColor;
+
+			public Vector4 _CustomLightDir;
+
+			public Vector4 _CustomLightColPla;
+
+			public Vector4 _CloudsShadowColor;
+
+			public Vector4 _BaseColorMap_ST;
+
+			public Vector4 _ErosionMap_ST;
+		}
+	}
+}

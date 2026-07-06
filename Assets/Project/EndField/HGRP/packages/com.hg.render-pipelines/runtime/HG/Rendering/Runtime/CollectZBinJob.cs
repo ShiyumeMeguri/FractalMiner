@@ -1,0 +1,82 @@
+﻿using System;
+using System.Runtime.InteropServices;
+using Unity.Burst;
+using Unity.Collections;
+using Unity.Jobs;
+using Unity.Mathematics;
+
+namespace HG.Rendering.Runtime
+{
+	[BurstCompile]
+	[StructLayout(LayoutKind.Sequential, Pack = 1, Size = 40)]
+	public struct CollectZBinJob : IJobParallelFor
+	{
+		public void Execute(int index)
+		{
+			// // Void Execute(Int32)
+			// void HG::Rendering::Runtime::CollectZBinJob::Execute(CollectZBinJob *this, int32_t index, MethodInfo *method)
+			// {
+			//   int32_t v5; // ebx
+			//   __int128 v6; // xmm0
+			//   __int128 v7; // xmm1
+			//   Void *v8; // r9
+			//   int v9; // eax
+			//   int v10; // edx
+			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
+			//   __int64 v12; // rdx
+			//   __int64 v13; // rcx
+			//   _DWORD v14[4]; // [rsp+10h] [rbp-38h]
+			//   __int128 v15; // [rsp+20h] [rbp-28h]
+			//   __int128 v16; // [rsp+30h] [rbp-18h]
+			// 
+			//   v5 = 0;
+			//   if ( IFix::WrappersManagerImpl::IsPatched(1546, 0LL) )
+			//   {
+			//     Patch = IFix::WrappersManagerImpl::GetPatch(1546, 0LL);
+			//     if ( !Patch )
+			//       sub_180B536AC(v13, v12);
+			//     IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_594(Patch, this, index, 0LL);
+			//   }
+			//   else
+			//   {
+			//     v6 = 0uLL;
+			//     v15 = 0uLL;
+			//     v7 = 0uLL;
+			//     v16 = 0uLL;
+			//     if ( this.lightCount > 0 )
+			//     {
+			//       v8 = &this.zSliceLightMarks.m_Buffer[this.lightCount * index];
+			//       do
+			//       {
+			//         if ( *v8 == 1 )
+			//         {
+			//           v9 = v5 / 32;
+			//           v10 = (v5 % 32) & 0x1F;
+			//           if ( v5 < 128 )
+			//             *((_DWORD *)&v16 + v9) |= 1 << v10;
+			//           else
+			//             v14[v9] |= 1 << v10;
+			//         }
+			//         ++v5;
+			//         ++v8;
+			//       }
+			//       while ( v5 < this.lightCount );
+			//       v6 = v16;
+			//       v7 = v15;
+			//     }
+			//     *(_OWORD *)&this.zBin.m_Buffer[32 * index] = v6;
+			//     *(_OWORD *)&this.zBin.m_Buffer[32 * index + 16] = v7;
+			//   }
+			// }
+			// 
+		}
+
+		public int lightCount;
+
+		[ReadOnly]
+		public NativeArray<byte> zSliceLightMarks;
+
+		[NativeDisableParallelForRestriction]
+		public NativeArray<uint4> zBin;
+	}
+}
