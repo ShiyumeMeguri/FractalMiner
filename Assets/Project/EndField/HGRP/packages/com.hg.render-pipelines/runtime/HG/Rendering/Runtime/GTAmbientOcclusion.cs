@@ -1,384 +1,750 @@
-﻿using System;
+using System;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using UnityEngine.Rendering;
+
+// Image 4: HG.RenderPipelines.Runtime.dll - Assembly: HG.RenderPipelines.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null - Types 37354-38879
 
 namespace HG.Rendering.Runtime
 {
-	[VolumeComponentMenuForRenderPipeline("HG/GTAmbientOcclusion", new Type[] { typeof(HGRenderPipeline) })]
 	[Serializable]
-	public class GTAmbientOcclusion : VolumeComponent
+	[VolumeComponentMenuForRenderPipeline("HG/GTAmbientOcclusion", new System.Type[1] {typeof(HGRenderPipeline) })]
+	public class GTAmbientOcclusion : VolumeComponent // TypeDefIndex: 38012
 	{
-		public GTAmbientOcclusion()
+		// Fields
+		public BoolParameter enable; // 0x30
+		public BoolParameter enableFP32Depths; // 0x38
+		private BoolParameter enableBentNormals; // 0x40
+		public BoolParameter generateNormalsInplace; // 0x48
+		public ClampedIntParameter qualityLevel; // 0x50
+		public ClampedIntParameter denoisePasses; // 0x58
+		public ClampedFloatParameter radius; // 0x60
+		public MinFloatParameter radiusMultiplier; // 0x68
+		public MinFloatParameter falloffRange; // 0x70
+		public MinFloatParameter sampleDistributionPower; // 0x78
+		public MinFloatParameter thinOccluderCompensation; // 0x80
+		public MinFloatParameter finalValuePower; // 0x88
+		public MinFloatParameter depthMIPSamplingOffset; // 0x90
+		public MinFloatParameter mvFactor; // 0x98
+		public MinFloatParameter depthFactor; // 0xA0
+	
+		// Constructors
+		public GTAmbientOcclusion() {} // 0x0000000184405A20-0x0000000184406750
+		// GTAmbientOcclusion()
+		void HG::Rendering::Runtime::GTAmbientOcclusion::GTAmbientOcclusion(GTAmbientOcclusion *this, MethodInfo *method)
 		{
-			// // GTAmbientOcclusion()
-			// void HG::Rendering::Runtime::GTAmbientOcclusion::GTAmbientOcclusion(GTAmbientOcclusion *this, MethodInfo *method)
-			// {
-			//   MethodInfo *v2; // xmm6_8
-			//   BoolParameter *v4; // rax
-			//   __int64 v5; // rdx
-			//   __int64 v6; // rcx
-			//   BoolParameter *v7; // rdi
-			//   OneofDescriptorProto *v8; // rdx
-			//   FileDescriptor *v9; // r8
-			//   MessageDescriptor *v10; // r9
-			//   BoolParameter *v11; // rax
-			//   BoolParameter *v12; // rdi
-			//   OneofDescriptorProto *v13; // rdx
-			//   FileDescriptor *v14; // r8
-			//   MessageDescriptor *v15; // r9
-			//   BoolParameter *v16; // rax
-			//   BoolParameter *v17; // rdi
-			//   OneofDescriptorProto *v18; // rdx
-			//   FileDescriptor *v19; // r8
-			//   MessageDescriptor *v20; // r9
-			//   IntParameter *v21; // rax
-			//   ClampedIntParameter *v22; // rdi
-			//   OneofDescriptorProto *v23; // rdx
-			//   FileDescriptor *v24; // r8
-			//   MessageDescriptor *v25; // r9
-			//   IntParameter *v26; // rax
-			//   ClampedIntParameter *v27; // rdi
-			//   OneofDescriptorProto *v28; // rdx
-			//   FileDescriptor *v29; // r8
-			//   MessageDescriptor *v30; // r9
-			//   ClampedFloatParameter *v31; // rax
-			//   ClampedFloatParameter *v32; // rdi
-			//   OneofDescriptorProto *v33; // rdx
-			//   FileDescriptor *v34; // r8
-			//   MessageDescriptor *v35; // r9
-			//   FloatParameter *v36; // rax
-			//   FloatParameter *v37; // rdi
-			//   OneofDescriptorProto *v38; // rdx
-			//   FileDescriptor *v39; // r8
-			//   MessageDescriptor *v40; // r9
-			//   FloatParameter *v41; // rax
-			//   FloatParameter *v42; // rdi
-			//   OneofDescriptorProto *v43; // rdx
-			//   FileDescriptor *v44; // r8
-			//   MessageDescriptor *v45; // r9
-			//   FloatParameter *v46; // rax
-			//   FloatParameter *v47; // rdi
-			//   OneofDescriptorProto *v48; // rdx
-			//   FileDescriptor *v49; // r8
-			//   MessageDescriptor *v50; // r9
-			//   FloatParameter *v51; // rax
-			//   FloatParameter *v52; // rdi
-			//   OneofDescriptorProto *v53; // rdx
-			//   FileDescriptor *v54; // r8
-			//   MessageDescriptor *v55; // r9
-			//   FloatParameter *v56; // rax
-			//   FloatParameter *v57; // rdi
-			//   OneofDescriptorProto *v58; // rdx
-			//   FileDescriptor *v59; // r8
-			//   MessageDescriptor *v60; // r9
-			//   FloatParameter *v61; // rax
-			//   FloatParameter *v62; // rdi
-			//   OneofDescriptorProto *v63; // rdx
-			//   FileDescriptor *v64; // r8
-			//   MessageDescriptor *v65; // r9
-			//   FloatParameter *v66; // rax
-			//   FloatParameter *v67; // rdi
-			//   OneofDescriptorProto *v68; // rdx
-			//   FileDescriptor *v69; // r8
-			//   MessageDescriptor *v70; // r9
-			//   FloatParameter *v71; // rax
-			//   FloatParameter *v72; // rdi
-			//   OneofDescriptorProto *v73; // rdx
-			//   FileDescriptor *v74; // r8
-			//   MessageDescriptor *v75; // r9
-			//   String__Array *overrideState; // [rsp+20h] [rbp-28h]
-			//   String__Array *overrideStatea; // [rsp+20h] [rbp-28h]
-			//   String__Array *overrideStateb; // [rsp+20h] [rbp-28h]
-			//   String__Array *overrideStatec; // [rsp+20h] [rbp-28h]
-			//   String__Array *overrideStated; // [rsp+20h] [rbp-28h]
-			//   String__Array *overrideStatem; // [rsp+20h] [rbp-28h]
-			//   String__Array *overrideStatee; // [rsp+20h] [rbp-28h]
-			//   String__Array *overrideStatef; // [rsp+20h] [rbp-28h]
-			//   String__Array *overrideStateg; // [rsp+20h] [rbp-28h]
-			//   String__Array *overrideStateh; // [rsp+20h] [rbp-28h]
-			//   String__Array *overrideStatei; // [rsp+20h] [rbp-28h]
-			//   String__Array *overrideStatej; // [rsp+20h] [rbp-28h]
-			//   String__Array *overrideStatek; // [rsp+20h] [rbp-28h]
-			//   String__Array *overrideStatel; // [rsp+20h] [rbp-28h]
-			//   MethodInfo *methoda; // [rsp+28h] [rbp-20h]
-			//   MethodInfo *methodb; // [rsp+28h] [rbp-20h]
-			//   MethodInfo *methodc; // [rsp+28h] [rbp-20h]
-			//   MethodInfo *methodd; // [rsp+28h] [rbp-20h]
-			//   MethodInfo *methode; // [rsp+28h] [rbp-20h]
-			//   MethodInfo *methodn; // [rsp+28h] [rbp-20h]
-			//   MethodInfo *methodf; // [rsp+28h] [rbp-20h]
-			//   MethodInfo *methodg; // [rsp+28h] [rbp-20h]
-			//   MethodInfo *methodh; // [rsp+28h] [rbp-20h]
-			//   MethodInfo *methodi; // [rsp+28h] [rbp-20h]
-			//   MethodInfo *methodj; // [rsp+28h] [rbp-20h]
-			//   MethodInfo *methodk; // [rsp+28h] [rbp-20h]
-			//   MethodInfo *methodl; // [rsp+28h] [rbp-20h]
-			//   MethodInfo *methodm; // [rsp+28h] [rbp-20h]
-			//   MethodInfo *v104; // [rsp+30h] [rbp-18h]
-			//   MethodInfo *v105; // [rsp+30h] [rbp-18h]
-			//   MethodInfo *v106; // [rsp+30h] [rbp-18h]
-			//   MethodInfo *v107; // [rsp+30h] [rbp-18h]
-			//   MethodInfo *v108; // [rsp+30h] [rbp-18h]
-			//   MethodInfo *v109; // [rsp+30h] [rbp-18h]
-			//   MethodInfo *v110; // [rsp+30h] [rbp-18h]
-			//   MethodInfo *v111; // [rsp+30h] [rbp-18h]
-			//   MethodInfo *v112; // [rsp+30h] [rbp-18h]
-			//   MethodInfo *v113; // [rsp+30h] [rbp-18h]
-			//   MethodInfo *v114; // [rsp+30h] [rbp-18h]
-			//   MethodInfo *v115; // [rsp+30h] [rbp-18h]
-			//   MethodInfo *v116; // [rsp+30h] [rbp-18h]
-			// 
-			//   if ( !byte_18D8ED9C8 )
-			//   {
-			//     sub_18003C530(&TypeInfo::UnityEngine::Rendering::BoolParameter);
-			//     sub_18003C530(&TypeInfo::UnityEngine::Rendering::ClampedFloatParameter);
-			//     sub_18003C530(&TypeInfo::UnityEngine::Rendering::ClampedIntParameter);
-			//     sub_18003C530(&TypeInfo::UnityEngine::Rendering::MinFloatParameter);
-			//     byte_18D8ED9C8 = 1;
-			//   }
-			//   v4 = (BoolParameter *)sub_180004920(TypeInfo::UnityEngine::Rendering::BoolParameter);
-			//   v7 = v4;
-			//   if ( !v4 )
-			//     goto LABEL_18;
-			//   UnityEngine::Rendering::BoolParameter::BoolParameter(v4, 0, 1, 0LL);
-			//   this.fields.enable = v7;
-			//   sub_1800054D0((OneofDescriptor *)&this.fields.enable, v8, v9, v10, overrideState, (String *)methoda, v2);
-			//   v11 = (BoolParameter *)sub_180004920(TypeInfo::UnityEngine::Rendering::BoolParameter);
-			//   v12 = v11;
-			//   if ( !v11 )
-			//     goto LABEL_18;
-			//   UnityEngine::Rendering::BoolParameter::BoolParameter(v11, 1, 0, 0LL);
-			//   this.fields.enableFP32Depths = v12;
-			//   sub_1800054D0(
-			//     (OneofDescriptor *)&this.fields.enableFP32Depths,
-			//     v13,
-			//     v14,
-			//     v15,
-			//     overrideStatea,
-			//     (String *)methodb,
-			//     v104);
-			//   v16 = (BoolParameter *)sub_180004920(TypeInfo::UnityEngine::Rendering::BoolParameter);
-			//   v17 = v16;
-			//   if ( !v16 )
-			//     goto LABEL_18;
-			//   UnityEngine::Rendering::BoolParameter::BoolParameter(v16, 1, 0, 0LL);
-			//   this.fields.enableBentNormals = v17;
-			//   sub_1800054D0(
-			//     (OneofDescriptor *)&this.fields.enableBentNormals,
-			//     v18,
-			//     v19,
-			//     v20,
-			//     overrideStateb,
-			//     (String *)methodc,
-			//     v105);
-			//   v21 = (IntParameter *)sub_180004920(TypeInfo::UnityEngine::Rendering::ClampedIntParameter);
-			//   v22 = (ClampedIntParameter *)v21;
-			//   if ( !v21 )
-			//     goto LABEL_18;
-			//   UnityEngine::Rendering::IntParameter::IntParameter(v21, 2, 0, 0LL);
-			//   v22.fields.max = 3;
-			//   v22.fields.min = 0;
-			//   this.fields.qualityLevel = v22;
-			//   sub_1800054D0((OneofDescriptor *)&this.fields.qualityLevel, v23, v24, v25, overrideStatec, (String *)methodd, v106);
-			//   v26 = (IntParameter *)sub_180004920(TypeInfo::UnityEngine::Rendering::ClampedIntParameter);
-			//   v27 = (ClampedIntParameter *)v26;
-			//   if ( !v26 )
-			//     goto LABEL_18;
-			//   UnityEngine::Rendering::IntParameter::IntParameter(v26, 1, 0, 0LL);
-			//   v27.fields.min = 0;
-			//   v27.fields.max = 3;
-			//   this.fields.denoisePasses = v27;
-			//   sub_1800054D0((OneofDescriptor *)&this.fields.denoisePasses, v28, v29, v30, overrideStated, (String *)methode, v107);
-			//   v31 = (ClampedFloatParameter *)sub_180004920(TypeInfo::UnityEngine::Rendering::ClampedFloatParameter);
-			//   v32 = v31;
-			//   if ( !v31 )
-			//     goto LABEL_18;
-			//   UnityEngine::Rendering::ClampedFloatParameter::ClampedFloatParameter(v31, 5.0, 0.0, 10.0, 0, 0LL);
-			//   this.fields.radius = v32;
-			//   sub_1800054D0((OneofDescriptor *)&this.fields.radius, v33, v34, v35, overrideStatem, (String *)methodn, v108);
-			//   v36 = (FloatParameter *)sub_180004920(TypeInfo::UnityEngine::Rendering::MinFloatParameter);
-			//   v37 = v36;
-			//   if ( !v36 )
-			//     goto LABEL_18;
-			//   UnityEngine::Rendering::FloatParameter::FloatParameter(v36, 2.0, 0, 0LL);
-			//   LODWORD(v37[1].klass) = 0;
-			//   this.fields.radiusMultiplier = (MinFloatParameter *)v37;
-			//   sub_1800054D0(
-			//     (OneofDescriptor *)&this.fields.radiusMultiplier,
-			//     v38,
-			//     v39,
-			//     v40,
-			//     overrideStatee,
-			//     (String *)methodf,
-			//     v109);
-			//   v41 = (FloatParameter *)sub_180004920(TypeInfo::UnityEngine::Rendering::MinFloatParameter);
-			//   v42 = v41;
-			//   if ( !v41 )
-			//     goto LABEL_18;
-			//   UnityEngine::Rendering::FloatParameter::FloatParameter(v41, 0.80000001, 0, 0LL);
-			//   LODWORD(v42[1].klass) = 0;
-			//   this.fields.falloffRange = (MinFloatParameter *)v42;
-			//   sub_1800054D0((OneofDescriptor *)&this.fields.falloffRange, v43, v44, v45, overrideStatef, (String *)methodg, v110);
-			//   v46 = (FloatParameter *)sub_180004920(TypeInfo::UnityEngine::Rendering::MinFloatParameter);
-			//   v47 = v46;
-			//   if ( !v46 )
-			//     goto LABEL_18;
-			//   UnityEngine::Rendering::FloatParameter::FloatParameter(v46, 2.0, 0, 0LL);
-			//   LODWORD(v47[1].klass) = 0;
-			//   this.fields.sampleDistributionPower = (MinFloatParameter *)v47;
-			//   sub_1800054D0(
-			//     (OneofDescriptor *)&this.fields.sampleDistributionPower,
-			//     v48,
-			//     v49,
-			//     v50,
-			//     overrideStateg,
-			//     (String *)methodh,
-			//     v111);
-			//   v51 = (FloatParameter *)sub_180004920(TypeInfo::UnityEngine::Rendering::MinFloatParameter);
-			//   v52 = v51;
-			//   if ( !v51 )
-			//     goto LABEL_18;
-			//   UnityEngine::Rendering::FloatParameter::FloatParameter(v51, 2.0, 0, 0LL);
-			//   LODWORD(v52[1].klass) = 0;
-			//   this.fields.thinOccluderCompensation = (MinFloatParameter *)v52;
-			//   sub_1800054D0(
-			//     (OneofDescriptor *)&this.fields.thinOccluderCompensation,
-			//     v53,
-			//     v54,
-			//     v55,
-			//     overrideStateh,
-			//     (String *)methodi,
-			//     v112);
-			//   v56 = (FloatParameter *)sub_180004920(TypeInfo::UnityEngine::Rendering::MinFloatParameter);
-			//   v57 = v56;
-			//   if ( !v56 )
-			//     goto LABEL_18;
-			//   UnityEngine::Rendering::FloatParameter::FloatParameter(v56, 2.2, 0, 0LL);
-			//   LODWORD(v57[1].klass) = 0;
-			//   this.fields.finalValuePower = (MinFloatParameter *)v57;
-			//   sub_1800054D0(
-			//     (OneofDescriptor *)&this.fields.finalValuePower,
-			//     v58,
-			//     v59,
-			//     v60,
-			//     overrideStatei,
-			//     (String *)methodj,
-			//     v113);
-			//   v61 = (FloatParameter *)sub_180004920(TypeInfo::UnityEngine::Rendering::MinFloatParameter);
-			//   v62 = v61;
-			//   if ( !v61 )
-			//     goto LABEL_18;
-			//   UnityEngine::Rendering::FloatParameter::FloatParameter(v61, 3.3, 0, 0LL);
-			//   LODWORD(v62[1].klass) = 0;
-			//   this.fields.depthMIPSamplingOffset = (MinFloatParameter *)v62;
-			//   sub_1800054D0(
-			//     (OneofDescriptor *)&this.fields.depthMIPSamplingOffset,
-			//     v63,
-			//     v64,
-			//     v65,
-			//     overrideStatej,
-			//     (String *)methodk,
-			//     v114);
-			//   v66 = (FloatParameter *)sub_180004920(TypeInfo::UnityEngine::Rendering::MinFloatParameter);
-			//   v67 = v66;
-			//   if ( !v66
-			//     || (UnityEngine::Rendering::FloatParameter::FloatParameter(v66, 0.001, 0, 0LL),
-			//         LODWORD(v67[1].klass) = 0,
-			//         this.fields.mvFactor = (MinFloatParameter *)v67,
-			//         sub_1800054D0((OneofDescriptor *)&this.fields.mvFactor, v68, v69, v70, overrideStatek, (String *)methodl, v115),
-			//         v71 = (FloatParameter *)sub_180004920(TypeInfo::UnityEngine::Rendering::MinFloatParameter),
-			//         (v72 = v71) == 0LL) )
-			//   {
-			// LABEL_18:
-			//     sub_180B536AC(v6, v5);
-			//   }
-			//   UnityEngine::Rendering::FloatParameter::FloatParameter(v71, 2.5, 0, 0LL);
-			//   LODWORD(v72[1].klass) = 0;
-			//   this.fields.depthFactor = (MinFloatParameter *)v72;
-			//   sub_1800054D0((OneofDescriptor *)&this.fields.depthFactor, v73, v74, v75, overrideStatel, (String *)methodm, v116);
-			//   UnityEngine::Rendering::VolumeComponent::VolumeComponent((VolumeComponent *)this, 0LL);
-			// }
-			// 
+		  BoolParameter *v3; // rax
+		  __int64 v4; // rdx
+		  __int64 v5; // rcx
+		  bool v6; // zf
+		  unsigned __int64 v7; // rdx
+		  signed __int64 v8; // rtt
+		  BoolParameter *v9; // rax
+		  unsigned __int64 v10; // rdx
+		  signed __int64 v11; // rtt
+		  BoolParameter *v12; // rax
+		  unsigned __int64 v13; // rdx
+		  signed __int64 v14; // rtt
+		  BoolParameter *v15; // rax
+		  unsigned __int64 v16; // rdx
+		  signed __int64 v17; // rtt
+		  ClampedIntParameter *v18; // rbp
+		  void (__fastcall __noreturn **v19)(); // rdi
+		  unsigned int v20; // r8d
+		  __int64 v21; // rsi
+		  void (__fastcall __noreturn **v22)(); // rdx
+		  unsigned int v23; // eax
+		  unsigned int v24; // r8d
+		  unsigned int v25; // eax
+		  __int64 v26; // rax
+		  __int64 v27; // r8
+		  signed __int64 v28; // r9
+		  unsigned __int64 v29; // rdx
+		  unsigned __int64 v30; // r8
+		  signed __int64 v31; // rtt
+		  __int64 v32; // rsi
+		  __int64 v33; // rax
+		  __int64 v34; // rsi
+		  _QWORD **v35; // rcx
+		  __int64 v36; // r8
+		  __int64 v37; // rax
+		  __int64 v38; // rdx
+		  unsigned __int64 v39; // rdx
+		  signed __int64 v40; // rtt
+		  ClampedIntParameter *v41; // rbp
+		  unsigned int v42; // r8d
+		  __int64 v43; // rsi
+		  unsigned int v44; // eax
+		  unsigned int v45; // r8d
+		  unsigned int v46; // eax
+		  __int64 v47; // rax
+		  unsigned __int64 v48; // rdx
+		  signed __int64 v49; // rtt
+		  __int64 v50; // rax
+		  unsigned __int64 v51; // rdx
+		  signed __int64 v52; // rtt
+		  __int64 v53; // rax
+		  unsigned __int64 v54; // rdx
+		  signed __int64 v55; // rtt
+		  __int64 v56; // rax
+		  unsigned __int64 v57; // rdx
+		  signed __int64 v58; // rtt
+		  __int64 v59; // rax
+		  unsigned __int64 v60; // rdx
+		  signed __int64 v61; // rtt
+		  __int64 v62; // rax
+		  unsigned __int64 v63; // rdx
+		  signed __int64 v64; // rtt
+		  __int64 v65; // rax
+		  unsigned __int64 v66; // rdx
+		  signed __int64 v67; // rtt
+		  __int64 v68; // rax
+		  unsigned __int64 v69; // rdx
+		  signed __int64 v70; // rtt
+		  __int64 v71; // rax
+		  unsigned __int64 v72; // rdx
+		  signed __int64 v73; // rtt
+		  __int64 v74; // rax
+		  int v75; // ecx
+		  unsigned __int64 v76; // rdx
+		  signed __int64 v77; // rtt
+		  unsigned __int64 v78; // rdx
+		  signed __int64 v79; // rtt
+		  __int64 v80; // r8
+		  signed __int64 v81; // r9
+		  unsigned __int64 v82; // rdx
+		  unsigned __int64 v83; // r8
+		  signed __int64 v84; // rtt
+		  __int64 v85; // rdi
+		  __int64 v86; // rax
+		  __int64 v87; // rdi
+		  _QWORD **v88; // rcx
+		  __int64 v89; // rcx
+		  __int64 v90; // rax
+		  __int64 v91; // rdx
+		  _DWORD v92[14]; // [rsp+30h] [rbp-38h] BYREF
+		
+		  v3 = (BoolParameter *)sub_18002C620(TypeInfo::UnityEngine::Rendering::BoolParameter);
+		  if ( !v3 )
+		    goto LABEL_127;
+		  v6 = dword_18F35FD08 == 0;
+		  v3->fields._.m_Value = 0;
+		  v3->fields._._.overrideState = 1;
+		  this->fields.enable = v3;
+		  if ( !v6 )
+		  {
+		    v7 = (((unsigned __int64)&this->fields.enable >> 12) & 0x1FFFFF) >> 6;
+		    _m_prefetchw(&qword_18F103690[v7]);
+		    do
+		      v8 = qword_18F103690[v7];
+		    while ( v8 != _InterlockedCompareExchange64(
+		                    &qword_18F103690[v7],
+		                    v8 | (1LL << (((unsigned __int64)&this->fields.enable >> 12) & 0x3F)),
+		                    v8) );
+		  }
+		  v9 = (BoolParameter *)sub_18002C620(TypeInfo::UnityEngine::Rendering::BoolParameter);
+		  if ( !v9 )
+		    goto LABEL_127;
+		  v6 = dword_18F35FD08 == 0;
+		  v9->fields._.m_Value = 1;
+		  v9->fields._._.overrideState = 0;
+		  this->fields.enableFP32Depths = v9;
+		  if ( !v6 )
+		  {
+		    v10 = (((unsigned __int64)&this->fields.enableFP32Depths >> 12) & 0x1FFFFF) >> 6;
+		    _m_prefetchw(&qword_18F103690[v10]);
+		    do
+		      v11 = qword_18F103690[v10];
+		    while ( v11 != _InterlockedCompareExchange64(
+		                     &qword_18F103690[v10],
+		                     v11 | (1LL << (((unsigned __int64)&this->fields.enableFP32Depths >> 12) & 0x3F)),
+		                     v11) );
+		  }
+		  v12 = (BoolParameter *)sub_18002C620(TypeInfo::UnityEngine::Rendering::BoolParameter);
+		  if ( !v12 )
+		    goto LABEL_127;
+		  v6 = dword_18F35FD08 == 0;
+		  v12->fields._.m_Value = 1;
+		  v12->fields._._.overrideState = 0;
+		  this->fields.enableBentNormals = v12;
+		  if ( !v6 )
+		  {
+		    v13 = (((unsigned __int64)&this->fields.enableBentNormals >> 12) & 0x1FFFFF) >> 6;
+		    _m_prefetchw(&qword_18F103690[v13]);
+		    do
+		      v14 = qword_18F103690[v13];
+		    while ( v14 != _InterlockedCompareExchange64(
+		                     &qword_18F103690[v13],
+		                     v14 | (1LL << (((unsigned __int64)&this->fields.enableBentNormals >> 12) & 0x3F)),
+		                     v14) );
+		  }
+		  v15 = (BoolParameter *)sub_18002C620(TypeInfo::UnityEngine::Rendering::BoolParameter);
+		  if ( !v15 )
+		    goto LABEL_127;
+		  v6 = dword_18F35FD08 == 0;
+		  v15->fields._.m_Value = 0;
+		  v15->fields._._.overrideState = 0;
+		  this->fields.generateNormalsInplace = v15;
+		  if ( !v6 )
+		  {
+		    v16 = (((unsigned __int64)&this->fields.generateNormalsInplace >> 12) & 0x1FFFFF) >> 6;
+		    _m_prefetchw(&qword_18F103690[v16]);
+		    do
+		      v17 = qword_18F103690[v16];
+		    while ( v17 != _InterlockedCompareExchange64(
+		                     &qword_18F103690[v16],
+		                     v17 | (1LL << (((unsigned __int64)&this->fields.generateNormalsInplace >> 12) & 0x3F)),
+		                     v17) );
+		  }
+		  v18 = (ClampedIntParameter *)sub_18002C620(TypeInfo::UnityEngine::Rendering::ClampedIntParameter);
+		  if ( !v18 )
+		    goto LABEL_127;
+		  v19 = off_18B8C2EC0;
+		  if ( !byte_18F36E4F3 )
+		  {
+		    v20 = _InterlockedExchangeAdd64(
+		            (volatile signed __int64 *)&MethodInfo::UnityEngine::Rendering::VolumeParameter<int>::VolumeParameter,
+		            0LL);
+		    if ( (v20 & 1) != 0 )
+		    {
+		      v21 = (v20 >> 1) & 0xFFFFFFF;
+		      switch ( v20 >> 29 )
+		      {
+		        case 1u:
+		          v22 = (void (__fastcall __noreturn **)())sub_180036020((unsigned int)v21);
+		          goto LABEL_46;
+		        case 2u:
+		          v22 = (void (__fastcall __noreturn **)())sub_1800362C0((unsigned int)v21);
+		          goto LABEL_46;
+		        case 3u:
+		        case 6u:
+		          v23 = v20;
+		          v24 = v20 >> 29;
+		          v25 = (v23 >> 1) & 0xFFFFFFF;
+		          if ( v24 )
+		          {
+		            if ( v24 == 3 )
+		            {
+		              v22 = (void (__fastcall __noreturn **)())sub_180009A40(v25);
+		              goto LABEL_46;
+		            }
+		            if ( v24 == 6 )
+		            {
+		              v26 = sub_1802F8800(v25);
+		              v22 = (void (__fastcall __noreturn **)())sub_180026660(v26, 0LL);
+		              goto LABEL_46;
+		            }
+		          }
+		          else if ( v25 == 1 )
+		          {
+		            v22 = off_18B8C2EC0;
+		            goto LABEL_46;
+		          }
+		LABEL_45:
+		          v22 = 0LL;
+		LABEL_46:
+		          if ( v22 )
+		            _InterlockedExchange64(
+		              (volatile __int64 *)&MethodInfo::UnityEngine::Rendering::VolumeParameter<int>::VolumeParameter,
+		              (__int64)v22);
+		          break;
+		        case 4u:
+		          v22 = (void (__fastcall __noreturn **)())sub_1802F8760((unsigned int)v21);
+		          goto LABEL_46;
+		        case 5u:
+		          v27 = 8 * v21;
+		          if ( *(_QWORD *)(qword_18F371F68 + 8 * v21) )
+		          {
+		            v22 = *(void (__fastcall __noreturn ***)())(v27 + qword_18F371F68);
+		          }
+		          else
+		          {
+		            v28 = il2cpp_string_new_len(
+		                    qword_18F360DF8
+		                  + *(int *)(v27 + *(int *)(qword_18F360E00 + 8) + qword_18F360DF8 + 4)
+		                  + *(int *)(qword_18F360E00 + 16),
+		                    *(unsigned int *)(v27 + *(int *)(qword_18F360E00 + 8) + qword_18F360DF8));
+		            v22 = (void (__fastcall __noreturn **)())_InterlockedCompareExchange64(
+		                                                       (volatile signed __int64 *)(qword_18F371F68 + 8 * v21),
+		                                                       v28,
+		                                                       0LL);
+		            if ( !v22 )
+		            {
+		              if ( dword_18F35FD08 )
+		              {
+		                v29 = (((unsigned __int64)(qword_18F371F68 + 8 * v21) >> 12) & 0x1FFFFF) >> 6;
+		                v30 = ((unsigned __int64)(qword_18F371F68 + 8 * v21) >> 12) & 0x3F;
+		                _m_prefetchw(&qword_18F103690[v29]);
+		                do
+		                  v31 = qword_18F103690[v29];
+		                while ( v31 != _InterlockedCompareExchange64(&qword_18F103690[v29], v31 | (1LL << v30), v31) );
+		              }
+		              v22 = (void (__fastcall __noreturn **)())v28;
+		            }
+		          }
+		          goto LABEL_46;
+		        case 7u:
+		          v32 = sub_1802F8760((unsigned int)v21);
+		          v33 = *(_QWORD *)(v32 + 16);
+		          v34 = (v32 - *(_QWORD *)(v33 + 128)) >> 5;
+		          if ( *(_BYTE *)(v33 + 42) == 21 )
+		          {
+		            v35 = *(_QWORD ***)(v33 + 96);
+		            if ( *v35 )
+		            {
+		              v36 = **v35 - *(int *)(qword_18F360E00 + 160) - qword_18F360DF8;
+		              v33 = sub_180009B10(v36 / 92 + v36);
+		            }
+		            else
+		            {
+		              v33 = 0LL;
+		            }
+		          }
+		          v92[0] = v34 + *(_DWORD *)(*(_QWORD *)(v33 + 104) + 32LL);
+		          v37 = sub_1801CD744(
+		                  (unsigned int)v92,
+		                  (int)qword_18F360DF8 + *(_DWORD *)(qword_18F360E00 + 64),
+		                  *(int *)(qword_18F360E00 + 68) / 0xCuLL,
+		                  12,
+		                  (__int64)sub_1802F7130);
+		          if ( !v37 )
+		            goto LABEL_45;
+		          v38 = *(unsigned int *)(v37 + 8);
+		          if ( (_DWORD)v38 == -1 )
+		            goto LABEL_45;
+		          v22 = (void (__fastcall __noreturn **)())(qword_18F360DF8 + *(int *)(qword_18F360E00 + 72) + v38);
+		          goto LABEL_46;
+		        default:
+		          break;
+		      }
+		    }
+		    byte_18F36E4F3 = 1;
+		  }
+		  v6 = dword_18F35FD08 == 0;
+		  v18->fields._._.m_Value = 2;
+		  v18->fields._._._.overrideState = 0;
+		  v18->fields.min = 0;
+		  v18->fields.max = 3;
+		  this->fields.qualityLevel = v18;
+		  if ( !v6 )
+		  {
+		    v39 = (((unsigned __int64)&this->fields.qualityLevel >> 12) & 0x1FFFFF) >> 6;
+		    _m_prefetchw(&qword_18F103690[v39]);
+		    do
+		      v40 = qword_18F103690[v39];
+		    while ( v40 != _InterlockedCompareExchange64(
+		                     &qword_18F103690[v39],
+		                     v40 | (1LL << (((unsigned __int64)&this->fields.qualityLevel >> 12) & 0x3F)),
+		                     v40) );
+		  }
+		  v41 = (ClampedIntParameter *)sub_18002C620(TypeInfo::UnityEngine::Rendering::ClampedIntParameter);
+		  if ( !v41 )
+		    goto LABEL_127;
+		  if ( !byte_18F36E4F3 )
+		  {
+		    v42 = _InterlockedExchangeAdd64(
+		            (volatile signed __int64 *)&MethodInfo::UnityEngine::Rendering::VolumeParameter<int>::VolumeParameter,
+		            0LL);
+		    if ( (v42 & 1) != 0 )
+		    {
+		      v43 = (v42 >> 1) & 0xFFFFFFF;
+		      switch ( v42 >> 29 )
+		      {
+		        case 1u:
+		          v19 = (void (__fastcall __noreturn **)())sub_180036020((unsigned int)v43);
+		          goto LABEL_65;
+		        case 2u:
+		          v19 = (void (__fastcall __noreturn **)())sub_1800362C0((unsigned int)v43);
+		          goto LABEL_65;
+		        case 3u:
+		        case 6u:
+		          v44 = v42;
+		          v45 = v42 >> 29;
+		          v46 = (v44 >> 1) & 0xFFFFFFF;
+		          if ( v45 )
+		          {
+		            if ( v45 == 3 )
+		            {
+		              v19 = (void (__fastcall __noreturn **)())sub_180009A40(v46);
+		              goto LABEL_65;
+		            }
+		            if ( v45 == 6 )
+		            {
+		              v47 = sub_1802F8800(v46);
+		              v19 = (void (__fastcall __noreturn **)())sub_180026660(v47, 0LL);
+		              goto LABEL_65;
+		            }
+		          }
+		          else if ( v46 == 1 )
+		          {
+		            goto LABEL_65;
+		          }
+		LABEL_64:
+		          v19 = 0LL;
+		LABEL_65:
+		          if ( v19 )
+		            _InterlockedExchange64(
+		              (volatile __int64 *)&MethodInfo::UnityEngine::Rendering::VolumeParameter<int>::VolumeParameter,
+		              (__int64)v19);
+		          break;
+		        case 4u:
+		          v19 = (void (__fastcall __noreturn **)())sub_1802F8760((unsigned int)v43);
+		          goto LABEL_65;
+		        case 5u:
+		          v80 = 8 * v43;
+		          if ( *(_QWORD *)(qword_18F371F68 + 8 * v43) )
+		          {
+		            v19 = *(void (__fastcall __noreturn ***)())(v80 + qword_18F371F68);
+		          }
+		          else
+		          {
+		            v81 = il2cpp_string_new_len(
+		                    qword_18F360DF8
+		                  + *(int *)(v80 + *(int *)(qword_18F360E00 + 8) + qword_18F360DF8 + 4)
+		                  + *(int *)(qword_18F360E00 + 16),
+		                    *(unsigned int *)(v80 + *(int *)(qword_18F360E00 + 8) + qword_18F360DF8));
+		            v19 = (void (__fastcall __noreturn **)())_InterlockedCompareExchange64(
+		                                                       (volatile signed __int64 *)(qword_18F371F68 + 8 * v43),
+		                                                       v81,
+		                                                       0LL);
+		            if ( !v19 )
+		            {
+		              if ( dword_18F35FD08 )
+		              {
+		                v82 = (((unsigned __int64)(qword_18F371F68 + 8 * v43) >> 12) & 0x1FFFFF) >> 6;
+		                v83 = ((unsigned __int64)(qword_18F371F68 + 8 * v43) >> 12) & 0x3F;
+		                _m_prefetchw(&qword_18F103690[v82]);
+		                do
+		                  v84 = qword_18F103690[v82];
+		                while ( v84 != _InterlockedCompareExchange64(&qword_18F103690[v82], v84 | (1LL << v83), v84) );
+		              }
+		              v19 = (void (__fastcall __noreturn **)())v81;
+		            }
+		          }
+		          goto LABEL_65;
+		        case 7u:
+		          v85 = sub_1802F8760((unsigned int)v43);
+		          v86 = *(_QWORD *)(v85 + 16);
+		          v87 = (v85 - *(_QWORD *)(v86 + 128)) >> 5;
+		          if ( *(_BYTE *)(v86 + 42) == 21 )
+		          {
+		            v88 = *(_QWORD ***)(v86 + 96);
+		            if ( *v88 )
+		            {
+		              v89 = **v88 - *(int *)(qword_18F360E00 + 160) - qword_18F360DF8;
+		              v86 = sub_180009B10(v89 / 92 + v89);
+		            }
+		            else
+		            {
+		              v86 = 0LL;
+		            }
+		          }
+		          v92[0] = v87 + *(_DWORD *)(*(_QWORD *)(v86 + 104) + 32LL);
+		          v90 = sub_1801CD744(
+		                  (unsigned int)v92,
+		                  (int)qword_18F360DF8 + *(_DWORD *)(qword_18F360E00 + 64),
+		                  *(int *)(qword_18F360E00 + 68) / 0xCuLL,
+		                  12,
+		                  (__int64)sub_1802F7130);
+		          if ( !v90 )
+		            goto LABEL_64;
+		          v91 = *(unsigned int *)(v90 + 8);
+		          if ( (_DWORD)v91 == -1 )
+		            goto LABEL_64;
+		          v19 = (void (__fastcall __noreturn **)())(v91 + qword_18F360DF8 + *(int *)(qword_18F360E00 + 72));
+		          goto LABEL_65;
+		        default:
+		          break;
+		      }
+		    }
+		    byte_18F36E4F3 = 1;
+		  }
+		  v6 = dword_18F35FD08 == 0;
+		  v41->fields._._.m_Value = 1;
+		  v41->fields._._._.overrideState = 0;
+		  v41->fields.min = 0;
+		  v41->fields.max = 3;
+		  this->fields.denoisePasses = v41;
+		  if ( !v6 )
+		  {
+		    v48 = (((unsigned __int64)&this->fields.denoisePasses >> 12) & 0x1FFFFF) >> 6;
+		    _m_prefetchw(&qword_18F103690[v48]);
+		    do
+		      v49 = qword_18F103690[v48];
+		    while ( v49 != _InterlockedCompareExchange64(
+		                     &qword_18F103690[v48],
+		                     v49 | (1LL << (((unsigned __int64)&this->fields.denoisePasses >> 12) & 0x3F)),
+		                     v49) );
+		  }
+		  v50 = sub_18002C620(TypeInfo::UnityEngine::Rendering::ClampedFloatParameter);
+		  if ( !v50 )
+		    goto LABEL_127;
+		  v6 = dword_18F35FD08 == 0;
+		  *(_DWORD *)(v50 + 24) = 1084227584;
+		  *(_BYTE *)(v50 + 16) = 0;
+		  *(_DWORD *)(v50 + 32) = 0;
+		  *(_DWORD *)(v50 + 36) = 1092616192;
+		  *(_DWORD *)(v50 + 40) = 1065353216;
+		  this->fields.radius = (ClampedFloatParameter *)v50;
+		  if ( !v6 )
+		  {
+		    v51 = (((unsigned __int64)&this->fields.radius >> 12) & 0x1FFFFF) >> 6;
+		    _m_prefetchw(&qword_18F103690[v51]);
+		    do
+		      v52 = qword_18F103690[v51];
+		    while ( v52 != _InterlockedCompareExchange64(
+		                     &qword_18F103690[v51],
+		                     v52 | (1LL << (((unsigned __int64)&this->fields.radius >> 12) & 0x3F)),
+		                     v52) );
+		  }
+		  v53 = sub_18002C620(TypeInfo::UnityEngine::Rendering::MinFloatParameter);
+		  if ( !v53 )
+		    goto LABEL_127;
+		  v6 = dword_18F35FD08 == 0;
+		  *(_DWORD *)(v53 + 24) = 0x40000000;
+		  *(_BYTE *)(v53 + 16) = 0;
+		  *(_DWORD *)(v53 + 32) = 0;
+		  this->fields.radiusMultiplier = (MinFloatParameter *)v53;
+		  if ( !v6 )
+		  {
+		    v54 = (((unsigned __int64)&this->fields.radiusMultiplier >> 12) & 0x1FFFFF) >> 6;
+		    _m_prefetchw(&qword_18F103690[v54]);
+		    do
+		      v55 = qword_18F103690[v54];
+		    while ( v55 != _InterlockedCompareExchange64(
+		                     &qword_18F103690[v54],
+		                     v55 | (1LL << (((unsigned __int64)&this->fields.radiusMultiplier >> 12) & 0x3F)),
+		                     v55) );
+		  }
+		  v56 = sub_18002C620(TypeInfo::UnityEngine::Rendering::MinFloatParameter);
+		  if ( !v56 )
+		    goto LABEL_127;
+		  v6 = dword_18F35FD08 == 0;
+		  *(_DWORD *)(v56 + 24) = 1061997773;
+		  *(_BYTE *)(v56 + 16) = 0;
+		  *(_DWORD *)(v56 + 32) = 0;
+		  this->fields.falloffRange = (MinFloatParameter *)v56;
+		  if ( !v6 )
+		  {
+		    v57 = (((unsigned __int64)&this->fields.falloffRange >> 12) & 0x1FFFFF) >> 6;
+		    _m_prefetchw(&qword_18F103690[v57]);
+		    do
+		      v58 = qword_18F103690[v57];
+		    while ( v58 != _InterlockedCompareExchange64(
+		                     &qword_18F103690[v57],
+		                     v58 | (1LL << (((unsigned __int64)&this->fields.falloffRange >> 12) & 0x3F)),
+		                     v58) );
+		  }
+		  v59 = sub_18002C620(TypeInfo::UnityEngine::Rendering::MinFloatParameter);
+		  if ( !v59 )
+		    goto LABEL_127;
+		  v6 = dword_18F35FD08 == 0;
+		  *(_DWORD *)(v59 + 24) = 0x40000000;
+		  *(_BYTE *)(v59 + 16) = 0;
+		  *(_DWORD *)(v59 + 32) = 0;
+		  this->fields.sampleDistributionPower = (MinFloatParameter *)v59;
+		  if ( !v6 )
+		  {
+		    v60 = (((unsigned __int64)&this->fields.sampleDistributionPower >> 12) & 0x1FFFFF) >> 6;
+		    _m_prefetchw(&qword_18F103690[v60]);
+		    do
+		      v61 = qword_18F103690[v60];
+		    while ( v61 != _InterlockedCompareExchange64(
+		                     &qword_18F103690[v60],
+		                     v61 | (1LL << (((unsigned __int64)&this->fields.sampleDistributionPower >> 12) & 0x3F)),
+		                     v61) );
+		  }
+		  v62 = sub_18002C620(TypeInfo::UnityEngine::Rendering::MinFloatParameter);
+		  if ( !v62 )
+		    goto LABEL_127;
+		  v6 = dword_18F35FD08 == 0;
+		  *(_DWORD *)(v62 + 24) = 0x40000000;
+		  *(_BYTE *)(v62 + 16) = 0;
+		  *(_DWORD *)(v62 + 32) = 0;
+		  this->fields.thinOccluderCompensation = (MinFloatParameter *)v62;
+		  if ( !v6 )
+		  {
+		    v63 = (((unsigned __int64)&this->fields.thinOccluderCompensation >> 12) & 0x1FFFFF) >> 6;
+		    _m_prefetchw(&qword_18F103690[v63]);
+		    do
+		      v64 = qword_18F103690[v63];
+		    while ( v64 != _InterlockedCompareExchange64(
+		                     &qword_18F103690[v63],
+		                     v64 | (1LL << (((unsigned __int64)&this->fields.thinOccluderCompensation >> 12) & 0x3F)),
+		                     v64) );
+		  }
+		  v65 = sub_18002C620(TypeInfo::UnityEngine::Rendering::MinFloatParameter);
+		  if ( !v65 )
+		    goto LABEL_127;
+		  v6 = dword_18F35FD08 == 0;
+		  *(_DWORD *)(v65 + 24) = 1074580685;
+		  *(_BYTE *)(v65 + 16) = 0;
+		  *(_DWORD *)(v65 + 32) = 0;
+		  this->fields.finalValuePower = (MinFloatParameter *)v65;
+		  if ( !v6 )
+		  {
+		    v66 = (((unsigned __int64)&this->fields.finalValuePower >> 12) & 0x1FFFFF) >> 6;
+		    _m_prefetchw(&qword_18F103690[v66]);
+		    do
+		      v67 = qword_18F103690[v66];
+		    while ( v67 != _InterlockedCompareExchange64(
+		                     &qword_18F103690[v66],
+		                     v67 | (1LL << (((unsigned __int64)&this->fields.finalValuePower >> 12) & 0x3F)),
+		                     v67) );
+		  }
+		  v68 = sub_18002C620(TypeInfo::UnityEngine::Rendering::MinFloatParameter);
+		  if ( !v68 )
+		    goto LABEL_127;
+		  v6 = dword_18F35FD08 == 0;
+		  *(_DWORD *)(v68 + 24) = 1079194419;
+		  *(_BYTE *)(v68 + 16) = 0;
+		  *(_DWORD *)(v68 + 32) = 0;
+		  this->fields.depthMIPSamplingOffset = (MinFloatParameter *)v68;
+		  if ( !v6 )
+		  {
+		    v69 = (((unsigned __int64)&this->fields.depthMIPSamplingOffset >> 12) & 0x1FFFFF) >> 6;
+		    _m_prefetchw(&qword_18F103690[v69]);
+		    do
+		      v70 = qword_18F103690[v69];
+		    while ( v70 != _InterlockedCompareExchange64(
+		                     &qword_18F103690[v69],
+		                     v70 | (1LL << (((unsigned __int64)&this->fields.depthMIPSamplingOffset >> 12) & 0x3F)),
+		                     v70) );
+		  }
+		  v71 = sub_18002C620(TypeInfo::UnityEngine::Rendering::MinFloatParameter);
+		  if ( !v71 )
+		    goto LABEL_127;
+		  v6 = dword_18F35FD08 == 0;
+		  *(_DWORD *)(v71 + 24) = 981668463;
+		  *(_BYTE *)(v71 + 16) = 0;
+		  *(_DWORD *)(v71 + 32) = 0;
+		  this->fields.mvFactor = (MinFloatParameter *)v71;
+		  if ( !v6 )
+		  {
+		    v72 = (((unsigned __int64)&this->fields.mvFactor >> 12) & 0x1FFFFF) >> 6;
+		    _m_prefetchw(&qword_18F103690[v72]);
+		    do
+		      v73 = qword_18F103690[v72];
+		    while ( v73 != _InterlockedCompareExchange64(
+		                     &qword_18F103690[v72],
+		                     v73 | (1LL << (((unsigned __int64)&this->fields.mvFactor >> 12) & 0x3F)),
+		                     v73) );
+		  }
+		  v74 = sub_18002C620(TypeInfo::UnityEngine::Rendering::MinFloatParameter);
+		  if ( !v74 )
+		LABEL_127:
+		    sub_1800D8250(v5, v4);
+		  v75 = dword_18F35FD08;
+		  *(_DWORD *)(v74 + 24) = 1075838976;
+		  *(_BYTE *)(v74 + 16) = 0;
+		  *(_DWORD *)(v74 + 32) = 0;
+		  this->fields.depthFactor = (MinFloatParameter *)v74;
+		  if ( v75 )
+		  {
+		    v76 = (((unsigned __int64)&this->fields.depthFactor >> 12) & 0x1FFFFF) >> 6;
+		    _m_prefetchw(&qword_18F103690[v76]);
+		    do
+		      v77 = qword_18F103690[v76];
+		    while ( v77 != _InterlockedCompareExchange64(
+		                     &qword_18F103690[v76],
+		                     v77 | (1LL << (((unsigned __int64)&this->fields.depthFactor >> 12) & 0x3F)),
+		                     v77) );
+		    v75 = dword_18F35FD08;
+		  }
+		  this->fields._.active = 1;
+		  this->fields._._displayName_k__BackingField = (String *)"";
+		  if ( v75 )
+		  {
+		    v78 = (((unsigned __int64)&this->fields._._displayName_k__BackingField >> 12) & 0x1FFFFF) >> 6;
+		    _m_prefetchw(&qword_18F103690[v78]);
+		    do
+		      v79 = qword_18F103690[v78];
+		    while ( v79 != _InterlockedCompareExchange64(
+		                     &qword_18F103690[v78],
+		                     v79 | (1LL << (((unsigned __int64)&this->fields._._displayName_k__BackingField >> 12) & 0x3F)),
+		                     v79) );
+		  }
+		  UnityEngine::ScriptableObject::ScriptableObject((ScriptableObject *)this, 0LL);
 		}
-
-		public bool IsActive()
+		
+	
+		// Methods
+		public bool IsActive() => default; // 0x0000000183C2F320-0x0000000183C2F430
+		// Boolean IsActive()
+		bool HG::Rendering::Runtime::GTAmbientOcclusion::IsActive(GTAmbientOcclusion *this, MethodInfo *method)
 		{
-			// // Boolean IsActive()
-			// bool HG::Rendering::Runtime::GTAmbientOcclusion::IsActive(GTAmbientOcclusion *this, MethodInfo *method)
-			// {
-			//   struct ILFixDynamicMethodWrapper_2__Class *v3; // rcx
-			//   BoolParameter *wrapperArray; // rdx
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			// 
-			//   if ( !byte_18D8EDC37 )
-			//   {
-			//     sub_18003C530(&TypeInfo::IFix::ILFixDynamicMethodWrapper);
-			//     byte_18D8EDC37 = 1;
-			//   }
-			//   v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper._1.cctor_finished_or_no_cctor )
-			//   {
-			//     il2cpp_runtime_class_init_0(TypeInfo::IFix::ILFixDynamicMethodWrapper, method);
-			//     v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   }
-			//   wrapperArray = (BoolParameter *)v3.static_fields.wrapperArray;
-			//   if ( !wrapperArray )
-			//     goto LABEL_9;
-			//   if ( *(int *)&wrapperArray.fields._.m_Value <= 988 )
-			//     goto LABEL_7;
-			//   if ( !v3._1.cctor_finished_or_no_cctor )
-			//   {
-			//     il2cpp_runtime_class_init_0(v3, wrapperArray);
-			//     v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   }
-			//   v3 = (struct ILFixDynamicMethodWrapper_2__Class *)v3.static_fields.wrapperArray;
-			//   if ( !v3 )
-			//     goto LABEL_9;
-			//   if ( LODWORD(v3._0.namespaze) <= 0x3DC )
-			//     sub_180070270(v3, wrapperArray);
-			//   if ( !*((_QWORD *)&v3[21]._0.byval_arg + 1) )
-			//   {
-			// LABEL_7:
-			//     wrapperArray = this.fields.enable;
-			//     if ( wrapperArray )
-			//       return sub_1800023D0(10LL, wrapperArray);
-			// LABEL_9:
-			//     sub_180B536AC(v3, wrapperArray);
-			//   }
-			//   Patch = IFix::WrappersManagerImpl::GetPatch(988, 0LL);
-			//   if ( !Patch )
-			//     goto LABEL_9;
-			//   return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_8((ILFixDynamicMethodWrapper_27 *)Patch, (Object *)this, 0LL);
-			// }
-			// 
-			return default(bool);
+		  struct ILFixDynamicMethodWrapper_2__Class *v3; // rcx
+		  ILFixDynamicMethodWrapper_2__Array *wrapperArray; // rdx
+		  BoolParameter *enable; // rbx
+		  bool (*v6)(RuntimeType *, MethodInfo *); // r8
+		  Il2CppMethodPointer methodPtr; // rdx
+		  VolumeParameter__Fields v9; // rax
+		  char v10; // al
+		  VolumeParameter__Fields v11; // rax
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		
+		  v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(TypeInfo::IFix::ILFixDynamicMethodWrapper);
+		    v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  wrapperArray = v3->static_fields->wrapperArray;
+		  if ( !wrapperArray )
+		    goto LABEL_21;
+		  if ( wrapperArray->max_length.size <= 1093 )
+		    goto LABEL_5;
+		  if ( !v3->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(v3);
+		    v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  v3 = (struct ILFixDynamicMethodWrapper_2__Class *)v3->static_fields->wrapperArray;
+		  if ( !v3 )
+		    goto LABEL_21;
+		  if ( LODWORD(v3->_0.namespaze) <= 0x445 )
+		    sub_1800D2AB0(v3, wrapperArray);
+		  if ( !v3[23]._0.fields )
+		  {
+		LABEL_5:
+		    enable = this->fields.enable;
+		    if ( enable )
+		    {
+		      sub_1800049A0(enable->klass);
+		      v6 = (bool (*)(RuntimeType *, MethodInfo *))enable->klass->vtable.get_value.method;
+		      methodPtr = enable->klass->vtable.set_value.methodPtr;
+		      if ( v6 == System::RuntimeType::HasElementTypeImpl )
+		      {
+		        v9 = enable->fields._._;
+		        if ( (*(_DWORD *)(*(_QWORD *)&v9 + 8LL) & 0x20000000) != 0 )
+		          return 1;
+		        v10 = *(_BYTE *)(*(_QWORD *)&v9 + 10LL);
+		        if ( v10 == 29 || v10 == 16 || v10 == 20 || v10 == 15 )
+		          return 1;
+		      }
+		      else
+		      {
+		        if ( v6 == System::RuntimeType::get_IsGenericType )
+		          return System::RuntimeTypeHandle::HasInstantiation(enable, methodPtr);
+		        if ( v6 != System::RuntimeType::get_IsGenericParameter )
+		          return ((__int64 (__fastcall *)(BoolParameter *, Il2CppMethodPointer))v6)(enable, methodPtr);
+		        v11 = enable->fields._._;
+		        if ( (*(_DWORD *)(*(_QWORD *)&v11 + 8LL) & 0x20000000) == 0
+		          && (*(_BYTE *)(*(_QWORD *)&v11 + 10LL) == 19 || *(_BYTE *)(*(_QWORD *)&v11 + 10LL) == 30) )
+		        {
+		          return 1;
+		        }
+		      }
+		      return 0;
+		    }
+		LABEL_21:
+		    sub_1800D8260(v3, wrapperArray);
+		  }
+		  Patch = IFix::WrappersManagerImpl::GetPatch(1093, 0LL);
+		  if ( !Patch )
+		    goto LABEL_21;
+		  return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_14((ILFixDynamicMethodWrapper_20 *)Patch, (Object *)this, 0LL);
 		}
-
-		public BoolParameter enable;
-
-		public BoolParameter enableFP32Depths;
-
-		private BoolParameter enableBentNormals;
-
-		public ClampedIntParameter qualityLevel;
-
-		public ClampedIntParameter denoisePasses;
-
-		public ClampedFloatParameter radius;
-
-		public MinFloatParameter radiusMultiplier;
-
-		public MinFloatParameter falloffRange;
-
-		public MinFloatParameter sampleDistributionPower;
-
-		public MinFloatParameter thinOccluderCompensation;
-
-		public MinFloatParameter finalValuePower;
-
-		public MinFloatParameter depthMIPSamplingOffset;
-
-		public MinFloatParameter mvFactor;
-
-		public MinFloatParameter depthFactor;
+		
 	}
 }

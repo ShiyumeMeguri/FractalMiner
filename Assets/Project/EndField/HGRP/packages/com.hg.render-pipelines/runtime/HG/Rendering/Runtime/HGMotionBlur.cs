@@ -1,170 +1,188 @@
-﻿using System;
+using System;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using UnityEngine.Rendering;
+
+// Image 4: HG.RenderPipelines.Runtime.dll - Assembly: HG.RenderPipelines.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null - Types 37354-38879
 
 namespace HG.Rendering.Runtime
 {
-	[VolumeComponentMenuForRenderPipeline("Post-processing/MotionBlur", new Type[] { typeof(HGRenderPipeline) })]
 	[Serializable]
-	public class HGMotionBlur : VolumeComponent
+	[VolumeComponentMenuForRenderPipeline("Post-processing/MotionBlur", new System.Type[1] {typeof(HGRenderPipeline) })]
+	public class HGMotionBlur : VolumeComponent // TypeDefIndex: 38045
 	{
-		public HGMotionBlur()
+		// Fields
+		public BoolParameter enable; // 0x30
+		public ClampedFloatParameter shutterAngle; // 0x38
+		public ClampedFloatParameter blendFrame; // 0x40
+		public ClampedIntParameter sampleCount; // 0x48
+	
+		// Constructors
+		public HGMotionBlur() {} // 0x0000000184405910-0x0000000184405A20
+		// HGMotionBlur()
+		void HG::Rendering::Runtime::HGMotionBlur::HGMotionBlur(HGMotionBlur *this, MethodInfo *method)
 		{
-			// // HGMotionBlur()
-			// void HG::Rendering::Runtime::HGMotionBlur::HGMotionBlur(HGMotionBlur *this, MethodInfo *method)
-			// {
-			//   BoolParameter *v3; // rax
-			//   __int64 v4; // rdx
-			//   __int64 v5; // rcx
-			//   BoolParameter *v6; // rdi
-			//   OneofDescriptorProto *v7; // rdx
-			//   FileDescriptor *v8; // r8
-			//   MessageDescriptor *v9; // r9
-			//   ClampedFloatParameter *v10; // rax
-			//   ClampedFloatParameter *v11; // rdi
-			//   OneofDescriptorProto *v12; // rdx
-			//   FileDescriptor *v13; // r8
-			//   MessageDescriptor *v14; // r9
-			//   ClampedFloatParameter *v15; // rax
-			//   ClampedFloatParameter *v16; // rdi
-			//   OneofDescriptorProto *v17; // rdx
-			//   FileDescriptor *v18; // r8
-			//   MessageDescriptor *v19; // r9
-			//   IntParameter *v20; // rax
-			//   ClampedIntParameter *v21; // rdi
-			//   OneofDescriptorProto *v22; // rdx
-			//   FileDescriptor *v23; // r8
-			//   MessageDescriptor *v24; // r9
-			//   String__Array *overrideState; // [rsp+20h] [rbp-18h]
-			//   String__Array *overrideStateb; // [rsp+20h] [rbp-18h]
-			//   String__Array *overrideStatec; // [rsp+20h] [rbp-18h]
-			//   String__Array *overrideStatea; // [rsp+20h] [rbp-18h]
-			//   MethodInfo *methoda; // [rsp+28h] [rbp-10h]
-			//   MethodInfo *methodc; // [rsp+28h] [rbp-10h]
-			//   MethodInfo *methodd; // [rsp+28h] [rbp-10h]
-			//   MethodInfo *methodb; // [rsp+28h] [rbp-10h]
-			//   MethodInfo *v33; // [rsp+30h] [rbp-8h]
-			//   MethodInfo *v34; // [rsp+30h] [rbp-8h]
-			//   MethodInfo *v35; // [rsp+30h] [rbp-8h]
-			//   MethodInfo *v36; // [rsp+30h] [rbp-8h]
-			// 
-			//   if ( !byte_18D8ED9DB )
-			//   {
-			//     sub_18003C530(&TypeInfo::UnityEngine::Rendering::BoolParameter);
-			//     sub_18003C530(&TypeInfo::UnityEngine::Rendering::ClampedFloatParameter);
-			//     sub_18003C530(&TypeInfo::UnityEngine::Rendering::ClampedIntParameter);
-			//     byte_18D8ED9DB = 1;
-			//   }
-			//   v3 = (BoolParameter *)sub_180004920(TypeInfo::UnityEngine::Rendering::BoolParameter);
-			//   v6 = v3;
-			//   if ( !v3 )
-			//     goto LABEL_8;
-			//   UnityEngine::Rendering::BoolParameter::BoolParameter(v3, 0, 0, 0LL);
-			//   this.fields.enable = v6;
-			//   sub_1800054D0((OneofDescriptor *)&this.fields.enable, v7, v8, v9, overrideState, (String *)methoda, v33);
-			//   v10 = (ClampedFloatParameter *)sub_180004920(TypeInfo::UnityEngine::Rendering::ClampedFloatParameter);
-			//   v11 = v10;
-			//   if ( !v10 )
-			//     goto LABEL_8;
-			//   UnityEngine::Rendering::ClampedFloatParameter::ClampedFloatParameter(v10, 30.0, 0.0, 360.0, 0, 0LL);
-			//   this.fields.shutterAngle = v11;
-			//   sub_1800054D0((OneofDescriptor *)&this.fields.shutterAngle, v12, v13, v14, overrideStateb, (String *)methodc, v34);
-			//   v15 = (ClampedFloatParameter *)sub_180004920(TypeInfo::UnityEngine::Rendering::ClampedFloatParameter);
-			//   v16 = v15;
-			//   if ( !v15
-			//     || (UnityEngine::Rendering::ClampedFloatParameter::ClampedFloatParameter(v15, 0.0, 0.0, 1.0, 0, 0LL),
-			//         this.fields.blendFrame = v16,
-			//         sub_1800054D0(
-			//           (OneofDescriptor *)&this.fields.blendFrame,
-			//           v17,
-			//           v18,
-			//           v19,
-			//           overrideStatec,
-			//           (String *)methodd,
-			//           v35),
-			//         v20 = (IntParameter *)sub_180004920(TypeInfo::UnityEngine::Rendering::ClampedIntParameter),
-			//         (v21 = (ClampedIntParameter *)v20) == 0LL) )
-			//   {
-			// LABEL_8:
-			//     sub_180B536AC(v5, v4);
-			//   }
-			//   UnityEngine::Rendering::IntParameter::IntParameter(v20, 8, 0, 0LL);
-			//   v21.fields.min = 4;
-			//   v21.fields.max = 12;
-			//   this.fields.sampleCount = v21;
-			//   sub_1800054D0((OneofDescriptor *)&this.fields.sampleCount, v22, v23, v24, overrideStatea, (String *)methodb, v36);
-			//   UnityEngine::Rendering::VolumeComponent::VolumeComponent((VolumeComponent *)this, 0LL);
-			// }
-			// 
+		  BoolParameter *v3; // rax
+		  Type *v4; // rdx
+		  __int64 v5; // rcx
+		  PropertyInfo_1 *v6; // r8
+		  Int32__Array **v7; // r9
+		  __int64 v8; // rax
+		  PropertyInfo_1 *v9; // r8
+		  Int32__Array **v10; // r9
+		  __int64 v11; // rax
+		  PropertyInfo_1 *v12; // r8
+		  Int32__Array **v13; // r9
+		  IntParameter *v14; // rax
+		  ClampedIntParameter *v15; // rdi
+		  Type *v16; // rdx
+		  PropertyInfo_1 *v17; // r8
+		  Int32__Array **v18; // r9
+		  MethodInfo *v19; // [rsp+20h] [rbp-8h]
+		  MethodInfo *v20; // [rsp+20h] [rbp-8h]
+		  MethodInfo *v21; // [rsp+20h] [rbp-8h]
+		  MethodInfo *v22; // [rsp+20h] [rbp-8h]
+		
+		  v3 = (BoolParameter *)sub_1800368D0(TypeInfo::UnityEngine::Rendering::BoolParameter);
+		  if ( !v3 )
+		    goto LABEL_6;
+		  v3->fields._.m_Value = 0;
+		  v3->fields._._.overrideState = 0;
+		  this->fields.enable = v3;
+		  sub_18002D1B0((SingleFieldAccessor *)&this->fields.enable, v4, v6, v7, v19);
+		  v8 = sub_1800368D0(TypeInfo::UnityEngine::Rendering::ClampedFloatParameter);
+		  if ( !v8 )
+		    goto LABEL_6;
+		  *(_DWORD *)(v8 + 24) = 1106247680;
+		  *(_BYTE *)(v8 + 16) = 0;
+		  *(_DWORD *)(v8 + 32) = 0;
+		  *(_DWORD *)(v8 + 36) = 1135869952;
+		  *(_DWORD *)(v8 + 40) = 1065353216;
+		  this->fields.shutterAngle = (ClampedFloatParameter *)v8;
+		  sub_18002D1B0((SingleFieldAccessor *)&this->fields.shutterAngle, v4, v9, v10, v20);
+		  v11 = sub_1800368D0(TypeInfo::UnityEngine::Rendering::ClampedFloatParameter);
+		  if ( !v11 )
+		    goto LABEL_6;
+		  *(_DWORD *)(v11 + 24) = 0;
+		  *(_BYTE *)(v11 + 16) = 0;
+		  *(_DWORD *)(v11 + 32) = 0;
+		  *(_DWORD *)(v11 + 36) = 1065353216;
+		  *(_DWORD *)(v11 + 40) = 1065353216;
+		  this->fields.blendFrame = (ClampedFloatParameter *)v11;
+		  sub_18002D1B0((SingleFieldAccessor *)&this->fields.blendFrame, v4, v12, v13, v21);
+		  v14 = (IntParameter *)sub_1800368D0(TypeInfo::UnityEngine::Rendering::ClampedIntParameter);
+		  v15 = (ClampedIntParameter *)v14;
+		  if ( !v14 )
+		LABEL_6:
+		    sub_1800D8260(v5, v4);
+		  UnityEngine::Rendering::IntParameter::IntParameter(v14, 8, 0, 0LL);
+		  v15->fields.min = 4;
+		  v15->fields.max = 12;
+		  this->fields.sampleCount = v15;
+		  sub_18002D1B0((SingleFieldAccessor *)&this->fields.sampleCount, v16, v17, v18, v22);
+		  UnityEngine::Rendering::VolumeComponent::VolumeComponent((VolumeComponent *)this, 0LL);
 		}
-
-		public bool IsActive()
+		
+	
+		// Methods
+		public bool IsActive() => default; // 0x0000000183C23680-0x0000000183C23790
+		// Boolean IsActive()
+		bool HG::Rendering::Runtime::HGMotionBlur::IsActive(HGMotionBlur *this, MethodInfo *method)
 		{
-			// // Boolean IsActive()
-			// bool HG::Rendering::Runtime::HGMotionBlur::IsActive(HGMotionBlur *this, MethodInfo *method)
-			// {
-			//   struct ILFixDynamicMethodWrapper_2__Class *v3; // rcx
-			//   int *wrapperArray; // rdx
-			//   bool result; // al
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			// 
-			//   if ( !byte_18D8EDC37 )
-			//   {
-			//     sub_18003C530(&TypeInfo::IFix::ILFixDynamicMethodWrapper);
-			//     byte_18D8EDC37 = 1;
-			//   }
-			//   v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper._1.cctor_finished_or_no_cctor )
-			//   {
-			//     il2cpp_runtime_class_init_0(TypeInfo::IFix::ILFixDynamicMethodWrapper, method);
-			//     v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   }
-			//   wrapperArray = (int *)v3.static_fields.wrapperArray;
-			//   if ( !wrapperArray )
-			//     goto LABEL_10;
-			//   if ( wrapperArray[6] > 1004 )
-			//   {
-			//     if ( !v3._1.cctor_finished_or_no_cctor )
-			//     {
-			//       il2cpp_runtime_class_init_0(v3, wrapperArray);
-			//       v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//     }
-			//     v3 = (struct ILFixDynamicMethodWrapper_2__Class *)v3.static_fields.wrapperArray;
-			//     if ( !v3 )
-			//       goto LABEL_10;
-			//     if ( LODWORD(v3._0.namespaze) <= 0x3EC )
-			//       sub_180070270(v3, wrapperArray);
-			//     if ( v3[21]._0.implementedInterfaces )
-			//     {
-			//       Patch = IFix::WrappersManagerImpl::GetPatch(1004, 0LL);
-			//       if ( Patch )
-			//         return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_8((ILFixDynamicMethodWrapper_27 *)Patch, (Object *)this, 0LL);
-			//       goto LABEL_10;
-			//     }
-			//   }
-			//   wrapperArray = (int *)this.fields.enable;
-			//   if ( !wrapperArray )
-			//     goto LABEL_10;
-			//   result = sub_1800023D0(10LL, wrapperArray);
-			//   if ( result )
-			//   {
-			//     wrapperArray = (int *)this.fields.shutterAngle;
-			//     if ( wrapperArray )
-			//       return sub_18003F9B0(10LL, wrapperArray) > 0.0;
-			// LABEL_10:
-			//     sub_180B536AC(v3, wrapperArray);
-			//   }
-			//   return result;
-			// }
-			// 
-			return default(bool);
+		  struct ILFixDynamicMethodWrapper_2__Class *v3; // rcx
+		  ClampedFloatParameter *wrapperArray; // rdx
+		  BoolParameter *enable; // rbx
+		  bool (*v6)(RuntimeType *, MethodInfo *); // r8
+		  Il2CppMethodPointer methodPtr; // rdx
+		  bool result; // al
+		  VolumeParameter__Fields v9; // rax
+		  char v10; // al
+		  VolumeParameter__Fields v11; // rax
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  double v13; // xmm0_8
+		
+		  v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(TypeInfo::IFix::ILFixDynamicMethodWrapper);
+		    v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  wrapperArray = (ClampedFloatParameter *)v3->static_fields->wrapperArray;
+		  if ( !wrapperArray )
+		    goto LABEL_23;
+		  if ( SLODWORD(wrapperArray->fields._._.m_Value) > 1114 )
+		  {
+		    if ( !v3->_1.cctor_finished_or_no_cctor )
+		    {
+		      il2cpp_runtime_class_init_1(v3);
+		      v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		    }
+		    v3 = (struct ILFixDynamicMethodWrapper_2__Class *)v3->static_fields->wrapperArray;
+		    if ( !v3 )
+		      goto LABEL_23;
+		    if ( LODWORD(v3->_0.namespaze) <= 0x45A )
+		      sub_1800D2AB0(v3, wrapperArray);
+		    if ( *(_QWORD *)&v3[23]._1.interfaces_count )
+		    {
+		      Patch = IFix::WrappersManagerImpl::GetPatch(1114, 0LL);
+		      if ( Patch )
+		        return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_14(
+		                 (ILFixDynamicMethodWrapper_20 *)Patch,
+		                 (Object *)this,
+		                 0LL);
+		      goto LABEL_23;
+		    }
+		  }
+		  enable = this->fields.enable;
+		  if ( !enable )
+		    goto LABEL_23;
+		  sub_1800049A0(enable->klass);
+		  v6 = (bool (*)(RuntimeType *, MethodInfo *))enable->klass->vtable.get_value.method;
+		  methodPtr = enable->klass->vtable.set_value.methodPtr;
+		  if ( v6 == System::RuntimeType::HasElementTypeImpl )
+		  {
+		    v9 = enable->fields._._;
+		    if ( (*(_DWORD *)(*(_QWORD *)&v9 + 8LL) & 0x20000000) != 0 )
+		      goto LABEL_22;
+		    v10 = *(_BYTE *)(*(_QWORD *)&v9 + 10LL);
+		    if ( v10 == 29 || v10 == 16 || v10 == 20 || v10 == 15 )
+		      goto LABEL_22;
+		LABEL_17:
+		    result = 0;
+		    goto LABEL_10;
+		  }
+		  if ( v6 == System::RuntimeType::get_IsGenericType )
+		  {
+		    result = System::RuntimeTypeHandle::HasInstantiation(enable, methodPtr);
+		    goto LABEL_10;
+		  }
+		  if ( v6 != System::RuntimeType::get_IsGenericParameter )
+		  {
+		    result = ((__int64 (__fastcall *)(BoolParameter *, Il2CppMethodPointer))v6)(enable, methodPtr);
+		    goto LABEL_10;
+		  }
+		  v11 = enable->fields._._;
+		  if ( (*(_DWORD *)(*(_QWORD *)&v11 + 8LL) & 0x20000000) != 0
+		    || *(_BYTE *)(*(_QWORD *)&v11 + 10LL) != 19 && *(_BYTE *)(*(_QWORD *)&v11 + 10LL) != 30 )
+		  {
+		    goto LABEL_17;
+		  }
+		LABEL_22:
+		  result = 1;
+		LABEL_10:
+		  if ( result )
+		  {
+		    wrapperArray = this->fields.shutterAngle;
+		    if ( wrapperArray )
+		    {
+		      v13 = sub_1800057D0(10LL, wrapperArray);
+		      return *(float *)&v13 > 0.0;
+		    }
+		LABEL_23:
+		    sub_1800D8260(v3, wrapperArray);
+		  }
+		  return result;
 		}
-
-		public BoolParameter enable;
-
-		public ClampedFloatParameter shutterAngle;
-
-		public ClampedFloatParameter blendFrame;
-
-		public ClampedIntParameter sampleCount;
+		
 	}
 }

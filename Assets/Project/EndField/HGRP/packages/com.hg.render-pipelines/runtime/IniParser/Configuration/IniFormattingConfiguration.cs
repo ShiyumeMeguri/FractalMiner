@@ -1,429 +1,276 @@
-﻿using System;
+using System;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using IniParser;
+
+// Image 4: HG.RenderPipelines.Runtime.dll - Assembly: HG.RenderPipelines.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null - Types 37354-38879
 
 namespace IniParser.Configuration
 {
-	public class IniFormattingConfiguration : IDeepCloneable<IniFormattingConfiguration>
+	public class IniFormattingConfiguration : IDeepCloneable<IniFormattingConfiguration> // TypeDefIndex: 37387
 	{
-		// (get) Token: 0x060000C1 RID: 193 RVA: 0x000025D2 File Offset: 0x000007D2
-		public string NewLineString
+		// Fields
+		private uint _numSpacesBetweenKeyAndAssigment; // 0x2C
+		private uint _numSpacesBetweenAssigmentAndValue; // 0x30
+	
+		// Properties
+		public string NewLineString { get => default; } // 0x0000000189B31654-0x0000000189B31668 
+		// String get_NewLineString()
+		String *IniParser::Configuration::IniFormattingConfiguration::get_NewLineString(
+		        IniFormattingConfiguration *this,
+		        MethodInfo *method)
 		{
-			get
-			{
-				// // String get_NewLineString()
-				// String *IniParser::Configuration::IniFormattingConfiguration::get_NewLineString(
-				//         IniFormattingConfiguration *this,
-				//         MethodInfo *method)
-				// {
-				//   String *result; // rax
-				// 
-				//   if ( !byte_18D9192F8 )
-				//   {
-				//     sub_18003C530(&off_18C907FF0);
-				//     sub_18003C530(&off_18C95A0C8);
-				//     byte_18D9192F8 = 1;
-				//   }
-				//   result = (String *)"\n";
-				//   if ( !this.fields._NewLineType_k__BackingField )
-				//     return (String *)"\r\n";
-				//   return result;
-				// }
-				// 
-				return null;
-			}
+		  String *result; // rax
+		
+		  result = (String *)"\n";
+		  if ( !this->fields._NewLineType_k__BackingField )
+		    return (String *)"\r\n";
+		  return result;
 		}
-
-		// (get) Token: 0x060000C2 RID: 194 RVA: 0x00002668 File Offset: 0x00000868
-		// (set) Token: 0x060000C3 RID: 195 RVA: 0x000025D0 File Offset: 0x000007D0
-		public IniFormattingConfiguration.ENewLine NewLineType
+		
+		public ENewLine NewLineType { get; set; } // 0x0000000182B2E2D0-0x0000000182B2E2E0 0x00000001814F51F0-0x00000001814F5220
+		// MjfRFftkTcBeBOoxrCKsCyjeiVkX get_Current()
+		MjfRFftkTcBeBOoxrCKsCyjeiVkX Rewired::Utils::Classes::Data::RingBuffer_1_T_::VFEweixJrFjiYwjUzBFjtcEMiCZW<MjfRFftkTcBeBOoxrCKsCyjeiVkX>::get_Current(
+		        RingBuffer_1_T_VFEweixJrFjiYwjUzBFjtcEMiCZW_MjfRFftkTcBeBOoxrCKsCyjeiVkX_ *this,
+		        MethodInfo *method)
 		{
-			[CompilerGenerated]
-			get
-			{
-				// // MjfRFftkTcBeBOoxrCKsCyjeiVkX get_Current()
-				// MjfRFftkTcBeBOoxrCKsCyjeiVkX Rewired::Utils::Classes::Data::RingBuffer_1_T_::VFEweixJrFjiYwjUzBFjtcEMiCZW<MjfRFftkTcBeBOoxrCKsCyjeiVkX>::get_Current(
-				//         RingBuffer_1_T_VFEweixJrFjiYwjUzBFjtcEMiCZW_MjfRFftkTcBeBOoxrCKsCyjeiVkX_ *this,
-				//         MethodInfo *method)
-				// {
-				//   return this.current;
-				// }
-				// 
-				return IniFormattingConfiguration.ENewLine.Windows;
-			}
-			[CompilerGenerated]
-			set
-			{
-				// // UpdateLoopDataSet`1[T]+yGyjUqbndvpPzKlyNzUYInPtwsHF[System.Object](UpdateLoopType)
-				// void Rewired::UpdateLoopDataSet_1_T_::yGyjUqbndvpPzKlyNzUYInPtwsHF<System::Object>::yGyjUqbndvpPzKlyNzUYInPtwsHF(
-				//         UpdateLoopDataSet_1_T_yGyjUqbndvpPzKlyNzUYInPtwsHF_System_Object_ *this,
-				//         UpdateLoopType__Enum param_0004ff5a,
-				//         MethodInfo *method)
-				// {
-				//   this.fields.URsVCNeXtjuGuUuIdAEYavYwEgUe = param_0004ff5a;
-				// }
-				// 
-			}
+		  return this->current;
 		}
+		
 
-		// (set) Token: 0x060000C4 RID: 196 RVA: 0x000025D0 File Offset: 0x000007D0
-		public uint NumSpacesBetweenKeyAndAssigment
+		// UpdateLoopDataSet`1[T]+yGyjUqbndvpPzKlyNzUYInPtwsHF[System.Object](UpdateLoopType)
+		void Rewired::UpdateLoopDataSet_1_T_::yGyjUqbndvpPzKlyNzUYInPtwsHF<System::Object>::yGyjUqbndvpPzKlyNzUYInPtwsHF(
+		        UpdateLoopDataSet_1_T_yGyjUqbndvpPzKlyNzUYInPtwsHF_System_Object_ *this,
+		        UpdateLoopType__Enum param_000585ac,
+		        MethodInfo *method)
 		{
-			set
-			{
-				// // Void set_NumSpacesBetweenKeyAndAssigment(UInt32)
-				// void IniParser::Configuration::IniFormattingConfiguration::set_NumSpacesBetweenKeyAndAssigment(
-				//         IniFormattingConfiguration *this,
-				//         uint32_t value,
-				//         MethodInfo *method)
-				// {
-				//   UberPostPassUtils_ColorGradingData **v4; // rdx
-				//   VolumetricPipelineRT **v5; // r8
-				//   Transform **v6; // r9
-				//   MeshRenderer **v7; // [rsp+50h] [rbp+28h]
-				//   Vector3 *v8; // [rsp+58h] [rbp+30h]
-				//   Quaternion *v9; // [rsp+60h] [rbp+38h]
-				//   Vector3 *v10; // [rsp+68h] [rbp+40h]
-				//   Object *v11; // [rsp+70h] [rbp+48h]
-				//   Object *v12; // [rsp+78h] [rbp+50h]
-				//   Object *v13; // [rsp+80h] [rbp+58h]
-				//   Object *v14; // [rsp+88h] [rbp+60h]
-				//   MethodInfo *v15; // [rsp+90h] [rbp+68h]
-				// 
-				//   this.fields._numSpacesBetweenKeyAndAssigment = value;
-				//   this.fields._SpacesBetweenKeyAndAssigment_k__BackingField = System::String::Ctor(0x20u, value, 0LL);
-				//   sub_1800054D0(
-				//     (ILFixDynamicMethodWrapper_2 *)&this.fields._SpacesBetweenKeyAndAssigment_k__BackingField,
-				//     v4,
-				//     v5,
-				//     v6,
-				//     v7,
-				//     v8,
-				//     v9,
-				//     v10,
-				//     v11,
-				//     v12,
-				//     v13,
-				//     v14,
-				//     v15);
-				// }
-				// 
-			}
+		  this->fields.URsVCNeXtjuGuUuIdAEYavYwEgUe = param_000585ac;
 		}
-
-		// (get) Token: 0x060000C5 RID: 197 RVA: 0x000025D2 File Offset: 0x000007D2
-		// (set) Token: 0x060000C6 RID: 198 RVA: 0x000025D0 File Offset: 0x000007D0
-		public string SpacesBetweenKeyAndAssigment
+		
+		public uint NumSpacesBetweenKeyAndAssigment { set {} } // 0x0000000189B31694-0x0000000189B316C0
+		// Void set_NumSpacesBetweenKeyAndAssigment(UInt32)
+		void IniParser::Configuration::IniFormattingConfiguration::set_NumSpacesBetweenKeyAndAssigment(
+		        IniFormattingConfiguration *this,
+		        uint32_t value,
+		        MethodInfo *method)
 		{
-			[CompilerGenerated]
-			get
-			{
-				// // Object System.Collections.IEnumerator.get_Current()
-				// Object *Rewired::Platforms::Custom::HardwareJoystickMapCustomPlatformMap_1_TMatchingCriteria_::vFJqwhcHvHdpsRAHqwODiJDbwkcr<System::Object>::System_Collections_IEnumerator_get_Current(
-				//         HardwareJoystickMapCustomPlatformMap_1_TMatchingCriteria_vFJqwhcHvHdpsRAHqwODiJDbwkcr_System_Object_ *this,
-				//         MethodInfo *method)
-				// {
-				//   return (Object *)this.fields.YcoKziTgrGqKCwJTNRuXadHqwkUP;
-				// }
-				// 
-				return null;
-			}
-			[CompilerGenerated]
-			private set
-			{
-				// // Void set_getValueDelegate(Func`1[Boolean])
-				// void Rewired::Utils::Classes::Utility::ValueWatcher<bool>::set_getValueDelegate(
-				//         ValueWatcher_1_System_Boolean_ *this,
-				//         Func_1_Boolean_ *value,
-				//         MethodInfo *method)
-				// {
-				//   Object__Array *v3; // r9
-				//   MethodInfo *v4; // [rsp+28h] [rbp+28h]
-				//   MethodInfo *v5; // [rsp+30h] [rbp+30h]
-				// 
-				//   this.fields.MHRAQZbVaKflzQthDWnBRvhnUSmRA = value;
-				//   sub_1800054D0(
-				//     (BSP *)&this.fields.MHRAQZbVaKflzQthDWnBRvhnUSmRA,
-				//     (IEnumerable_1_HG_Rendering_Runtime_CSG_CSGPolygon_ *)value,
-				//     (Bounds *)method,
-				//     v3,
-				//     v4,
-				//     v5);
-				// }
-				// 
-			}
+		  UberPostPassUtils_ColorGradingData **v4; // rdx
+		  VolumetricPipelineRT **v5; // r8
+		  VolumetricPipelineRT **v6; // r9
+		  VolumetricPipelineRT **v7; // [rsp+50h] [rbp+28h]
+		  MethodInfo *v8; // [rsp+58h] [rbp+30h]
+		
+		  this->fields._numSpacesBetweenKeyAndAssigment = value;
+		  this->fields._SpacesBetweenKeyAndAssigment_k__BackingField = System::String::Ctor(0x20u, value, 0LL);
+		  sub_18002D1B0(
+		    (ILFixDynamicMethodWrapper_2 *)&this->fields._SpacesBetweenKeyAndAssigment_k__BackingField,
+		    v4,
+		    v5,
+		    v6,
+		    v7,
+		    v8);
 		}
-
-		// (set) Token: 0x060000C7 RID: 199 RVA: 0x000025D0 File Offset: 0x000007D0
-		public uint NumSpacesBetweenAssigmentAndValue
+		
+		public string SpacesBetweenKeyAndAssigment { get; private set; } // 0x000000018385B100-0x000000018385B110 0x0000000185392C40-0x0000000185392C50
+		// Object System.Collections.IEnumerator.get_Current()
+		Object *Rewired::Platforms::Custom::HardwareJoystickMapCustomPlatformMap_1_TMatchingCriteria_::vFJqwhcHvHdpsRAHqwODiJDbwkcr<System::Object>::System_Collections_IEnumerator_get_Current(
+		        HardwareJoystickMapCustomPlatformMap_1_TMatchingCriteria_vFJqwhcHvHdpsRAHqwODiJDbwkcr_System_Object_ *this,
+		        MethodInfo *method)
 		{
-			set
-			{
-				// // Void set_NumSpacesBetweenAssigmentAndValue(UInt32)
-				// void IniParser::Configuration::IniFormattingConfiguration::set_NumSpacesBetweenAssigmentAndValue(
-				//         IniFormattingConfiguration *this,
-				//         uint32_t value,
-				//         MethodInfo *method)
-				// {
-				//   UberPostPassUtils_ColorGradingData **v4; // rdx
-				//   VolumetricPipelineRT **v5; // r8
-				//   Transform **v6; // r9
-				//   MeshRenderer **v7; // [rsp+50h] [rbp+28h]
-				//   Vector3 *v8; // [rsp+58h] [rbp+30h]
-				//   Quaternion *v9; // [rsp+60h] [rbp+38h]
-				//   Vector3 *v10; // [rsp+68h] [rbp+40h]
-				//   Object *v11; // [rsp+70h] [rbp+48h]
-				//   Object *v12; // [rsp+78h] [rbp+50h]
-				//   Object *v13; // [rsp+80h] [rbp+58h]
-				//   Object *v14; // [rsp+88h] [rbp+60h]
-				//   MethodInfo *v15; // [rsp+90h] [rbp+68h]
-				// 
-				//   this.fields._numSpacesBetweenAssigmentAndValue = value;
-				//   this.fields._SpacesBetweenAssigmentAndValue_k__BackingField = System::String::Ctor(0x20u, value, 0LL);
-				//   sub_1800054D0(
-				//     (ILFixDynamicMethodWrapper_2 *)&this.fields._SpacesBetweenAssigmentAndValue_k__BackingField,
-				//     v4,
-				//     v5,
-				//     v6,
-				//     v7,
-				//     v8,
-				//     v9,
-				//     v10,
-				//     v11,
-				//     v12,
-				//     v13,
-				//     v14,
-				//     v15);
-				// }
-				// 
-			}
+		  return (Object *)this->fields.YcoKziTgrGqKCwJTNRuXadHqwkUP;
 		}
+		
 
-		// (get) Token: 0x060000C8 RID: 200 RVA: 0x000025D2 File Offset: 0x000007D2
-		// (set) Token: 0x060000C9 RID: 201 RVA: 0x000025D0 File Offset: 0x000007D0
-		public string SpacesBetweenAssigmentAndValue
+		// Void set_getValueDelegate(Func`1[Boolean])
+		void Rewired::Utils::Classes::Utility::ValueWatcher<bool>::set_getValueDelegate(
+		        ValueWatcher_1_System_Boolean_ *this,
+		        Func_1_Boolean_ *value,
+		        MethodInfo *method)
 		{
-			[CompilerGenerated]
-			get
-			{
-				// // Func`1[Single] get_getValueDelegate()
-				// Func_1_Single_ *Rewired::Utils::Classes::Utility::ValueWatcher<float>::get_getValueDelegate(
-				//         ValueWatcher_1_System_Single_ *this,
-				//         MethodInfo *method)
-				// {
-				//   return this.fields.MHRAQZbVaKflzQthDWnBRvhnUSmRA;
-				// }
-				// 
-				return null;
-			}
-			[CompilerGenerated]
-			private set
-			{
-				// // Void set_getValueDelegate(Func`1[Single])
-				// void Rewired::Utils::Classes::Utility::ValueWatcher<float>::set_getValueDelegate(
-				//         ValueWatcher_1_System_Single_ *this,
-				//         Func_1_Single_ *value,
-				//         MethodInfo *method)
-				// {
-				//   Object__Array *v3; // r9
-				//   MethodInfo *v4; // [rsp+28h] [rbp+28h]
-				//   MethodInfo *v5; // [rsp+30h] [rbp+30h]
-				// 
-				//   this.fields.MHRAQZbVaKflzQthDWnBRvhnUSmRA = value;
-				//   sub_1800054D0(
-				//     (BSP *)&this.fields.MHRAQZbVaKflzQthDWnBRvhnUSmRA,
-				//     (IEnumerable_1_HG_Rendering_Runtime_CSG_CSGPolygon_ *)value,
-				//     (Bounds *)method,
-				//     v3,
-				//     v4,
-				//     v5);
-				// }
-				// 
-			}
+		  VolumetricPipelineRT **v3; // r9
+		  VolumetricPipelineRT **v4; // [rsp+28h] [rbp+28h]
+		  MethodInfo *v5; // [rsp+30h] [rbp+30h]
+		
+		  this->fields.MHRAQZbVaKflzQthDWnBRvhnUSmRA = value;
+		  sub_18002D1B0(
+		    (ILFixDynamicMethodWrapper_2 *)&this->fields.MHRAQZbVaKflzQthDWnBRvhnUSmRA,
+		    (UberPostPassUtils_ColorGradingData **)value,
+		    (VolumetricPipelineRT **)method,
+		    v3,
+		    v4,
+		    v5);
 		}
-
-		// (get) Token: 0x060000CA RID: 202 RVA: 0x000025D8 File Offset: 0x000007D8
-		// (set) Token: 0x060000CB RID: 203 RVA: 0x000025D0 File Offset: 0x000007D0
-		public bool NewLineBeforeSection
+		
+		public uint NumSpacesBetweenAssigmentAndValue { set {} } // 0x0000000189B31668-0x0000000189B31694
+		// Void set_NumSpacesBetweenAssigmentAndValue(UInt32)
+		void IniParser::Configuration::IniFormattingConfiguration::set_NumSpacesBetweenAssigmentAndValue(
+		        IniFormattingConfiguration *this,
+		        uint32_t value,
+		        MethodInfo *method)
 		{
-			[CompilerGenerated]
-			get
-			{
-				// // Boolean get_isRunning()
-				// bool UnityEngine::UIElements::Experimental::ValueAnimation<UnityEngine::UIElements::Experimental::StyleValues>::get_isRunning(
-				//         ValueAnimation_1_StyleValues_ *this,
-				//         MethodInfo *method)
-				// {
-				//   return this.fields._isRunning_k__BackingField;
-				// }
-				// 
-				return default(bool);
-			}
-			[CompilerGenerated]
-			set
-			{
-				// // Void set_isRunning(Boolean)
-				// void UnityEngine::UIElements::Experimental::ValueAnimation<UnityEngine::UIElements::Experimental::StyleValues>::set_isRunning(
-				//         ValueAnimation_1_StyleValues_ *this,
-				//         bool value,
-				//         MethodInfo *method)
-				// {
-				//   this.fields._isRunning_k__BackingField = value;
-				// }
-				// 
-			}
+		  UberPostPassUtils_ColorGradingData **v4; // rdx
+		  VolumetricPipelineRT **v5; // r8
+		  VolumetricPipelineRT **v6; // r9
+		  VolumetricPipelineRT **v7; // [rsp+50h] [rbp+28h]
+		  MethodInfo *v8; // [rsp+58h] [rbp+30h]
+		
+		  this->fields._numSpacesBetweenAssigmentAndValue = value;
+		  this->fields._SpacesBetweenAssigmentAndValue_k__BackingField = System::String::Ctor(0x20u, value, 0LL);
+		  sub_18002D1B0(
+		    (ILFixDynamicMethodWrapper_2 *)&this->fields._SpacesBetweenAssigmentAndValue_k__BackingField,
+		    v4,
+		    v5,
+		    v6,
+		    v7,
+		    v8);
 		}
-
-		// (get) Token: 0x060000CC RID: 204 RVA: 0x000025D8 File Offset: 0x000007D8
-		// (set) Token: 0x060000CD RID: 205 RVA: 0x000025D0 File Offset: 0x000007D0
-		public bool NewLineAfterSection
+		
+		public string SpacesBetweenAssigmentAndValue { get; private set; } // 0x0000000184D862C0-0x0000000184D862D0 0x0000000185390F40-0x0000000185390F50
+		// Func`1[Single] get_getValueDelegate()
+		Func_1_Single_ *Rewired::Utils::Classes::Utility::ValueWatcher<float>::get_getValueDelegate(
+		        ValueWatcher_1_System_Single_ *this,
+		        MethodInfo *method)
 		{
-			[CompilerGenerated]
-			get
-			{
-				// // Boolean get_defaultValue()
-				// bool HG::Rendering::Runtime::SettingParameter<bool>::get_defaultValue(
-				//         SettingParameter_1_System_Boolean_ *this,
-				//         MethodInfo *method)
-				// {
-				//   return this.fields._defaultValue_k__BackingField;
-				// }
-				// 
-				return default(bool);
-			}
-			[CompilerGenerated]
-			set
-			{
-				// // Void set_defaultValue(Boolean)
-				// void HG::Rendering::Runtime::SettingParameter<bool>::set_defaultValue(
-				//         SettingParameter_1_System_Boolean_ *this,
-				//         bool value,
-				//         MethodInfo *method)
-				// {
-				//   this.fields._defaultValue_k__BackingField = value;
-				// }
-				// 
-			}
+		  return this->fields.MHRAQZbVaKflzQthDWnBRvhnUSmRA;
 		}
+		
 
-		// (get) Token: 0x060000CE RID: 206 RVA: 0x000025D8 File Offset: 0x000007D8
-		// (set) Token: 0x060000CF RID: 207 RVA: 0x000025D0 File Offset: 0x000007D0
-		public bool NewLineAfterProperty
+		// Void set_getValueDelegate(Func`1[Single])
+		void Rewired::Utils::Classes::Utility::ValueWatcher<float>::set_getValueDelegate(
+		        ValueWatcher_1_System_Single_ *this,
+		        Func_1_Single_ *value,
+		        MethodInfo *method)
 		{
-			[CompilerGenerated]
-			get
-			{
-				// // Boolean get_isKeyword()
-				// bool Beyond::Rendering::EntityVFXControllerBase::get_isKeyword(EntityVFXControllerBase *this, MethodInfo *method)
-				// {
-				//   return this.fields.m_isKeyword;
-				// }
-				// 
-				return default(bool);
-			}
-			[CompilerGenerated]
-			set
-			{
-				// // Void set_isMaterialAvailable(Boolean)
-				// void CriWare::CriManaMovieMaterialBase::set_isMaterialAvailable(
-				//         CriManaMovieMaterialBase *this,
-				//         bool value,
-				//         MethodInfo *method)
-				// {
-				//   this.fields._isMaterialAvailable_k__BackingField = value;
-				// }
-				// 
-			}
+		  VolumetricPipelineRT **v3; // r9
+		  VolumetricPipelineRT **v4; // [rsp+28h] [rbp+28h]
+		  MethodInfo *v5; // [rsp+30h] [rbp+30h]
+		
+		  this->fields.MHRAQZbVaKflzQthDWnBRvhnUSmRA = value;
+		  sub_18002D1B0(
+		    (ILFixDynamicMethodWrapper_2 *)&this->fields.MHRAQZbVaKflzQthDWnBRvhnUSmRA,
+		    (UberPostPassUtils_ColorGradingData **)value,
+		    (VolumetricPipelineRT **)method,
+		    v3,
+		    v4,
+		    v5);
 		}
-
-		// (get) Token: 0x060000D0 RID: 208 RVA: 0x000025D8 File Offset: 0x000007D8
-		// (set) Token: 0x060000D1 RID: 209 RVA: 0x000025D0 File Offset: 0x000007D0
-		public bool NewLineBeforeProperty
+		
+		public bool NewLineBeforeSection { get; set; } // 0x00000001811F33C0-0x00000001811F33D0 0x00000001811F33D0-0x00000001811F33E0
+		// Boolean get_isRunning()
+		bool UnityEngine::UIElements::Experimental::ValueAnimation<UnityEngine::UIElements::Experimental::StyleValues>::get_isRunning(
+		        ValueAnimation_1_StyleValues_ *this,
+		        MethodInfo *method)
 		{
-			[CompilerGenerated]
-			get
-			{
-				// // Boolean get_NewLineBeforeProperty()
-				// bool IniParser::Configuration::IniFormattingConfiguration::get_NewLineBeforeProperty(
-				//         IniFormattingConfiguration *this,
-				//         MethodInfo *method)
-				// {
-				//   return this.fields._NewLineBeforeProperty_k__BackingField;
-				// }
-				// 
-				return default(bool);
-			}
-			[CompilerGenerated]
-			set
-			{
-				// // Void set_rendererPriority(Boolean)
-				// void UnityEngine::Rendering::SupportedRenderingFeatures::set_rendererPriority(
-				//         SupportedRenderingFeatures *this,
-				//         bool value,
-				//         MethodInfo *method)
-				// {
-				//   this.fields._rendererPriority_k__BackingField = value;
-				// }
-				// 
-			}
+		  return this->fields._isRunning_k__BackingField;
 		}
+		
 
-		public IniFormattingConfiguration()
+		// Void set_isRunning(Boolean)
+		void UnityEngine::UIElements::Experimental::ValueAnimation<UnityEngine::UIElements::Experimental::StyleValues>::set_isRunning(
+		        ValueAnimation_1_StyleValues_ *this,
+		        bool value,
+		        MethodInfo *method)
 		{
-			// // IniFormattingConfiguration()
-			// void IniParser::Configuration::IniFormattingConfiguration::IniFormattingConfiguration(
-			//         IniFormattingConfiguration *this,
-			//         MethodInfo *method)
-			// {
-			//   String *NewLine; // rax
-			//   bool v4; // al
-			//   __int64 v5; // rdx
-			//   __int64 v6; // rcx
-			// 
-			//   if ( !byte_18D9192F7 )
-			//   {
-			//     sub_18003C530(&off_18C95A0C8);
-			//     byte_18D9192F7 = 1;
-			//   }
-			//   NewLine = System::Environment::get_NewLine(0LL);
-			//   v4 = System::String::Equals(NewLine, (String *)"\r\n", 0LL);
-			//   if ( !this )
-			//     sub_180B536AC(v6, v5);
-			//   this.fields._NewLineType_k__BackingField = !v4;
-			//   IniParser::Configuration::IniFormattingConfiguration::set_NumSpacesBetweenAssigmentAndValue(this, 1u, 0LL);
-			//   IniParser::Configuration::IniFormattingConfiguration::set_NumSpacesBetweenKeyAndAssigment(this, 1u, 0LL);
-			// }
-			// 
+		  this->fields._isRunning_k__BackingField = value;
 		}
-
-		public IniFormattingConfiguration DeepClone()
+		
+		public bool NewLineAfterSection { get; set; } // 0x0000000184D867B0-0x0000000184D867C0 0x0000000184D867C0-0x0000000184D867D0
+		// Boolean get_defaultValue()
+		bool HG::Rendering::Runtime::SettingParameter<bool>::get_defaultValue(
+		        SettingParameter_1_System_Boolean_ *this,
+		        MethodInfo *method)
 		{
-			// // IniFormattingConfiguration DeepClone()
-			// IniFormattingConfiguration *IniParser::Configuration::IniFormattingConfiguration::DeepClone(
-			//         IniFormattingConfiguration *this,
-			//         MethodInfo *method)
-			// {
-			//   __int64 v3; // rax
-			// 
-			//   if ( !byte_18D9192F9 )
-			//   {
-			//     sub_18003C530(&TypeInfo::IniParser::Configuration::IniFormattingConfiguration);
-			//     byte_18D9192F9 = 1;
-			//   }
-			//   v3 = System::CharEnumerator::Clone((System::CharEnumerator *)this);
-			//   return (IniFormattingConfiguration *)sub_18003F5A0(v3, TypeInfo::IniParser::Configuration::IniFormattingConfiguration);
-			// }
-			// 
-			return null;
+		  return this->fields._defaultValue_k__BackingField;
 		}
+		
 
-		private uint _numSpacesBetweenKeyAndAssigment;
-
-		private uint _numSpacesBetweenAssigmentAndValue;
-
-		public enum ENewLine
+		// Void set_defaultValue(Boolean)
+		void HG::Rendering::Runtime::SettingParameter<bool>::set_defaultValue(
+		        SettingParameter_1_System_Boolean_ *this,
+		        bool value,
+		        MethodInfo *method)
 		{
-			Windows,
-			Unix_Mac
+		  this->fields._defaultValue_k__BackingField = value;
 		}
+		
+		public bool NewLineAfterProperty { get; set; } // 0x0000000184D86CA0-0x0000000184D86CB0 0x0000000184D86CD0-0x0000000184D86CE0
+		// Boolean get_isMaterialAvailable()
+		bool CriWare::CriManaMovieMaterialBase::get_isMaterialAvailable(CriManaMovieMaterialBase *this, MethodInfo *method)
+		{
+		  return this->fields._isMaterialAvailable_k__BackingField;
+		}
+		
+
+		// Void set_isMaterialAvailable(Boolean)
+		void CriWare::CriManaMovieMaterialBase::set_isMaterialAvailable(
+		        CriManaMovieMaterialBase *this,
+		        bool value,
+		        MethodInfo *method)
+		{
+		  this->fields._isMaterialAvailable_k__BackingField = value;
+		}
+		
+		public bool NewLineBeforeProperty { get; set; } // 0x0000000184D86C90-0x0000000184D86CA0 0x0000000184D86CC0-0x0000000184D86CD0
+		// Boolean get_NewLineBeforeProperty()
+		bool IniParser::Configuration::IniFormattingConfiguration::get_NewLineBeforeProperty(
+		        IniFormattingConfiguration *this,
+		        MethodInfo *method)
+		{
+		  return this->fields._NewLineBeforeProperty_k__BackingField;
+		}
+		
+
+		// Void set_rendererPriority(Boolean)
+		void UnityEngine::Rendering::SupportedRenderingFeatures::set_rendererPriority(
+		        SupportedRenderingFeatures *this,
+		        bool value,
+		        MethodInfo *method)
+		{
+		  this->fields._rendererPriority_k__BackingField = value;
+		}
+		
+	
+		// Nested types
+		public enum ENewLine // TypeDefIndex: 37386
+		{
+			Windows = 0,
+			Unix_Mac = 1
+		}
+	
+		// Constructors
+		public IniFormattingConfiguration() {} // 0x0000000189B315F8-0x0000000189B31654
+		// IniFormattingConfiguration()
+		void IniParser::Configuration::IniFormattingConfiguration::IniFormattingConfiguration(
+		        IniFormattingConfiguration *this,
+		        MethodInfo *method)
+		{
+		  String *NewLine; // rax
+		  bool v4; // al
+		  __int64 v5; // rdx
+		  __int64 v6; // rcx
+		
+		  NewLine = System::Environment::get_NewLine(0LL);
+		  v4 = System::String::Equals(NewLine, (String *)"\r\n", 0LL);
+		  if ( !this )
+		    sub_1800D8260(v6, v5);
+		  this->fields._NewLineType_k__BackingField = !v4;
+		  IniParser::Configuration::IniFormattingConfiguration::set_NumSpacesBetweenAssigmentAndValue(this, 1u, 0LL);
+		  IniParser::Configuration::IniFormattingConfiguration::set_NumSpacesBetweenKeyAndAssigment(this, 1u, 0LL);
+		}
+		
+	
+		// Methods
+		public IniFormattingConfiguration DeepClone() => default; // 0x0000000189B315DC-0x0000000189B315F8
+		// IniFormattingConfiguration DeepClone()
+		IniFormattingConfiguration *IniParser::Configuration::IniFormattingConfiguration::DeepClone(
+		        IniFormattingConfiguration *this,
+		        MethodInfo *method)
+		{
+		  __int64 v2; // rax
+		
+		  v2 = System::CharEnumerator::Clone((System::CharEnumerator *)this);
+		  return (IniFormattingConfiguration *)sub_180005050(v2, TypeInfo::IniParser::Configuration::IniFormattingConfiguration);
+		}
+		
 	}
 }

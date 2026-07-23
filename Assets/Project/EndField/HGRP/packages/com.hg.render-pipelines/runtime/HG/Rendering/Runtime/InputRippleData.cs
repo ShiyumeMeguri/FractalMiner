@@ -1,18 +1,18 @@
-﻿using System;
-using System.Runtime.InteropServices;
+using System;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using UnityEngine;
+
+// Image 4: HG.RenderPipelines.Runtime.dll - Assembly: HG.RenderPipelines.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null - Types 37354-38879
 
 namespace HG.Rendering.Runtime
 {
-	[StructLayout(LayoutKind.Sequential, Pack = 1, Size = 20)]
-	public struct InputRippleData
+	public struct InputRippleData // TypeDefIndex: 38788
 	{
-		public Vector2 positionXZ;
-
-		public float size;
-
-		public float distanceXZ;
-
-		public float priority;
+		// Fields
+		public Vector2 positionXZ; // 0x00
+		public float size; // 0x08
+		public float distanceXZ; // 0x0C
+		public float priority; // 0x10
 	}
 }

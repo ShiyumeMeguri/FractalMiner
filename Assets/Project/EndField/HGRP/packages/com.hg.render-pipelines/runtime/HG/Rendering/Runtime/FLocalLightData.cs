@@ -1,36 +1,27 @@
-﻿using System;
-using System.Runtime.InteropServices;
+using System;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using UnityEngine;
+
+// Image 4: HG.RenderPipelines.Runtime.dll - Assembly: HG.RenderPipelines.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null - Types 37354-38879
 
 namespace HG.Rendering.Runtime
 {
-	[StructLayout(LayoutKind.Sequential, Pack = 1, Size = 80)]
-	public struct FLocalLightData
+	public struct FLocalLightData // TypeDefIndex: 38724
 	{
-		public Vector3 Position;
-
-		public float Radius;
-
-		public Vector3 Color;
-
-		public float InvRadius;
-
-		public Vector3 Direction;
-
-		public int bSpotLight;
-
-		public Vector2 SpotAngles;
-
-		public int bInverseSquared;
-
-		public float FalloffExponent;
-
-		public float ShadowIntensity;
-
-		public float MsScatteringFactor;
-
-		public float MsExtinctionFactor;
-
-		public float Padding;
+		// Fields
+		public Vector3 Position; // 0x00
+		public float Radius; // 0x0C
+		public Vector3 Color; // 0x10
+		public float InvRadius; // 0x1C
+		public Vector3 Direction; // 0x20
+		public int bSpotLight; // 0x2C
+		public Vector2 SpotAngles; // 0x30
+		public int bInverseSquared; // 0x38
+		public float FalloffExponent; // 0x3C
+		public float ShadowIntensity; // 0x40
+		public float MsScatteringFactor; // 0x44
+		public float MsExtinctionFactor; // 0x48
+		public float Padding; // 0x4C
 	}
 }

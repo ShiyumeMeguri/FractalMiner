@@ -1,91 +1,74 @@
-﻿using System;
+using System;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using UnityEngine;
+
+// Image 4: HG.RenderPipelines.Runtime.dll - Assembly: HG.RenderPipelines.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null - Types 37354-38879
 
 namespace HG.Rendering.Runtime
 {
-	public class HGFoliageOccluderRenderParams
+	public class HGFoliageOccluderRenderParams // TypeDefIndex: 37982
 	{
-		// (get) Token: 0x06000BEB RID: 3051 RVA: 0x000025D2 File Offset: 0x000007D2
-		public static HGFoliageOccluderRenderParams defaultParams
+		// Fields
+		public bool shouldRender; // 0x10
+		public bool curMaskIsA; // 0x11
+		public float lodFadeValue; // 0x14
+		public Matrix4x4 cullingMatrix; // 0x18
+	
+		// Properties
+		public static HGFoliageOccluderRenderParams defaultParams { get => default; } // 0x0000000182ED8C00-0x0000000182ED8C70 
+		// HGFoliageOccluderRenderParams get_defaultParams()
+		HGFoliageOccluderRenderParams *HG::Rendering::Runtime::HGFoliageOccluderRenderParams::get_defaultParams(
+		        MethodInfo *method)
 		{
-			get
-			{
-				// // HGFoliageOccluderRenderParams get_defaultParams()
-				// HGFoliageOccluderRenderParams *HG::Rendering::Runtime::HGFoliageOccluderRenderParams::get_defaultParams(
-				//         MethodInfo *method)
-				// {
-				//   __int64 v1; // rax
-				//   __int64 v2; // rdx
-				//   __int64 v3; // rcx
-				//   __int64 v4; // rbx
-				//   Matrix4x4 *zero; // rax
-				//   __int128 v6; // xmm0
-				//   __int128 v7; // xmm1
-				//   __int128 v8; // xmm2
-				//   __int128 v9; // xmm3
-				//   HGFoliageOccluderRenderParams *result; // rax
-				//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-				//   Matrix4x4 v12; // [rsp+20h] [rbp-48h] BYREF
-				// 
-				//   if ( !byte_18D8ED9B2 )
-				//   {
-				//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGFoliageOccluderRenderParams);
-				//     byte_18D8ED9B2 = 1;
-				//   }
-				//   if ( !IFix::WrappersManagerImpl::IsPatched(2170, 0LL) )
-				//   {
-				//     v1 = sub_180004920(TypeInfo::HG::Rendering::Runtime::HGFoliageOccluderRenderParams);
-				//     v4 = v1;
-				//     if ( v1 )
-				//     {
-				//       *(_WORD *)(v1 + 16) = 256;
-				//       *(_DWORD *)(v1 + 20) = 0;
-				//       zero = UnityEngine::Matrix4x4::get_zero(&v12, 0LL);
-				//       v6 = *(_OWORD *)&zero.m00;
-				//       v7 = *(_OWORD *)&zero.m01;
-				//       v8 = *(_OWORD *)&zero.m02;
-				//       v9 = *(_OWORD *)&zero.m03;
-				//       result = (HGFoliageOccluderRenderParams *)v4;
-				//       *(_OWORD *)(v4 + 24) = v6;
-				//       *(_OWORD *)(v4 + 40) = v7;
-				//       *(_OWORD *)(v4 + 56) = v8;
-				//       *(_OWORD *)(v4 + 72) = v9;
-				//       return result;
-				//     }
-				// LABEL_6:
-				//     sub_180B536AC(v3, v2);
-				//   }
-				//   Patch = IFix::WrappersManagerImpl::GetPatch(2170, 0LL);
-				//   if ( !Patch )
-				//     goto LABEL_6;
-				//   return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_789(Patch, 0LL);
-				// }
-				// 
-				return null;
-			}
+		  HGFoliageOccluderRenderParams *result; // rax
+		  __int64 v2; // rdx
+		  __int64 v3; // rcx
+		  Matrix4x4__StaticFields *static_fields; // rdx
+		  __int128 v5; // xmm1
+		  __int128 v6; // xmm2
+		  __int128 v7; // xmm3
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		
+		  if ( !IFix::WrappersManagerImpl::IsPatched(2619, 0LL) )
+		  {
+		    result = (HGFoliageOccluderRenderParams *)sub_1800368D0(TypeInfo::HG::Rendering::Runtime::HGFoliageOccluderRenderParams);
+		    if ( result )
+		    {
+		      *(_WORD *)&result->fields.shouldRender = 256;
+		      result->fields.lodFadeValue = 0.0;
+		      static_fields = TypeInfo::UnityEngine::Matrix4x4->static_fields;
+		      v5 = *(_OWORD *)&static_fields->zeroMatrix.m01;
+		      v6 = *(_OWORD *)&static_fields->zeroMatrix.m02;
+		      v7 = *(_OWORD *)&static_fields->zeroMatrix.m03;
+		      *(_OWORD *)&result->fields.cullingMatrix.m00 = *(_OWORD *)&static_fields->zeroMatrix.m00;
+		      *(_OWORD *)&result->fields.cullingMatrix.m01 = v5;
+		      *(_OWORD *)&result->fields.cullingMatrix.m02 = v6;
+		      *(_OWORD *)&result->fields.cullingMatrix.m03 = v7;
+		      return result;
+		    }
+		LABEL_4:
+		    sub_1800D8260(v3, v2);
+		  }
+		  Patch = IFix::WrappersManagerImpl::GetPatch(2619, 0LL);
+		  if ( !Patch )
+		    goto LABEL_4;
+		  return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_965(Patch, 0LL);
 		}
-
-		public HGFoliageOccluderRenderParams()
+		
+	
+		// Constructors
+		public HGFoliageOccluderRenderParams() {} // 0x00000001841E1670-0x00000001841E1680
+		// Void Lerp[HGWindConfig](HGWindConfig ByRef, HGWindConfig ByRef, Single)
+		void HG::Rendering::Runtime::HGCelestialConfig::HGCelestialAdvancedObjectConfig::Lerp<HG::Rendering::Runtime::HGWindConfig>(
+		        HGCelestialConfig_HGCelestialAdvancedObjectConfig *this,
+		        HGWindConfig *cSrc,
+		        HGWindConfig *cDst,
+		        float t,
+		        MethodInfo *method)
 		{
-			// // Void Lerp[HGWindConfig](HGWindConfig ByRef, HGWindConfig ByRef, Single)
-			// void HG::Rendering::Runtime::HGCelestialConfig::HGCelestialAdvancedObjectConfig::Lerp<HG::Rendering::Runtime::HGWindConfig>(
-			//         HGCelestialConfig_HGCelestialAdvancedObjectConfig *this,
-			//         HGWindConfig *cSrc,
-			//         HGWindConfig *cDst,
-			//         float t,
-			//         MethodInfo *method)
-			// {
-			//   ;
-			// }
-			// 
+		  ;
 		}
-
-		public bool shouldRender;
-
-		public bool curMaskIsA;
-
-		public float lodFadeValue;
-
-		public Matrix4x4 cullingMatrix;
+		
 	}
 }

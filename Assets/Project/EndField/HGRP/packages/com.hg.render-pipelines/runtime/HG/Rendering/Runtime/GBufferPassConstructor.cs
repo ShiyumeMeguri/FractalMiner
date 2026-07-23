@@ -1,604 +1,603 @@
-﻿using System;
-using System.Runtime.InteropServices;
+using System;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using HG.Rendering.RenderGraphModule;
 using UnityEngine.HyperGryphEngineCode;
 using UnityEngine.Rendering;
 
+// Image 4: HG.RenderPipelines.Runtime.dll - Assembly: HG.RenderPipelines.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null - Types 37354-38879
+
 namespace HG.Rendering.Runtime
 {
-	internal class GBufferPassConstructor : IPassConstructor
+	internal class GBufferPassConstructor : IPassConstructor // TypeDefIndex: 38294
 	{
-		public GBufferPassConstructor()
+		// Fields
+		private static readonly RenderFunc<GBufferPassData> s_gBufferRenderFunc; // 0x00
+	
+		// Nested types
+		internal struct PassInput // TypeDefIndex: 38290
 		{
-			// // Void Lerp[HGWindConfig](HGWindConfig ByRef, HGWindConfig ByRef, Single)
-			// void HG::Rendering::Runtime::HGCelestialConfig::HGCelestialAdvancedObjectConfig::Lerp<HG::Rendering::Runtime::HGWindConfig>(
-			//         HGCelestialConfig_HGCelestialAdvancedObjectConfig *this,
-			//         HGWindConfig *cSrc,
-			//         HGWindConfig *cDst,
-			//         float t,
-			//         MethodInfo *method)
-			// {
-			//   ;
-			// }
-			// 
+			// Fields
+			internal TextureHandle sceneColor; // 0x00
+			internal TextureHandle sceneDepth; // 0x10
+			internal TextureHandle sceneMV; // 0x20
+			internal TextureHandle sceneColorCopied; // 0x30
+			internal TextureHandle sceneDepthCopied; // 0x40
+			internal GBufferOutput gBufferOutput; // 0x50
+			internal CullingResults cullingResults; // 0x70
+			internal PerObjectData bakedLightConfig; // 0x80
+			internal bool enableTerrainTessellation; // 0x84
+			internal bool enableTerrainWetRipple; // 0x85
+			internal bool enableTerrainPOM; // 0x86
+			internal float screenCullingRatio; // 0x88
+			internal float screenCullingRatioDistance; // 0x8C
+			internal uint screenCullingLayerMask; // 0x90
+			internal uint deferredOpaqueECSList; // 0x94
+			internal uint deferredOpaqueEqualECSList; // 0x98
+			internal uint deferredGrassECSList; // 0x9C
+			internal uint deferredTreeECSList; // 0xA0
+			internal uint deferredSludgeECSList; // 0xA4
+			internal uint characterPrePassECSList; // 0xA8
+			internal uint characterOutlinePrePassECSList; // 0xAC
+			internal uint deferredOpaqueGPUDrivenList; // 0xB0
+			internal uint deferredOpaqueEqualGPUDrivenList; // 0xB4
 		}
-
-		private void HG.Rendering.Runtime.IPassConstructor.PrepareShaderVariablesGlobal(ref ShaderVariablesGlobal shaderVariablesGlobal)
-		{
-			// // Void HG.Rendering.Runtime.IPassConstructor.PrepareShaderVariablesGlobal(ShaderVariablesGlobal ByRef)
-			// void HG::Rendering::Runtime::GBufferPassConstructor::HG_Rendering_Runtime_IPassConstructor_PrepareShaderVariablesGlobal(
-			//         GBufferPassConstructor *this,
-			//         ShaderVariablesGlobal *shaderVariablesGlobal,
-			//         MethodInfo *method)
-			// {
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			//   __int64 v6; // rdx
-			//   __int64 v7; // rcx
-			// 
-			//   if ( IFix::WrappersManagerImpl::IsPatched(2657, 0LL) )
-			//   {
-			//     Patch = IFix::WrappersManagerImpl::GetPatch(2657, 0LL);
-			//     if ( !Patch )
-			//       sub_180B536AC(v7, v6);
-			//     IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_340(Patch, (Object *)this, shaderVariablesGlobal, 0LL);
-			//   }
-			// }
-			// 
-		}
-
-		private void HG.Rendering.Runtime.IPassConstructor.OnPreRendering(ref PassEventInput input)
-		{
-			// // Void HG.Rendering.Runtime.IPassConstructor.OnPreRendering(PassEventInput ByRef)
-			// void HG::Rendering::Runtime::GBufferPassConstructor::HG_Rendering_Runtime_IPassConstructor_OnPreRendering(
-			//         GBufferPassConstructor *this,
-			//         PassEventInput *input,
-			//         MethodInfo *method)
-			// {
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			//   __int64 v6; // rdx
-			//   __int64 v7; // rcx
-			// 
-			//   if ( IFix::WrappersManagerImpl::IsPatched(2658, 0LL) )
-			//   {
-			//     Patch = IFix::WrappersManagerImpl::GetPatch(2658, 0LL);
-			//     if ( !Patch )
-			//       sub_180B536AC(v7, v6);
-			//     IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_634(Patch, (Object *)this, input, 0LL);
-			//   }
-			// }
-			// 
-		}
-
-		internal void ConstructPass(ref GBufferPassConstructor.PassInput input, ref GBufferPassConstructor.PassOutput output, HGRenderGraph renderGraph, HGCamera camera)
-		{
-			// // Void ConstructPass(GBufferPassConstructor+PassInput ByRef, GBufferPassConstructor+PassOutput ByRef, HGRenderGraph, HGCamera)
-			// // Hidden C++ exception states: #wind=1
-			// void HG::Rendering::Runtime::GBufferPassConstructor::ConstructPass(
-			//         GBufferPassConstructor *this,
-			//         GBufferPassConstructor_PassInput *input,
-			//         GBufferPassConstructor_PassOutput *output,
-			//         HGRenderGraph *renderGraph,
-			//         HGCamera *camera,
-			//         MethodInfo *method)
-			// {
-			//   ProfilingSampler *v10; // rax
-			//   __int64 v11; // rdx
-			//   __int64 v12; // rcx
-			//   int v13; // edi
-			//   int32_t i; // ebx
-			//   int32_t v15; // r9d
-			//   HGGraphicsFeatureManager__StaticFields *static_fields; // rax
-			//   HGGraphicsFeatureSwitch *characterPrePass; // rdx
-			//   bool m_defaultValue; // di
-			//   HGGraphicsFeatureSwitch *deferredOpaque; // rcx
-			//   bool v20; // bl
-			//   Object__Class *v21; // xmm1_8
-			//   Object *v22; // rax
-			//   PerObjectData__Enum v23; // r13d
-			//   TextureHandle cullingResults; // xmm8
-			//   Camera *v25; // r12
-			//   HGShaderPassNames__StaticFields *v26; // rbx
-			//   float screenCullingRatio; // xmm7_4
-			//   float screenCullingRatioDistance; // xmm6_4
-			//   uint32_t screenCullingLayerMask; // edi
-			//   RendererListDesc *v30; // rax
-			//   ResourceHandle InvalidHandle; // rax
-			//   RendererListHandle *v32; // rbx
-			//   RendererListHandle v33; // rax
-			//   RendererListHandle v34; // rdx
-			//   RendererListHandle v35; // rcx
-			//   CullingResults v36; // xmm8
-			//   HGShaderPassNames__StaticFields *v37; // rbx
-			//   float v38; // xmm7_4
-			//   float v39; // xmm6_4
-			//   uint32_t v40; // edi
-			//   RendererListDesc *v41; // rax
-			//   ResourceHandle v42; // rax
-			//   RendererListHandle *v43; // rbx
-			//   RendererListHandle v44; // rax
-			//   RendererListHandle v45; // rdx
-			//   RendererListHandle v46; // rcx
-			//   __int64 vtFeedbackViewId; // rcx
-			//   __int64 terrainCullViewHandle; // rcx
-			//   __int64 editorTerrainCullViewHandle; // rcx
-			//   __int64 subdivisionHandle; // rcx
-			//   __int64 deferredOpaqueECSList; // rcx
-			//   __int64 deferredOpaqueEqualECSList; // rcx
-			//   __int64 deferredGrassECSList; // rcx
-			//   __int64 deferredSludgeECSList; // rcx
-			//   __int64 characterPrePassECSList; // rcx
-			//   __int64 characterOutlinePrePassECSList; // rcx
-			//   __int64 deferredOpaqueGPUDrivenList; // rcx
-			//   __int64 deferredOpaqueEqualGPUDrivenList; // rcx
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			//   __int64 v60; // rdx
-			//   __int64 v61; // rcx
-			//   Object *v62; // [rsp+70h] [rbp-308h] BYREF
-			//   bool v63; // [rsp+78h] [rbp-300h]
-			//   TextureHandle si128; // [rsp+80h] [rbp-2F8h] BYREF
-			//   TextureHandle inputa; // [rsp+90h] [rbp-2E8h] BYREF
-			//   CullingResults v66; // [rsp+A0h] [rbp-2D8h] BYREF
-			//   HGRenderGraphBuilder v67; // [rsp+B0h] [rbp-2C8h] BYREF
-			//   HGRenderGraphBuilder v68; // [rsp+D0h] [rbp-2A8h] BYREF
-			//   Il2CppExceptionWrapper *v69; // [rsp+F0h] [rbp-288h] BYREF
-			//   Nullable_1_UnityEngine_Rendering_RenderStateBlock_ v70; // [rsp+100h] [rbp-278h] BYREF
-			//   RendererListDesc desc; // [rsp+170h] [rbp-208h] BYREF
-			//   RendererListDesc v72; // [rsp+250h] [rbp-128h] BYREF
-			// 
-			//   if ( !byte_18D919563 )
-			//   {
-			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::GBufferPassConstructor);
-			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGGraphicsFeatureManager);
-			//     sub_18003C530(&MethodInfo::HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::SetRenderFunc<HG::Rendering::Runtime::GBufferPassConstructor::GBufferPassData>);
-			//     sub_18003C530(&MethodInfo::HG::Rendering::RenderGraphModule::HGRenderGraph::AddRenderPass<HG::Rendering::Runtime::GBufferPassConstructor::GBufferPassData>);
-			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGRenderPipeline);
-			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGShaderPassNames);
-			//     sub_18003C530(&MethodInfo::UnityEngine::Rendering::ProfilingSampler::Get<HG::Rendering::Runtime::HGProfileId>);
-			//     sub_18003C530(&TypeInfo::HG::Rendering::RenderGraphModule::TextureHandle);
-			//     sub_18003C530(&off_18C959DD0);
-			//     byte_18D919563 = 1;
-			//   }
-			//   v62 = 0LL;
-			//   if ( IFix::WrappersManagerImpl::IsPatched(2659, 0LL) )
-			//   {
-			//     Patch = IFix::WrappersManagerImpl::GetPatch(2659, 0LL);
-			//     if ( !Patch )
-			//       sub_180B536AC(v61, v60);
-			//     IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_974(
-			//       Patch,
-			//       (Object *)this,
-			//       input,
-			//       output,
-			//       (Object *)renderGraph,
-			//       (Object *)camera,
-			//       0LL);
-			//   }
-			//   else
-			//   {
-			//     v10 = UnityEngine::Rendering::ProfilingSampler::Get<System::Int32Enum>(
-			//             (Int32Enum__Enum)0x16u,
-			//             MethodInfo::UnityEngine::Rendering::ProfilingSampler::Get<HG::Rendering::Runtime::HGProfileId>);
-			//     if ( !renderGraph )
-			//       sub_180B536AC(v12, v11);
-			//     HG::Rendering::RenderGraphModule::HGRenderGraph::AddRenderPass<System::Object>(
-			//       &v68,
-			//       renderGraph,
-			//       (String *)"GBuffer",
-			//       &v62,
-			//       v10,
-			//       1,
-			//       ProfilingHGPass__Enum_GBuffer,
-			//       MethodInfo::HG::Rendering::RenderGraphModule::HGRenderGraph::AddRenderPass<HG::Rendering::Runtime::GBufferPassConstructor::GBufferPassData>);
-			//     v67 = v68;
-			//     v68.m_RenderPass = 0LL;
-			//     v68.m_Resources = (HGRenderGraphResourceRegistry *)&v67;
-			//     try
-			//     {
-			//       HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::AllowRendererListCulling(&v67, 0, 0LL);
-			//       v13 = 1;
-			//       HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::SetColorAttachment(
-			//         &si128,
-			//         &v67,
-			//         &input.sceneColor,
-			//         0,
-			//         0,
-			//         0LL);
-			//       sub_180002C70(TypeInfo::HG::Rendering::RenderGraphModule::TextureHandle);
-			//       if ( HG::Rendering::RenderGraphModule::TextureHandle::IsValid(&input.sceneMV, 0LL) )
-			//       {
-			//         v13 = 2;
-			//         si128 = (TextureHandle)_mm_load_si128((const __m128i *)&xmmword_18C1755F0);
-			//         HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::SetColorAttachment(
-			//           (TextureHandle *)&v66,
-			//           &v67,
-			//           &input.sceneMV,
-			//           1,
-			//           (Color *)&si128,
-			//           0,
-			//           0LL);
-			//       }
-			//       HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::SetDepthAttachment(
-			//         &si128,
-			//         &v67,
-			//         &input.sceneDepth,
-			//         DepthAccess__Enum_Write,
-			//         0,
-			//         0LL);
-			//       for ( i = 0; i < 4; ++i )
-			//       {
-			//         si128 = *HG::Rendering::Runtime::GBufferOutput::GetGBufferAttachment(
-			//                    (TextureHandle *)&v66,
-			//                    &input.gBufferOutput,
-			//                    i,
-			//                    0LL);
-			//         sub_180002C70(TypeInfo::HG::Rendering::RenderGraphModule::TextureHandle);
-			//         if ( HG::Rendering::RenderGraphModule::TextureHandle::IsValid(&si128, 0LL) )
-			//         {
-			//           v15 = v13++;
-			//           HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::SetColorAttachment(&inputa, &v67, &si128, v15, 0, 0LL);
-			//         }
-			//       }
-			//       sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGGraphicsFeatureManager);
-			//       static_fields = TypeInfo::HG::Rendering::Runtime::HGGraphicsFeatureManager.static_fields;
-			//       characterPrePass = static_fields.characterPrePass;
-			//       if ( !characterPrePass )
-			//         sub_1802DC2C8(TypeInfo::HG::Rendering::Runtime::HGGraphicsFeatureManager, 0LL);
-			//       m_defaultValue = characterPrePass.fields.m_defaultValue;
-			//       v63 = m_defaultValue;
-			//       deferredOpaque = static_fields.deferredOpaque;
-			//       if ( !deferredOpaque )
-			//         sub_1802DC2C8(0LL, characterPrePass);
-			//       v20 = deferredOpaque.fields.m_defaultValue;
-			//       if ( !camera )
-			//         sub_1802DC2C8(deferredOpaque, characterPrePass);
-			//       v21 = *(Object__Class **)&camera.fields._frameSettings_k__BackingField.materialQuality;
-			//       v22 = v62;
-			//       if ( !v62 )
-			//         sub_1802DC2C8(deferredOpaque, characterPrePass);
-			//       v62[2] = (Object)camera.fields._frameSettings_k__BackingField.bitDatas;
-			//       v22[3].klass = v21;
-			//       sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGRenderPipeline);
-			//       v23 = input.bakedLightConfig | HG::Rendering::Runtime::HGRenderPipeline::GetPerObjectDataConfig(camera, 0LL);
-			//       if ( v20 )
-			//       {
-			//         cullingResults = (TextureHandle)input.cullingResults;
-			//         v25 = camera.fields.camera;
-			//         sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGShaderPassNames);
-			//         v26 = TypeInfo::HG::Rendering::Runtime::HGShaderPassNames.static_fields;
-			//         screenCullingRatio = input.screenCullingRatio;
-			//         screenCullingRatioDistance = input.screenCullingRatioDistance;
-			//         screenCullingLayerMask = input.screenCullingLayerMask;
-			//         v66.ptr = 0LL;
-			//         sub_1802F01E0(&v70, 0LL, 112LL);
-			//         inputa.handle = (ResourceHandle)v66.ptr;
-			//         inputa.fallBackResource.m_Value = (uint32_t)v66.ptr;
-			//         si128 = cullingResults;
-			//         v30 = HG::Rendering::Runtime::HGRendererListUtils::CreateOpaqueRendererListDesc(
-			//                 &v72,
-			//                 (CullingResults *)&si128,
-			//                 v25,
-			//                 v26.s_GBufferName,
-			//                 screenCullingRatio,
-			//                 screenCullingRatioDistance,
-			//                 screenCullingLayerMask,
-			//                 v23,
-			//                 (Nullable_1_UnityEngine_Rendering_RenderQueueRange_ *)&inputa,
-			//                 &v70,
-			//                 0LL,
-			//                 0,
-			//                 0LL,
-			//                 0LL);
-			//         *(_OWORD *)&desc.sortingCriteria = *(_OWORD *)&v30.sortingCriteria;
-			//         desc.stateBlock = v30.stateBlock;
-			//         v30 = (RendererListDesc *)((char *)v30 + 128);
-			//         *(_OWORD *)&desc.overrideMaterial = *(_OWORD *)&v30.sortingCriteria;
-			//         *(_OWORD *)&desc.overrideMaterialPassIndex = *(_OWORD *)&v30.stateBlock.hasValue;
-			//         *(_OWORD *)&desc.sortingLayerMin = *(_OWORD *)&v30.stateBlock.value.m_BlendState.m_BlendState1.m_DestinationAlphaBlendMode;
-			//         *(_OWORD *)&desc.drawableFeedbackPtr = *(_OWORD *)&v30.stateBlock.value.m_BlendState.m_BlendState3.m_DestinationAlphaBlendMode;
-			//         *(_OWORD *)&desc._cullingResult_k__BackingField.m_AllocationInfo = *(_OWORD *)&v30.stateBlock.value.m_BlendState.m_BlendState5.m_DestinationAlphaBlendMode;
-			//         *(_OWORD *)&desc._passName_k__BackingField.m_Id = *(_OWORD *)&v30.stateBlock.value.m_BlendState.m_BlendState7.m_DestinationAlphaBlendMode;
-			//         InvalidHandle = (ResourceHandle)HG::Rendering::RenderGraphModule::HGRenderGraph::CreateRendererList(
-			//                                           renderGraph,
-			//                                           &desc,
-			//                                           0LL);
-			//         m_defaultValue = v63;
-			//       }
-			//       else
-			//       {
-			//         InvalidHandle = (ResourceHandle)HG::Rendering::RenderGraphModule::RendererListHandle::get_InvalidHandle(0LL);
-			//       }
-			//       inputa.handle = InvalidHandle;
-			//       v32 = (RendererListHandle *)v62;
-			//       v33 = HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::UseRendererList(
-			//               &v67,
-			//               (RendererListHandle *)&inputa,
-			//               0LL);
-			//       if ( !v32 )
-			//         sub_1802DC2C8(v35, v34);
-			//       v32[7] = v33;
-			//       if ( m_defaultValue )
-			//       {
-			//         v36 = input.cullingResults;
-			//         inputa.handle = (ResourceHandle)camera.fields.camera;
-			//         sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGShaderPassNames);
-			//         v37 = TypeInfo::HG::Rendering::Runtime::HGShaderPassNames.static_fields;
-			//         v38 = input.screenCullingRatio;
-			//         v39 = input.screenCullingRatioDistance;
-			//         v40 = input.screenCullingLayerMask;
-			//         v66.ptr = 0LL;
-			//         sub_1802F01E0(&v70, 0LL, 112LL);
-			//         si128.handle = (ResourceHandle)v66.ptr;
-			//         si128.fallBackResource.m_Value = (uint32_t)v66.ptr;
-			//         v66 = v36;
-			//         v41 = HG::Rendering::Runtime::HGRendererListUtils::CreateOpaqueRendererListDesc(
-			//                 &v72,
-			//                 &v66,
-			//                 *(Camera **)&inputa.handle,
-			//                 v37.s_DepthCharacterOnlyName,
-			//                 v38,
-			//                 v39,
-			//                 v40,
-			//                 v23,
-			//                 (Nullable_1_UnityEngine_Rendering_RenderQueueRange_ *)&si128,
-			//                 &v70,
-			//                 0LL,
-			//                 0,
-			//                 0LL,
-			//                 0LL);
-			//         *(_OWORD *)&desc.sortingCriteria = *(_OWORD *)&v41.sortingCriteria;
-			//         desc.stateBlock = v41.stateBlock;
-			//         v41 = (RendererListDesc *)((char *)v41 + 128);
-			//         *(_OWORD *)&desc.overrideMaterial = *(_OWORD *)&v41.sortingCriteria;
-			//         *(_OWORD *)&desc.overrideMaterialPassIndex = *(_OWORD *)&v41.stateBlock.hasValue;
-			//         *(_OWORD *)&desc.sortingLayerMin = *(_OWORD *)&v41.stateBlock.value.m_BlendState.m_BlendState1.m_DestinationAlphaBlendMode;
-			//         *(_OWORD *)&desc.drawableFeedbackPtr = *(_OWORD *)&v41.stateBlock.value.m_BlendState.m_BlendState3.m_DestinationAlphaBlendMode;
-			//         *(_OWORD *)&desc._cullingResult_k__BackingField.m_AllocationInfo = *(_OWORD *)&v41.stateBlock.value.m_BlendState.m_BlendState5.m_DestinationAlphaBlendMode;
-			//         *(_OWORD *)&desc._passName_k__BackingField.m_Id = *(_OWORD *)&v41.stateBlock.value.m_BlendState.m_BlendState7.m_DestinationAlphaBlendMode;
-			//         v42 = (ResourceHandle)HG::Rendering::RenderGraphModule::HGRenderGraph::CreateRendererList(
-			//                                 renderGraph,
-			//                                 &desc,
-			//                                 0LL);
-			//       }
-			//       else
-			//       {
-			//         v42 = (ResourceHandle)HG::Rendering::RenderGraphModule::RendererListHandle::get_InvalidHandle(0LL);
-			//       }
-			//       inputa.handle = v42;
-			//       v43 = (RendererListHandle *)v62;
-			//       v44 = HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::UseRendererList(
-			//               &v67,
-			//               (RendererListHandle *)&inputa,
-			//               0LL);
-			//       if ( !v43 )
-			//         sub_1802DC2C8(v46, v45);
-			//       v43[8] = v44;
-			//       vtFeedbackViewId = (unsigned int)camera.fields.vtFeedbackViewId;
-			//       if ( !v62 )
-			//         sub_1802DC2C8(vtFeedbackViewId, v45);
-			//       LODWORD(v62[1].klass) = vtFeedbackViewId;
-			//       terrainCullViewHandle = camera.fields.terrainCullViewHandle;
-			//       if ( !v62 )
-			//         sub_1802DC2C8(terrainCullViewHandle, v45);
-			//       HIDWORD(v62[1].klass) = terrainCullViewHandle;
-			//       editorTerrainCullViewHandle = camera.fields.editorTerrainCullViewHandle;
-			//       if ( !v62 )
-			//         sub_1802DC2C8(editorTerrainCullViewHandle, v45);
-			//       LODWORD(v62[1].monitor) = editorTerrainCullViewHandle;
-			//       subdivisionHandle = (unsigned int)camera.fields.subdivisionHandle;
-			//       if ( !v62 )
-			//         sub_1802DC2C8(subdivisionHandle, v45);
-			//       HIDWORD(v62[1].monitor) = subdivisionHandle;
-			//       deferredOpaqueECSList = input.deferredOpaqueECSList;
-			//       if ( !v62 )
-			//         sub_1802DC2C8(deferredOpaqueECSList, v45);
-			//       LODWORD(v62[4].monitor) = deferredOpaqueECSList;
-			//       deferredOpaqueEqualECSList = input.deferredOpaqueEqualECSList;
-			//       if ( !v62 )
-			//         sub_1802DC2C8(deferredOpaqueEqualECSList, v45);
-			//       HIDWORD(v62[4].monitor) = deferredOpaqueEqualECSList;
-			//       deferredGrassECSList = input.deferredGrassECSList;
-			//       if ( !v62 )
-			//         sub_1802DC2C8(deferredGrassECSList, v45);
-			//       LODWORD(v62[5].klass) = deferredGrassECSList;
-			//       deferredSludgeECSList = input.deferredSludgeECSList;
-			//       if ( !v62 )
-			//         sub_1802DC2C8(deferredSludgeECSList, v45);
-			//       HIDWORD(v62[5].klass) = deferredSludgeECSList;
-			//       characterPrePassECSList = input.characterPrePassECSList;
-			//       if ( !v62 )
-			//         sub_1802DC2C8(characterPrePassECSList, v45);
-			//       LODWORD(v62[5].monitor) = characterPrePassECSList;
-			//       characterOutlinePrePassECSList = input.characterOutlinePrePassECSList;
-			//       if ( !v62 )
-			//         sub_1802DC2C8(characterOutlinePrePassECSList, v45);
-			//       HIDWORD(v62[5].monitor) = characterOutlinePrePassECSList;
-			//       LOBYTE(characterOutlinePrePassECSList) = input.enableTerrainTessellation;
-			//       if ( !v62 )
-			//         sub_1802DC2C8(characterOutlinePrePassECSList, v45);
-			//       LOBYTE(v62[6].monitor) = characterOutlinePrePassECSList;
-			//       LOBYTE(characterOutlinePrePassECSList) = input.enableTerrainWetRipple;
-			//       if ( !v62 )
-			//         sub_1802DC2C8(characterOutlinePrePassECSList, v45);
-			//       BYTE1(v62[6].monitor) = characterOutlinePrePassECSList;
-			//       deferredOpaqueGPUDrivenList = input.deferredOpaqueGPUDrivenList;
-			//       if ( !v62 )
-			//         sub_1802DC2C8(deferredOpaqueGPUDrivenList, v45);
-			//       LODWORD(v62[6].klass) = deferredOpaqueGPUDrivenList;
-			//       deferredOpaqueEqualGPUDrivenList = input.deferredOpaqueEqualGPUDrivenList;
-			//       if ( !v62 )
-			//         sub_1802DC2C8(deferredOpaqueEqualGPUDrivenList, v45);
-			//       HIDWORD(v62[6].klass) = deferredOpaqueEqualGPUDrivenList;
-			//       sub_180002C70(TypeInfo::HG::Rendering::Runtime::GBufferPassConstructor);
-			//       HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::SetRenderFunc<System::Object>(
-			//         &v67,
-			//         (RenderFunc_1_System_Object_ *)TypeInfo::HG::Rendering::Runtime::GBufferPassConstructor.static_fields.s_gBufferRenderFunc,
-			//         0LL,
-			//         0,
-			//         MethodInfo::HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::SetRenderFunc<HG::Rendering::Runtime::GBufferPassConstructor::GBufferPassData>);
-			//     }
-			//     catch ( Il2CppExceptionWrapper *v69 )
-			//     {
-			//       v68.m_RenderPass = (HGRenderGraphPass *)v69.ex;
-			//     }
-			//     sub_180222690(&v68);
-			//   }
-			// }
-			// 
-		}
-
-		private void HG.Rendering.Runtime.IPassConstructor.OnPostRendering(ref PassEventInput input)
-		{
-			// // Void HG.Rendering.Runtime.IPassConstructor.OnPostRendering(PassEventInput ByRef)
-			// void HG::Rendering::Runtime::GBufferPassConstructor::HG_Rendering_Runtime_IPassConstructor_OnPostRendering(
-			//         GBufferPassConstructor *this,
-			//         PassEventInput *input,
-			//         MethodInfo *method)
-			// {
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			//   __int64 v6; // rdx
-			//   __int64 v7; // rcx
-			// 
-			//   if ( IFix::WrappersManagerImpl::IsPatched(2660, 0LL) )
-			//   {
-			//     Patch = IFix::WrappersManagerImpl::GetPatch(2660, 0LL);
-			//     if ( !Patch )
-			//       sub_180B536AC(v7, v6);
-			//     IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_634(Patch, (Object *)this, input, 0LL);
-			//   }
-			// }
-			// 
-		}
-
-		private void HG.Rendering.Runtime.IPassConstructor.Dispose(HGRenderGraph renderGraph)
-		{
-			// // Void HG.Rendering.Runtime.IPassConstructor.Dispose(HGRenderGraph)
-			// void HG::Rendering::Runtime::GBufferPassConstructor::HG_Rendering_Runtime_IPassConstructor_Dispose(
-			//         GBufferPassConstructor *this,
-			//         HGRenderGraph *renderGraph,
-			//         MethodInfo *method)
-			// {
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			//   __int64 v6; // rdx
-			//   __int64 v7; // rcx
-			// 
-			//   if ( IFix::WrappersManagerImpl::IsPatched(2661, 0LL) )
-			//   {
-			//     Patch = IFix::WrappersManagerImpl::GetPatch(2661, 0LL);
-			//     if ( !Patch )
-			//       sub_180B536AC(v7, v6);
-			//     IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_1(
-			//       (ILFixDynamicMethodWrapper_37 *)Patch,
-			//       (Object *)this,
-			//       (Object *)renderGraph,
-			//       0LL);
-			//   }
-			// }
-			// 
-		}
-
-		[StaticFieldOffset(ThreadStatic = false, Offset = "0x00")]
-		private static readonly RenderFunc<GBufferPassConstructor.GBufferPassData> s_gBufferRenderFunc;
-
-		[StructLayout(LayoutKind.Sequential, Pack = 1, Size = 184)]
-		internal struct PassInput
-		{
-			internal TextureHandle sceneColor;
-
-			internal TextureHandle sceneDepth;
-
-			internal TextureHandle sceneMV;
-
-			internal TextureHandle sceneColorCopied;
-
-			internal TextureHandle sceneDepthCopied;
-
-			internal GBufferOutput gBufferOutput;
-
-			internal CullingResults cullingResults;
-
-			internal PerObjectData bakedLightConfig;
-
-			internal bool enableTerrainTessellation;
-
-			internal bool enableTerrainWetRipple;
-
-			internal float screenCullingRatio;
-
-			internal float screenCullingRatioDistance;
-
-			internal uint screenCullingLayerMask;
-
-			internal uint deferredOpaqueECSList;
-
-			internal uint deferredOpaqueEqualECSList;
-
-			internal uint deferredGrassECSList;
-
-			internal uint deferredSludgeECSList;
-
-			internal uint characterPrePassECSList;
-
-			internal uint characterOutlinePrePassECSList;
-
-			internal uint deferredOpaqueGPUDrivenList;
-
-			internal uint deferredOpaqueEqualGPUDrivenList;
-		}
-
-		internal struct PassOutput
+	
+		internal struct PassOutput // TypeDefIndex: 38291
 		{
 		}
-
-		private class GBufferPassData
+	
+		private class GBufferPassData // TypeDefIndex: 38292
 		{
-			public GBufferPassData()
+			// Fields
+			public int vtFeedbackId; // 0x10
+			public uint terrainCullViewHandle; // 0x14
+			public uint editorTerrainCullViewHandle; // 0x18
+			public int subdivisionHandle; // 0x1C
+			public FrameSettings frameSettings; // 0x20
+			public RendererListHandle rendererList; // 0x38
+			public RendererListHandle characterPrePassRendererList; // 0x40
+			public uint deferredOpaqueECSList; // 0x48
+			public uint deferredOpaqueEqualECSList; // 0x4C
+			public uint deferredGrassECSList; // 0x50
+			public uint deferredTreeECSList; // 0x54
+			public uint deferredSludgeECSList; // 0x58
+			public uint characterPrePassECSList; // 0x5C
+			public uint characterOutlinePrePassECSList; // 0x60
+			public uint deferredOpaqueGPUDrivenList; // 0x64
+			public uint deferredOpaqueEqualGPUDrivenList; // 0x68
+			public bool enableTerrainTessellation; // 0x6C
+			public bool enableTerrainWetRipple; // 0x6D
+			public bool enableTerrainPOM; // 0x6E
+	
+			// Constructors
+			public GBufferPassData() {} // 0x00000001841E1670-0x00000001841E1680
+			// Void Lerp[HGWindConfig](HGWindConfig ByRef, HGWindConfig ByRef, Single)
+			void HG::Rendering::Runtime::HGCelestialConfig::HGCelestialAdvancedObjectConfig::Lerp<HG::Rendering::Runtime::HGWindConfig>(
+			        HGCelestialConfig_HGCelestialAdvancedObjectConfig *this,
+			        HGWindConfig *cSrc,
+			        HGWindConfig *cDst,
+			        float t,
+			        MethodInfo *method)
 			{
-				// // Void Lerp[HGWindConfig](HGWindConfig ByRef, HGWindConfig ByRef, Single)
-				// void HG::Rendering::Runtime::HGCelestialConfig::HGCelestialAdvancedObjectConfig::Lerp<HG::Rendering::Runtime::HGWindConfig>(
-				//         HGCelestialConfig_HGCelestialAdvancedObjectConfig *this,
-				//         HGWindConfig *cSrc,
-				//         HGWindConfig *cDst,
-				//         float t,
-				//         MethodInfo *method)
-				// {
-				//   ;
-				// }
-				// 
+			  ;
 			}
-
-			public int vtFeedbackId;
-
-			public uint terrainCullViewHandle;
-
-			public uint editorTerrainCullViewHandle;
-
-			public int subdivisionHandle;
-
-			public FrameSettings frameSettings;
-
-			public RendererListHandle rendererList;
-
-			public RendererListHandle characterPrePassRendererList;
-
-			public uint deferredOpaqueECSList;
-
-			public uint deferredOpaqueEqualECSList;
-
-			public uint deferredGrassECSList;
-
-			public uint deferredSludgeECSList;
-
-			public uint characterPrePassECSList;
-
-			public uint characterOutlinePrePassECSList;
-
-			public uint deferredOpaqueGPUDrivenList;
-
-			public uint deferredOpaqueEqualGPUDrivenList;
-
-			public bool enableTerrainTessellation;
-
-			public bool enableTerrainWetRipple;
+			
 		}
+	
+		// Constructors
+		public GBufferPassConstructor() {} // 0x00000001841E1670-0x00000001841E1680
+		// Void Lerp[HGWindConfig](HGWindConfig ByRef, HGWindConfig ByRef, Single)
+		void HG::Rendering::Runtime::HGCelestialConfig::HGCelestialAdvancedObjectConfig::Lerp<HG::Rendering::Runtime::HGWindConfig>(
+		        HGCelestialConfig_HGCelestialAdvancedObjectConfig *this,
+		        HGWindConfig *cSrc,
+		        HGWindConfig *cDst,
+		        float t,
+		        MethodInfo *method)
+		{
+		  ;
+		}
+		
+		static GBufferPassConstructor() {} // 0x0000000184D2CF10-0x0000000184D2CFA0
+		// GBufferPassConstructor()
+		void HG::Rendering::Runtime::GBufferPassConstructor::cctor(MethodInfo *method)
+		{
+		  struct GBufferPassConstructor_c__Class *v1; // rax
+		  Object *v2; // rdi
+		  RenderFunc_1_System_Object_ *v3; // rax
+		  __int64 v4; // rdx
+		  __int64 v5; // rcx
+		  RenderFunc_1_HG_Rendering_Runtime_GBufferPassConstructor_GBufferPassData_ *v6; // rbx
+		  Type *v7; // rdx
+		  PropertyInfo_1 *v8; // r8
+		  Int32__Array **v9; // r9
+		  MethodInfo *v10; // [rsp+50h] [rbp+28h]
+		
+		  v1 = TypeInfo::HG::Rendering::Runtime::GBufferPassConstructor::__c;
+		  if ( !TypeInfo::HG::Rendering::Runtime::GBufferPassConstructor::__c->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(TypeInfo::HG::Rendering::Runtime::GBufferPassConstructor::__c);
+		    v1 = TypeInfo::HG::Rendering::Runtime::GBufferPassConstructor::__c;
+		  }
+		  v2 = (Object *)v1->static_fields->__9;
+		  v3 = (RenderFunc_1_System_Object_ *)sub_1800368D0(TypeInfo::HG::Rendering::RenderGraphModule::RenderFunc<HG::Rendering::Runtime::GBufferPassConstructor::GBufferPassData>);
+		  v6 = (RenderFunc_1_HG_Rendering_Runtime_GBufferPassConstructor_GBufferPassData_ *)v3;
+		  if ( !v3 )
+		    sub_1800D8260(v5, v4);
+		  HG::Rendering::RenderGraphModule::RenderFunc<System::Object>::RenderFunc(
+		    v3,
+		    v2,
+		    MethodInfo::HG::Rendering::Runtime::GBufferPassConstructor::__c::__cctor_b__10_0,
+		    0LL);
+		  TypeInfo::HG::Rendering::Runtime::GBufferPassConstructor->static_fields->s_gBufferRenderFunc = v6;
+		  sub_18002D1B0(
+		    (SingleFieldAccessor *)TypeInfo::HG::Rendering::Runtime::GBufferPassConstructor->static_fields,
+		    v7,
+		    v8,
+		    v9,
+		    v10);
+		}
+		
+	
+		// Methods
+		void IPassConstructor.PrepareShaderVariablesGlobal(ref ShaderVariablesGlobal shaderVariablesGlobal) {} // 0x0000000189BAE918-0x0000000189BAE96C
+		// Void HG.Rendering.Runtime.IPassConstructor.PrepareShaderVariablesGlobal(ShaderVariablesGlobal ByRef)
+		void HG::Rendering::Runtime::GBufferPassConstructor::HG_Rendering_Runtime_IPassConstructor_PrepareShaderVariablesGlobal(
+		        GBufferPassConstructor *this,
+		        ShaderVariablesGlobal *shaderVariablesGlobal,
+		        MethodInfo *method)
+		{
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v6; // rdx
+		  __int64 v7; // rcx
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(3187, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(3187, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(v7, v6);
+		    IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_378(Patch, (Object *)this, shaderVariablesGlobal, 0LL);
+		  }
+		}
+		
+		void IPassConstructor.OnPreRendering(ref PassEventInput input) {} // 0x0000000189BAE8C4-0x0000000189BAE918
+		// Void HG.Rendering.Runtime.IPassConstructor.OnPreRendering(PassEventInput ByRef)
+		void HG::Rendering::Runtime::GBufferPassConstructor::HG_Rendering_Runtime_IPassConstructor_OnPreRendering(
+		        GBufferPassConstructor *this,
+		        PassEventInput *input,
+		        MethodInfo *method)
+		{
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v6; // rdx
+		  __int64 v7; // rcx
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(3188, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(3188, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(v7, v6);
+		    IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_788(Patch, (Object *)this, input, 0LL);
+		  }
+		}
+		
+		internal void ConstructPass(ref PassInput input, ref PassOutput output, HGRenderGraph renderGraph, HGCamera camera) {} // 0x0000000189BADF00-0x0000000189BAE870
+		// Void ConstructPass(GBufferPassConstructor+PassInput ByRef, GBufferPassConstructor+PassOutput ByRef, HGRenderGraph, HGCamera)
+		// Hidden C++ exception states: #wind=1
+		void HG::Rendering::Runtime::GBufferPassConstructor::ConstructPass(
+		        GBufferPassConstructor *this,
+		        GBufferPassConstructor_PassInput *input,
+		        GBufferPassConstructor_PassOutput *output,
+		        HGRenderGraph *renderGraph,
+		        HGCamera *camera,
+		        MethodInfo *method)
+		{
+		  ProfilingSampler *v10; // rax
+		  __int64 v11; // rdx
+		  __int64 v12; // rcx
+		  int v13; // edi
+		  int32_t i; // ebx
+		  int32_t v15; // r9d
+		  __int64 v16; // rdx
+		  HGGraphicsFeatureSwitch *characterPrePass; // rcx
+		  bool enabledForCPUCommands; // di
+		  HGGraphicsFeatureManager__StaticFields *static_fields; // rdx
+		  HGGraphicsFeatureSwitch *deferredOpaque; // rcx
+		  __int64 v21; // rdx
+		  __int64 v22; // rcx
+		  bool v23; // bl
+		  Object__Class *v24; // xmm1_8
+		  Object *v25; // rcx
+		  PerObjectData__Enum v26; // r13d
+		  TextureHandle cullingResults; // xmm8
+		  Camera *v28; // r12
+		  HGShaderPassNames__StaticFields *v29; // rbx
+		  float screenCullingRatio; // xmm7_4
+		  float screenCullingRatioDistance; // xmm6_4
+		  uint32_t screenCullingLayerMask; // edi
+		  RendererListDesc *v33; // rax
+		  ResourceHandle InvalidHandle; // rax
+		  RendererListHandle *v35; // rbx
+		  RendererListHandle v36; // rax
+		  RendererListHandle v37; // rdx
+		  RendererListHandle v38; // rcx
+		  CullingResults v39; // xmm8
+		  HGShaderPassNames__StaticFields *v40; // rbx
+		  float v41; // xmm7_4
+		  float v42; // xmm6_4
+		  uint32_t v43; // edi
+		  RendererListDesc *v44; // rax
+		  ResourceHandle v45; // rax
+		  RendererListHandle *v46; // rbx
+		  RendererListHandle v47; // rax
+		  RendererListHandle v48; // rdx
+		  RendererListHandle v49; // rcx
+		  __int64 vtFeedbackViewId; // rcx
+		  __int64 terrainCullViewHandle; // rcx
+		  __int64 editorTerrainCullViewHandle; // rcx
+		  __int64 subdivisionHandle; // rcx
+		  __int64 deferredOpaqueECSList; // rcx
+		  __int64 deferredOpaqueEqualECSList; // rcx
+		  __int64 deferredGrassECSList; // rcx
+		  __int64 deferredTreeECSList; // rcx
+		  __int64 deferredSludgeECSList; // rcx
+		  __int64 characterPrePassECSList; // rcx
+		  __int64 characterOutlinePrePassECSList; // rcx
+		  __int64 deferredOpaqueGPUDrivenList; // rcx
+		  __int64 deferredOpaqueEqualGPUDrivenList; // rcx
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v64; // rdx
+		  __int64 v65; // rcx
+		  Object *v66; // [rsp+70h] [rbp-308h] BYREF
+		  bool v67; // [rsp+78h] [rbp-300h]
+		  TextureHandle si128; // [rsp+80h] [rbp-2F8h] BYREF
+		  TextureHandle inputa; // [rsp+90h] [rbp-2E8h] BYREF
+		  CullingResults v70; // [rsp+A0h] [rbp-2D8h] BYREF
+		  HGRenderGraphBuilder v71; // [rsp+B0h] [rbp-2C8h] BYREF
+		  HGRenderGraphBuilder v72; // [rsp+D0h] [rbp-2A8h] BYREF
+		  Il2CppExceptionWrapper *v73; // [rsp+F0h] [rbp-288h] BYREF
+		  Nullable_1_UnityEngine_Rendering_RenderStateBlock_ v74; // [rsp+100h] [rbp-278h] BYREF
+		  RendererListDesc desc; // [rsp+170h] [rbp-208h] BYREF
+		  RendererListDesc v76; // [rsp+250h] [rbp-128h] BYREF
+		
+		  v66 = 0LL;
+		  if ( IFix::WrappersManagerImpl::IsPatched(3189, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(3189, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(v65, v64);
+		    IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_1177(
+		      Patch,
+		      (Object *)this,
+		      input,
+		      output,
+		      (Object *)renderGraph,
+		      (Object *)camera,
+		      0LL);
+		  }
+		  else
+		  {
+		    v10 = UnityEngine::Rendering::ProfilingSampler::Get<System::Int32Enum>(
+		            (Int32Enum__Enum)0x16u,
+		            MethodInfo::UnityEngine::Rendering::ProfilingSampler::Get<HG::Rendering::Runtime::HGProfileId>);
+		    if ( !renderGraph )
+		      sub_1800D8260(v12, v11);
+		    HG::Rendering::RenderGraphModule::HGRenderGraph::AddRenderPass<System::Object>(
+		      &v72,
+		      renderGraph,
+		      (String *)"GBuffer",
+		      &v66,
+		      v10,
+		      1,
+		      ProfilingHGPass__Enum_GBuffer,
+		      MethodInfo::HG::Rendering::RenderGraphModule::HGRenderGraph::AddRenderPass<HG::Rendering::Runtime::GBufferPassConstructor::GBufferPassData>);
+		    v71 = v72;
+		    v72.m_RenderPass = 0LL;
+		    v72.m_Resources = (HGRenderGraphResourceRegistry *)&v71;
+		    try
+		    {
+		      HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::AllowRendererListCulling(&v71, 0, 0LL);
+		      v13 = 1;
+		      HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::SetColorAttachment(
+		        &si128,
+		        &v71,
+		        &input->sceneColor,
+		        0,
+		        0,
+		        0LL);
+		      sub_1800036A0(TypeInfo::HG::Rendering::RenderGraphModule::TextureHandle);
+		      if ( HG::Rendering::RenderGraphModule::TextureHandle::IsValid(&input->sceneMV, 0LL) )
+		      {
+		        v13 = 2;
+		        si128 = (TextureHandle)_mm_load_si128((const __m128i *)&xmmword_18DC80F80);
+		        HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::SetColorAttachment(
+		          (TextureHandle *)&v70,
+		          &v71,
+		          &input->sceneMV,
+		          1,
+		          (Color *)&si128,
+		          0,
+		          0LL);
+		      }
+		      HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::SetDepthAttachment(
+		        &si128,
+		        &v71,
+		        &input->sceneDepth,
+		        DepthAccess__Enum_Write,
+		        0,
+		        0LL);
+		      for ( i = 0; i < 4; ++i )
+		      {
+		        si128 = *HG::Rendering::Runtime::GBufferOutput::GetGBufferAttachment(
+		                   (TextureHandle *)&v70,
+		                   &input->gBufferOutput,
+		                   i,
+		                   0LL);
+		        sub_1800036A0(TypeInfo::HG::Rendering::RenderGraphModule::TextureHandle);
+		        if ( HG::Rendering::RenderGraphModule::TextureHandle::IsValid(&si128, 0LL) )
+		        {
+		          v15 = v13++;
+		          HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::SetColorAttachment(&inputa, &v71, &si128, v15, 0, 0LL);
+		        }
+		      }
+		      sub_1800036A0(TypeInfo::HG::Rendering::Runtime::HGGraphicsFeatureManager);
+		      characterPrePass = TypeInfo::HG::Rendering::Runtime::HGGraphicsFeatureManager->static_fields->characterPrePass;
+		      if ( !characterPrePass )
+		        sub_1800D8250(0LL, v16);
+		      enabledForCPUCommands = HG::Rendering::Runtime::HGGraphicsFeatureSwitch::get_enabledForCPUCommands(
+		                                characterPrePass,
+		                                0LL);
+		      v67 = enabledForCPUCommands;
+		      static_fields = TypeInfo::HG::Rendering::Runtime::HGGraphicsFeatureManager->static_fields;
+		      deferredOpaque = static_fields->deferredOpaque;
+		      if ( !deferredOpaque )
+		        sub_1800D8250(0LL, static_fields);
+		      v23 = HG::Rendering::Runtime::HGGraphicsFeatureSwitch::get_enabledForCPUCommands(deferredOpaque, 0LL);
+		      if ( !camera )
+		        sub_1800D8250(v22, v21);
+		      v24 = *(Object__Class **)&camera->fields._frameSettings_k__BackingField.materialQuality;
+		      v25 = v66;
+		      if ( !v66 )
+		        sub_1800D8250(0LL, v21);
+		      v66[2] = (Object)camera->fields._frameSettings_k__BackingField.bitDatas;
+		      v25[3].klass = v24;
+		      sub_1800036A0(TypeInfo::HG::Rendering::Runtime::HGRenderPipeline);
+		      v26 = input->bakedLightConfig | HG::Rendering::Runtime::HGRenderPipeline::GetPerObjectDataConfig(camera, 0LL);
+		      if ( v23 )
+		      {
+		        cullingResults = (TextureHandle)input->cullingResults;
+		        v28 = camera->fields.camera;
+		        sub_1800036A0(TypeInfo::HG::Rendering::Runtime::HGShaderPassNames);
+		        v29 = TypeInfo::HG::Rendering::Runtime::HGShaderPassNames->static_fields;
+		        screenCullingRatio = input->screenCullingRatio;
+		        screenCullingRatioDistance = input->screenCullingRatioDistance;
+		        screenCullingLayerMask = input->screenCullingLayerMask;
+		        v70.ptr = 0LL;
+		        sub_18033B9D0(&v74, 0LL, 112LL);
+		        inputa.handle = (ResourceHandle)v70.ptr;
+		        inputa.fallBackResource.m_Value = (uint32_t)v70.ptr;
+		        si128 = cullingResults;
+		        v33 = HG::Rendering::Runtime::HGRendererListUtils::CreateOpaqueRendererListDesc(
+		                &v76,
+		                (CullingResults *)&si128,
+		                v28,
+		                v29->s_GBufferName,
+		                screenCullingRatio,
+		                screenCullingRatioDistance,
+		                screenCullingLayerMask,
+		                v26,
+		                (Nullable_1_UnityEngine_Rendering_RenderQueueRange_ *)&inputa,
+		                &v74,
+		                0LL,
+		                0,
+		                0LL,
+		                0LL);
+		        *(_OWORD *)&desc.sortingCriteria = *(_OWORD *)&v33->sortingCriteria;
+		        desc.stateBlock = v33->stateBlock;
+		        v33 = (RendererListDesc *)((char *)v33 + 128);
+		        *(_OWORD *)&desc.overrideMaterial = *(_OWORD *)&v33->sortingCriteria;
+		        *(_OWORD *)&desc.overrideMaterialPassIndex = *(_OWORD *)&v33->stateBlock.hasValue;
+		        *(_OWORD *)&desc.sortingLayerMin = *(_OWORD *)&v33->stateBlock.value.m_BlendState.m_BlendState1.m_DestinationAlphaBlendMode;
+		        *(_OWORD *)&desc.drawableFeedbackPtr = *(_OWORD *)&v33->stateBlock.value.m_BlendState.m_BlendState3.m_DestinationAlphaBlendMode;
+		        *(_OWORD *)&desc._cullingResult_k__BackingField.m_AllocationInfo = *(_OWORD *)&v33->stateBlock.value.m_BlendState.m_BlendState5.m_DestinationAlphaBlendMode;
+		        *(_OWORD *)&desc._passName_k__BackingField.m_Id = *(_OWORD *)&v33->stateBlock.value.m_BlendState.m_BlendState7.m_DestinationAlphaBlendMode;
+		        InvalidHandle = (ResourceHandle)HG::Rendering::RenderGraphModule::HGRenderGraph::CreateRendererList(
+		                                          renderGraph,
+		                                          &desc,
+		                                          0LL);
+		        enabledForCPUCommands = v67;
+		      }
+		      else
+		      {
+		        InvalidHandle = (ResourceHandle)HG::Rendering::RenderGraphModule::RendererListHandle::get_InvalidHandle(0LL);
+		      }
+		      inputa.handle = InvalidHandle;
+		      v35 = (RendererListHandle *)v66;
+		      v36 = HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::UseRendererList(
+		              &v71,
+		              (RendererListHandle *)&inputa,
+		              0LL);
+		      if ( !v35 )
+		        ((void (__fastcall __noreturn *)(_QWORD, _QWORD))sub_1800D8250)(v38, v37);
+		      v35[7] = v36;
+		      if ( enabledForCPUCommands )
+		      {
+		        v39 = input->cullingResults;
+		        inputa.handle = (ResourceHandle)camera->fields.camera;
+		        sub_1800036A0(TypeInfo::HG::Rendering::Runtime::HGShaderPassNames);
+		        v40 = TypeInfo::HG::Rendering::Runtime::HGShaderPassNames->static_fields;
+		        v41 = input->screenCullingRatio;
+		        v42 = input->screenCullingRatioDistance;
+		        v43 = input->screenCullingLayerMask;
+		        v70.ptr = 0LL;
+		        sub_18033B9D0(&v74, 0LL, 112LL);
+		        si128.handle = (ResourceHandle)v70.ptr;
+		        si128.fallBackResource.m_Value = (uint32_t)v70.ptr;
+		        v70 = v39;
+		        v44 = HG::Rendering::Runtime::HGRendererListUtils::CreateOpaqueRendererListDesc(
+		                &v76,
+		                &v70,
+		                *(Camera **)&inputa.handle,
+		                v40->s_DepthCharacterOnlyName,
+		                v41,
+		                v42,
+		                v43,
+		                v26,
+		                (Nullable_1_UnityEngine_Rendering_RenderQueueRange_ *)&si128,
+		                &v74,
+		                0LL,
+		                0,
+		                0LL,
+		                0LL);
+		        *(_OWORD *)&desc.sortingCriteria = *(_OWORD *)&v44->sortingCriteria;
+		        desc.stateBlock = v44->stateBlock;
+		        v44 = (RendererListDesc *)((char *)v44 + 128);
+		        *(_OWORD *)&desc.overrideMaterial = *(_OWORD *)&v44->sortingCriteria;
+		        *(_OWORD *)&desc.overrideMaterialPassIndex = *(_OWORD *)&v44->stateBlock.hasValue;
+		        *(_OWORD *)&desc.sortingLayerMin = *(_OWORD *)&v44->stateBlock.value.m_BlendState.m_BlendState1.m_DestinationAlphaBlendMode;
+		        *(_OWORD *)&desc.drawableFeedbackPtr = *(_OWORD *)&v44->stateBlock.value.m_BlendState.m_BlendState3.m_DestinationAlphaBlendMode;
+		        *(_OWORD *)&desc._cullingResult_k__BackingField.m_AllocationInfo = *(_OWORD *)&v44->stateBlock.value.m_BlendState.m_BlendState5.m_DestinationAlphaBlendMode;
+		        *(_OWORD *)&desc._passName_k__BackingField.m_Id = *(_OWORD *)&v44->stateBlock.value.m_BlendState.m_BlendState7.m_DestinationAlphaBlendMode;
+		        v45 = (ResourceHandle)HG::Rendering::RenderGraphModule::HGRenderGraph::CreateRendererList(
+		                                renderGraph,
+		                                &desc,
+		                                0LL);
+		      }
+		      else
+		      {
+		        v45 = (ResourceHandle)HG::Rendering::RenderGraphModule::RendererListHandle::get_InvalidHandle(0LL);
+		      }
+		      inputa.handle = v45;
+		      v46 = (RendererListHandle *)v66;
+		      v47 = HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::UseRendererList(
+		              &v71,
+		              (RendererListHandle *)&inputa,
+		              0LL);
+		      if ( !v46 )
+		        ((void (__fastcall __noreturn *)(_QWORD, _QWORD))sub_1800D8250)(v49, v48);
+		      v46[8] = v47;
+		      vtFeedbackViewId = (unsigned int)camera->fields.vtFeedbackViewId;
+		      if ( !v66 )
+		        ((void (__fastcall __noreturn *)(_QWORD, _QWORD))sub_1800D8250)(vtFeedbackViewId, v48);
+		      LODWORD(v66[1].klass) = vtFeedbackViewId;
+		      terrainCullViewHandle = camera->fields.terrainCullViewHandle;
+		      if ( !v66 )
+		        ((void (__fastcall __noreturn *)(_QWORD, _QWORD))sub_1800D8250)(terrainCullViewHandle, v48);
+		      HIDWORD(v66[1].klass) = terrainCullViewHandle;
+		      editorTerrainCullViewHandle = camera->fields.editorTerrainCullViewHandle;
+		      if ( !v66 )
+		        ((void (__fastcall __noreturn *)(_QWORD, _QWORD))sub_1800D8250)(editorTerrainCullViewHandle, v48);
+		      LODWORD(v66[1].monitor) = editorTerrainCullViewHandle;
+		      subdivisionHandle = (unsigned int)camera->fields.subdivisionHandle;
+		      if ( !v66 )
+		        ((void (__fastcall __noreturn *)(_QWORD, _QWORD))sub_1800D8250)(subdivisionHandle, v48);
+		      HIDWORD(v66[1].monitor) = subdivisionHandle;
+		      deferredOpaqueECSList = input->deferredOpaqueECSList;
+		      if ( !v66 )
+		        ((void (__fastcall __noreturn *)(_QWORD, _QWORD))sub_1800D8250)(deferredOpaqueECSList, v48);
+		      LODWORD(v66[4].monitor) = deferredOpaqueECSList;
+		      deferredOpaqueEqualECSList = input->deferredOpaqueEqualECSList;
+		      if ( !v66 )
+		        ((void (__fastcall __noreturn *)(_QWORD, _QWORD))sub_1800D8250)(deferredOpaqueEqualECSList, v48);
+		      HIDWORD(v66[4].monitor) = deferredOpaqueEqualECSList;
+		      deferredGrassECSList = input->deferredGrassECSList;
+		      if ( !v66 )
+		        ((void (__fastcall __noreturn *)(_QWORD, _QWORD))sub_1800D8250)(deferredGrassECSList, v48);
+		      LODWORD(v66[5].klass) = deferredGrassECSList;
+		      deferredTreeECSList = input->deferredTreeECSList;
+		      if ( !v66 )
+		        ((void (__fastcall __noreturn *)(_QWORD, _QWORD))sub_1800D8250)(deferredTreeECSList, v48);
+		      HIDWORD(v66[5].klass) = deferredTreeECSList;
+		      deferredSludgeECSList = input->deferredSludgeECSList;
+		      if ( !v66 )
+		        ((void (__fastcall __noreturn *)(_QWORD, _QWORD))sub_1800D8250)(deferredSludgeECSList, v48);
+		      LODWORD(v66[5].monitor) = deferredSludgeECSList;
+		      characterPrePassECSList = input->characterPrePassECSList;
+		      if ( !v66 )
+		        ((void (__fastcall __noreturn *)(_QWORD, _QWORD))sub_1800D8250)(characterPrePassECSList, v48);
+		      HIDWORD(v66[5].monitor) = characterPrePassECSList;
+		      characterOutlinePrePassECSList = input->characterOutlinePrePassECSList;
+		      if ( !v66 )
+		        ((void (__fastcall __noreturn *)(_QWORD, _QWORD))sub_1800D8250)(characterOutlinePrePassECSList, v48);
+		      LODWORD(v66[6].klass) = characterOutlinePrePassECSList;
+		      LOBYTE(characterOutlinePrePassECSList) = input->enableTerrainTessellation;
+		      if ( !v66 )
+		        ((void (__fastcall __noreturn *)(_QWORD, _QWORD))sub_1800D8250)(characterOutlinePrePassECSList, v48);
+		      BYTE4(v66[6].monitor) = characterOutlinePrePassECSList;
+		      LOBYTE(characterOutlinePrePassECSList) = input->enableTerrainWetRipple;
+		      if ( !v66 )
+		        ((void (__fastcall __noreturn *)(_QWORD, _QWORD))sub_1800D8250)(characterOutlinePrePassECSList, v48);
+		      BYTE5(v66[6].monitor) = characterOutlinePrePassECSList;
+		      LOBYTE(characterOutlinePrePassECSList) = input->enableTerrainPOM;
+		      if ( !v66 )
+		        ((void (__fastcall __noreturn *)(_QWORD, _QWORD))sub_1800D8250)(characterOutlinePrePassECSList, v48);
+		      BYTE6(v66[6].monitor) = characterOutlinePrePassECSList;
+		      deferredOpaqueGPUDrivenList = input->deferredOpaqueGPUDrivenList;
+		      if ( !v66 )
+		        ((void (__fastcall __noreturn *)(_QWORD, _QWORD))sub_1800D8250)(deferredOpaqueGPUDrivenList, v48);
+		      HIDWORD(v66[6].klass) = deferredOpaqueGPUDrivenList;
+		      deferredOpaqueEqualGPUDrivenList = input->deferredOpaqueEqualGPUDrivenList;
+		      if ( !v66 )
+		        ((void (__fastcall __noreturn *)(_QWORD, _QWORD))sub_1800D8250)(deferredOpaqueEqualGPUDrivenList, v48);
+		      LODWORD(v66[6].monitor) = deferredOpaqueEqualGPUDrivenList;
+		      sub_1800036A0(TypeInfo::HG::Rendering::Runtime::GBufferPassConstructor);
+		      HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::SetRenderFunc<System::Object>(
+		        &v71,
+		        (RenderFunc_1_System_Object_ *)TypeInfo::HG::Rendering::Runtime::GBufferPassConstructor->static_fields->s_gBufferRenderFunc,
+		        0LL,
+		        0,
+		        MethodInfo::HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::SetRenderFunc<HG::Rendering::Runtime::GBufferPassConstructor::GBufferPassData>);
+		    }
+		    catch ( Il2CppExceptionWrapper *v73 )
+		    {
+		      v72.m_RenderPass = (HGRenderGraphPass *)v73->ex;
+		    }
+		    sub_180268AE0(&v72);
+		  }
+		}
+		
+		void IPassConstructor.OnPostRendering(ref PassEventInput input) {} // 0x0000000189BAE870-0x0000000189BAE8C4
+		// Void HG.Rendering.Runtime.IPassConstructor.OnPostRendering(PassEventInput ByRef)
+		void HG::Rendering::Runtime::GBufferPassConstructor::HG_Rendering_Runtime_IPassConstructor_OnPostRendering(
+		        GBufferPassConstructor *this,
+		        PassEventInput *input,
+		        MethodInfo *method)
+		{
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v6; // rdx
+		  __int64 v7; // rcx
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(3190, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(3190, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(v7, v6);
+		    IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_788(Patch, (Object *)this, input, 0LL);
+		  }
+		}
+		
+		void IPassConstructor.Dispose(HGRenderGraph renderGraph) {} // 0x0000000184D80470-0x0000000184D804A0
+		// Void HG.Rendering.Runtime.IPassConstructor.Dispose(HGRenderGraph)
+		void HG::Rendering::Runtime::GBufferPassConstructor::HG_Rendering_Runtime_IPassConstructor_Dispose(
+		        GBufferPassConstructor *this,
+		        HGRenderGraph *renderGraph,
+		        MethodInfo *method)
+		{
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v6; // rdx
+		  __int64 v7; // rcx
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(3191, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(3191, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(v7, v6);
+		    IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_1(
+		      (ILFixDynamicMethodWrapper_39 *)Patch,
+		      (Object *)this,
+		      (Object *)renderGraph,
+		      0LL);
+		  }
+		}
+		
 	}
 }

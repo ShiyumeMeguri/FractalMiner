@@ -1,34 +1,28 @@
-﻿using System;
+using System;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using UnityEngine.Rendering;
+
+// Image 4: HG.RenderPipelines.Runtime.dll - Assembly: HG.RenderPipelines.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null - Types 37354-38879
 
 namespace HG.Rendering.Runtime
 {
 	[Serializable]
-	public sealed class HGShadowSampleModeParameter : VolumeParameter<HGShadowSampleMode>
+	public sealed class HGShadowSampleModeParameter : VolumeParameter<HG.Rendering.Runtime.HGShadowSampleMode> // TypeDefIndex: 37893
 	{
-		public HGShadowSampleModeParameter(HGShadowSampleMode value, [MetadataOffset(Offset = "0x01F90E57")] bool overrideState = false)
+		// Constructors
+		public HGShadowSampleModeParameter() {} // Dummy constructor
+		public HGShadowSampleModeParameter(HGShadowSampleMode value, bool overrideState = false /* Metadata: 0x023031AB */) {} // 0x0000000184DA09B0-0x0000000184DA09C0
+		// VolumeParameter`1[UnityEngine.LayerMask](LayerMask, Boolean)
+		void UnityEngine::Rendering::VolumeParameter<UnityEngine::LayerMask>::VolumeParameter(
+		        VolumeParameter_1_UnityEngine_LayerMask_ *this,
+		        LayerMask value,
+		        bool overrideState,
+		        MethodInfo *method)
 		{
-			// // HGShadowSampleModeParameter(HGShadowSampleMode, Boolean)
-			// void HG::Rendering::Runtime::HGShadowSampleModeParameter::HGShadowSampleModeParameter(
-			//         HGShadowSampleModeParameter *this,
-			//         HGShadowSampleMode__Enum value,
-			//         bool overrideState,
-			//         MethodInfo *method)
-			// {
-			//   if ( byte_18D8EDD16 )
-			//   {
-			//     this.fields._.m_Value = value;
-			//     this.fields._._.overrideState = overrideState;
-			//   }
-			//   else
-			//   {
-			//     sub_18003C530(&MethodInfo::UnityEngine::Rendering::VolumeParameter<HG::Rendering::Runtime::HGShadowSampleMode>::VolumeParameter);
-			//     this.fields._.m_Value = value;
-			//     this.fields._._.overrideState = overrideState;
-			//     byte_18D8EDD16 = 1;
-			//   }
-			// }
-			// 
+		  this->fields.m_Value = value;
+		  this->fields._.overrideState = overrideState;
 		}
+		
 	}
 }

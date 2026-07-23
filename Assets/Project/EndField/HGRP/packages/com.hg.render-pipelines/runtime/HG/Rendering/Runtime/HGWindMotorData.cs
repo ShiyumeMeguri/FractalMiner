@@ -1,76 +1,69 @@
-﻿using System;
-using System.Runtime.InteropServices;
+using System;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using UnityEngine;
+
+// Image 4: HG.RenderPipelines.Runtime.dll - Assembly: HG.RenderPipelines.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null - Types 37354-38879
 
 namespace HG.Rendering.Runtime
 {
 	[Serializable]
-	[StructLayout(LayoutKind.Sequential, Pack = 1, Size = 52)]
-	public struct HGWindMotorData
+	public struct HGWindMotorData // TypeDefIndex: 37702
 	{
-		// (get) Token: 0x0600075A RID: 1882 RVA: 0x000025D8 File Offset: 0x000007D8
-		public bool IsSphere
-		{
-			get
-			{
-				// // Boolean get_isEmpty()
-				// bool UnityEngine::InputSystem::Utilities::MemoryHelpers::BitRegion::get_isEmpty(
-				//         MemoryHelpers_BitRegion *this,
-				//         MethodInfo *method)
-				// {
-				//   return this.sizeInBits == 0;
-				// }
-				// 
-				return default(bool);
-			}
-		}
-
-		// (get) Token: 0x0600075B RID: 1883 RVA: 0x000025D8 File Offset: 0x000007D8
-		public bool IsRect
-		{
-			get
-			{
-				// // Boolean get_IsRect()
-				// bool HG::Rendering::Runtime::HGWindMotorData::get_IsRect(HGWindMotorData *this, MethodInfo *method)
-				// {
-				//   return this.shape == 1;
-				// }
-				// 
-				return default(bool);
-			}
-		}
-
-		public HGWindPriority windPriority;
-
-		public HGWindShape shape;
-
-		public float rangeIn;
-
+		// Fields
+		public HGWindPriority windPriority; // 0x00
+		public HGWindShape shape; // 0x04
+		public float rangeIn; // 0x08
 		[HideInInspector]
-		public float length;
-
+		public float length; // 0x0C
 		[HideInInspector]
-		public float width;
-
+		public float width; // 0x10
 		[HideInInspector]
-		public float height;
-
-		public bool rectBackward;
-
+		public float height; // 0x14
+		public bool rectBackward; // 0x18
 		[HideInInspector]
-		public float radius;
-
+		public float radius; // 0x1C
 		[Range(0f, 360f)]
-		public float angle;
-
+		public float angle; // 0x20
 		[Range(0f, 40f)]
-		public float windSpeed;
-
-		public Orient focus;
-
-		public int motorInfo;
-
+		public float windSpeed; // 0x24
+		public Orient focus; // 0x28
+		public int motorInfo; // 0x2C
 		[HideInInspector]
-		public float distanceToCamera;
+		public float distanceToCamera; // 0x30
+	
+		// Properties
+		public bool IsSphere { get => default; } // 0x0000000189CF7074-0x0000000189CF70C4 
+		// Boolean get_IsSphere()
+		bool HG::Rendering::Runtime::HGWindMotorData::get_IsSphere(HGWindMotorData *this, MethodInfo *method)
+		{
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v5; // rdx
+		  __int64 v6; // rcx
+		
+		  if ( !IFix::WrappersManagerImpl::IsPatched(1707, 0LL) )
+		    return this->shape == 0;
+		  Patch = IFix::WrappersManagerImpl::GetPatch(1707, 0LL);
+		  if ( !Patch )
+		    sub_1800D8260(v6, v5);
+		  return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_683(Patch, this, 0LL);
+		}
+		
+		public bool IsRect { get => default; } // 0x0000000189CF7024-0x0000000189CF7074 
+		// Boolean get_IsRect()
+		bool HG::Rendering::Runtime::HGWindMotorData::get_IsRect(HGWindMotorData *this, MethodInfo *method)
+		{
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v5; // rdx
+		  __int64 v6; // rcx
+		
+		  if ( !IFix::WrappersManagerImpl::IsPatched(1708, 0LL) )
+		    return this->shape == 1;
+		  Patch = IFix::WrappersManagerImpl::GetPatch(1708, 0LL);
+		  if ( !Patch )
+		    sub_1800D8260(v6, v5);
+		  return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_683(Patch, this, 0LL);
+		}
+		
 	}
 }

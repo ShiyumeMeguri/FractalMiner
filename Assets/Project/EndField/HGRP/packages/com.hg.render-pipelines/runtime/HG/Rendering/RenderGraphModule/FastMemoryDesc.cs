@@ -1,16 +1,17 @@
-﻿using System;
-using System.Runtime.InteropServices;
+using System;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using UnityEngine.Rendering;
+
+// Image 4: HG.RenderPipelines.Runtime.dll - Assembly: HG.RenderPipelines.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null - Types 37354-38879
 
 namespace HG.Rendering.RenderGraphModule
 {
-	[StructLayout(LayoutKind.Sequential, Pack = 1, Size = 12)]
-	public struct FastMemoryDesc
+	public struct FastMemoryDesc // TypeDefIndex: 37470
 	{
-		public bool inFastMemory;
-
-		public FastMemoryFlags flags;
-
-		public float residencyFraction;
+		// Fields
+		public bool inFastMemory; // 0x00
+		public FastMemoryFlags flags; // 0x04
+		public float residencyFraction; // 0x08
 	}
 }

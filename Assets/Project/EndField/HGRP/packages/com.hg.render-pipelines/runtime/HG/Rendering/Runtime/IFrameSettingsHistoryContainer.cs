@@ -1,40 +1,19 @@
-﻿using System;
+using System;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using UnityEngine.Rendering;
+
+// Image 4: HG.RenderPipelines.Runtime.dll - Assembly: HG.RenderPipelines.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null - Types 37354-38879
 
 namespace HG.Rendering.Runtime
 {
-	internal interface IFrameSettingsHistoryContainer : IDebugData
+	internal interface IFrameSettingsHistoryContainer : IDebugData // TypeDefIndex: 38543
 	{
-		// (get) Token: 0x0600131F RID: 4895
-		// (set) Token: 0x06001320 RID: 4896
-		FrameSettingsHistory frameSettingsHistory
-		{
-			get;
-			set;
-		}
-
-		// (get) Token: 0x06001321 RID: 4897
-		FrameSettingsOverrideMask frameSettingsMask
-		{
-			get;
-		}
-
-		// (get) Token: 0x06001322 RID: 4898
-		FrameSettings frameSettings
-		{
-			get;
-		}
-
-		// (get) Token: 0x06001323 RID: 4899
-		bool hasCustomFrameSettings
-		{
-			get;
-		}
-
-		// (get) Token: 0x06001324 RID: 4900
-		string panelName
-		{
-			get;
-		}
+		// Properties
+		FrameSettingsHistory frameSettingsHistory { get; set; }
+		FrameSettingsOverrideMask frameSettingsMask { get; }
+		FrameSettings frameSettings { get; }
+		bool hasCustomFrameSettings { get; }
+		string panelName { get; }
 	}
 }

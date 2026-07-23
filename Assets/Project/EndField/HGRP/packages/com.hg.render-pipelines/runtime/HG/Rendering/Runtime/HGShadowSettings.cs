@@ -1,199 +1,164 @@
-﻿using System;
+using System;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using UnityEngine.Rendering;
+
+// Image 4: HG.RenderPipelines.Runtime.dll - Assembly: HG.RenderPipelines.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null - Types 37354-38879
 
 namespace HG.Rendering.Runtime
 {
-	[MigratingVolumeComponent]
-	[VolumeComponentMenuForRenderPipeline("Shadowing/Shadows", new Type[] { typeof(HGRenderPipeline) })]
 	[Serializable]
-	public class HGShadowSettings : VolumeComponent
+	[MigratingVolumeComponent]
+	[VolumeComponentMenuForRenderPipeline("Shadowing/Shadows", new System.Type[1] {typeof(HGRenderPipeline) })]
+	public class HGShadowSettings : VolumeComponent // TypeDefIndex: 37889
 	{
-		private HGShadowSettings()
+		// Fields
+		public ClampedFloatParameter csmDepthBias; // 0x30
+		public ClampedFloatParameter csmNormalBias; // 0x38
+		public ClampedFloatParameter shadowIntensity; // 0x40
+		public ClampedFloatParameter csmShadowSoftness; // 0x48
+		public Texture2DParameter csmShadowRamp; // 0x50
+		public ClampedFloatParameter characterDepthBias; // 0x58
+		public ClampedFloatParameter characterNormalBias; // 0x60
+		public LightShadowResolutionParameter characterShadowResolution; // 0x68
+		public HGShadowSampleModeParameter characterShadowSampleMode; // 0x70
+	
+		// Constructors
+		private HGShadowSettings() {} // 0x000000018402BD10-0x000000018402BF60
+		// HGShadowSettings()
+		void HG::Rendering::Runtime::HGShadowSettings::HGShadowSettings(HGShadowSettings *this, MethodInfo *method)
 		{
-			// // HGShadowSettings()
-			// void HG::Rendering::Runtime::HGShadowSettings::HGShadowSettings(HGShadowSettings *this, MethodInfo *method)
-			// {
-			//   ClampedFloatParameter *v3; // rax
-			//   __int64 v4; // rdx
-			//   __int64 v5; // rcx
-			//   ClampedFloatParameter *v6; // rdi
-			//   HGRenderPathBase_HGRenderPathResources *v7; // rdx
-			//   PassConstructorID__Enum__Array *v8; // r8
-			//   HGCamera *v9; // r9
-			//   ClampedFloatParameter *v10; // rax
-			//   ClampedFloatParameter *v11; // rdi
-			//   HGRenderPathBase_HGRenderPathResources *v12; // rdx
-			//   PassConstructorID__Enum__Array *v13; // r8
-			//   HGCamera *v14; // r9
-			//   ClampedFloatParameter *v15; // rax
-			//   ClampedFloatParameter *v16; // rdi
-			//   HGRenderPathBase_HGRenderPathResources *v17; // rdx
-			//   PassConstructorID__Enum__Array *v18; // r8
-			//   HGCamera *v19; // r9
-			//   ClampedFloatParameter *v20; // rax
-			//   ClampedFloatParameter *v21; // rdi
-			//   HGRenderPathBase_HGRenderPathResources *v22; // rdx
-			//   PassConstructorID__Enum__Array *v23; // r8
-			//   HGCamera *v24; // r9
-			//   Texture2DParameter *v25; // rax
-			//   Texture2DParameter *v26; // rdi
-			//   HGRenderPathBase_HGRenderPathResources *v27; // rdx
-			//   PassConstructorID__Enum__Array *v28; // r8
-			//   HGCamera *v29; // r9
-			//   ClampedFloatParameter *v30; // rax
-			//   ClampedFloatParameter *v31; // rdi
-			//   HGRenderPathBase_HGRenderPathResources *v32; // rdx
-			//   PassConstructorID__Enum__Array *v33; // r8
-			//   HGCamera *v34; // r9
-			//   ClampedFloatParameter *v35; // rax
-			//   ClampedFloatParameter *v36; // rdi
-			//   HGRenderPathBase_HGRenderPathResources *v37; // rdx
-			//   PassConstructorID__Enum__Array *v38; // r8
-			//   HGCamera *v39; // r9
-			//   LightShadowResolutionParameter *v40; // rax
-			//   LightShadowResolutionParameter *v41; // rdi
-			//   HGRenderPathBase_HGRenderPathResources *v42; // rdx
-			//   PassConstructorID__Enum__Array *v43; // r8
-			//   HGCamera *v44; // r9
-			//   HGShadowSampleModeParameter *v45; // rax
-			//   HGShadowSampleModeParameter *v46; // rdi
-			//   HGRenderPathBase_HGRenderPathResources *v47; // rdx
-			//   PassConstructorID__Enum__Array *v48; // r8
-			//   HGCamera *v49; // r9
-			//   HGRenderPathBase_HGRenderPathResources *v50; // rdx
-			//   PassConstructorID__Enum__Array *v51; // r8
-			//   HGCamera *v52; // r9
-			//   MethodInfo *overrideStatec; // [rsp+20h] [rbp-28h]
-			//   MethodInfo *overrideStated; // [rsp+20h] [rbp-28h]
-			//   MethodInfo *overrideStatee; // [rsp+20h] [rbp-28h]
-			//   MethodInfo *overrideStatef; // [rsp+20h] [rbp-28h]
-			//   MethodInfo *overrideState; // [rsp+20h] [rbp-28h]
-			//   MethodInfo *overrideStateg; // [rsp+20h] [rbp-28h]
-			//   MethodInfo *overrideStateh; // [rsp+20h] [rbp-28h]
-			//   MethodInfo *overrideStatea; // [rsp+20h] [rbp-28h]
-			//   MethodInfo *overrideStateb; // [rsp+20h] [rbp-28h]
-			//   MethodInfo *methodd; // [rsp+28h] [rbp-20h]
-			//   MethodInfo *methode; // [rsp+28h] [rbp-20h]
-			//   MethodInfo *methodf; // [rsp+28h] [rbp-20h]
-			//   MethodInfo *methodg; // [rsp+28h] [rbp-20h]
-			//   MethodInfo *methoda; // [rsp+28h] [rbp-20h]
-			//   MethodInfo *methodh; // [rsp+28h] [rbp-20h]
-			//   MethodInfo *methodi; // [rsp+28h] [rbp-20h]
-			//   MethodInfo *methodb; // [rsp+28h] [rbp-20h]
-			//   MethodInfo *methodc; // [rsp+28h] [rbp-20h]
-			//   MethodInfo *v71; // [rsp+70h] [rbp+28h]
-			//   MethodInfo *v72; // [rsp+78h] [rbp+30h]
-			// 
-			//   if ( !byte_18D8EDD14 )
-			//   {
-			//     sub_18003C530(&TypeInfo::UnityEngine::Rendering::ClampedFloatParameter);
-			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGShadowSampleModeParameter);
-			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::LightShadowResolutionParameter);
-			//     sub_18003C530(&TypeInfo::UnityEngine::Rendering::Texture2DParameter);
-			//     sub_18003C530(&off_18C9BC568);
-			//     byte_18D8EDD14 = 1;
-			//   }
-			//   v3 = (ClampedFloatParameter *)sub_180004920(TypeInfo::UnityEngine::Rendering::ClampedFloatParameter);
-			//   v6 = v3;
-			//   if ( !v3 )
-			//     goto LABEL_13;
-			//   UnityEngine::Rendering::ClampedFloatParameter::ClampedFloatParameter(v3, 1.0, 0.0, 10.0, 0, 0LL);
-			//   this.fields.csmDepthBias = v6;
-			//   sub_1800054D0((HGRenderPathScene *)&this.fields.csmDepthBias, v7, v8, v9, overrideStatec, methodd);
-			//   v10 = (ClampedFloatParameter *)sub_180004920(TypeInfo::UnityEngine::Rendering::ClampedFloatParameter);
-			//   v11 = v10;
-			//   if ( !v10 )
-			//     goto LABEL_13;
-			//   UnityEngine::Rendering::ClampedFloatParameter::ClampedFloatParameter(v10, 1.0, 0.0, 5.0, 0, 0LL);
-			//   this.fields.csmNormalBias = v11;
-			//   sub_1800054D0((HGRenderPathScene *)&this.fields.csmNormalBias, v12, v13, v14, overrideStated, methode);
-			//   v15 = (ClampedFloatParameter *)sub_180004920(TypeInfo::UnityEngine::Rendering::ClampedFloatParameter);
-			//   v16 = v15;
-			//   if ( !v15 )
-			//     goto LABEL_13;
-			//   UnityEngine::Rendering::ClampedFloatParameter::ClampedFloatParameter(v15, 1.0, 0.0, 1.0, 0, 0LL);
-			//   this.fields.shadowIntensity = v16;
-			//   sub_1800054D0((HGRenderPathScene *)&this.fields.shadowIntensity, v17, v18, v19, overrideStatee, methodf);
-			//   v20 = (ClampedFloatParameter *)sub_180004920(TypeInfo::UnityEngine::Rendering::ClampedFloatParameter);
-			//   v21 = v20;
-			//   if ( !v20 )
-			//     goto LABEL_13;
-			//   UnityEngine::Rendering::ClampedFloatParameter::ClampedFloatParameter(v20, 0.0099999998, 0.001, 0.1, 0, 0LL);
-			//   this.fields.csmShadowSoftness = v21;
-			//   sub_1800054D0((HGRenderPathScene *)&this.fields.csmShadowSoftness, v22, v23, v24, overrideStatef, methodg);
-			//   v25 = (Texture2DParameter *)sub_180004920(TypeInfo::UnityEngine::Rendering::Texture2DParameter);
-			//   v26 = v25;
-			//   if ( !v25 )
-			//     goto LABEL_13;
-			//   UnityEngine::Rendering::Texture2DParameter::Texture2DParameter(v25, 0LL, 0, 0LL);
-			//   this.fields.csmShadowRamp = v26;
-			//   sub_1800054D0((HGRenderPathScene *)&this.fields.csmShadowRamp, v27, v28, v29, overrideState, methoda);
-			//   v30 = (ClampedFloatParameter *)sub_180004920(TypeInfo::UnityEngine::Rendering::ClampedFloatParameter);
-			//   v31 = v30;
-			//   if ( !v30 )
-			//     goto LABEL_13;
-			//   UnityEngine::Rendering::ClampedFloatParameter::ClampedFloatParameter(v30, 1.0, 0.0, 3.0, 0, 0LL);
-			//   this.fields.characterDepthBias = v31;
-			//   sub_1800054D0((HGRenderPathScene *)&this.fields.characterDepthBias, v32, v33, v34, overrideStateg, methodh);
-			//   v35 = (ClampedFloatParameter *)sub_180004920(TypeInfo::UnityEngine::Rendering::ClampedFloatParameter);
-			//   v36 = v35;
-			//   if ( !v35 )
-			//     goto LABEL_13;
-			//   UnityEngine::Rendering::ClampedFloatParameter::ClampedFloatParameter(v35, 1.0, 0.0, 25.0, 0, 0LL);
-			//   this.fields.characterNormalBias = v36;
-			//   sub_1800054D0((HGRenderPathScene *)&this.fields.characterNormalBias, v37, v38, v39, overrideStateh, methodi);
-			//   v40 = (LightShadowResolutionParameter *)sub_180004920(TypeInfo::HG::Rendering::Runtime::LightShadowResolutionParameter);
-			//   v41 = v40;
-			//   if ( !v40
-			//     || (HG::Rendering::Runtime::LightShadowResolutionParameter::LightShadowResolutionParameter(
-			//           v40,
-			//           LightShadowResolution__Enum_FromQualitySettings,
-			//           0,
-			//           0LL),
-			//         this.fields.characterShadowResolution = v41,
-			//         sub_1800054D0(
-			//           (HGRenderPathScene *)&this.fields.characterShadowResolution,
-			//           v42,
-			//           v43,
-			//           v44,
-			//           overrideStatea,
-			//           methodb),
-			//         v45 = (HGShadowSampleModeParameter *)sub_180004920(TypeInfo::HG::Rendering::Runtime::HGShadowSampleModeParameter),
-			//         (v46 = v45) == 0LL) )
-			//   {
-			// LABEL_13:
-			//     sub_180B536AC(v5, v4);
-			//   }
-			//   HG::Rendering::Runtime::HGShadowSampleModeParameter::HGShadowSampleModeParameter(
-			//     v45,
-			//     HGShadowSampleMode__Enum_PCF_Hard,
-			//     0,
-			//     0LL);
-			//   this.fields.characterShadowSampleMode = v46;
-			//   sub_1800054D0((HGRenderPathScene *)&this.fields.characterShadowSampleMode, v47, v48, v49, overrideStateb, methodc);
-			//   UnityEngine::Rendering::VolumeComponent::VolumeComponent((VolumeComponent *)this, 0LL);
-			//   this.fields._._displayName_k__BackingField = (String *)"Shadows";
-			//   sub_1800054D0((HGRenderPathScene *)&this.fields._._displayName_k__BackingField, v50, v51, v52, v71, v72);
-			// }
-			// 
+		  __int64 v3; // rax
+		  HGRuntimeGrassQuery_Node *v4; // rdx
+		  __int64 v5; // rcx
+		  HGRuntimeGrassQuery_Node *v6; // r8
+		  Int32__Array **v7; // r9
+		  __int64 v8; // rax
+		  HGRuntimeGrassQuery_Node *v9; // r8
+		  Int32__Array **v10; // r9
+		  __int64 v11; // rax
+		  HGRuntimeGrassQuery_Node *v12; // r8
+		  Int32__Array **v13; // r9
+		  __int64 v14; // rax
+		  HGRuntimeGrassQuery_Node *v15; // r8
+		  Int32__Array **v16; // r9
+		  Texture2DParameter *v17; // rax
+		  Texture2DParameter *v18; // rdi
+		  HGRuntimeGrassQuery_Node *v19; // rdx
+		  HGRuntimeGrassQuery_Node *v20; // r8
+		  Int32__Array **v21; // r9
+		  __int64 v22; // rax
+		  HGRuntimeGrassQuery_Node *v23; // r8
+		  Int32__Array **v24; // r9
+		  __int64 v25; // rax
+		  HGRuntimeGrassQuery_Node *v26; // r8
+		  Int32__Array **v27; // r9
+		  LightShadowResolutionParameter *v28; // rax
+		  HGRuntimeGrassQuery_Node *v29; // r8
+		  Int32__Array **v30; // r9
+		  HGShadowSampleModeParameter *v31; // rax
+		  HGRuntimeGrassQuery_Node *v32; // r8
+		  Int32__Array **v33; // r9
+		  HGRuntimeGrassQuery_Node *v34; // rdx
+		  HGRuntimeGrassQuery_Node *v35; // r8
+		  Int32__Array **v36; // r9
+		  MethodInfo *v37; // [rsp+20h] [rbp-8h]
+		  MethodInfo *v38; // [rsp+20h] [rbp-8h]
+		  MethodInfo *v39; // [rsp+20h] [rbp-8h]
+		  MethodInfo *v40; // [rsp+20h] [rbp-8h]
+		  MethodInfo *v41; // [rsp+20h] [rbp-8h]
+		  MethodInfo *v42; // [rsp+20h] [rbp-8h]
+		  MethodInfo *v43; // [rsp+20h] [rbp-8h]
+		  MethodInfo *v44; // [rsp+20h] [rbp-8h]
+		  MethodInfo *v45; // [rsp+20h] [rbp-8h]
+		  MethodInfo *v46; // [rsp+50h] [rbp+28h]
+		
+		  v3 = sub_1800368D0(TypeInfo::UnityEngine::Rendering::ClampedFloatParameter);
+		  if ( !v3 )
+		    goto LABEL_11;
+		  *(_DWORD *)(v3 + 24) = 1065353216;
+		  *(_BYTE *)(v3 + 16) = 0;
+		  *(_DWORD *)(v3 + 32) = 0;
+		  *(_DWORD *)(v3 + 36) = 1092616192;
+		  *(_DWORD *)(v3 + 40) = 1065353216;
+		  this->fields.csmDepthBias = (ClampedFloatParameter *)v3;
+		  sub_18002D1B0((HGRuntimeGrassQuery_Node *)&this->fields.csmDepthBias, v4, v6, v7, v37);
+		  v8 = sub_1800368D0(TypeInfo::UnityEngine::Rendering::ClampedFloatParameter);
+		  if ( !v8 )
+		    goto LABEL_11;
+		  *(_DWORD *)(v8 + 24) = 1065353216;
+		  *(_BYTE *)(v8 + 16) = 0;
+		  *(_DWORD *)(v8 + 32) = 0;
+		  *(_DWORD *)(v8 + 36) = 1084227584;
+		  *(_DWORD *)(v8 + 40) = 1065353216;
+		  this->fields.csmNormalBias = (ClampedFloatParameter *)v8;
+		  sub_18002D1B0((HGRuntimeGrassQuery_Node *)&this->fields.csmNormalBias, v4, v9, v10, v38);
+		  v11 = sub_1800368D0(TypeInfo::UnityEngine::Rendering::ClampedFloatParameter);
+		  if ( !v11 )
+		    goto LABEL_11;
+		  *(_DWORD *)(v11 + 24) = 1065353216;
+		  *(_BYTE *)(v11 + 16) = 0;
+		  *(_DWORD *)(v11 + 32) = 0;
+		  *(_DWORD *)(v11 + 36) = 1065353216;
+		  *(_DWORD *)(v11 + 40) = 1065353216;
+		  this->fields.shadowIntensity = (ClampedFloatParameter *)v11;
+		  sub_18002D1B0((HGRuntimeGrassQuery_Node *)&this->fields.shadowIntensity, v4, v12, v13, v39);
+		  v14 = sub_1800368D0(TypeInfo::UnityEngine::Rendering::ClampedFloatParameter);
+		  if ( !v14 )
+		    goto LABEL_11;
+		  *(_DWORD *)(v14 + 24) = 1008981770;
+		  *(_BYTE *)(v14 + 16) = 0;
+		  *(_DWORD *)(v14 + 32) = 981668463;
+		  *(_DWORD *)(v14 + 36) = 1036831949;
+		  *(_DWORD *)(v14 + 40) = 1065353216;
+		  this->fields.csmShadowSoftness = (ClampedFloatParameter *)v14;
+		  sub_18002D1B0((HGRuntimeGrassQuery_Node *)&this->fields.csmShadowSoftness, v4, v15, v16, v40);
+		  v17 = (Texture2DParameter *)sub_1800368D0(TypeInfo::UnityEngine::Rendering::Texture2DParameter);
+		  v18 = v17;
+		  if ( !v17 )
+		    goto LABEL_11;
+		  UnityEngine::Rendering::Texture2DParameter::Texture2DParameter(v17, 0LL, 0, 0LL);
+		  this->fields.csmShadowRamp = v18;
+		  sub_18002D1B0((HGRuntimeGrassQuery_Node *)&this->fields.csmShadowRamp, v19, v20, v21, v41);
+		  v22 = sub_1800368D0(TypeInfo::UnityEngine::Rendering::ClampedFloatParameter);
+		  if ( !v22 )
+		    goto LABEL_11;
+		  *(_DWORD *)(v22 + 24) = 1065353216;
+		  *(_BYTE *)(v22 + 16) = 0;
+		  *(_DWORD *)(v22 + 32) = 0;
+		  *(_DWORD *)(v22 + 36) = 1077936128;
+		  *(_DWORD *)(v22 + 40) = 1065353216;
+		  this->fields.characterDepthBias = (ClampedFloatParameter *)v22;
+		  sub_18002D1B0((HGRuntimeGrassQuery_Node *)&this->fields.characterDepthBias, v4, v23, v24, v42);
+		  v25 = sub_1800368D0(TypeInfo::UnityEngine::Rendering::ClampedFloatParameter);
+		  if ( !v25 )
+		    goto LABEL_11;
+		  *(_DWORD *)(v25 + 24) = 1065353216;
+		  *(_BYTE *)(v25 + 16) = 0;
+		  *(_DWORD *)(v25 + 32) = 0;
+		  *(_DWORD *)(v25 + 36) = 1103626240;
+		  *(_DWORD *)(v25 + 40) = 1065353216;
+		  this->fields.characterNormalBias = (ClampedFloatParameter *)v25;
+		  sub_18002D1B0((HGRuntimeGrassQuery_Node *)&this->fields.characterNormalBias, v4, v26, v27, v43);
+		  v28 = (LightShadowResolutionParameter *)sub_1800368D0(TypeInfo::HG::Rendering::Runtime::LightShadowResolutionParameter);
+		  if ( !v28
+		    || (v28->fields._.m_Value = -1,
+		        v28->fields._._.overrideState = 0,
+		        this->fields.characterShadowResolution = v28,
+		        sub_18002D1B0((HGRuntimeGrassQuery_Node *)&this->fields.characterShadowResolution, v4, v29, v30, v44),
+		        (v31 = (HGShadowSampleModeParameter *)sub_1800368D0(TypeInfo::HG::Rendering::Runtime::HGShadowSampleModeParameter)) == 0LL) )
+		  {
+		LABEL_11:
+		    sub_1800D8260(v5, v4);
+		  }
+		  v31->fields._.m_Value = 0;
+		  v31->fields._._.overrideState = 0;
+		  this->fields.characterShadowSampleMode = v31;
+		  sub_18002D1B0((HGRuntimeGrassQuery_Node *)&this->fields.characterShadowSampleMode, v4, v32, v33, v45);
+		  UnityEngine::Rendering::VolumeComponent::VolumeComponent((VolumeComponent *)this, 0LL);
+		  this->fields._._displayName_k__BackingField = (String *)"Shadows";
+		  sub_18002D1B0((HGRuntimeGrassQuery_Node *)&this->fields._._displayName_k__BackingField, v34, v35, v36, v46);
 		}
-
-		public ClampedFloatParameter csmDepthBias;
-
-		public ClampedFloatParameter csmNormalBias;
-
-		public ClampedFloatParameter shadowIntensity;
-
-		public ClampedFloatParameter csmShadowSoftness;
-
-		public Texture2DParameter csmShadowRamp;
-
-		public ClampedFloatParameter characterDepthBias;
-
-		public ClampedFloatParameter characterNormalBias;
-
-		public LightShadowResolutionParameter characterShadowResolution;
-
-		public HGShadowSampleModeParameter characterShadowSampleMode;
+		
 	}
 }

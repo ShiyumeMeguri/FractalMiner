@@ -1,39 +1,38 @@
-﻿using System;
+using System;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
+
+// Image 4: HG.RenderPipelines.Runtime.dll - Assembly: HG.RenderPipelines.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null - Types 37354-38879
 
 namespace HG.Rendering.Runtime
 {
-	internal static class TypeInfo
+	internal static class TypeInfo // TypeDefIndex: 38704
 	{
-		public static TEnum[] GetEnumValues<TEnum>() where TEnum : struct, IConvertible
+		// Nested types
+		private struct EnumInfoJITCache<TEnum> // TypeDefIndex: 38703
+			where TEnum : struct, IConvertible
 		{
-			return null;
-		}
-
-		public static int GetEnumLength<TEnum>() where TEnum : struct, IConvertible
-		{
-			return 0;
-		}
-
-		public static string[] GetEnumNames<TEnum>() where TEnum : struct, IConvertible
-		{
-			return null;
-		}
-
-		public static TEnum GetEnumLastValue<TEnum>() where TEnum : struct, IConvertible
-		{
-			return null;
-		}
-
-		private struct EnumInfoJITCache<TEnum> where TEnum : struct, IConvertible
-		{
-			[StaticFieldOffset(ThreadStatic = false, Offset = "0x00")]
+			// Fields
 			public static readonly TEnum[] values;
-
-			[StaticFieldOffset(ThreadStatic = false, Offset = "0x00")]
 			public static readonly string[] names;
-
-			[StaticFieldOffset(ThreadStatic = false, Offset = "0x00")]
 			public static readonly int length;
+	
+			// Constructors
+			static EnumInfoJITCache() {
+				values = default;
+				names = default;
+				length = default;
+			}
 		}
+	
+		// Methods
+		public static TEnum[] GetEnumValues<TEnum>()
+			where TEnum : struct, IConvertible => default;
+		public static int GetEnumLength<TEnum>()
+			where TEnum : struct, IConvertible => default;
+		public static string[] GetEnumNames<TEnum>()
+			where TEnum : struct, IConvertible => default;
+		public static TEnum GetEnumLastValue<TEnum>()
+			where TEnum : struct, IConvertible => default;
 	}
 }

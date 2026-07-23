@@ -1,187 +1,200 @@
-﻿using System;
+using System;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using UnityEngine.Rendering;
+
+// Image 4: HG.RenderPipelines.Runtime.dll - Assembly: HG.RenderPipelines.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null - Types 37354-38879
 
 namespace HG.Rendering.Runtime
 {
-	[VolumeComponentMenuForRenderPipeline("HG/Other Settings", new Type[] { typeof(HGRenderPipeline) })]
 	[Serializable]
-	public sealed class OtherSettings : VolumeComponent, IPostProcessComponent
+	[VolumeComponentMenuForRenderPipeline("HG/Other Settings", new System.Type[1] {typeof(HGRenderPipeline) })]
+	public sealed class OtherSettings : VolumeComponent, IPostProcessComponent // TypeDefIndex: 38055
 	{
-		public OtherSettings()
+		// Fields
+		public BoolParameter enable; // 0x30
+		public BoolParameter fakePlanarReflection; // 0x38
+		public BoolParameter fakePlanarDisableCharacterOutline; // 0x40
+		public Vector3Parameter fakeReflectionProbeNormal; // 0x48
+		public Vector3Parameter fakeReflectionPos; // 0x50
+		public FloatParameter fakePlanarReflectionBlur; // 0x58
+	
+		// Constructors
+		public OtherSettings() {} // 0x00000001844160C0-0x0000000184416260
+		// OtherSettings()
+		void HG::Rendering::Runtime::OtherSettings::OtherSettings(OtherSettings *this, MethodInfo *method)
 		{
-			// // OtherSettings()
-			// void HG::Rendering::Runtime::OtherSettings::OtherSettings(OtherSettings *this, MethodInfo *method)
-			// {
-			//   __int128 v2; // xmm7
-			//   BoolParameter *v4; // rax
-			//   HGRenderPathBase_HGRenderPathResources *v5; // rdx
-			//   __int64 v6; // rcx
-			//   BoolParameter *v7; // rdi
-			//   HGRenderPathBase_HGRenderPathResources *v8; // rdx
-			//   PassConstructorID__Enum__Array *v9; // r8
-			//   HGCamera *v10; // r9
-			//   BoolParameter *v11; // rax
-			//   BoolParameter *v12; // rdi
-			//   HGRenderPathBase_HGRenderPathResources *v13; // rdx
-			//   PassConstructorID__Enum__Array *v14; // r8
-			//   HGCamera *v15; // r9
-			//   BoolParameter *v16; // rax
-			//   BoolParameter *v17; // rdi
-			//   HGRenderPathBase_HGRenderPathResources *v18; // rdx
-			//   PassConstructorID__Enum__Array *v19; // r8
-			//   HGCamera *v20; // r9
-			//   __int64 v21; // rdi
-			//   PassConstructorID__Enum__Array *v22; // r8
-			//   HGCamera *v23; // r9
-			//   __int64 v24; // rdi
-			//   PassConstructorID__Enum__Array *v25; // r8
-			//   HGCamera *v26; // r9
-			//   FloatParameter *v27; // rax
-			//   FloatParameter *v28; // rdi
-			//   HGRenderPathBase_HGRenderPathResources *v29; // rdx
-			//   PassConstructorID__Enum__Array *v30; // r8
-			//   HGCamera *v31; // r9
-			//   MethodInfo *v32; // [rsp+20h] [rbp-28h]
-			//   MethodInfo *v33; // [rsp+20h] [rbp-28h]
-			//   MethodInfo *v34; // [rsp+20h] [rbp-28h]
-			//   MethodInfo *v35; // [rsp+20h] [rbp-28h]
-			//   MethodInfo *v36; // [rsp+20h] [rbp-28h]
-			//   MethodInfo *v37; // [rsp+28h] [rbp-20h]
-			//   MethodInfo *v38; // [rsp+28h] [rbp-20h]
-			//   MethodInfo *v39; // [rsp+28h] [rbp-20h]
-			//   MethodInfo *v40; // [rsp+28h] [rbp-20h]
-			//   MethodInfo *v41; // [rsp+28h] [rbp-20h]
-			// 
-			//   if ( !byte_18D8ED9E2 )
-			//   {
-			//     sub_18003C530(&TypeInfo::UnityEngine::Rendering::BoolParameter);
-			//     sub_18003C530(&TypeInfo::UnityEngine::Rendering::FloatParameter);
-			//     sub_18003C530(&TypeInfo::UnityEngine::Rendering::Vector3Parameter);
-			//     byte_18D8ED9E2 = 1;
-			//   }
-			//   v4 = (BoolParameter *)sub_180004920(TypeInfo::UnityEngine::Rendering::BoolParameter);
-			//   v7 = v4;
-			//   if ( !v4 )
-			//     goto LABEL_14;
-			//   UnityEngine::Rendering::BoolParameter::BoolParameter(v4, 0, 0, 0LL);
-			//   this.fields.enable = v7;
-			//   sub_1800054D0((HGRenderPathScene *)&this.fields.enable, v8, v9, v10, (MethodInfo *)v2, *((MethodInfo **)&v2 + 1));
-			//   v11 = (BoolParameter *)sub_180004920(TypeInfo::UnityEngine::Rendering::BoolParameter);
-			//   v12 = v11;
-			//   if ( !v11 )
-			//     goto LABEL_14;
-			//   UnityEngine::Rendering::BoolParameter::BoolParameter(v11, 0, 0, 0LL);
-			//   this.fields.fakePlanarReflection = v12;
-			//   sub_1800054D0((HGRenderPathScene *)&this.fields.fakePlanarReflection, v13, v14, v15, v32, v37);
-			//   v16 = (BoolParameter *)sub_180004920(TypeInfo::UnityEngine::Rendering::BoolParameter);
-			//   v17 = v16;
-			//   if ( !v16 )
-			//     goto LABEL_14;
-			//   UnityEngine::Rendering::BoolParameter::BoolParameter(v16, 0, 0, 0LL);
-			//   this.fields.fakePlanarDisableCharacterOutline = v17;
-			//   sub_1800054D0((HGRenderPathScene *)&this.fields.fakePlanarDisableCharacterOutline, v18, v19, v20, v33, v38);
-			//   v21 = sub_180004920(TypeInfo::UnityEngine::Rendering::Vector3Parameter);
-			//   if ( !v21 )
-			//     goto LABEL_14;
-			//   if ( !byte_18D8F3663 )
-			//   {
-			//     sub_18003C530(&MethodInfo::UnityEngine::Rendering::VolumeParameter<UnityEngine::Vector3>::VolumeParameter);
-			//     byte_18D8F3663 = 1;
-			//   }
-			//   *(_BYTE *)(v21 + 16) = 0;
-			//   *(_QWORD *)(v21 + 24) = _mm_unpacklo_ps((__m128)0LL, (__m128)0x3F800000u).m128_u64[0];
-			//   *(_DWORD *)(v21 + 32) = 0;
-			//   this.fields.fakeReflectionProbeNormal = (Vector3Parameter *)v21;
-			//   sub_1800054D0((HGRenderPathScene *)&this.fields.fakeReflectionProbeNormal, v5, v22, v23, v34, v39);
-			//   v24 = sub_180004920(TypeInfo::UnityEngine::Rendering::Vector3Parameter);
-			//   if ( !v24 )
-			//     goto LABEL_14;
-			//   if ( !byte_18D8F3663 )
-			//   {
-			//     sub_18003C530(&MethodInfo::UnityEngine::Rendering::VolumeParameter<UnityEngine::Vector3>::VolumeParameter);
-			//     byte_18D8F3663 = 1;
-			//   }
-			//   *(_BYTE *)(v24 + 16) = 0;
-			//   *(_QWORD *)(v24 + 24) = _mm_unpacklo_ps((__m128)0LL, (__m128)0LL).m128_u64[0];
-			//   *(_DWORD *)(v24 + 32) = 0;
-			//   this.fields.fakeReflectionPos = (Vector3Parameter *)v24;
-			//   sub_1800054D0((HGRenderPathScene *)&this.fields.fakeReflectionPos, v5, v25, v26, v35, v40);
-			//   v27 = (FloatParameter *)sub_180004920(TypeInfo::UnityEngine::Rendering::FloatParameter);
-			//   v28 = v27;
-			//   if ( !v27 )
-			// LABEL_14:
-			//     sub_180B536AC(v6, v5);
-			//   UnityEngine::Rendering::FloatParameter::FloatParameter(v27, 1.0, 0, 0LL);
-			//   this.fields.fakePlanarReflectionBlur = v28;
-			//   sub_1800054D0((HGRenderPathScene *)&this.fields.fakePlanarReflectionBlur, v29, v30, v31, v36, v41);
-			//   UnityEngine::Rendering::VolumeComponent::VolumeComponent((VolumeComponent *)this, 0LL);
-			// }
-			// 
+		  BoolParameter *v3; // rax
+		  HGRuntimeGrassQuery_Node *v4; // rdx
+		  __int64 v5; // rcx
+		  HGRuntimeGrassQuery_Node *v6; // r8
+		  Int32__Array **v7; // r9
+		  BoolParameter *v8; // rax
+		  HGRuntimeGrassQuery_Node *v9; // r8
+		  Int32__Array **v10; // r9
+		  BoolParameter *v11; // rax
+		  HGRuntimeGrassQuery_Node *v12; // r8
+		  Int32__Array **v13; // r9
+		  __int64 v14; // rdi
+		  HGRuntimeGrassQuery_Node *v15; // r8
+		  Int32__Array **v16; // r9
+		  __int64 v17; // rdi
+		  HGRuntimeGrassQuery_Node *v18; // r8
+		  Int32__Array **v19; // r9
+		  __int64 v20; // rax
+		  HGRuntimeGrassQuery_Node *v21; // r8
+		  Int32__Array **v22; // r9
+		  MethodInfo *v23; // [rsp+20h] [rbp-18h]
+		  MethodInfo *v24; // [rsp+20h] [rbp-18h]
+		  MethodInfo *v25; // [rsp+20h] [rbp-18h]
+		  MethodInfo *v26; // [rsp+20h] [rbp-18h]
+		  MethodInfo *v27; // [rsp+20h] [rbp-18h]
+		  MethodInfo *v28; // [rsp+20h] [rbp-18h]
+		
+		  v3 = (BoolParameter *)sub_1800368D0(TypeInfo::UnityEngine::Rendering::BoolParameter);
+		  if ( !v3 )
+		    goto LABEL_12;
+		  v3->fields._.m_Value = 0;
+		  v3->fields._._.overrideState = 0;
+		  this->fields.enable = v3;
+		  sub_18002D1B0((HGRuntimeGrassQuery_Node *)&this->fields.enable, v4, v6, v7, v23);
+		  v8 = (BoolParameter *)sub_1800368D0(TypeInfo::UnityEngine::Rendering::BoolParameter);
+		  if ( !v8 )
+		    goto LABEL_12;
+		  v8->fields._.m_Value = 0;
+		  v8->fields._._.overrideState = 0;
+		  this->fields.fakePlanarReflection = v8;
+		  sub_18002D1B0((HGRuntimeGrassQuery_Node *)&this->fields.fakePlanarReflection, v4, v9, v10, v24);
+		  v11 = (BoolParameter *)sub_1800368D0(TypeInfo::UnityEngine::Rendering::BoolParameter);
+		  if ( !v11 )
+		    goto LABEL_12;
+		  v11->fields._.m_Value = 0;
+		  v11->fields._._.overrideState = 0;
+		  this->fields.fakePlanarDisableCharacterOutline = v11;
+		  sub_18002D1B0((HGRuntimeGrassQuery_Node *)&this->fields.fakePlanarDisableCharacterOutline, v4, v12, v13, v25);
+		  v14 = sub_1800368D0(TypeInfo::UnityEngine::Rendering::Vector3Parameter);
+		  if ( !v14 )
+		    goto LABEL_12;
+		  if ( !byte_18F36E4F5 )
+		  {
+		    sub_180035ED0(&MethodInfo::UnityEngine::Rendering::VolumeParameter<UnityEngine::Vector3>::VolumeParameter);
+		    byte_18F36E4F5 = 1;
+		  }
+		  *(_BYTE *)(v14 + 16) = 0;
+		  *(_QWORD *)(v14 + 24) = _mm_unpacklo_ps((__m128)0LL, (__m128)0x3F800000u).m128_u64[0];
+		  *(_DWORD *)(v14 + 32) = 0;
+		  this->fields.fakeReflectionProbeNormal = (Vector3Parameter *)v14;
+		  sub_18002D1B0((HGRuntimeGrassQuery_Node *)&this->fields.fakeReflectionProbeNormal, v4, v15, v16, v26);
+		  v17 = sub_1800368D0(TypeInfo::UnityEngine::Rendering::Vector3Parameter);
+		  if ( !v17 )
+		    goto LABEL_12;
+		  if ( !byte_18F36E4F5 )
+		  {
+		    sub_180035ED0(&MethodInfo::UnityEngine::Rendering::VolumeParameter<UnityEngine::Vector3>::VolumeParameter);
+		    byte_18F36E4F5 = 1;
+		  }
+		  *(_BYTE *)(v17 + 16) = 0;
+		  *(_QWORD *)(v17 + 24) = _mm_unpacklo_ps((__m128)0LL, (__m128)0LL).m128_u64[0];
+		  *(_DWORD *)(v17 + 32) = 0;
+		  this->fields.fakeReflectionPos = (Vector3Parameter *)v17;
+		  sub_18002D1B0((HGRuntimeGrassQuery_Node *)&this->fields.fakeReflectionPos, v4, v18, v19, v27);
+		  v20 = sub_1800368D0(TypeInfo::UnityEngine::Rendering::FloatParameter);
+		  if ( !v20 )
+		LABEL_12:
+		    sub_1800D8260(v5, v4);
+		  *(_DWORD *)(v20 + 24) = 1065353216;
+		  *(_BYTE *)(v20 + 16) = 0;
+		  this->fields.fakePlanarReflectionBlur = (FloatParameter *)v20;
+		  sub_18002D1B0((HGRuntimeGrassQuery_Node *)&this->fields.fakePlanarReflectionBlur, v4, v21, v22, v28);
+		  UnityEngine::Rendering::VolumeComponent::VolumeComponent((VolumeComponent *)this, 0LL);
 		}
-
-		public bool IsActive()
+		
+	
+		// Methods
+		public bool IsActive() => default; // 0x00000001839741A0-0x00000001839742C0
+		// Boolean IsActive()
+		bool HG::Rendering::Runtime::OtherSettings::IsActive(OtherSettings *this, MethodInfo *method)
 		{
-			// // Boolean IsActive()
-			// bool HG::Rendering::Runtime::OtherSettings::IsActive(OtherSettings *this, MethodInfo *method)
-			// {
-			//   struct ILFixDynamicMethodWrapper_2__Class *v3; // rcx
-			//   BoolParameter *wrapperArray; // rdx
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			// 
-			//   if ( !byte_18D8EDC37 )
-			//   {
-			//     sub_18003C530(&TypeInfo::IFix::ILFixDynamicMethodWrapper);
-			//     byte_18D8EDC37 = 1;
-			//   }
-			//   v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper._1.cctor_finished_or_no_cctor )
-			//   {
-			//     il2cpp_runtime_class_init_0(TypeInfo::IFix::ILFixDynamicMethodWrapper, method);
-			//     v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   }
-			//   wrapperArray = (BoolParameter *)v3.static_fields.wrapperArray;
-			//   if ( !wrapperArray )
-			//     goto LABEL_9;
-			//   if ( *(int *)&wrapperArray.fields._.m_Value <= 992 )
-			//     goto LABEL_7;
-			//   if ( !v3._1.cctor_finished_or_no_cctor )
-			//   {
-			//     il2cpp_runtime_class_init_0(v3, wrapperArray);
-			//     v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   }
-			//   v3 = (struct ILFixDynamicMethodWrapper_2__Class *)v3.static_fields.wrapperArray;
-			//   if ( !v3 )
-			//     goto LABEL_9;
-			//   if ( LODWORD(v3._0.namespaze) <= 0x3E0 )
-			//     sub_180070270(v3, wrapperArray);
-			//   if ( !v3[21]._0.castClass )
-			//   {
-			// LABEL_7:
-			//     wrapperArray = this.fields.enable;
-			//     if ( wrapperArray )
-			//       return sub_1800023D0(10LL, wrapperArray);
-			// LABEL_9:
-			//     sub_180B536AC(v3, wrapperArray);
-			//   }
-			//   Patch = IFix::WrappersManagerImpl::GetPatch(992, 0LL);
-			//   if ( !Patch )
-			//     goto LABEL_9;
-			//   return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_8((ILFixDynamicMethodWrapper_27 *)Patch, (Object *)this, 0LL);
-			// }
-			// 
-			return default(bool);
+		  struct ILFixDynamicMethodWrapper_2__Class *v3; // rcx
+		  ILFixDynamicMethodWrapper_2__Array *wrapperArray; // rdx
+		  BoolParameter *enable; // rbx
+		  bool (*v6)(RuntimeType *, MethodInfo *); // r8
+		  Il2CppMethodPointer methodPtr; // rdx
+		  VolumeParameter__Fields v9; // rax
+		  char v10; // al
+		  VolumeParameter__Fields v11; // rcx
+		  __int64 v12; // rax
+		  VolumeParameter__Fields v13; // rax
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		
+		  v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(TypeInfo::IFix::ILFixDynamicMethodWrapper);
+		    v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  wrapperArray = v3->static_fields->wrapperArray;
+		  if ( !wrapperArray )
+		    goto LABEL_24;
+		  if ( wrapperArray->max_length.size <= 1097 )
+		    goto LABEL_5;
+		  if ( !v3->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(v3);
+		    v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  v3 = (struct ILFixDynamicMethodWrapper_2__Class *)v3->static_fields->wrapperArray;
+		  if ( !v3 )
+		    goto LABEL_24;
+		  if ( LODWORD(v3->_0.namespaze) <= 0x449 )
+		    sub_1800D2AB0(v3, wrapperArray);
+		  if ( !v3[23]._0.nestedTypes )
+		  {
+		LABEL_5:
+		    enable = this->fields.enable;
+		    if ( enable )
+		    {
+		      sub_1800049A0(enable->klass);
+		      v6 = (bool (*)(RuntimeType *, MethodInfo *))enable->klass->vtable.get_value.method;
+		      methodPtr = enable->klass->vtable.set_value.methodPtr;
+		      if ( v6 == System::RuntimeType::HasElementTypeImpl )
+		      {
+		        v9 = enable->fields._._;
+		        if ( (*(_DWORD *)(*(_QWORD *)&v9 + 8LL) & 0x20000000) == 0 )
+		        {
+		          v10 = *(_BYTE *)(*(_QWORD *)&v9 + 10LL);
+		          if ( v10 != 29 && v10 != 16 && v10 != 20 && v10 != 15 )
+		            return 0;
+		        }
+		      }
+		      else
+		      {
+		        if ( v6 != System::RuntimeType::get_IsGenericType )
+		        {
+		          if ( v6 != System::RuntimeType::get_IsGenericParameter )
+		            return ((__int64 (__fastcall *)(BoolParameter *, Il2CppMethodPointer))v6)(enable, methodPtr);
+		          v13 = enable->fields._._;
+		          return (*(_DWORD *)(*(_QWORD *)&v13 + 8LL) & 0x20000000) == 0
+		              && (*(_BYTE *)(*(_QWORD *)&v13 + 10LL) == 19 || *(_BYTE *)(*(_QWORD *)&v13 + 10LL) == 30);
+		        }
+		        v11 = enable->fields._._;
+		        if ( (*(_DWORD *)(*(_QWORD *)&v11 + 8LL) & 0x20000000) != 0 )
+		          return 0;
+		        LOBYTE(methodPtr) = 1;
+		        v12 = ((__int64 (__fastcall *)(_QWORD, _QWORD))sub_180028750)(v11, methodPtr);
+		        if ( (*(_BYTE *)(v12 + 312) & 0x10) == 0 && !*(_QWORD *)(v12 + 96) )
+		          return 0;
+		      }
+		      return 1;
+		    }
+		LABEL_24:
+		    sub_1800D8260(v3, wrapperArray);
+		  }
+		  Patch = IFix::WrappersManagerImpl::GetPatch(1097, 0LL);
+		  if ( !Patch )
+		    goto LABEL_24;
+		  return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_14((ILFixDynamicMethodWrapper_20 *)Patch, (Object *)this, 0LL);
 		}
-
-		public BoolParameter enable;
-
-		public BoolParameter fakePlanarReflection;
-
-		public BoolParameter fakePlanarDisableCharacterOutline;
-
-		public Vector3Parameter fakeReflectionProbeNormal;
-
-		public Vector3Parameter fakeReflectionPos;
-
-		public FloatParameter fakePlanarReflectionBlur;
+		
 	}
 }

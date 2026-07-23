@@ -1,156 +1,144 @@
-﻿using System;
+using System;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using UnityEngine;
+
+// Image 4: HG.RenderPipelines.Runtime.dll - Assembly: HG.RenderPipelines.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null - Types 37354-38879
 
 namespace HG.Rendering.Runtime
 {
-	public class HGFoliageOccluder : MonoBehaviour
+	public class HGFoliageOccluder : MonoBehaviour // TypeDefIndex: 37981
 	{
-		public HGFoliageOccluder()
+		// Constructors
+		public HGFoliageOccluder() {} // 0x0000000183695570-0x0000000183695590
+		// LuaUIWidget()
+		void Beyond::Lua::LuaUIWidget::LuaUIWidget(LuaUIWidget *this, MethodInfo *method)
 		{
-			// // Singleton`1[System.Object]()
-			// void RootMotion::Singleton<System::Object>::Singleton(Singleton_1_System_Object__1 *this, MethodInfo *method)
-			// {
-			//   UnityEngine::Component::Component((Component *)this, 0LL);
-			// }
-			// 
+		  if ( !TypeInfo::UnityEngine::Object->_1.cctor_finished_or_no_cctor )
+		    il2cpp_runtime_class_init_1(TypeInfo::UnityEngine::Object);
 		}
-
-		private void OnEnable()
+		
+	
+		// Methods
+		private void OnEnable() {} // 0x0000000184CE4E60-0x0000000184CE4EA0
+		// Void OnEnable()
+		void HG::Rendering::Runtime::HGFoliageOccluder::OnEnable(HGFoliageOccluder *this, MethodInfo *method)
 		{
-			// // Void OnEnable()
-			// void HG::Rendering::Runtime::HGFoliageOccluder::OnEnable(HGFoliageOccluder *this, MethodInfo *method)
-			// {
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			//   __int64 v4; // rdx
-			//   __int64 v5; // rcx
-			// 
-			//   if ( IFix::WrappersManagerImpl::IsPatched(2164, 0LL) )
-			//   {
-			//     Patch = IFix::WrappersManagerImpl::GetPatch(2164, 0LL);
-			//     if ( !Patch )
-			//       sub_180B536AC(v5, v4);
-			//     IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_0((ILFixDynamicMethodWrapper_37 *)Patch, (Object *)this, 0LL);
-			//   }
-			//   else
-			//   {
-			//     HG::Rendering::Runtime::HGFoliageOccluder::_AddToFoliageOccluderManager(this, 0LL);
-			//   }
-			// }
-			// 
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v4; // rdx
+		  __int64 v5; // rcx
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(2613, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(2613, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(v5, v4);
+		    IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_0((ILFixDynamicMethodWrapper_39 *)Patch, (Object *)this, 0LL);
+		  }
+		  else
+		  {
+		    HG::Rendering::Runtime::HGFoliageOccluder::_AddToFoliageOccluderManager(this, 0LL);
+		  }
 		}
-
-		private void OnDisable()
+		
+		private void OnDisable() {} // 0x0000000184CE4ED0-0x0000000184CE4F10
+		// Void OnDisable()
+		void HG::Rendering::Runtime::HGFoliageOccluder::OnDisable(HGFoliageOccluder *this, MethodInfo *method)
 		{
-			// // Void OnDisable()
-			// void HG::Rendering::Runtime::HGFoliageOccluder::OnDisable(HGFoliageOccluder *this, MethodInfo *method)
-			// {
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			//   __int64 v4; // rdx
-			//   __int64 v5; // rcx
-			// 
-			//   if ( IFix::WrappersManagerImpl::IsPatched(2166, 0LL) )
-			//   {
-			//     Patch = IFix::WrappersManagerImpl::GetPatch(2166, 0LL);
-			//     if ( !Patch )
-			//       sub_180B536AC(v5, v4);
-			//     IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_0((ILFixDynamicMethodWrapper_37 *)Patch, (Object *)this, 0LL);
-			//   }
-			//   else
-			//   {
-			//     HG::Rendering::Runtime::HGFoliageOccluder::_RemoveFromFoliageOccluderManager(this, 0LL);
-			//   }
-			// }
-			// 
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v4; // rdx
+		  __int64 v5; // rcx
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(2615, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(2615, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(v5, v4);
+		    IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_0((ILFixDynamicMethodWrapper_39 *)Patch, (Object *)this, 0LL);
+		  }
+		  else
+		  {
+		    HG::Rendering::Runtime::HGFoliageOccluder::_RemoveFromFoliageOccluderManager(this, 0LL);
+		  }
 		}
-
-		public void SyncPosition()
+		
+		public void SyncPosition() {} // 0x0000000189B6B5D0-0x0000000189B6B620
+		// Void SyncPosition()
+		void HG::Rendering::Runtime::HGFoliageOccluder::SyncPosition(HGFoliageOccluder *this, MethodInfo *method)
 		{
-			// // Void SyncPosition()
-			// void HG::Rendering::Runtime::HGFoliageOccluder::SyncPosition(HGFoliageOccluder *this, MethodInfo *method)
-			// {
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			//   __int64 v4; // rdx
-			//   __int64 v5; // rcx
-			// 
-			//   if ( IFix::WrappersManagerImpl::IsPatched(2168, 0LL) )
-			//   {
-			//     Patch = IFix::WrappersManagerImpl::GetPatch(2168, 0LL);
-			//     if ( !Patch )
-			//       sub_180B536AC(v5, v4);
-			//     IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_0((ILFixDynamicMethodWrapper_37 *)Patch, (Object *)this, 0LL);
-			//   }
-			//   else
-			//   {
-			//     HG::Rendering::Runtime::HGFoliageOccluder::_UpdateFromFoliageOccluderManager(this, 0LL);
-			//   }
-			// }
-			// 
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v4; // rdx
+		  __int64 v5; // rcx
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(2617, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(2617, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(v5, v4);
+		    IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_0((ILFixDynamicMethodWrapper_39 *)Patch, (Object *)this, 0LL);
+		  }
+		  else
+		  {
+		    HG::Rendering::Runtime::HGFoliageOccluder::_UpdateFromFoliageOccluderManager(this, 0LL);
+		  }
 		}
-
-		private void _AddToFoliageOccluderManager()
+		
+		private void _AddToFoliageOccluderManager() {} // 0x0000000184CE4EA0-0x0000000184CE4ED0
+		// Void _AddToFoliageOccluderManager()
+		void HG::Rendering::Runtime::HGFoliageOccluder::_AddToFoliageOccluderManager(
+		        HGFoliageOccluder *this,
+		        MethodInfo *method)
 		{
-			// // Void _AddToFoliageOccluderManager()
-			// void HG::Rendering::Runtime::HGFoliageOccluder::_AddToFoliageOccluderManager(
-			//         HGFoliageOccluder *this,
-			//         MethodInfo *method)
-			// {
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			//   __int64 v4; // rdx
-			//   __int64 v5; // rcx
-			// 
-			//   if ( IFix::WrappersManagerImpl::IsPatched(2165, 0LL) )
-			//   {
-			//     Patch = IFix::WrappersManagerImpl::GetPatch(2165, 0LL);
-			//     if ( !Patch )
-			//       sub_180B536AC(v5, v4);
-			//     IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_0((ILFixDynamicMethodWrapper_37 *)Patch, (Object *)this, 0LL);
-			//   }
-			// }
-			// 
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v4; // rdx
+		  __int64 v5; // rcx
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(2614, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(2614, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(v5, v4);
+		    IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_0((ILFixDynamicMethodWrapper_39 *)Patch, (Object *)this, 0LL);
+		  }
 		}
-
-		private void _RemoveFromFoliageOccluderManager()
+		
+		private void _RemoveFromFoliageOccluderManager() {} // 0x0000000184CE4F10-0x0000000184CE4F40
+		// Void _RemoveFromFoliageOccluderManager()
+		void HG::Rendering::Runtime::HGFoliageOccluder::_RemoveFromFoliageOccluderManager(
+		        HGFoliageOccluder *this,
+		        MethodInfo *method)
 		{
-			// // Void _RemoveFromFoliageOccluderManager()
-			// void HG::Rendering::Runtime::HGFoliageOccluder::_RemoveFromFoliageOccluderManager(
-			//         HGFoliageOccluder *this,
-			//         MethodInfo *method)
-			// {
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			//   __int64 v4; // rdx
-			//   __int64 v5; // rcx
-			// 
-			//   if ( IFix::WrappersManagerImpl::IsPatched(2167, 0LL) )
-			//   {
-			//     Patch = IFix::WrappersManagerImpl::GetPatch(2167, 0LL);
-			//     if ( !Patch )
-			//       sub_180B536AC(v5, v4);
-			//     IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_0((ILFixDynamicMethodWrapper_37 *)Patch, (Object *)this, 0LL);
-			//   }
-			// }
-			// 
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v4; // rdx
+		  __int64 v5; // rcx
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(2616, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(2616, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(v5, v4);
+		    IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_0((ILFixDynamicMethodWrapper_39 *)Patch, (Object *)this, 0LL);
+		  }
 		}
-
-		private void _UpdateFromFoliageOccluderManager()
+		
+		private void _UpdateFromFoliageOccluderManager() {} // 0x0000000189B6B620-0x0000000189B6B664
+		// Void _UpdateFromFoliageOccluderManager()
+		void HG::Rendering::Runtime::HGFoliageOccluder::_UpdateFromFoliageOccluderManager(
+		        HGFoliageOccluder *this,
+		        MethodInfo *method)
 		{
-			// // Void _UpdateFromFoliageOccluderManager()
-			// void HG::Rendering::Runtime::HGFoliageOccluder::_UpdateFromFoliageOccluderManager(
-			//         HGFoliageOccluder *this,
-			//         MethodInfo *method)
-			// {
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			//   __int64 v4; // rdx
-			//   __int64 v5; // rcx
-			// 
-			//   if ( IFix::WrappersManagerImpl::IsPatched(2169, 0LL) )
-			//   {
-			//     Patch = IFix::WrappersManagerImpl::GetPatch(2169, 0LL);
-			//     if ( !Patch )
-			//       sub_180B536AC(v5, v4);
-			//     IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_0((ILFixDynamicMethodWrapper_37 *)Patch, (Object *)this, 0LL);
-			//   }
-			// }
-			// 
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v4; // rdx
+		  __int64 v5; // rcx
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(2618, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(2618, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(v5, v4);
+		    IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_0((ILFixDynamicMethodWrapper_39 *)Patch, (Object *)this, 0LL);
+		  }
 		}
+		
 	}
 }

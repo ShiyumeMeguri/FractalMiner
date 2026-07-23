@@ -1,20 +1,19 @@
-﻿using System;
-using System.Runtime.InteropServices;
+using System;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using HG.Rendering.RenderGraphModule;
+
+// Image 4: HG.RenderPipelines.Runtime.dll - Assembly: HG.RenderPipelines.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null - Types 37354-38879
 
 namespace HG.Rendering.Runtime
 {
-	[StructLayout(LayoutKind.Sequential, Pack = 1)]
-	internal struct PassEventInput
+	internal struct PassEventInput // TypeDefIndex: 38510
 	{
-		internal HGCamera camera;
-
-		internal HGCamera uiCamera;
-
-		internal HGRenderGraph renderGraph;
-
-		internal HGRenderPipeline hgrp;
-
-		internal bool passSkipped;
+		// Fields
+		internal HGCamera camera; // 0x00
+		internal HGCamera uiCamera; // 0x08
+		internal HGRenderGraph renderGraph; // 0x10
+		internal HGRenderPipeline hgrp; // 0x18
+		internal bool passSkipped; // 0x20
 	}
 }

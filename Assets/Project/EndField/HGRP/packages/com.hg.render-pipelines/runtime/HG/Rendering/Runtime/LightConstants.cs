@@ -1,60 +1,65 @@
-﻿using System;
+using System;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
+
+// Image 4: HG.RenderPipelines.Runtime.dll - Assembly: HG.RenderPipelines.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null - Types 37354-38879
 
 namespace HG.Rendering.Runtime
 {
-	internal class LightConstants
+	internal class LightConstants // TypeDefIndex: 37774
 	{
-		// (get) Token: 0x060008A4 RID: 2212 RVA: 0x00002608 File Offset: 0x00000808
-		public static int NUM_PUNCTUAL_LIGHT_MASK_BYTES
+		// Fields
+		public const int MAX_DIRECTIONAL_LIGHTS = 4; // Metadata: 0x023030F1
+		public const int NUM_DIR_LIGHT_DATA_BYTES = 5; // Metadata: 0x023030F2
+		public const int NUM_LIGHT_COUNT_DATA_BYTES = 1; // Metadata: 0x023030F3
+		public const int MAX_VISIBLE_LIGHTS = 256; // Metadata: 0x023030F4
+	
+		// Properties
+		public static int NUM_PUNCTUAL_LIGHT_MASK_BYTES { get => default; } // 0x0000000189D0A5B8-0x0000000189D0A5FC 
+		// Int32 get_NUM_PUNCTUAL_LIGHT_MASK_BYTES()
+		int32_t HG::Rendering::Runtime::LightConstants::get_NUM_PUNCTUAL_LIGHT_MASK_BYTES(MethodInfo *method)
 		{
-			get
-			{
-				// // UInt32 get_capacity()
-				// uint32_t UnityEngine::Rendering::BitArray32::get_capacity(BitArray32 *this, MethodInfo *method)
-				// {
-				//   return 32;
-				// }
-				// 
-				return 0;
-			}
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v3; // rdx
+		  __int64 v4; // rcx
+		
+		  if ( !IFix::WrappersManagerImpl::IsPatched(1935, 0LL) )
+		    return 32;
+		  Patch = IFix::WrappersManagerImpl::GetPatch(1935, 0LL);
+		  if ( !Patch )
+		    sub_1800D8260(v4, v3);
+		  return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_14((ILFixDynamicMethodWrapper_30 *)Patch, 0LL);
 		}
-
-		// (get) Token: 0x060008A5 RID: 2213 RVA: 0x00002608 File Offset: 0x00000808
-		public static int NUM_PUNCTUAL_LIGHT_MASK_UNITS
+		
+		public static int NUM_PUNCTUAL_LIGHT_MASK_UNITS { get => default; } // 0x0000000189D0A5FC-0x0000000189D0A64C 
+		// Int32 get_NUM_PUNCTUAL_LIGHT_MASK_UNITS()
+		int32_t HG::Rendering::Runtime::LightConstants::get_NUM_PUNCTUAL_LIGHT_MASK_UNITS(MethodInfo *method)
 		{
-			get
-			{
-				// // XmlNodeType get_NodeType()
-				// XmlNodeType__Enum System::Xml::Linq::XComment::get_NodeType(XComment *this, MethodInfo *method)
-				// {
-				//   return 8;
-				// }
-				// 
-				return 0;
-			}
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v3; // rdx
+		  __int64 v4; // rcx
+		
+		  if ( !IFix::WrappersManagerImpl::IsPatched(1936, 0LL) )
+		    return HG::Rendering::Runtime::LightConstants::get_NUM_PUNCTUAL_LIGHT_MASK_BYTES(0LL) / 4;
+		  Patch = IFix::WrappersManagerImpl::GetPatch(1936, 0LL);
+		  if ( !Patch )
+		    sub_1800D8260(v4, v3);
+		  return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_14((ILFixDynamicMethodWrapper_30 *)Patch, 0LL);
 		}
-
-		public LightConstants()
+		
+	
+		// Constructors
+		public LightConstants() {} // 0x00000001841E1670-0x00000001841E1680
+		// Void Lerp[HGWindConfig](HGWindConfig ByRef, HGWindConfig ByRef, Single)
+		void HG::Rendering::Runtime::HGCelestialConfig::HGCelestialAdvancedObjectConfig::Lerp<HG::Rendering::Runtime::HGWindConfig>(
+		        HGCelestialConfig_HGCelestialAdvancedObjectConfig *this,
+		        HGWindConfig *cSrc,
+		        HGWindConfig *cDst,
+		        float t,
+		        MethodInfo *method)
 		{
-			// // Void Lerp[HGWindConfig](HGWindConfig ByRef, HGWindConfig ByRef, Single)
-			// void HG::Rendering::Runtime::HGCelestialConfig::HGCelestialAdvancedObjectConfig::Lerp<HG::Rendering::Runtime::HGWindConfig>(
-			//         HGCelestialConfig_HGCelestialAdvancedObjectConfig *this,
-			//         HGWindConfig *cSrc,
-			//         HGWindConfig *cDst,
-			//         float t,
-			//         MethodInfo *method)
-			// {
-			//   ;
-			// }
-			// 
+		  ;
 		}
-
-		public const int MAX_DIRECTIONAL_LIGHTS = 4;
-
-		public const int NUM_DIR_LIGHT_DATA_BYTES = 5;
-
-		public const int NUM_LIGHT_COUNT_DATA_BYTES = 1;
-
-		public const int MAX_VISIBLE_LIGHTS = 256;
+		
 	}
 }

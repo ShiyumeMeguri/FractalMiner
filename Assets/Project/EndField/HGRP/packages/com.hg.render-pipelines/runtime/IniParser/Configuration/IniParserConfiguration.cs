@@ -1,415 +1,268 @@
-﻿using System;
+using System;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using IniParser;
+
+// Image 4: HG.RenderPipelines.Runtime.dll - Assembly: HG.RenderPipelines.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null - Types 37354-38879
 
 namespace IniParser.Configuration
 {
-	public class IniParserConfiguration : IDeepCloneable<IniParserConfiguration>
+	public class IniParserConfiguration : IDeepCloneable<IniParserConfiguration> // TypeDefIndex: 37389
 	{
-		// (get) Token: 0x060000D4 RID: 212 RVA: 0x000025D8 File Offset: 0x000007D8
-		// (set) Token: 0x060000D5 RID: 213 RVA: 0x000025D0 File Offset: 0x000007D0
-		public bool CaseInsensitive
+		// Properties
+		public bool CaseInsensitive { get; set; } // 0x00000001815EFCE0-0x00000001815EFCF0 0x0000000184D86130-0x0000000184D86140
+		// Boolean get_changed()
+		bool Rewired::Utils::Classes::Utility::ValueWatcher<float>::get_changed(
+		        ValueWatcher_1_System_Single_ *this,
+		        MethodInfo *method)
 		{
-			[CompilerGenerated]
-			get
-			{
-				// // Boolean get_changed()
-				// bool Rewired::Utils::Classes::Utility::ValueWatcher<float>::get_changed(
-				//         ValueWatcher_1_System_Single_ *this,
-				//         MethodInfo *method)
-				// {
-				//   return this.fields.NiVDAueHECEJqGCNLxcjNXRtPmUC;
-				// }
-				// 
-				return default(bool);
-			}
-			[CompilerGenerated]
-			set
-			{
-				// // Void set_override(Boolean)
-				// void HG::Rendering::Runtime::ScalableSettingValue<bool>::set_override(
-				//         ScalableSettingValue_1_System_Boolean_ *this,
-				//         bool value,
-				//         MethodInfo *method)
-				// {
-				//   this.fields.m_Override = value;
-				// }
-				// 
-			}
+		  return this->fields.NiVDAueHECEJqGCNLxcjNXRtPmUC;
 		}
+		
 
-		// (get) Token: 0x060000D6 RID: 214 RVA: 0x000025D8 File Offset: 0x000007D8
-		// (set) Token: 0x060000D7 RID: 215 RVA: 0x000025D0 File Offset: 0x000007D0
-		public bool AllowKeysWithoutSection
+		// Void set_override(Boolean)
+		void HG::Rendering::Runtime::ScalableSettingValue<bool>::set_override(
+		        ScalableSettingValue_1_System_Boolean_ *this,
+		        bool value,
+		        MethodInfo *method)
 		{
-			[CompilerGenerated]
-			get
-			{
-				// // Boolean get_value()
-				// bool Rewired::Utils::Classes::Utility::ValueWatcher<bool>::get_value(
-				//         ValueWatcher_1_System_Boolean_ *this,
-				//         MethodInfo *method)
-				// {
-				//   return this.fields.lbeYGGLqExuAmnvpTifZPpiwyZrH;
-				// }
-				// 
-				return default(bool);
-			}
-			[CompilerGenerated]
-			set
-			{
-				// // Void set_useOverride(Boolean)
-				// void HG::Rendering::Runtime::ScalableSettingValue<bool>::set_useOverride(
-				//         ScalableSettingValue_1_System_Boolean_ *this,
-				//         bool value,
-				//         MethodInfo *method)
-				// {
-				//   this.fields.m_UseOverride = value;
-				// }
-				// 
-			}
+		  this->fields.m_Override = value;
 		}
+		
+		public bool AllowKeysWithoutSection { get; set; } // 0x0000000184D88380-0x0000000184D88390 0x0000000184D88460-0x0000000184D88470
+		// Boolean get_value()
+		bool Rewired::Utils::Classes::Utility::ValueWatcher<bool>::get_value(
+		        ValueWatcher_1_System_Boolean_ *this,
+		        MethodInfo *method)
+		{
+		  return this->fields.lbeYGGLqExuAmnvpTifZPpiwyZrH;
+		}
+		
 
-		// (get) Token: 0x060000D8 RID: 216 RVA: 0x00002680 File Offset: 0x00000880
-		// (set) Token: 0x060000D9 RID: 217 RVA: 0x000025D0 File Offset: 0x000007D0
-		public IniParserConfiguration.EDuplicatePropertiesBehaviour DuplicatePropertiesBehaviour
+		// Void set_useOverride(Boolean)
+		void HG::Rendering::Runtime::ScalableSettingValue<bool>::set_useOverride(
+		        ScalableSettingValue_1_System_Boolean_ *this,
+		        bool value,
+		        MethodInfo *method)
 		{
-			[CompilerGenerated]
-			get
-			{
-				// // Int32 get_value()
-				// int32_t Rewired::Utils::Classes::Utility::ValueWatcher<int>::get_value(
-				//         ValueWatcher_1_System_Int32_ *this,
-				//         MethodInfo *method)
-				// {
-				//   return this.fields.lbeYGGLqExuAmnvpTifZPpiwyZrH;
-				// }
-				// 
-				return IniParserConfiguration.EDuplicatePropertiesBehaviour.DisallowAndStopWithError;
-			}
-			[CompilerGenerated]
-			set
-			{
-				// // Void set_rolloverSize(Int32)
-				// void TMPro::TMP_TextProcessingStack<float>::set_rolloverSize(
-				//         TMP_TextProcessingStack_1_System_Single_ *this,
-				//         int32_t value,
-				//         MethodInfo *method)
-				// {
-				//   this.m_RolloverSize = value;
-				// }
-				// 
-			}
+		  this->fields.m_UseOverride = value;
 		}
+		
+		public EDuplicatePropertiesBehaviour DuplicatePropertiesBehaviour { get; set; } // 0x0000000184D882A0-0x0000000184D882B0 0x0000000184D8F540-0x0000000184D8F550
+		// Int32 get_value()
+		int32_t Rewired::Utils::Classes::Utility::ValueWatcher<int>::get_value(
+		        ValueWatcher_1_System_Int32_ *this,
+		        MethodInfo *method)
+		{
+		  return this->fields.lbeYGGLqExuAmnvpTifZPpiwyZrH;
+		}
+		
 
-		// (get) Token: 0x060000DA RID: 218 RVA: 0x000025D2 File Offset: 0x000007D2
-		// (set) Token: 0x060000DB RID: 219 RVA: 0x000025D0 File Offset: 0x000007D0
-		public string ConcatenateDuplicatePropertiesString
+		// Void set_rolloverSize(Int32)
+		void TMPro::TMP_TextProcessingStack<float>::set_rolloverSize(
+		        TMP_TextProcessingStack_1_System_Single_ *this,
+		        int32_t value,
+		        MethodInfo *method)
 		{
-			[CompilerGenerated]
-			get
-			{
-				// // Object System.Collections.IEnumerator.get_Current()
-				// Object *Rewired::Platforms::Custom::HardwareJoystickMapCustomPlatformMap_1_TMatchingCriteria_::vFJqwhcHvHdpsRAHqwODiJDbwkcr<System::Object>::System_Collections_IEnumerator_get_Current(
-				//         HardwareJoystickMapCustomPlatformMap_1_TMatchingCriteria_vFJqwhcHvHdpsRAHqwODiJDbwkcr_System_Object_ *this,
-				//         MethodInfo *method)
-				// {
-				//   return (Object *)this.fields.YcoKziTgrGqKCwJTNRuXadHqwkUP;
-				// }
-				// 
-				return null;
-			}
-			[CompilerGenerated]
-			set
-			{
-				// // Void set_getValueDelegate(Func`1[Boolean])
-				// void Rewired::Utils::Classes::Utility::ValueWatcher<bool>::set_getValueDelegate(
-				//         ValueWatcher_1_System_Boolean_ *this,
-				//         Func_1_Boolean_ *value,
-				//         MethodInfo *method)
-				// {
-				//   Object__Array *v3; // r9
-				//   MethodInfo *v4; // [rsp+28h] [rbp+28h]
-				//   MethodInfo *v5; // [rsp+30h] [rbp+30h]
-				// 
-				//   this.fields.MHRAQZbVaKflzQthDWnBRvhnUSmRA = value;
-				//   sub_1800054D0(
-				//     (BSP *)&this.fields.MHRAQZbVaKflzQthDWnBRvhnUSmRA,
-				//     (IEnumerable_1_HG_Rendering_Runtime_CSG_CSGPolygon_ *)value,
-				//     (Bounds *)method,
-				//     v3,
-				//     v4,
-				//     v5);
-				// }
-				// 
-			}
+		  this->m_RolloverSize = value;
 		}
+		
+		public string ConcatenateDuplicatePropertiesString { get; set; } // 0x000000018385B100-0x000000018385B110 0x0000000185392C40-0x0000000185392C50
+		// Object System.Collections.IEnumerator.get_Current()
+		Object *Rewired::Platforms::Custom::HardwareJoystickMapCustomPlatformMap_1_TMatchingCriteria_::vFJqwhcHvHdpsRAHqwODiJDbwkcr<System::Object>::System_Collections_IEnumerator_get_Current(
+		        HardwareJoystickMapCustomPlatformMap_1_TMatchingCriteria_vFJqwhcHvHdpsRAHqwODiJDbwkcr_System_Object_ *this,
+		        MethodInfo *method)
+		{
+		  return (Object *)this->fields.YcoKziTgrGqKCwJTNRuXadHqwkUP;
+		}
+		
 
-		// (get) Token: 0x060000DC RID: 220 RVA: 0x000025D8 File Offset: 0x000007D8
-		// (set) Token: 0x060000DD RID: 221 RVA: 0x000025D0 File Offset: 0x000007D0
-		public bool ThrowExceptionsOnError
+		// Void set_getValueDelegate(Func`1[Boolean])
+		void Rewired::Utils::Classes::Utility::ValueWatcher<bool>::set_getValueDelegate(
+		        ValueWatcher_1_System_Boolean_ *this,
+		        Func_1_Boolean_ *value,
+		        MethodInfo *method)
 		{
-			[CompilerGenerated]
-			get
-			{
-				// // Boolean get_autoTriggerEvent()
-				// bool Rewired::Utils::Classes::Utility::ValueWatcher<System::Object>::get_autoTriggerEvent(
-				//         ValueWatcher_1_System_Object_ *this,
-				//         MethodInfo *method)
-				// {
-				//   return this.fields.jfwTQnAbUjPonSNJeDchTULdikzO;
-				// }
-				// 
-				return default(bool);
-			}
-			[CompilerGenerated]
-			set
-			{
-				// // Void set_autoTriggerEvent(Boolean)
-				// void Rewired::Utils::Classes::Utility::ValueWatcher<System::Object>::set_autoTriggerEvent(
-				//         ValueWatcher_1_System_Object_ *this,
-				//         bool value,
-				//         MethodInfo *method)
-				// {
-				//   this.fields.jfwTQnAbUjPonSNJeDchTULdikzO = value;
-				// }
-				// 
-			}
+		  VolumetricPipelineRT **v3; // r9
+		  VolumetricPipelineRT **v4; // [rsp+28h] [rbp+28h]
+		  MethodInfo *v5; // [rsp+30h] [rbp+30h]
+		
+		  this->fields.MHRAQZbVaKflzQthDWnBRvhnUSmRA = value;
+		  sub_18002D1B0(
+		    (ILFixDynamicMethodWrapper_2 *)&this->fields.MHRAQZbVaKflzQthDWnBRvhnUSmRA,
+		    (UberPostPassUtils_ColorGradingData **)value,
+		    (VolumetricPipelineRT **)method,
+		    v3,
+		    v4,
+		    v5);
 		}
+		
+		public bool ThrowExceptionsOnError { get; set; } // 0x0000000184D866B0-0x0000000184D866C0 0x0000000184D866D0-0x0000000184D866E0
+		// Boolean get_autoTriggerEvent()
+		bool Rewired::Utils::Classes::Utility::ValueWatcher<System::Object>::get_autoTriggerEvent(
+		        ValueWatcher_1_System_Object_ *this,
+		        MethodInfo *method)
+		{
+		  return this->fields.jfwTQnAbUjPonSNJeDchTULdikzO;
+		}
+		
 
-		// (get) Token: 0x060000DE RID: 222 RVA: 0x000025D8 File Offset: 0x000007D8
-		// (set) Token: 0x060000DF RID: 223 RVA: 0x000025D0 File Offset: 0x000007D0
-		public bool AllowDuplicateSections
+		// Void set_autoTriggerEvent(Boolean)
+		void Rewired::Utils::Classes::Utility::ValueWatcher<System::Object>::set_autoTriggerEvent(
+		        ValueWatcher_1_System_Object_ *this,
+		        bool value,
+		        MethodInfo *method)
 		{
-			[CompilerGenerated]
-			get
-			{
-				// // Boolean get_IsExpanded()
-				// bool SRDebugger::Services::Implementation::DockConsoleServiceImpl::get_IsExpanded(
-				//         DockConsoleServiceImpl *this,
-				//         MethodInfo *method)
-				// {
-				//   return this.fields._isExpanded;
-				// }
-				// 
-				return default(bool);
-			}
-			[CompilerGenerated]
-			set
-			{
-				// // Void set_isManualUpdate(Boolean)
-				// void UnityEngine::Timeline::TimeNotificationBehaviour::set_isManualUpdate(
-				//         TimeNotificationBehaviour *this,
-				//         bool value,
-				//         MethodInfo *method)
-				// {
-				//   this.fields.m_IsManualUpdate = value;
-				// }
-				// 
-			}
+		  this->fields.jfwTQnAbUjPonSNJeDchTULdikzO = value;
 		}
+		
+		public bool AllowDuplicateSections { get; set; } // 0x0000000184D86850-0x0000000184D86860 0x0000000184D86860-0x0000000184D86870
+		// Boolean get_IsExpanded()
+		bool SRDebugger::Services::Implementation::DockConsoleServiceImpl::get_IsExpanded(
+		        DockConsoleServiceImpl *this,
+		        MethodInfo *method)
+		{
+		  return this->fields._isExpanded;
+		}
+		
 
-		// (get) Token: 0x060000E0 RID: 224 RVA: 0x000025D8 File Offset: 0x000007D8
-		// (set) Token: 0x060000E1 RID: 225 RVA: 0x000025D0 File Offset: 0x000007D0
-		public bool SkipInvalidLines
+		// Void set_isManualUpdate(Boolean)
+		void UnityEngine::Timeline::TimeNotificationBehaviour::set_isManualUpdate(
+		        TimeNotificationBehaviour *this,
+		        bool value,
+		        MethodInfo *method)
 		{
-			[CompilerGenerated]
-			get
-			{
-				// // Boolean get_IsVisible()
-				// bool SRDebugger::Services::Implementation::DockConsoleServiceImpl::get_IsVisible(
-				//         DockConsoleServiceImpl *this,
-				//         MethodInfo *method)
-				// {
-				//   return this.fields._isVisible;
-				// }
-				// 
-				return default(bool);
-			}
-			[CompilerGenerated]
-			set
-			{
-				// // Void <RegisterDebug>b__10_3(Boolean)
-				// void UnityEngine::Experimental::Rendering::RenderGraphModule::RenderGraphDebugParams::_RegisterDebug_b__10_3(
-				//         RenderGraphDebugParams *this,
-				//         bool value,
-				//         MethodInfo *method)
-				// {
-				//   this.fields.disablePassCulling = value;
-				// }
-				// 
-			}
+		  this->fields.m_IsManualUpdate = value;
 		}
+		
+		public bool SkipInvalidLines { get; set; } // 0x0000000184D86AD0-0x0000000184D86AE0 0x0000000184D86AE0-0x0000000184D86AF0
+		// Boolean get_IsVisible()
+		bool SRDebugger::Services::Implementation::DockConsoleServiceImpl::get_IsVisible(
+		        DockConsoleServiceImpl *this,
+		        MethodInfo *method)
+		{
+		  return this->fields._isVisible;
+		}
+		
 
-		// (get) Token: 0x060000E2 RID: 226 RVA: 0x000025D8 File Offset: 0x000007D8
-		// (set) Token: 0x060000E3 RID: 227 RVA: 0x000025D0 File Offset: 0x000007D0
-		public bool TrimProperties
+		// Void <RegisterDebug>b__10_3(Boolean)
+		void UnityEngine::Experimental::Rendering::RenderGraphModule::RenderGraphDebugParams::_RegisterDebug_b__10_3(
+		        RenderGraphDebugParams *this,
+		        bool value,
+		        MethodInfo *method)
 		{
-			[CompilerGenerated]
-			get
-			{
-				// // Boolean <RegisterDebug>b__10_4()
-				// bool UnityEngine::Experimental::Rendering::RenderGraphModule::RenderGraphDebugParams::_RegisterDebug_b__10_4(
-				//         RenderGraphDebugParams *this,
-				//         MethodInfo *method)
-				// {
-				//   return this.fields.immediateMode;
-				// }
-				// 
-				return default(bool);
-			}
-			[CompilerGenerated]
-			set
-			{
-				// // Void <RegisterDebug>b__10_5(Boolean)
-				// void UnityEngine::Experimental::Rendering::RenderGraphModule::RenderGraphDebugParams::_RegisterDebug_b__10_5(
-				//         RenderGraphDebugParams *this,
-				//         bool value,
-				//         MethodInfo *method)
-				// {
-				//   this.fields.immediateMode = value;
-				// }
-				// 
-			}
+		  this->fields.disablePassCulling = value;
 		}
+		
+		public bool TrimProperties { get; set; } // 0x0000000184D8E070-0x0000000184D8E080 0x0000000184D8E080-0x0000000184D8E090
+		// Boolean <RegisterDebug>b__10_4()
+		bool UnityEngine::Experimental::Rendering::RenderGraphModule::RenderGraphDebugParams::_RegisterDebug_b__10_4(
+		        RenderGraphDebugParams *this,
+		        MethodInfo *method)
+		{
+		  return this->fields.immediateMode;
+		}
+		
 
-		// (get) Token: 0x060000E4 RID: 228 RVA: 0x000025D8 File Offset: 0x000007D8
-		// (set) Token: 0x060000E5 RID: 229 RVA: 0x000025D0 File Offset: 0x000007D0
-		public bool TrimSections
+		// Void <RegisterDebug>b__10_5(Boolean)
+		void UnityEngine::Experimental::Rendering::RenderGraphModule::RenderGraphDebugParams::_RegisterDebug_b__10_5(
+		        RenderGraphDebugParams *this,
+		        bool value,
+		        MethodInfo *method)
 		{
-			[CompilerGenerated]
-			get
-			{
-				// // Boolean get_maintainPositionOffsets()
-				// bool UnityEngine::Animations::Rigging::BlendConstraintData::get_maintainPositionOffsets(
-				//         BlendConstraintData *this,
-				//         MethodInfo *method)
-				// {
-				//   return this.m_MaintainPositionOffsets;
-				// }
-				// 
-				return default(bool);
-			}
-			[CompilerGenerated]
-			set
-			{
-				// // Void set_maintainPositionOffsets(Boolean)
-				// void UnityEngine::Animations::Rigging::BlendConstraintData::set_maintainPositionOffsets(
-				//         BlendConstraintData *this,
-				//         bool value,
-				//         MethodInfo *method)
-				// {
-				//   this.m_MaintainPositionOffsets = value;
-				// }
-				// 
-			}
+		  this->fields.immediateMode = value;
 		}
+		
+		public bool TrimSections { get; set; } // 0x0000000184D86870-0x0000000184D86880 0x0000000184D86880-0x0000000184D86890
+		// Boolean get_maintainPositionOffsets()
+		bool UnityEngine::Animations::Rigging::BlendConstraintData::get_maintainPositionOffsets(
+		        BlendConstraintData *this,
+		        MethodInfo *method)
+		{
+		  return this->m_MaintainPositionOffsets;
+		}
+		
 
-		// (get) Token: 0x060000E6 RID: 230 RVA: 0x000025D8 File Offset: 0x000007D8
-		// (set) Token: 0x060000E7 RID: 231 RVA: 0x000025D0 File Offset: 0x000007D0
-		public bool TrimComments
+		// Void set_maintainPositionOffsets(Boolean)
+		void UnityEngine::Animations::Rigging::BlendConstraintData::set_maintainPositionOffsets(
+		        BlendConstraintData *this,
+		        bool value,
+		        MethodInfo *method)
 		{
-			[CompilerGenerated]
-			get
-			{
-				// // Boolean get_maintainRotationOffsets()
-				// bool UnityEngine::Animations::Rigging::BlendConstraintData::get_maintainRotationOffsets(
-				//         BlendConstraintData *this,
-				//         MethodInfo *method)
-				// {
-				//   return this.m_MaintainRotationOffsets;
-				// }
-				// 
-				return default(bool);
-			}
-			[CompilerGenerated]
-			set
-			{
-				// // Void set_maintainRotationOffsets(Boolean)
-				// void UnityEngine::Animations::Rigging::BlendConstraintData::set_maintainRotationOffsets(
-				//         BlendConstraintData *this,
-				//         bool value,
-				//         MethodInfo *method)
-				// {
-				//   this.m_MaintainRotationOffsets = value;
-				// }
-				// 
-			}
+		  this->m_MaintainPositionOffsets = value;
 		}
+		
+		public bool TrimComments { get; set; } // 0x0000000184D86930-0x0000000184D86940 0x0000000184D86950-0x0000000184D86960
+		// Boolean get_maintainRotationOffsets()
+		bool UnityEngine::Animations::Rigging::BlendConstraintData::get_maintainRotationOffsets(
+		        BlendConstraintData *this,
+		        MethodInfo *method)
+		{
+		  return this->m_MaintainRotationOffsets;
+		}
+		
 
-		// (get) Token: 0x060000E8 RID: 232 RVA: 0x000025D8 File Offset: 0x000007D8
-		// (set) Token: 0x060000E9 RID: 233 RVA: 0x000025D0 File Offset: 0x000007D0
-		public bool ParseComments
+		// Void set_maintainRotationOffsets(Boolean)
+		void UnityEngine::Animations::Rigging::BlendConstraintData::set_maintainRotationOffsets(
+		        BlendConstraintData *this,
+		        bool value,
+		        MethodInfo *method)
 		{
-			[CompilerGenerated]
-			get
-			{
-				// // Boolean get_IgnoreSerializableAttribute()
-				// bool Newtonsoft::Json::Serialization::DefaultContractResolver::get_IgnoreSerializableAttribute(
-				//         DefaultContractResolver *this,
-				//         MethodInfo *method)
-				// {
-				//   return this.fields._IgnoreSerializableAttribute_k__BackingField;
-				// }
-				// 
-				return default(bool);
-			}
-			[CompilerGenerated]
-			set
-			{
-				// // Void set_IgnoreSerializableAttribute(Boolean)
-				// void Newtonsoft::Json::Serialization::DefaultContractResolver::set_IgnoreSerializableAttribute(
-				//         DefaultContractResolver *this,
-				//         bool value,
-				//         MethodInfo *method)
-				// {
-				//   this.fields._IgnoreSerializableAttribute_k__BackingField = value;
-				// }
-				// 
-			}
+		  this->m_MaintainRotationOffsets = value;
 		}
+		
+		public bool ParseComments { get; set; } // 0x0000000184D86940-0x0000000184D86950 0x0000000184D86960-0x0000000184D86970
+		// Boolean get_IgnoreSerializableAttribute()
+		bool Newtonsoft::Json::Serialization::DefaultContractResolver::get_IgnoreSerializableAttribute(
+		        DefaultContractResolver *this,
+		        MethodInfo *method)
+		{
+		  return this->fields._IgnoreSerializableAttribute_k__BackingField;
+		}
+		
 
-		public IniParserConfiguration()
+		// Void set_IgnoreSerializableAttribute(Boolean)
+		void Newtonsoft::Json::Serialization::DefaultContractResolver::set_IgnoreSerializableAttribute(
+		        DefaultContractResolver *this,
+		        bool value,
+		        MethodInfo *method)
 		{
+		  this->fields._IgnoreSerializableAttribute_k__BackingField = value;
 		}
-
-		private IniParserConfiguration(IniParserConfiguration ori)
+		
+	
+		// Nested types
+		public enum EDuplicatePropertiesBehaviour // TypeDefIndex: 37388
 		{
+			DisallowAndStopWithError = 0,
+			AllowAndKeepFirstValue = 1,
+			AllowAndKeepLastValue = 2,
+			AllowAndConcatenateValues = 3
 		}
-
-		public IniParserConfiguration DeepClone()
+	
+		// Constructors
+		public IniParserConfiguration() {} // 0x0000000183689AB0-0x0000000183689AF0
+		private IniParserConfiguration(IniParserConfiguration ori) {} // 0x0000000189B31704-0x0000000189B31794
+	
+		// Methods
+		public IniParserConfiguration DeepClone() => default; // 0x0000000189B316C0-0x0000000189B31704
+		// IniParserConfiguration DeepClone()
+		IniParserConfiguration *IniParser::Configuration::IniParserConfiguration::DeepClone(
+		        IniParserConfiguration *this,
+		        MethodInfo *method)
 		{
-			// // IniParserConfiguration DeepClone()
-			// IniParserConfiguration *IniParser::Configuration::IniParserConfiguration::DeepClone(
-			//         IniParserConfiguration *this,
-			//         MethodInfo *method)
-			// {
-			//   IniParserConfiguration *v3; // rax
-			//   __int64 v4; // rdx
-			//   __int64 v5; // rcx
-			//   IniParserConfiguration *v6; // rbx
-			// 
-			//   if ( !byte_18D9192FB )
-			//   {
-			//     sub_18003C530(&TypeInfo::IniParser::Configuration::IniParserConfiguration);
-			//     byte_18D9192FB = 1;
-			//   }
-			//   v3 = (IniParserConfiguration *)sub_180004920(TypeInfo::IniParser::Configuration::IniParserConfiguration);
-			//   v6 = v3;
-			//   if ( !v3 )
-			//     sub_180B536AC(v5, v4);
-			//   IniParser::Configuration::IniParserConfiguration::IniParserConfiguration(v3, this, 0LL);
-			//   return v6;
-			// }
-			// 
-			return null;
+		  IniParserConfiguration *v3; // rax
+		  __int64 v4; // rdx
+		  __int64 v5; // rcx
+		  IniParserConfiguration *v6; // rbx
+		
+		  v3 = (IniParserConfiguration *)sub_18002C620(TypeInfo::IniParser::Configuration::IniParserConfiguration);
+		  v6 = v3;
+		  if ( !v3 )
+		    sub_1800D8260(v5, v4);
+		  IniParser::Configuration::IniParserConfiguration::IniParserConfiguration(v3, this, 0LL);
+		  return v6;
 		}
-
-		public enum EDuplicatePropertiesBehaviour
-		{
-			DisallowAndStopWithError,
-			AllowAndKeepFirstValue,
-			AllowAndKeepLastValue,
-			AllowAndConcatenateValues
-		}
+		
 	}
 }

@@ -1,5407 +1,6233 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using Beyond;
 using UnityEngine;
 using UnityEngine.Rendering;
 
+// Image 4: HG.RenderPipelines.Runtime.dll - Assembly: HG.RenderPipelines.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null - Types 37354-38879
+
 namespace HG.Rendering.Runtime
 {
-	public class HGEnvironmentManager
+	public class HGEnvironmentManager // TypeDefIndex: 37648
 	{
-		// (get) Token: 0x06000622 RID: 1570 RVA: 0x000025D2 File Offset: 0x000007D2
-		public static HGEnvironmentManager instance
+		// Fields
+		private static readonly Lazy<HGEnvironmentManager> s_instance; // 0x00
+		private readonly HashSet<HGEnvironmentVolumeBase> m_activeVolumes; // 0x10
+		private readonly List<HGEnvironmentVolumeBase> m_sortedVolumes; // 0x18
+		private readonly IndexedHashSet<HGEnvironmentVolumeBase> m_interpolatedVolumes; // 0x20
+		private readonly List<float> m_interpolatedVolumesFactor; // 0x28
+		private readonly HGAtmosphereRenderer m_atmosphereRenderer; // 0x30
+		private readonly HGVolumetricFogRenderer m_volumetricFogRenderer; // 0x38
+		private readonly HGSkyRenderer m_skyRenderer; // 0x40
+		private readonly HGSkydomeStarRenderer m_talosStarRenderer; // 0x48
+		private readonly HGRainRenderer m_rainRenderer; // 0x50
+		private readonly HGSnowRenderer m_snowRenderer; // 0x58
+		private readonly HGEnvironmentPhase m_defaultPhase; // 0x60
+		private readonly HGEnvironmentPhase m_interpolatedPhase; // 0x68
+		private float m_timeOfDay; // 0x70
+		private Transform m_interpolateTrigger; // 0x78
+		private Transform m_interpolateTriggerOverride; // 0x80
+		private bool m_sortNeeded; // 0x88
+		private float m_interpolateTimeFactor; // 0x8C
+		private Vector3 m_lastInterpolateTriggerPosition; // 0x90
+	
+		// Properties
+		public static HGEnvironmentManager instance { get => default; } // 0x0000000183106530-0x00000001831065C0 
+		// HGEnvironmentManager get_instance()
+		HGEnvironmentManager *HG::Rendering::Runtime::HGEnvironmentManager::get_instance(MethodInfo *method)
 		{
-			get
-			{
-				// // HGEnvironmentManager get_instance()
-				// HGEnvironmentManager *HG::Rendering::Runtime::HGEnvironmentManager::get_instance(MethodInfo *method)
-				// {
-				//   __int64 v1; // rdx
-				//   struct HGEnvironmentManager__Class *v2; // rax
-				//   Lazy_1_Object_ *s_instance; // rcx
-				// 
-				//   if ( !byte_18D8EDC57 )
-				//   {
-				//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
-				//     sub_18003C530(&MethodInfo::System::Lazy<HG::Rendering::Runtime::HGEnvironmentManager>::get_Value);
-				//     byte_18D8EDC57 = 1;
-				//   }
-				//   v2 = TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager;
-				//   if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager._1.cctor_finished_or_no_cctor )
-				//   {
-				//     il2cpp_runtime_class_init_0(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager, v1);
-				//     v2 = TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager;
-				//   }
-				//   s_instance = (Lazy_1_Object_ *)v2.static_fields.s_instance;
-				//   if ( !s_instance )
-				//     sub_180B536AC(0LL, v1);
-				//   return (HGEnvironmentManager *)System::Lazy<System::Object>::get_Value(
-				//                                    s_instance,
-				//                                    MethodInfo::System::Lazy<HG::Rendering::Runtime::HGEnvironmentManager>::get_Value);
-				// }
-				// 
-				return null;
-			}
+		  struct ILFixDynamicMethodWrapper_2__Class *v1; // rdx
+		  int *wrapperArray; // rcx
+		  struct HGEnvironmentManager__Class *v3; // rax
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		
+		  v1 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(TypeInfo::IFix::ILFixDynamicMethodWrapper);
+		    v1 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  wrapperArray = (int *)v1->static_fields->wrapperArray;
+		  if ( !wrapperArray )
+		    goto LABEL_9;
+		  if ( wrapperArray[6] <= 450 )
+		    goto LABEL_5;
+		  if ( !v1->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(v1);
+		    v1 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  wrapperArray = (int *)v1->static_fields->wrapperArray;
+		  if ( !wrapperArray )
+		    goto LABEL_9;
+		  if ( (unsigned int)wrapperArray[6] <= 0x1C2 )
+		    sub_1800D2AB0(wrapperArray, v1);
+		  if ( !*((_QWORD *)wrapperArray + 454) )
+		  {
+		LABEL_5:
+		    v3 = TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager;
+		    if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager->_1.cctor_finished_or_no_cctor )
+		    {
+		      il2cpp_runtime_class_init_1(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
+		      v3 = TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager;
+		    }
+		    wrapperArray = (int *)v3->static_fields->s_instance;
+		    if ( wrapperArray )
+		      return (HGEnvironmentManager *)System::Lazy<System::Object>::get_Value(
+		                                       (Lazy_1_Object_ *)wrapperArray,
+		                                       MethodInfo::System::Lazy<HG::Rendering::Runtime::HGEnvironmentManager>::get_Value);
+		LABEL_9:
+		    sub_1800D8260(wrapperArray, v1);
+		  }
+		  Patch = IFix::WrappersManagerImpl::GetPatch(450, 0LL);
+		  if ( !Patch )
+		    goto LABEL_9;
+		  return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_208(Patch, 0LL);
 		}
-
-		// (get) Token: 0x06000623 RID: 1571 RVA: 0x000025D8 File Offset: 0x000007D8
-		public static bool initialized
+		
+		public static bool initialized { get => default; } // 0x0000000189CE16F4-0x0000000189CE1764 
+		// Boolean get_initialized()
+		bool HG::Rendering::Runtime::HGEnvironmentManager::get_initialized(MethodInfo *method)
 		{
-			get
-			{
-				// // Boolean get_initialized()
-				// bool HG::Rendering::Runtime::HGEnvironmentManager::get_initialized(MethodInfo *method)
-				// {
-				//   __int64 v1; // rdx
-				//   HGEnvironmentManager__StaticFields *static_fields; // rcx
-				//   LazyHelper *state; // rax
-				//   signed __int32 v5[10]; // [rsp+0h] [rbp-28h] BYREF
-				// 
-				//   if ( !byte_18D919D73 )
-				//   {
-				//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
-				//     sub_18003C530(&MethodInfo::System::Lazy<HG::Rendering::Runtime::HGEnvironmentManager>::get_IsValueCreated);
-				//     byte_18D919D73 = 1;
-				//   }
-				//   sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
-				//   static_fields = TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager.static_fields;
-				//   if ( !static_fields.s_instance )
-				//     sub_180B536AC(static_fields, v1);
-				//   state = static_fields.s_instance.fields._state;
-				//   _InterlockedOr(v5, 0);
-				//   return state == 0LL;
-				// }
-				// 
-				return default(bool);
-			}
+		  __int64 v1; // rdx
+		  HGEnvironmentManager__StaticFields *static_fields; // rcx
+		  LazyHelper *state; // rax
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  signed __int32 v6[10]; // [rsp+0h] [rbp-28h] BYREF
+		
+		  if ( !IFix::WrappersManagerImpl::IsPatched(1488, 0LL) )
+		  {
+		    sub_1800036A0(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
+		    static_fields = TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager->static_fields;
+		    if ( static_fields->s_instance )
+		    {
+		      state = static_fields->s_instance->fields._state;
+		      _InterlockedOr(v6, 0);
+		      return state == 0LL;
+		    }
+		LABEL_5:
+		    sub_1800D8260(static_fields, v1);
+		  }
+		  Patch = IFix::WrappersManagerImpl::GetPatch(1488, 0LL);
+		  if ( !Patch )
+		    goto LABEL_5;
+		  return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_4((ILFixDynamicMethodWrapper_23 *)Patch, 0LL);
 		}
-
-		// (get) Token: 0x06000624 RID: 1572 RVA: 0x000025D2 File Offset: 0x000007D2
-		public static HGAtmosphereRenderer s_atmosphereRenderer
+		
+		public static HGAtmosphereRenderer s_atmosphereRenderer { get => default; } // 0x0000000189CE17C4-0x0000000189CE1820 
+		// HGAtmosphereRenderer get_s_atmosphereRenderer()
+		HGAtmosphereRenderer *HG::Rendering::Runtime::HGEnvironmentManager::get_s_atmosphereRenderer(MethodInfo *method)
 		{
-			get
-			{
-				// // HGAtmosphereRenderer get_s_atmosphereRenderer()
-				// HGAtmosphereRenderer *HG::Rendering::Runtime::HGEnvironmentManager::get_s_atmosphereRenderer(MethodInfo *method)
-				// {
-				//   __int64 v1; // rdx
-				//   HGEnvironmentManager *instance; // rax
-				//   __int64 v3; // rdx
-				//   __int64 v4; // rcx
-				// 
-				//   if ( !byte_18D919D74 )
-				//   {
-				//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
-				//     byte_18D919D74 = 1;
-				//   }
-				//   if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager._1.cctor_finished_or_no_cctor )
-				//     il2cpp_runtime_class_init_0(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager, v1);
-				//   instance = HG::Rendering::Runtime::HGEnvironmentManager::get_instance(0LL);
-				//   if ( !instance )
-				//     sub_180B536AC(v4, v3);
-				//   return instance.fields.m_atmosphereRenderer;
-				// }
-				// 
-				return null;
-			}
+		  HGEnvironmentManager *instance; // rax
+		  __int64 v2; // rdx
+		  __int64 v3; // rcx
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		
+		  if ( !IFix::WrappersManagerImpl::IsPatched(1489, 0LL) )
+		  {
+		    sub_1800036A0(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
+		    instance = HG::Rendering::Runtime::HGEnvironmentManager::get_instance(0LL);
+		    if ( instance )
+		      return instance->fields.m_atmosphereRenderer;
+		LABEL_5:
+		    sub_1800D8260(v3, v2);
+		  }
+		  Patch = IFix::WrappersManagerImpl::GetPatch(1489, 0LL);
+		  if ( !Patch )
+		    goto LABEL_5;
+		  return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_607(Patch, 0LL);
 		}
-
-		// (get) Token: 0x06000625 RID: 1573 RVA: 0x000025D2 File Offset: 0x000007D2
-		public static HGVolumetricFogRenderer s_volumetricFogRenderer
+		
+		public static HGVolumetricFogRenderer s_volumetricFogRenderer { get => default; } // 0x0000000189CE1934-0x0000000189CE1990 
+		// HGVolumetricFogRenderer get_s_volumetricFogRenderer()
+		HGVolumetricFogRenderer *HG::Rendering::Runtime::HGEnvironmentManager::get_s_volumetricFogRenderer(MethodInfo *method)
 		{
-			get
-			{
-				// // HGVolumetricFogRenderer get_s_volumetricFogRenderer()
-				// HGVolumetricFogRenderer *HG::Rendering::Runtime::HGEnvironmentManager::get_s_volumetricFogRenderer(MethodInfo *method)
-				// {
-				//   __int64 v1; // rdx
-				//   HGEnvironmentManager *instance; // rax
-				//   __int64 v3; // rdx
-				//   __int64 v4; // rcx
-				// 
-				//   if ( !byte_18D919D75 )
-				//   {
-				//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
-				//     byte_18D919D75 = 1;
-				//   }
-				//   if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager._1.cctor_finished_or_no_cctor )
-				//     il2cpp_runtime_class_init_0(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager, v1);
-				//   instance = HG::Rendering::Runtime::HGEnvironmentManager::get_instance(0LL);
-				//   if ( !instance )
-				//     sub_180B536AC(v4, v3);
-				//   return instance.fields.m_volumetricFogRenderer;
-				// }
-				// 
-				return null;
-			}
+		  HGEnvironmentManager *instance; // rax
+		  __int64 v2; // rdx
+		  __int64 v3; // rcx
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		
+		  if ( !IFix::WrappersManagerImpl::IsPatched(1490, 0LL) )
+		  {
+		    sub_1800036A0(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
+		    instance = HG::Rendering::Runtime::HGEnvironmentManager::get_instance(0LL);
+		    if ( instance )
+		      return instance->fields.m_volumetricFogRenderer;
+		LABEL_5:
+		    sub_1800D8260(v3, v2);
+		  }
+		  Patch = IFix::WrappersManagerImpl::GetPatch(1490, 0LL);
+		  if ( !Patch )
+		    goto LABEL_5;
+		  return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_608(Patch, 0LL);
 		}
-
-		// (get) Token: 0x06000626 RID: 1574 RVA: 0x000025D2 File Offset: 0x000007D2
-		public static HGSkyRenderer s_skyRenderer
+		
+		public static HGSkyRenderer s_skyRenderer { get => default; } // 0x00000001839458D0-0x0000000183945950 
+		// HGSkyRenderer get_s_skyRenderer()
+		HGSkyRenderer *HG::Rendering::Runtime::HGEnvironmentManager::get_s_skyRenderer(MethodInfo *method)
 		{
-			get
-			{
-				// // HGSkyRenderer get_s_skyRenderer()
-				// HGSkyRenderer *HG::Rendering::Runtime::HGEnvironmentManager::get_s_skyRenderer(MethodInfo *method)
-				// {
-				//   __int64 v1; // rdx
-				//   HGEnvironmentManager *instance; // rax
-				//   __int64 v3; // rdx
-				//   __int64 v4; // rcx
-				// 
-				//   if ( !byte_18D8EDC59 )
-				//   {
-				//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
-				//     byte_18D8EDC59 = 1;
-				//   }
-				//   if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager._1.cctor_finished_or_no_cctor )
-				//     il2cpp_runtime_class_init_0(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager, v1);
-				//   instance = HG::Rendering::Runtime::HGEnvironmentManager::get_instance(0LL);
-				//   if ( !instance )
-				//     sub_180B536AC(v4, v3);
-				//   return instance.fields.m_skyRenderer;
-				// }
-				// 
-				return null;
-			}
+		  struct ILFixDynamicMethodWrapper_2__Class *v1; // rdx
+		  ILFixDynamicMethodWrapper_2__Array *wrapperArray; // rcx
+		  HGEnvironmentManager *instance; // rax
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		
+		  v1 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(TypeInfo::IFix::ILFixDynamicMethodWrapper);
+		    v1 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  wrapperArray = v1->static_fields->wrapperArray;
+		  if ( !wrapperArray )
+		    goto LABEL_9;
+		  if ( wrapperArray->max_length.size <= 1135 )
+		    goto LABEL_20;
+		  if ( !v1->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(v1);
+		    v1 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  wrapperArray = v1->static_fields->wrapperArray;
+		  if ( !wrapperArray )
+		    goto LABEL_9;
+		  if ( wrapperArray->max_length.size <= 0x46Fu )
+		    sub_1800D2AB0(wrapperArray, v1);
+		  if ( !wrapperArray[31].vector[19] )
+		  {
+		LABEL_20:
+		    if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager->_1.cctor_finished_or_no_cctor )
+		      il2cpp_runtime_class_init_1(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
+		    instance = HG::Rendering::Runtime::HGEnvironmentManager::get_instance(0LL);
+		    if ( instance )
+		      return instance->fields.m_skyRenderer;
+		LABEL_9:
+		    sub_1800D8260(wrapperArray, v1);
+		  }
+		  Patch = IFix::WrappersManagerImpl::GetPatch(1135, 0LL);
+		  if ( !Patch )
+		    goto LABEL_9;
+		  return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_430(Patch, 0LL);
 		}
-
-		// (get) Token: 0x06000627 RID: 1575 RVA: 0x000025D2 File Offset: 0x000007D2
-		public static HGSkydomeStarRenderer s_talosRenderer
+		
+		public static HGSkydomeStarRenderer s_talosRenderer { get => default; } // 0x0000000189CE18D8-0x0000000189CE1934 
+		// HGSkydomeStarRenderer get_s_talosRenderer()
+		HGSkydomeStarRenderer *HG::Rendering::Runtime::HGEnvironmentManager::get_s_talosRenderer(MethodInfo *method)
 		{
-			get
-			{
-				// // HGSkydomeStarRenderer get_s_talosRenderer()
-				// HGSkydomeStarRenderer *HG::Rendering::Runtime::HGEnvironmentManager::get_s_talosRenderer(MethodInfo *method)
-				// {
-				//   __int64 v1; // rdx
-				//   HGEnvironmentManager *instance; // rax
-				//   __int64 v3; // rdx
-				//   __int64 v4; // rcx
-				// 
-				//   if ( !byte_18D919D76 )
-				//   {
-				//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
-				//     byte_18D919D76 = 1;
-				//   }
-				//   if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager._1.cctor_finished_or_no_cctor )
-				//     il2cpp_runtime_class_init_0(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager, v1);
-				//   instance = HG::Rendering::Runtime::HGEnvironmentManager::get_instance(0LL);
-				//   if ( !instance )
-				//     sub_180B536AC(v4, v3);
-				//   return instance.fields.m_talosStarRenderer;
-				// }
-				// 
-				return null;
-			}
+		  HGEnvironmentManager *instance; // rax
+		  __int64 v2; // rdx
+		  __int64 v3; // rcx
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		
+		  if ( !IFix::WrappersManagerImpl::IsPatched(1491, 0LL) )
+		  {
+		    sub_1800036A0(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
+		    instance = HG::Rendering::Runtime::HGEnvironmentManager::get_instance(0LL);
+		    if ( instance )
+		      return instance->fields.m_talosStarRenderer;
+		LABEL_5:
+		    sub_1800D8260(v3, v2);
+		  }
+		  Patch = IFix::WrappersManagerImpl::GetPatch(1491, 0LL);
+		  if ( !Patch )
+		    goto LABEL_5;
+		  return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_609(Patch, 0LL);
 		}
-
-		// (get) Token: 0x06000628 RID: 1576 RVA: 0x000025D2 File Offset: 0x000007D2
-		public static HGRainRenderer s_rainRenderer
+		
+		public static HGRainRenderer s_rainRenderer { get => default; } // 0x0000000182EE2570-0x0000000182EE2670 
+		// HGRainRenderer get_s_rainRenderer()
+		HGRainRenderer *HG::Rendering::Runtime::HGEnvironmentManager::get_s_rainRenderer(MethodInfo *method)
 		{
-			get
-			{
-				// // HGRainRenderer get_s_rainRenderer()
-				// HGRainRenderer *HG::Rendering::Runtime::HGEnvironmentManager::get_s_rainRenderer(MethodInfo *method)
-				// {
-				//   __int64 v1; // rdx
-				//   Lazy_1_HG_Rendering_Runtime_HGEnvironmentManager_ *s_instance; // rcx
-				//   Object *Value; // rax
-				// 
-				//   if ( !byte_18D8EDC5A )
-				//   {
-				//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
-				//     byte_18D8EDC5A = 1;
-				//   }
-				//   if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager._1.cctor_finished_or_no_cctor )
-				//     il2cpp_runtime_class_init_0(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager, v1);
-				//   if ( !byte_18D8EDC57 )
-				//   {
-				//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
-				//     sub_18003C530(&MethodInfo::System::Lazy<HG::Rendering::Runtime::HGEnvironmentManager>::get_Value);
-				//     byte_18D8EDC57 = 1;
-				//   }
-				//   if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager._1.cctor_finished_or_no_cctor )
-				//     il2cpp_runtime_class_init_0(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager, v1);
-				//   s_instance = TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager.static_fields.s_instance;
-				//   if ( !s_instance
-				//     || (Value = System::Lazy<System::Object>::get_Value(
-				//                   (Lazy_1_Object_ *)s_instance,
-				//                   MethodInfo::System::Lazy<HG::Rendering::Runtime::HGEnvironmentManager>::get_Value)) == 0LL )
-				//   {
-				//     sub_180B536AC(s_instance, v1);
-				//   }
-				//   return (HGRainRenderer *)Value[5].klass;
-				// }
-				// 
-				return null;
-			}
+		  struct ILFixDynamicMethodWrapper_2__Class *v1; // rax
+		  Lazy_1_Object_ *static_fields; // rcx
+		  int *klass; // rdx
+		  void *Value; // rax
+		  __int64 v6; // r8
+		  ILFixDynamicMethodWrapper_2 *v7; // rax
+		  Lazy_1_Object___Class *v8; // rax
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		
+		  v1 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(TypeInfo::IFix::ILFixDynamicMethodWrapper);
+		    v1 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  static_fields = (Lazy_1_Object_ *)v1->static_fields;
+		  klass = (int *)static_fields->klass;
+		  if ( !static_fields->klass )
+		    goto LABEL_17;
+		  if ( klass[6] <= 517 )
+		    goto LABEL_35;
+		  if ( !v1->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(v1);
+		    v1 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  klass = (int *)v1->static_fields;
+		  v6 = *(_QWORD *)klass;
+		  if ( !*(_QWORD *)klass )
+		    goto LABEL_17;
+		  if ( *(_DWORD *)(v6 + 24) <= 0x205u )
+		    goto LABEL_32;
+		  if ( !*(_QWORD *)(v6 + 4168) )
+		  {
+		LABEL_35:
+		    if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager->_1.cctor_finished_or_no_cctor )
+		    {
+		      il2cpp_runtime_class_init_1(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
+		      v1 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		    }
+		    if ( !v1->_1.cctor_finished_or_no_cctor )
+		    {
+		      il2cpp_runtime_class_init_1(v1);
+		      v1 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		    }
+		    static_fields = (Lazy_1_Object_ *)v1->static_fields;
+		    klass = (int *)static_fields->klass;
+		    if ( !static_fields->klass )
+		      goto LABEL_17;
+		    if ( klass[6] <= 450 )
+		      goto LABEL_11;
+		    if ( !v1->_1.cctor_finished_or_no_cctor )
+		    {
+		      il2cpp_runtime_class_init_1(v1);
+		      v1 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		    }
+		    static_fields = (Lazy_1_Object_ *)v1->static_fields;
+		    v8 = static_fields->klass;
+		    if ( !static_fields->klass )
+		      goto LABEL_17;
+		    if ( LODWORD(v8->_0.namespaze) > 0x1C2 )
+		    {
+		      if ( *(_QWORD *)&v8[9]._1.instance_size )
+		      {
+		        Patch = IFix::WrappersManagerImpl::GetPatch(450, 0LL);
+		        if ( !Patch )
+		          goto LABEL_17;
+		        Value = IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_208(Patch, 0LL);
+		LABEL_15:
+		        if ( Value )
+		          return (HGRainRenderer *)*((_QWORD *)Value + 10);
+		LABEL_17:
+		        sub_1800D8260(static_fields, klass);
+		      }
+		LABEL_11:
+		      if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager->_1.cctor_finished_or_no_cctor )
+		        il2cpp_runtime_class_init_1(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
+		      static_fields = (Lazy_1_Object_ *)TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager->static_fields->s_instance;
+		      if ( !static_fields )
+		        goto LABEL_17;
+		      Value = System::Lazy<System::Object>::get_Value(
+		                static_fields,
+		                MethodInfo::System::Lazy<HG::Rendering::Runtime::HGEnvironmentManager>::get_Value);
+		      goto LABEL_15;
+		    }
+		LABEL_32:
+		    sub_1800D2AB0(static_fields, klass);
+		  }
+		  v7 = IFix::WrappersManagerImpl::GetPatch(517, 0LL);
+		  if ( !v7 )
+		    goto LABEL_17;
+		  return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_225(v7, 0LL);
 		}
-
-		// (get) Token: 0x06000629 RID: 1577 RVA: 0x000025D2 File Offset: 0x000007D2
-		public static HGSnowRenderer s_snowRenderer
+		
+		public static HGSnowRenderer s_snowRenderer { get => default; } // 0x0000000182EE24F0-0x0000000182EE2570 
+		// HGSnowRenderer get_s_snowRenderer()
+		HGSnowRenderer *HG::Rendering::Runtime::HGEnvironmentManager::get_s_snowRenderer(MethodInfo *method)
 		{
-			get
-			{
-				// // HGSnowRenderer get_s_snowRenderer()
-				// HGSnowRenderer *HG::Rendering::Runtime::HGEnvironmentManager::get_s_snowRenderer(MethodInfo *method)
-				// {
-				//   __int64 v1; // rdx
-				//   HGEnvironmentManager *instance; // rax
-				//   __int64 v3; // rdx
-				//   __int64 v4; // rcx
-				// 
-				//   if ( !byte_18D8EDC5B )
-				//   {
-				//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
-				//     byte_18D8EDC5B = 1;
-				//   }
-				//   if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager._1.cctor_finished_or_no_cctor )
-				//     il2cpp_runtime_class_init_0(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager, v1);
-				//   instance = HG::Rendering::Runtime::HGEnvironmentManager::get_instance(0LL);
-				//   if ( !instance )
-				//     sub_180B536AC(v4, v3);
-				//   return instance.fields.m_snowRenderer;
-				// }
-				// 
-				return null;
-			}
+		  struct ILFixDynamicMethodWrapper_2__Class *v1; // rdx
+		  ILFixDynamicMethodWrapper_2__Array *wrapperArray; // rcx
+		  HGEnvironmentManager *instance; // rax
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		
+		  v1 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(TypeInfo::IFix::ILFixDynamicMethodWrapper);
+		    v1 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  wrapperArray = v1->static_fields->wrapperArray;
+		  if ( !wrapperArray )
+		    goto LABEL_9;
+		  if ( wrapperArray->max_length.size <= 521 )
+		    goto LABEL_20;
+		  if ( !v1->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(v1);
+		    v1 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  wrapperArray = v1->static_fields->wrapperArray;
+		  if ( !wrapperArray )
+		    goto LABEL_9;
+		  if ( wrapperArray->max_length.size <= 0x209u )
+		    sub_1800D2AB0(wrapperArray, v1);
+		  if ( !wrapperArray[14].vector[17] )
+		  {
+		LABEL_20:
+		    if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager->_1.cctor_finished_or_no_cctor )
+		      il2cpp_runtime_class_init_1(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
+		    instance = HG::Rendering::Runtime::HGEnvironmentManager::get_instance(0LL);
+		    if ( instance )
+		      return instance->fields.m_snowRenderer;
+		LABEL_9:
+		    sub_1800D8260(wrapperArray, v1);
+		  }
+		  Patch = IFix::WrappersManagerImpl::GetPatch(521, 0LL);
+		  if ( !Patch )
+		    goto LABEL_9;
+		  return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_226(Patch, 0LL);
 		}
-
-		// (get) Token: 0x0600062A RID: 1578 RVA: 0x000025D2 File Offset: 0x000007D2
-		public static IndexedHashSet<HGEnvironmentVolume> s_interpolatedVolumes
+		
+		public static IndexedHashSet<HGEnvironmentVolumeBase> s_interpolatedVolumes { get => default; } // 0x0000000189CE187C-0x0000000189CE18D8 
+		// IndexedHashSet`1[HG.Rendering.Runtime.HGEnvironmentVolumeBase] get_s_interpolatedVolumes()
+		IndexedHashSet_1_HG_Rendering_Runtime_HGEnvironmentVolumeBase_ *HG::Rendering::Runtime::HGEnvironmentManager::get_s_interpolatedVolumes(
+		        MethodInfo *method)
 		{
-			get
-			{
-				// // IndexedHashSet`1[HG.Rendering.Runtime.HGEnvironmentVolume] get_s_interpolatedVolumes()
-				// IndexedHashSet_1_HG_Rendering_Runtime_HGEnvironmentVolume_ *HG::Rendering::Runtime::HGEnvironmentManager::get_s_interpolatedVolumes(
-				//         MethodInfo *method)
-				// {
-				//   HGEnvironmentManager *instance; // rax
-				//   __int64 v2; // rdx
-				//   __int64 v3; // rcx
-				//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-				// 
-				//   if ( !byte_18D919D77 )
-				//   {
-				//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
-				//     byte_18D919D77 = 1;
-				//   }
-				//   if ( !IFix::WrappersManagerImpl::IsPatched(983, 0LL) )
-				//   {
-				//     sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
-				//     instance = HG::Rendering::Runtime::HGEnvironmentManager::get_instance(0LL);
-				//     if ( instance )
-				//       return instance.fields.m_interpolatedVolumes;
-				// LABEL_7:
-				//     sub_180B536AC(v3, v2);
-				//   }
-				//   Patch = IFix::WrappersManagerImpl::GetPatch(983, 0LL);
-				//   if ( !Patch )
-				//     goto LABEL_7;
-				//   return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_361(Patch, 0LL);
-				// }
-				// 
-				return null;
-			}
+		  HGEnvironmentManager *instance; // rax
+		  __int64 v2; // rdx
+		  __int64 v3; // rcx
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		
+		  if ( !IFix::WrappersManagerImpl::IsPatched(1087, 0LL) )
+		  {
+		    sub_1800036A0(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
+		    instance = HG::Rendering::Runtime::HGEnvironmentManager::get_instance(0LL);
+		    if ( instance )
+		      return instance->fields.m_interpolatedVolumes;
+		LABEL_5:
+		    sub_1800D8260(v3, v2);
+		  }
+		  Patch = IFix::WrappersManagerImpl::GetPatch(1087, 0LL);
+		  if ( !Patch )
+		    goto LABEL_5;
+		  return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_418(Patch, 0LL);
 		}
-
-		// (get) Token: 0x0600062B RID: 1579 RVA: 0x000025D2 File Offset: 0x000007D2
-		public static List<float> s_interpolatedVolumesFactor
+		
+		public static List<float> s_interpolatedVolumesFactor { get => default; } // 0x0000000189CE1820-0x0000000189CE187C 
+		// List`1[System.Single] get_s_interpolatedVolumesFactor()
+		List_1_System_Single_ *HG::Rendering::Runtime::HGEnvironmentManager::get_s_interpolatedVolumesFactor(
+		        MethodInfo *method)
 		{
-			get
-			{
-				// // List`1[System.Single] get_s_interpolatedVolumesFactor()
-				// List_1_System_Single_ *HG::Rendering::Runtime::HGEnvironmentManager::get_s_interpolatedVolumesFactor(
-				//         MethodInfo *method)
-				// {
-				//   HGEnvironmentManager *instance; // rax
-				//   __int64 v2; // rdx
-				//   __int64 v3; // rcx
-				//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-				// 
-				//   if ( !byte_18D919D78 )
-				//   {
-				//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
-				//     byte_18D919D78 = 1;
-				//   }
-				//   if ( !IFix::WrappersManagerImpl::IsPatched(985, 0LL) )
-				//   {
-				//     sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
-				//     instance = HG::Rendering::Runtime::HGEnvironmentManager::get_instance(0LL);
-				//     if ( instance )
-				//       return instance.fields.m_interpolatedVolumesFactor;
-				// LABEL_7:
-				//     sub_180B536AC(v3, v2);
-				//   }
-				//   Patch = IFix::WrappersManagerImpl::GetPatch(985, 0LL);
-				//   if ( !Patch )
-				//     goto LABEL_7;
-				//   return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_362(Patch, 0LL);
-				// }
-				// 
-				return null;
-			}
+		  HGEnvironmentManager *instance; // rax
+		  __int64 v2; // rdx
+		  __int64 v3; // rcx
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		
+		  if ( !IFix::WrappersManagerImpl::IsPatched(1089, 0LL) )
+		  {
+		    sub_1800036A0(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
+		    instance = HG::Rendering::Runtime::HGEnvironmentManager::get_instance(0LL);
+		    if ( instance )
+		      return instance->fields.m_interpolatedVolumesFactor;
+		LABEL_5:
+		    sub_1800D8260(v3, v2);
+		  }
+		  Patch = IFix::WrappersManagerImpl::GetPatch(1089, 0LL);
+		  if ( !Patch )
+		    goto LABEL_5;
+		  return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_419(Patch, 0LL);
 		}
-
-		// (get) Token: 0x0600062C RID: 1580 RVA: 0x000025D2 File Offset: 0x000007D2
-		public static HGEnvironmentPhase s_interpolatedPhase
+		
+		public static HGEnvironmentPhase s_interpolatedPhase { get => default; } // 0x0000000183104890-0x0000000183104990 
+		// HGEnvironmentPhase get_s_interpolatedPhase()
+		HGEnvironmentPhase *HG::Rendering::Runtime::HGEnvironmentManager::get_s_interpolatedPhase(MethodInfo *method)
 		{
-			get
-			{
-				// // HGEnvironmentPhase get_s_interpolatedPhase()
-				// HGEnvironmentPhase *HG::Rendering::Runtime::HGEnvironmentManager::get_s_interpolatedPhase(MethodInfo *method)
-				// {
-				//   __int64 v1; // rdx
-				//   Lazy_1_HG_Rendering_Runtime_HGEnvironmentManager_ *s_instance; // rcx
-				//   Object *Value; // rax
-				// 
-				//   if ( !byte_18D8EDC5C )
-				//   {
-				//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
-				//     byte_18D8EDC5C = 1;
-				//   }
-				//   if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager._1.cctor_finished_or_no_cctor )
-				//     il2cpp_runtime_class_init_0(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager, v1);
-				//   if ( !byte_18D8EDC57 )
-				//   {
-				//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
-				//     sub_18003C530(&MethodInfo::System::Lazy<HG::Rendering::Runtime::HGEnvironmentManager>::get_Value);
-				//     byte_18D8EDC57 = 1;
-				//   }
-				//   if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager._1.cctor_finished_or_no_cctor )
-				//     il2cpp_runtime_class_init_0(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager, v1);
-				//   s_instance = TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager.static_fields.s_instance;
-				//   if ( !s_instance
-				//     || (Value = System::Lazy<System::Object>::get_Value(
-				//                   (Lazy_1_Object_ *)s_instance,
-				//                   MethodInfo::System::Lazy<HG::Rendering::Runtime::HGEnvironmentManager>::get_Value)) == 0LL )
-				//   {
-				//     sub_180B536AC(s_instance, v1);
-				//   }
-				//   return (HGEnvironmentPhase *)Value[6].monitor;
-				// }
-				// 
-				return null;
-			}
+		  struct ILFixDynamicMethodWrapper_2__Class *v1; // rax
+		  Lazy_1_Object_ *static_fields; // rcx
+		  int *klass; // rdx
+		  void *Value; // rax
+		  __int64 v6; // r8
+		  ILFixDynamicMethodWrapper_2 *v7; // rax
+		  Lazy_1_Object___Class *v8; // rax
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		
+		  v1 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(TypeInfo::IFix::ILFixDynamicMethodWrapper);
+		    v1 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  static_fields = (Lazy_1_Object_ *)v1->static_fields;
+		  klass = (int *)static_fields->klass;
+		  if ( !static_fields->klass )
+		    goto LABEL_17;
+		  if ( klass[6] <= 449 )
+		    goto LABEL_35;
+		  if ( !v1->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(v1);
+		    v1 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  klass = (int *)v1->static_fields;
+		  v6 = *(_QWORD *)klass;
+		  if ( !*(_QWORD *)klass )
+		    goto LABEL_17;
+		  if ( *(_DWORD *)(v6 + 24) <= 0x1C1u )
+		    goto LABEL_32;
+		  if ( !*(_QWORD *)(v6 + 3624) )
+		  {
+		LABEL_35:
+		    if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager->_1.cctor_finished_or_no_cctor )
+		    {
+		      il2cpp_runtime_class_init_1(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
+		      v1 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		    }
+		    if ( !v1->_1.cctor_finished_or_no_cctor )
+		    {
+		      il2cpp_runtime_class_init_1(v1);
+		      v1 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		    }
+		    static_fields = (Lazy_1_Object_ *)v1->static_fields;
+		    klass = (int *)static_fields->klass;
+		    if ( !static_fields->klass )
+		      goto LABEL_17;
+		    if ( klass[6] <= 450 )
+		      goto LABEL_11;
+		    if ( !v1->_1.cctor_finished_or_no_cctor )
+		    {
+		      il2cpp_runtime_class_init_1(v1);
+		      v1 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		    }
+		    static_fields = (Lazy_1_Object_ *)v1->static_fields;
+		    v8 = static_fields->klass;
+		    if ( !static_fields->klass )
+		      goto LABEL_17;
+		    if ( LODWORD(v8->_0.namespaze) > 0x1C2 )
+		    {
+		      if ( *(_QWORD *)&v8[9]._1.instance_size )
+		      {
+		        Patch = IFix::WrappersManagerImpl::GetPatch(450, 0LL);
+		        if ( !Patch )
+		          goto LABEL_17;
+		        Value = IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_208(Patch, 0LL);
+		LABEL_15:
+		        if ( Value )
+		          return (HGEnvironmentPhase *)*((_QWORD *)Value + 13);
+		LABEL_17:
+		        sub_1800D8260(static_fields, klass);
+		      }
+		LABEL_11:
+		      if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager->_1.cctor_finished_or_no_cctor )
+		        il2cpp_runtime_class_init_1(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
+		      static_fields = (Lazy_1_Object_ *)TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager->static_fields->s_instance;
+		      if ( !static_fields )
+		        goto LABEL_17;
+		      Value = System::Lazy<System::Object>::get_Value(
+		                static_fields,
+		                MethodInfo::System::Lazy<HG::Rendering::Runtime::HGEnvironmentManager>::get_Value);
+		      goto LABEL_15;
+		    }
+		LABEL_32:
+		    sub_1800D2AB0(static_fields, klass);
+		  }
+		  v7 = IFix::WrappersManagerImpl::GetPatch(449, 0LL);
+		  if ( !v7 )
+		    goto LABEL_17;
+		  return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_209(v7, 0LL);
 		}
-
-		// (get) Token: 0x0600062D RID: 1581 RVA: 0x000025D2 File Offset: 0x000007D2
-		// (set) Token: 0x0600062E RID: 1582 RVA: 0x000025D0 File Offset: 0x000007D0
-		public static Transform interpolateTriggerOverride
+		
+		public static float s_timeOfDay { get => default; set {} } // 0x0000000183C82670-0x0000000183C826F0 0x0000000189CE1A60-0x0000000189CE1AD4
+		// Single get_s_timeOfDay()
+		float HG::Rendering::Runtime::HGEnvironmentManager::get_s_timeOfDay(MethodInfo *method)
 		{
-			get
-			{
-				// // Transform get_interpolateTriggerOverride()
-				// Transform *HG::Rendering::Runtime::HGEnvironmentManager::get_interpolateTriggerOverride(MethodInfo *method)
-				// {
-				//   __int64 v1; // rdx
-				//   HGEnvironmentManager *instance; // rax
-				//   __int64 v3; // rdx
-				//   __int64 v4; // rcx
-				// 
-				//   if ( !byte_18D8EDC60 )
-				//   {
-				//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
-				//     byte_18D8EDC60 = 1;
-				//   }
-				//   if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager._1.cctor_finished_or_no_cctor )
-				//     il2cpp_runtime_class_init_0(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager, v1);
-				//   instance = HG::Rendering::Runtime::HGEnvironmentManager::get_instance(0LL);
-				//   if ( !instance )
-				//     sub_180B536AC(v4, v3);
-				//   return instance.fields.m_interpolateTriggerOverride;
-				// }
-				// 
-				return null;
-			}
-			set
-			{
-				// // Void set_interpolateTriggerOverride(Transform)
-				// void HG::Rendering::Runtime::HGEnvironmentManager::set_interpolateTriggerOverride(Transform *value, MethodInfo *method)
-				// {
-				//   HGEnvironmentManager *instance; // rax
-				//   OneofDescriptorProto *v4; // rdx
-				//   __int64 v5; // rcx
-				//   FileDescriptor *v6; // r8
-				//   MessageDescriptor *v7; // r9
-				//   String__Array *v8; // [rsp+50h] [rbp+28h]
-				//   String *v9; // [rsp+58h] [rbp+30h]
-				//   MethodInfo *v10; // [rsp+60h] [rbp+38h]
-				// 
-				//   if ( !byte_18D919D79 )
-				//   {
-				//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
-				//     byte_18D919D79 = 1;
-				//   }
-				//   sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
-				//   instance = HG::Rendering::Runtime::HGEnvironmentManager::get_instance(0LL);
-				//   if ( !instance )
-				//     sub_180B536AC(v5, v4);
-				//   instance.fields.m_interpolateTriggerOverride = value;
-				//   sub_1800054D0((OneofDescriptor *)&instance.fields.m_interpolateTriggerOverride, v4, v6, v7, v8, v9, v10);
-				// }
-				// 
-			}
+		  struct ILFixDynamicMethodWrapper_2__Class *v1; // rdx
+		  ILFixDynamicMethodWrapper_2__Array *wrapperArray; // rcx
+		  HGEnvironmentManager *instance; // rax
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		
+		  v1 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(TypeInfo::IFix::ILFixDynamicMethodWrapper);
+		    v1 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  wrapperArray = v1->static_fields->wrapperArray;
+		  if ( !wrapperArray )
+		    goto LABEL_9;
+		  if ( wrapperArray->max_length.size <= 631 )
+		    goto LABEL_20;
+		  if ( !v1->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(v1);
+		    v1 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  wrapperArray = v1->static_fields->wrapperArray;
+		  if ( !wrapperArray )
+		    goto LABEL_9;
+		  if ( wrapperArray->max_length.size <= 0x277u )
+		    sub_1800D2AB0(wrapperArray, v1);
+		  if ( !wrapperArray[17].vector[19] )
+		  {
+		LABEL_20:
+		    if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager->_1.cctor_finished_or_no_cctor )
+		      il2cpp_runtime_class_init_1(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
+		    instance = HG::Rendering::Runtime::HGEnvironmentManager::get_instance(0LL);
+		    if ( instance )
+		      return instance->fields.m_timeOfDay;
+		LABEL_9:
+		    sub_1800D8260(wrapperArray, v1);
+		  }
+		  Patch = IFix::WrappersManagerImpl::GetPatch(631, 0LL);
+		  if ( !Patch )
+		    goto LABEL_9;
+		  return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_52((ILFixDynamicMethodWrapper_6 *)Patch, 0LL);
 		}
+		
 
-		// (get) Token: 0x0600062F RID: 1583 RVA: 0x000025D8 File Offset: 0x000007D8
-		// (set) Token: 0x06000630 RID: 1584 RVA: 0x000025D0 File Offset: 0x000007D0
-		public static bool sortNeeded
+		// Void set_s_timeOfDay(Single)
+		void HG::Rendering::Runtime::HGEnvironmentManager::set_s_timeOfDay(float value, MethodInfo *method)
 		{
-			get
-			{
-				// // Boolean get_sortNeeded()
-				// bool HG::Rendering::Runtime::HGEnvironmentManager::get_sortNeeded(MethodInfo *method)
-				// {
-				//   __int64 v1; // rdx
-				//   HGEnvironmentManager *instance; // rax
-				//   __int64 v3; // rdx
-				//   __int64 v4; // rcx
-				// 
-				//   if ( !byte_18D919D7A )
-				//   {
-				//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
-				//     byte_18D919D7A = 1;
-				//   }
-				//   if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager._1.cctor_finished_or_no_cctor )
-				//     il2cpp_runtime_class_init_0(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager, v1);
-				//   instance = HG::Rendering::Runtime::HGEnvironmentManager::get_instance(0LL);
-				//   if ( !instance )
-				//     sub_180B536AC(v4, v3);
-				//   return instance.fields.m_sortNeeded;
-				// }
-				// 
-				return default(bool);
-			}
-			set
-			{
-				// // Void set_sortNeeded(Boolean)
-				// void HG::Rendering::Runtime::HGEnvironmentManager::set_sortNeeded(bool value, MethodInfo *method)
-				// {
-				//   HGEnvironmentManager *instance; // rax
-				//   __int64 v4; // rdx
-				//   __int64 v5; // rcx
-				// 
-				//   if ( !byte_18D8EDC61 )
-				//   {
-				//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
-				//     byte_18D8EDC61 = 1;
-				//   }
-				//   if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager._1.cctor_finished_or_no_cctor )
-				//     il2cpp_runtime_class_init_0(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager, method);
-				//   instance = HG::Rendering::Runtime::HGEnvironmentManager::get_instance(0LL);
-				//   if ( !instance )
-				//     sub_180B536AC(v5, v4);
-				//   instance.fields.m_sortNeeded = value;
-				// }
-				// 
-			}
+		  HGEnvironmentManager *instance; // rax
+		  __int64 v4; // rdx
+		  __int64 v5; // rcx
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		
+		  if ( !IFix::WrappersManagerImpl::IsPatched(1492, 0LL) )
+		  {
+		    sub_1800036A0(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
+		    instance = HG::Rendering::Runtime::HGEnvironmentManager::get_instance(0LL);
+		    if ( instance )
+		    {
+		      instance->fields.m_timeOfDay = value;
+		      return;
+		    }
+		LABEL_5:
+		    sub_1800D8260(v5, v4);
+		  }
+		  Patch = IFix::WrappersManagerImpl::GetPatch(1492, 0LL);
+		  if ( !Patch )
+		    goto LABEL_5;
+		  IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_86((ILFixDynamicMethodWrapper_20 *)Patch, value, 0LL);
 		}
-
-		// (get) Token: 0x06000631 RID: 1585 RVA: 0x000025F0 File Offset: 0x000007F0
-		// (set) Token: 0x06000632 RID: 1586 RVA: 0x000025D0 File Offset: 0x000007D0
-		public static float interpolateTimeFactor
+		
+		public static Transform interpolateTriggerOverride { get => default; set {} } // 0x00000001831C9EF0-0x00000001831C9F70 0x0000000189CE19EC-0x0000000189CE1A60
+		// Transform get_interpolateTriggerOverride()
+		Transform *HG::Rendering::Runtime::HGEnvironmentManager::get_interpolateTriggerOverride(MethodInfo *method)
 		{
-			get
-			{
-				// // Single get_interpolateTimeFactor()
-				// float HG::Rendering::Runtime::HGEnvironmentManager::get_interpolateTimeFactor(MethodInfo *method)
-				// {
-				//   __int64 v1; // rdx
-				//   HGEnvironmentManager *instance; // rax
-				//   __int64 v3; // rdx
-				//   __int64 v4; // rcx
-				// 
-				//   if ( !byte_18D919D7B )
-				//   {
-				//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
-				//     byte_18D919D7B = 1;
-				//   }
-				//   if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager._1.cctor_finished_or_no_cctor )
-				//     il2cpp_runtime_class_init_0(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager, v1);
-				//   instance = HG::Rendering::Runtime::HGEnvironmentManager::get_instance(0LL);
-				//   if ( !instance )
-				//     sub_180B536AC(v4, v3);
-				//   return instance.fields.m_interpolateTimeFactor;
-				// }
-				// 
-				return 0f;
-			}
-			set
-			{
-				// // Void set_interpolateTimeFactor(Single)
-				// void HG::Rendering::Runtime::HGEnvironmentManager::set_interpolateTimeFactor(float value, MethodInfo *method)
-				// {
-				//   HGEnvironmentManager *instance; // rax
-				//   __int64 v4; // rdx
-				//   __int64 v5; // rcx
-				// 
-				//   if ( !byte_18D8EDC62 )
-				//   {
-				//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
-				//     byte_18D8EDC62 = 1;
-				//   }
-				//   if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager._1.cctor_finished_or_no_cctor )
-				//     il2cpp_runtime_class_init_0(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager, method);
-				//   instance = HG::Rendering::Runtime::HGEnvironmentManager::get_instance(0LL);
-				//   if ( !instance )
-				//     sub_180B536AC(v5, v4);
-				//   instance.fields.m_interpolateTimeFactor = value;
-				// }
-				// 
-			}
+		  struct ILFixDynamicMethodWrapper_2__Class *v1; // rdx
+		  ILFixDynamicMethodWrapper_2__Array *wrapperArray; // rcx
+		  HGEnvironmentManager *instance; // rax
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		
+		  v1 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(TypeInfo::IFix::ILFixDynamicMethodWrapper);
+		    v1 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  wrapperArray = v1->static_fields->wrapperArray;
+		  if ( !wrapperArray )
+		    goto LABEL_9;
+		  if ( wrapperArray->max_length.size <= 787 )
+		    goto LABEL_20;
+		  if ( !v1->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(v1);
+		    v1 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  wrapperArray = v1->static_fields->wrapperArray;
+		  if ( !wrapperArray )
+		    goto LABEL_9;
+		  if ( wrapperArray->max_length.size <= 0x313u )
+		    sub_1800D2AB0(wrapperArray, v1);
+		  if ( !wrapperArray[21].vector[31] )
+		  {
+		LABEL_20:
+		    if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager->_1.cctor_finished_or_no_cctor )
+		      il2cpp_runtime_class_init_1(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
+		    instance = HG::Rendering::Runtime::HGEnvironmentManager::get_instance(0LL);
+		    if ( instance )
+		      return instance->fields.m_interpolateTriggerOverride;
+		LABEL_9:
+		    sub_1800D8260(wrapperArray, v1);
+		  }
+		  Patch = IFix::WrappersManagerImpl::GetPatch(787, 0LL);
+		  if ( !Patch )
+		    goto LABEL_9;
+		  return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_313(Patch, 0LL);
 		}
+		
 
-		public HGEnvironmentManager()
+		// Void set_interpolateTriggerOverride(Transform)
+		void HG::Rendering::Runtime::HGEnvironmentManager::set_interpolateTriggerOverride(Transform *value, MethodInfo *method)
 		{
-			// // HGEnvironmentManager()
-			// void HG::Rendering::Runtime::HGEnvironmentManager::HGEnvironmentManager(HGEnvironmentManager *this, MethodInfo *method)
-			// {
-			//   HGAtmosphereRenderer *v3; // rax
-			//   OneofDescriptorProto *v4; // rdx
-			//   HGEnvironmentPhase *m_defaultPhase; // rcx
-			//   FileDescriptor *v6; // r8
-			//   MessageDescriptor *v7; // r9
-			//   HGVolumetricFogRenderer *v8; // rax
-			//   FileDescriptor *v9; // r8
-			//   MessageDescriptor *v10; // r9
-			//   HGSkyRenderer *v11; // rax
-			//   HGSkyRenderer *v12; // rdi
-			//   OneofDescriptorProto *v13; // rdx
-			//   FileDescriptor *v14; // r8
-			//   MessageDescriptor *v15; // r9
-			//   HGSkydomeStarRenderer *v16; // rax
-			//   HGSkydomeStarRenderer *v17; // rdi
-			//   OneofDescriptorProto *v18; // rdx
-			//   FileDescriptor *v19; // r8
-			//   MessageDescriptor *v20; // r9
-			//   HGRainRenderer *v21; // rax
-			//   HGRainRenderer *v22; // rdi
-			//   OneofDescriptorProto *v23; // rdx
-			//   FileDescriptor *v24; // r8
-			//   MessageDescriptor *v25; // r9
-			//   HGSnowRenderer *v26; // rax
-			//   HGSnowRenderer *v27; // rdi
-			//   OneofDescriptorProto *v28; // rdx
-			//   FileDescriptor *v29; // r8
-			//   MessageDescriptor *v30; // r9
-			//   HashSet_1_System_Object_ *v31; // rax
-			//   HashSet_1_HG_Rendering_Runtime_HGEnvironmentVolume_ *v32; // rdi
-			//   OneofDescriptorProto *v33; // rdx
-			//   FileDescriptor *v34; // r8
-			//   MessageDescriptor *v35; // r9
-			//   List_1_Beyond_Gameplay_ZhuangfySleeveSolver_BoneData_ *v36; // rax
-			//   List_1_HG_Rendering_Runtime_HGEnvironmentVolume_ *v37; // rdi
-			//   OneofDescriptorProto *v38; // rdx
-			//   FileDescriptor *v39; // r8
-			//   MessageDescriptor *v40; // r9
-			//   IndexedHashSet_1_System_Object_ *v41; // rax
-			//   IndexedHashSet_1_HG_Rendering_Runtime_HGEnvironmentVolume_ *v42; // rdi
-			//   OneofDescriptorProto *v43; // rdx
-			//   FileDescriptor *v44; // r8
-			//   MessageDescriptor *v45; // r9
-			//   LowLevelList_1_System_Object_ *v46; // rax
-			//   List_1_System_Single_ *v47; // rdi
-			//   OneofDescriptorProto *v48; // rdx
-			//   FileDescriptor *v49; // r8
-			//   MessageDescriptor *v50; // r9
-			//   OneofDescriptorProto *v51; // rdx
-			//   FileDescriptor *v52; // r8
-			//   MessageDescriptor *v53; // r9
-			//   OneofDescriptorProto *v54; // rdx
-			//   FileDescriptor *v55; // r8
-			//   MessageDescriptor *v56; // r9
-			//   __int64 v57; // rax
-			//   float v58; // ecx
-			//   String__Array *v59; // [rsp+20h] [rbp-18h] BYREF
-			//   String *v60; // [rsp+28h] [rbp-10h]
-			//   MethodInfo *v61; // [rsp+30h] [rbp-8h]
-			// 
-			//   if ( !byte_18D8EDC58 )
-			//   {
-			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGAtmosphereRenderer);
-			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGRainRenderer);
-			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGSkyRenderer);
-			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGSkydomeStarRenderer);
-			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGSnowRenderer);
-			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGVolumetricFogRenderer);
-			//     sub_18003C530(&MethodInfo::System::Collections::Generic::HashSet<HG::Rendering::Runtime::HGEnvironmentVolume>::HashSet);
-			//     sub_18003C530(&TypeInfo::System::Collections::Generic::HashSet<HG::Rendering::Runtime::HGEnvironmentVolume>);
-			//     sub_18003C530(&MethodInfo::Beyond::IndexedHashSet<HG::Rendering::Runtime::HGEnvironmentVolume>::IndexedHashSet);
-			//     sub_18003C530(&TypeInfo::Beyond::IndexedHashSet<HG::Rendering::Runtime::HGEnvironmentVolume>);
-			//     sub_18003C530(&MethodInfo::System::Collections::Generic::List<HG::Rendering::Runtime::HGEnvironmentVolume>::List);
-			//     sub_18003C530(&MethodInfo::System::Collections::Generic::List<float>::List);
-			//     sub_18003C530(&TypeInfo::System::Collections::Generic::List<float>);
-			//     sub_18003C530(&TypeInfo::System::Collections::Generic::List<HG::Rendering::Runtime::HGEnvironmentVolume>);
-			//     sub_18003C530(&MethodInfo::UnityEngine::ScriptableObject::CreateInstance<HG::Rendering::Runtime::HGEnvironmentPhase>);
-			//     byte_18D8EDC58 = 1;
-			//   }
-			//   v3 = (HGAtmosphereRenderer *)sub_180004920(TypeInfo::HG::Rendering::Runtime::HGAtmosphereRenderer);
-			//   if ( !v3 )
-			//     goto LABEL_4;
-			//   this.fields.m_atmosphereRenderer = v3;
-			//   sub_1800054D0((OneofDescriptor *)&this.fields.m_atmosphereRenderer, v4, v6, v7, v59, v60, v61);
-			//   v8 = (HGVolumetricFogRenderer *)sub_180004920(TypeInfo::HG::Rendering::Runtime::HGVolumetricFogRenderer);
-			//   if ( !v8 )
-			//     goto LABEL_4;
-			//   this.fields.m_volumetricFogRenderer = v8;
-			//   sub_1800054D0((OneofDescriptor *)&this.fields.m_volumetricFogRenderer, v4, v9, v10, v59, v60, v61);
-			//   v11 = (HGSkyRenderer *)sub_180004920(TypeInfo::HG::Rendering::Runtime::HGSkyRenderer);
-			//   v12 = v11;
-			//   if ( !v11 )
-			//     goto LABEL_4;
-			//   HG::Rendering::Runtime::HGSkyRenderer::HGSkyRenderer(v11, 0LL);
-			//   this.fields.m_skyRenderer = v12;
-			//   sub_1800054D0((OneofDescriptor *)&this.fields.m_skyRenderer, v13, v14, v15, v59, v60, v61);
-			//   v16 = (HGSkydomeStarRenderer *)sub_180004920(TypeInfo::HG::Rendering::Runtime::HGSkydomeStarRenderer);
-			//   v17 = v16;
-			//   if ( !v16 )
-			//     goto LABEL_4;
-			//   HG::Rendering::Runtime::HGSkydomeStarRenderer::HGSkydomeStarRenderer(v16, 0LL);
-			//   this.fields.m_talosStarRenderer = v17;
-			//   sub_1800054D0((OneofDescriptor *)&this.fields.m_talosStarRenderer, v18, v19, v20, v59, v60, v61);
-			//   v21 = (HGRainRenderer *)sub_180004920(TypeInfo::HG::Rendering::Runtime::HGRainRenderer);
-			//   v22 = v21;
-			//   if ( !v21 )
-			//     goto LABEL_4;
-			//   HG::Rendering::Runtime::HGRainRenderer::HGRainRenderer(v21, 0LL);
-			//   this.fields.m_rainRenderer = v22;
-			//   sub_1800054D0((OneofDescriptor *)&this.fields.m_rainRenderer, v23, v24, v25, v59, v60, v61);
-			//   v26 = (HGSnowRenderer *)sub_180004920(TypeInfo::HG::Rendering::Runtime::HGSnowRenderer);
-			//   v27 = v26;
-			//   if ( !v26 )
-			//     goto LABEL_4;
-			//   HG::Rendering::Runtime::HGSnowRenderer::HGSnowRenderer(v26, 0LL);
-			//   this.fields.m_snowRenderer = v27;
-			//   sub_1800054D0((OneofDescriptor *)&this.fields.m_snowRenderer, v28, v29, v30, v59, v60, v61);
-			//   v31 = (HashSet_1_System_Object_ *)sub_180004920(TypeInfo::System::Collections::Generic::HashSet<HG::Rendering::Runtime::HGEnvironmentVolume>);
-			//   v32 = (HashSet_1_HG_Rendering_Runtime_HGEnvironmentVolume_ *)v31;
-			//   if ( !v31 )
-			//     goto LABEL_4;
-			//   System::Collections::Generic::HashSet<System::Object>::HashSet(
-			//     v31,
-			//     MethodInfo::System::Collections::Generic::HashSet<HG::Rendering::Runtime::HGEnvironmentVolume>::HashSet);
-			//   this.fields.m_activeVolumes = v32;
-			//   sub_1800054D0((OneofDescriptor *)&this.fields, v33, v34, v35, v59, v60, v61);
-			//   v36 = (List_1_Beyond_Gameplay_ZhuangfySleeveSolver_BoneData_ *)sub_180004920(TypeInfo::System::Collections::Generic::List<HG::Rendering::Runtime::HGEnvironmentVolume>);
-			//   v37 = (List_1_HG_Rendering_Runtime_HGEnvironmentVolume_ *)v36;
-			//   if ( !v36 )
-			//     goto LABEL_4;
-			//   System::Collections::Generic::List<Beyond::Gameplay::ZhuangfySleeveSolver::BoneData>::List(
-			//     v36,
-			//     MethodInfo::System::Collections::Generic::List<HG::Rendering::Runtime::HGEnvironmentVolume>::List);
-			//   this.fields.m_sortedVolumes = v37;
-			//   sub_1800054D0((OneofDescriptor *)&this.fields.m_sortedVolumes, v38, v39, v40, v59, v60, v61);
-			//   v41 = (IndexedHashSet_1_System_Object_ *)sub_180004920(TypeInfo::Beyond::IndexedHashSet<HG::Rendering::Runtime::HGEnvironmentVolume>);
-			//   v42 = (IndexedHashSet_1_HG_Rendering_Runtime_HGEnvironmentVolume_ *)v41;
-			//   if ( !v41 )
-			//     goto LABEL_4;
-			//   Beyond::IndexedHashSet<System::Object>::IndexedHashSet(
-			//     v41,
-			//     MethodInfo::Beyond::IndexedHashSet<HG::Rendering::Runtime::HGEnvironmentVolume>::IndexedHashSet);
-			//   this.fields.m_interpolatedVolumes = v42;
-			//   sub_1800054D0((OneofDescriptor *)&this.fields.m_interpolatedVolumes, v43, v44, v45, v59, v60, v61);
-			//   v46 = (LowLevelList_1_System_Object_ *)sub_180004920(TypeInfo::System::Collections::Generic::List<float>);
-			//   v47 = (List_1_System_Single_ *)v46;
-			//   if ( !v46
-			//     || (System::Collections::Generic::LowLevelList<System::Object>::LowLevelList(
-			//           v46,
-			//           MethodInfo::System::Collections::Generic::List<float>::List),
-			//         this.fields.m_interpolatedVolumesFactor = v47,
-			//         sub_1800054D0((OneofDescriptor *)&this.fields.m_interpolatedVolumesFactor, v48, v49, v50, v59, v60, v61),
-			//         this.fields.m_defaultPhase = (HGEnvironmentPhase *)UnityEngine::ScriptableObject::CreateInstance<System::Object>(MethodInfo::UnityEngine::ScriptableObject::CreateInstance<HG::Rendering::Runtime::HGEnvironmentPhase>),
-			//         sub_1800054D0((OneofDescriptor *)&this.fields.m_defaultPhase, v51, v52, v53, v59, v60, v61),
-			//         (m_defaultPhase = this.fields.m_defaultPhase) == 0LL) )
-			//   {
-			// LABEL_4:
-			//     sub_180B536AC(m_defaultPhase, v4);
-			//   }
-			//   HG::Rendering::Runtime::HGEnvironmentPhase::ActivateAllEnvConfig(m_defaultPhase, 1, 0LL);
-			//   this.fields.m_interpolatedPhase = (HGEnvironmentPhase *)UnityEngine::ScriptableObject::CreateInstance<System::Object>(MethodInfo::UnityEngine::ScriptableObject::CreateInstance<HG::Rendering::Runtime::HGEnvironmentPhase>);
-			//   sub_1800054D0((OneofDescriptor *)&this.fields.m_interpolatedPhase, v54, v55, v56, v59, v60, v61);
-			//   this.fields.m_sortNeeded = 0;
-			//   this.fields.m_interpolateTimeFactor = 1.0;
-			//   v57 = sub_18281C140(&v59);
-			//   v58 = *(float *)(v57 + 8);
-			//   *(_QWORD *)&this.fields.m_lastInterpolateTriggerPosition.x = *(_QWORD *)v57;
-			//   this.fields.m_lastInterpolateTriggerPosition.z = v58;
-			// }
-			// 
+		  HGEnvironmentManager *instance; // rax
+		  Type *v4; // rdx
+		  __int64 v5; // rcx
+		  PropertyInfo_1 *v6; // r8
+		  Int32__Array **v7; // r9
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  MethodInfo *v9; // [rsp+50h] [rbp+28h]
+		
+		  if ( !IFix::WrappersManagerImpl::IsPatched(1494, 0LL) )
+		  {
+		    sub_1800036A0(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
+		    instance = HG::Rendering::Runtime::HGEnvironmentManager::get_instance(0LL);
+		    if ( instance )
+		    {
+		      instance->fields.m_interpolateTriggerOverride = value;
+		      sub_18002D1B0((SingleFieldAccessor *)&instance->fields.m_interpolateTriggerOverride, v4, v6, v7, v9);
+		      return;
+		    }
+		LABEL_5:
+		    sub_1800D8260(v5, v4);
+		  }
+		  Patch = IFix::WrappersManagerImpl::GetPatch(1494, 0LL);
+		  if ( !Patch )
+		    goto LABEL_5;
+		  IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_0((ILFixDynamicMethodWrapper_39 *)Patch, (Object *)value, 0LL);
 		}
-
-		public static HGEnvironmentPhase GetInterpolatedPhase(HGCamera hgCamera)
+		
+		public static bool sortNeeded { get => default; set {} } // 0x0000000189CE1990-0x0000000189CE19EC 0x0000000183D09C30-0x0000000183D09C80
+		// Boolean get_sortNeeded()
+		bool HG::Rendering::Runtime::HGEnvironmentManager::get_sortNeeded(MethodInfo *method)
 		{
-			// // HGEnvironmentPhase GetInterpolatedPhase(HGCamera)
-			// HGEnvironmentPhase *HG::Rendering::Runtime::HGEnvironmentManager::GetInterpolatedPhase(
-			//         HGCamera *hgCamera,
-			//         MethodInfo *method)
-			// {
-			//   struct ILFixDynamicMethodWrapper_2__Class *v3; // rcx
-			//   ILFixDynamicMethodWrapper_2__Array *wrapperArray; // rdx
-			//   HGEnvironmentVolumeCameraComponent *m_envVolumeCameraComponent; // rax
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			// 
-			//   if ( !byte_18D8EDC5D )
-			//   {
-			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
-			//     byte_18D8EDC5D = 1;
-			//   }
-			//   if ( !byte_18D8EDC37 )
-			//   {
-			//     sub_18003C530(&TypeInfo::IFix::ILFixDynamicMethodWrapper);
-			//     byte_18D8EDC37 = 1;
-			//   }
-			//   v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper._1.cctor_finished_or_no_cctor )
-			//   {
-			//     il2cpp_runtime_class_init_0(TypeInfo::IFix::ILFixDynamicMethodWrapper, method);
-			//     v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   }
-			//   wrapperArray = v3.static_fields.wrapperArray;
-			//   if ( !wrapperArray )
-			//     goto LABEL_13;
-			//   if ( wrapperArray.max_length.size <= 439 )
-			//     goto LABEL_9;
-			//   if ( !v3._1.cctor_finished_or_no_cctor )
-			//   {
-			//     il2cpp_runtime_class_init_0(v3, wrapperArray);
-			//     v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   }
-			//   v3 = (struct ILFixDynamicMethodWrapper_2__Class *)v3.static_fields.wrapperArray;
-			//   if ( !v3 )
-			// LABEL_13:
-			//     sub_180B536AC(v3, wrapperArray);
-			//   if ( LODWORD(v3._0.namespaze) <= 0x1B7 )
-			//     sub_180070270(v3, wrapperArray);
-			//   if ( v3[9]._0.nestedTypes )
-			//   {
-			//     Patch = IFix::WrappersManagerImpl::GetPatch(439, 0LL);
-			//     if ( Patch )
-			//       return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_199(Patch, (Object *)hgCamera, 0LL);
-			//     goto LABEL_13;
-			//   }
-			// LABEL_9:
-			//   if ( !hgCamera )
-			//     goto LABEL_13;
-			//   m_envVolumeCameraComponent = hgCamera.fields.m_envVolumeCameraComponent;
-			//   if ( !m_envVolumeCameraComponent )
-			//     goto LABEL_13;
-			//   if ( m_envVolumeCameraComponent.fields.m_useEnvVolumeInterpolatedPhase )
-			//     return m_envVolumeCameraComponent.fields.m_interpolatedPhase;
-			//   if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager._1.cctor_finished_or_no_cctor )
-			//     il2cpp_runtime_class_init_0(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager, wrapperArray);
-			//   return HG::Rendering::Runtime::HGEnvironmentManager::get_s_interpolatedPhase(0LL);
-			// }
-			// 
-			return null;
+		  HGEnvironmentManager *instance; // rax
+		  __int64 v2; // rdx
+		  __int64 v3; // rcx
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		
+		  if ( !IFix::WrappersManagerImpl::IsPatched(1495, 0LL) )
+		  {
+		    sub_1800036A0(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
+		    instance = HG::Rendering::Runtime::HGEnvironmentManager::get_instance(0LL);
+		    if ( instance )
+		      return instance->fields.m_sortNeeded;
+		LABEL_5:
+		    sub_1800D8260(v3, v2);
+		  }
+		  Patch = IFix::WrappersManagerImpl::GetPatch(1495, 0LL);
+		  if ( !Patch )
+		    goto LABEL_5;
+		  return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_4((ILFixDynamicMethodWrapper_23 *)Patch, 0LL);
 		}
+		
 
-		public static List<float> GetInterpolatedVolumesFactor(HGCamera hgCamera)
+		// Void set_sortNeeded(Boolean)
+		void HG::Rendering::Runtime::HGEnvironmentManager::set_sortNeeded(bool value, MethodInfo *method)
 		{
-			// // List`1[System.Single] GetInterpolatedVolumesFactor(HGCamera)
-			// List_1_System_Single_ *HG::Rendering::Runtime::HGEnvironmentManager::GetInterpolatedVolumesFactor(
-			//         HGCamera *hgCamera,
-			//         MethodInfo *method)
-			// {
-			//   struct ILFixDynamicMethodWrapper_2__Class *v3; // rax
-			//   HGEnvironmentVolumeCameraComponent **static_fields; // rcx
-			//   HGEnvironmentVolumeCameraComponent *m_envVolumeCameraComponent; // rdx
-			//   HGEnvironmentVolumeCameraComponent__Class *klass; // r8
-			//   int32_t v8; // ecx
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			//   HGEnvironmentVolumeCameraComponent *v10; // rax
-			// 
-			//   if ( !byte_18D8EDC5E )
-			//   {
-			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
-			//     byte_18D8EDC5E = 1;
-			//   }
-			//   if ( !byte_18D8EDC37 )
-			//   {
-			//     sub_18003C530(&TypeInfo::IFix::ILFixDynamicMethodWrapper);
-			//     byte_18D8EDC37 = 1;
-			//   }
-			//   v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper._1.cctor_finished_or_no_cctor )
-			//   {
-			//     il2cpp_runtime_class_init_0(TypeInfo::IFix::ILFixDynamicMethodWrapper, method);
-			//     v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   }
-			//   static_fields = (HGEnvironmentVolumeCameraComponent **)v3.static_fields;
-			//   m_envVolumeCameraComponent = *static_fields;
-			//   if ( !*static_fields )
-			//     goto LABEL_19;
-			//   if ( SLODWORD(m_envVolumeCameraComponent.fields.m_lastInterpolateTriggerPosition.x) > 984 )
-			//   {
-			//     if ( !v3._1.cctor_finished_or_no_cctor )
-			//     {
-			//       il2cpp_runtime_class_init_0(v3, m_envVolumeCameraComponent);
-			//       v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//     }
-			//     m_envVolumeCameraComponent = (HGEnvironmentVolumeCameraComponent *)v3.static_fields;
-			//     klass = m_envVolumeCameraComponent.klass;
-			//     if ( !m_envVolumeCameraComponent.klass )
-			//       goto LABEL_19;
-			//     if ( LODWORD(klass._0.namespaze) <= 0x3D8 )
-			//       goto LABEL_34;
-			//     if ( klass[21]._0.gc_desc )
-			//     {
-			//       v8 = 984;
-			//       goto LABEL_26;
-			//     }
-			//   }
-			//   if ( !hgCamera )
-			//     goto LABEL_19;
-			//   m_envVolumeCameraComponent = hgCamera.fields.m_envVolumeCameraComponent;
-			//   if ( !m_envVolumeCameraComponent )
-			//     goto LABEL_19;
-			//   if ( m_envVolumeCameraComponent.fields.m_useEnvVolumeInterpolatedPhase )
-			//   {
-			//     hgCamera = (HGCamera *)hgCamera.fields.m_envVolumeCameraComponent;
-			//     if ( !byte_18D8EDC37 )
-			//     {
-			//       sub_18003C530(&TypeInfo::IFix::ILFixDynamicMethodWrapper);
-			//       v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//       byte_18D8EDC37 = 1;
-			//     }
-			//     if ( !v3._1.cctor_finished_or_no_cctor )
-			//     {
-			//       il2cpp_runtime_class_init_0(v3, m_envVolumeCameraComponent);
-			//       v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//     }
-			//     static_fields = (HGEnvironmentVolumeCameraComponent **)v3.static_fields;
-			//     m_envVolumeCameraComponent = *static_fields;
-			//     if ( !*static_fields )
-			//       goto LABEL_19;
-			//     if ( SLODWORD(m_envVolumeCameraComponent.fields.m_lastInterpolateTriggerPosition.x) <= 724 )
-			//       return (List_1_System_Single_ *)hgCamera.fields._sceneRTSize_k__BackingField;
-			//     if ( !v3._1.cctor_finished_or_no_cctor )
-			//     {
-			//       il2cpp_runtime_class_init_0(v3, m_envVolumeCameraComponent);
-			//       v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//     }
-			//     static_fields = (HGEnvironmentVolumeCameraComponent **)v3.static_fields;
-			//     v10 = *static_fields;
-			//     if ( !*static_fields )
-			//       goto LABEL_19;
-			//     if ( LODWORD(v10.fields.m_lastInterpolateTriggerPosition.x) > 0x2D4 )
-			//     {
-			//       if ( !v10[104].klass )
-			//         return (List_1_System_Single_ *)hgCamera.fields._sceneRTSize_k__BackingField;
-			//       v8 = 724;
-			// LABEL_26:
-			//       Patch = IFix::WrappersManagerImpl::GetPatch(v8, 0LL);
-			//       if ( Patch )
-			//         return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_277(Patch, (Object *)hgCamera, 0LL);
-			// LABEL_19:
-			//       sub_180B536AC(static_fields, m_envVolumeCameraComponent);
-			//     }
-			// LABEL_34:
-			//     sub_180070270(static_fields, m_envVolumeCameraComponent);
-			//   }
-			//   if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager._1.cctor_finished_or_no_cctor )
-			//     il2cpp_runtime_class_init_0(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager, m_envVolumeCameraComponent);
-			//   return HG::Rendering::Runtime::HGEnvironmentManager::get_s_interpolatedVolumesFactor(0LL);
-			// }
-			// 
-			return null;
+		  HGEnvironmentManager *instance; // rax
+		  __int64 v4; // rdx
+		  __int64 v5; // rcx
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		
+		  if ( !IFix::WrappersManagerImpl::IsPatched(1472, 0LL) )
+		  {
+		    if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager->_1.cctor_finished_or_no_cctor )
+		      il2cpp_runtime_class_init_1(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
+		    instance = HG::Rendering::Runtime::HGEnvironmentManager::get_instance(0LL);
+		    if ( instance )
+		    {
+		      instance->fields.m_sortNeeded = value;
+		      return;
+		    }
+		LABEL_6:
+		    sub_1800D8260(v5, v4);
+		  }
+		  Patch = IFix::WrappersManagerImpl::GetPatch(1472, 0LL);
+		  if ( !Patch )
+		    goto LABEL_6;
+		  IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_0((ILFixDynamicMethodWrapper_30 *)Patch, value, 0LL);
 		}
-
-		public static IndexedHashSet<HGEnvironmentVolume> GetInterpolatedVolumes(HGCamera hgCamera)
+		
+		public static float interpolateTimeFactor { get => default; set {} } // 0x0000000189CE1764-0x0000000189CE17C4 0x00000001849B1290-0x00000001849B12F0
+		// Single get_interpolateTimeFactor()
+		float HG::Rendering::Runtime::HGEnvironmentManager::get_interpolateTimeFactor(MethodInfo *method)
 		{
-			// // IndexedHashSet`1[HG.Rendering.Runtime.HGEnvironmentVolume] GetInterpolatedVolumes(HGCamera)
-			// IndexedHashSet_1_HG_Rendering_Runtime_HGEnvironmentVolume_ *HG::Rendering::Runtime::HGEnvironmentManager::GetInterpolatedVolumes(
-			//         HGCamera *hgCamera,
-			//         MethodInfo *method)
-			// {
-			//   struct ILFixDynamicMethodWrapper_2__Class *v3; // rax
-			//   HGEnvironmentVolumeCameraComponent **static_fields; // rcx
-			//   HGEnvironmentVolumeCameraComponent *m_envVolumeCameraComponent; // rdx
-			//   HGEnvironmentVolumeCameraComponent__Class *klass; // r8
-			//   int32_t v8; // ecx
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			//   HGEnvironmentVolumeCameraComponent *v10; // rax
-			// 
-			//   if ( !byte_18D8EDC5F )
-			//   {
-			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
-			//     byte_18D8EDC5F = 1;
-			//   }
-			//   if ( !byte_18D8EDC37 )
-			//   {
-			//     sub_18003C530(&TypeInfo::IFix::ILFixDynamicMethodWrapper);
-			//     byte_18D8EDC37 = 1;
-			//   }
-			//   v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper._1.cctor_finished_or_no_cctor )
-			//   {
-			//     il2cpp_runtime_class_init_0(TypeInfo::IFix::ILFixDynamicMethodWrapper, method);
-			//     v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   }
-			//   static_fields = (HGEnvironmentVolumeCameraComponent **)v3.static_fields;
-			//   m_envVolumeCameraComponent = *static_fields;
-			//   if ( !*static_fields )
-			//     goto LABEL_19;
-			//   if ( SLODWORD(m_envVolumeCameraComponent.fields.m_lastInterpolateTriggerPosition.x) > 982 )
-			//   {
-			//     if ( !v3._1.cctor_finished_or_no_cctor )
-			//     {
-			//       il2cpp_runtime_class_init_0(v3, m_envVolumeCameraComponent);
-			//       v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//     }
-			//     m_envVolumeCameraComponent = (HGEnvironmentVolumeCameraComponent *)v3.static_fields;
-			//     klass = m_envVolumeCameraComponent.klass;
-			//     if ( !m_envVolumeCameraComponent.klass )
-			//       goto LABEL_19;
-			//     if ( LODWORD(klass._0.namespaze) <= 0x3D6 )
-			//       goto LABEL_34;
-			//     if ( klass[20].vtable.ToString.method )
-			//     {
-			//       v8 = 982;
-			//       goto LABEL_26;
-			//     }
-			//   }
-			//   if ( !hgCamera )
-			//     goto LABEL_19;
-			//   m_envVolumeCameraComponent = hgCamera.fields.m_envVolumeCameraComponent;
-			//   if ( !m_envVolumeCameraComponent )
-			//     goto LABEL_19;
-			//   if ( m_envVolumeCameraComponent.fields.m_useEnvVolumeInterpolatedPhase )
-			//   {
-			//     hgCamera = (HGCamera *)hgCamera.fields.m_envVolumeCameraComponent;
-			//     if ( !byte_18D8EDC37 )
-			//     {
-			//       sub_18003C530(&TypeInfo::IFix::ILFixDynamicMethodWrapper);
-			//       v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//       byte_18D8EDC37 = 1;
-			//     }
-			//     if ( !v3._1.cctor_finished_or_no_cctor )
-			//     {
-			//       il2cpp_runtime_class_init_0(v3, m_envVolumeCameraComponent);
-			//       v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//     }
-			//     static_fields = (HGEnvironmentVolumeCameraComponent **)v3.static_fields;
-			//     m_envVolumeCameraComponent = *static_fields;
-			//     if ( !*static_fields )
-			//       goto LABEL_19;
-			//     if ( SLODWORD(m_envVolumeCameraComponent.fields.m_lastInterpolateTriggerPosition.x) <= 723 )
-			//       return *(IndexedHashSet_1_HG_Rendering_Runtime_HGEnvironmentVolume_ **)&hgCamera.fields._taauRTSizeParam_k__BackingField.z;
-			//     if ( !v3._1.cctor_finished_or_no_cctor )
-			//     {
-			//       il2cpp_runtime_class_init_0(v3, m_envVolumeCameraComponent);
-			//       v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//     }
-			//     static_fields = (HGEnvironmentVolumeCameraComponent **)v3.static_fields;
-			//     v10 = *static_fields;
-			//     if ( !*static_fields )
-			//       goto LABEL_19;
-			//     if ( LODWORD(v10.fields.m_lastInterpolateTriggerPosition.x) > 0x2D3 )
-			//     {
-			//       if ( !v10[103].fields.m_interpolatedVolumesFactor )
-			//         return *(IndexedHashSet_1_HG_Rendering_Runtime_HGEnvironmentVolume_ **)&hgCamera.fields._taauRTSizeParam_k__BackingField.z;
-			//       v8 = 723;
-			// LABEL_26:
-			//       Patch = IFix::WrappersManagerImpl::GetPatch(v8, 0LL);
-			//       if ( Patch )
-			//         return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_276(Patch, (Object *)hgCamera, 0LL);
-			// LABEL_19:
-			//       sub_180B536AC(static_fields, m_envVolumeCameraComponent);
-			//     }
-			// LABEL_34:
-			//     sub_180070270(static_fields, m_envVolumeCameraComponent);
-			//   }
-			//   if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager._1.cctor_finished_or_no_cctor )
-			//     il2cpp_runtime_class_init_0(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager, m_envVolumeCameraComponent);
-			//   return HG::Rendering::Runtime::HGEnvironmentManager::get_s_interpolatedVolumes(0LL);
-			// }
-			// 
-			return null;
+		  HGEnvironmentManager *instance; // rax
+		  __int64 v2; // rdx
+		  __int64 v3; // rcx
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		
+		  if ( !IFix::WrappersManagerImpl::IsPatched(1496, 0LL) )
+		  {
+		    sub_1800036A0(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
+		    instance = HG::Rendering::Runtime::HGEnvironmentManager::get_instance(0LL);
+		    if ( instance )
+		      return instance->fields.m_interpolateTimeFactor;
+		LABEL_5:
+		    sub_1800D8260(v3, v2);
+		  }
+		  Patch = IFix::WrappersManagerImpl::GetPatch(1496, 0LL);
+		  if ( !Patch )
+		    goto LABEL_5;
+		  return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_52((ILFixDynamicMethodWrapper_6 *)Patch, 0LL);
 		}
+		
 
-		public static bool Register(HGEnvironmentVolume volume)
+		// Void set_interpolateTimeFactor(Single)
+		void HG::Rendering::Runtime::HGEnvironmentManager::set_interpolateTimeFactor(float value, MethodInfo *method)
 		{
-			// // Boolean Register(HGEnvironmentVolume)
-			// bool HG::Rendering::Runtime::HGEnvironmentManager::Register(HGEnvironmentVolume *volume, MethodInfo *method)
-			// {
-			//   __int64 v3; // rdx
-			//   HGEnvironmentManager *instance; // rax
-			//   __int64 v5; // rdx
-			//   __int64 v6; // rcx
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			// 
-			//   if ( !byte_18D8EDC63 )
-			//   {
-			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
-			//     byte_18D8EDC63 = 1;
-			//   }
-			//   if ( !IFix::WrappersManagerImpl::IsPatched(1239, 0LL) )
-			//   {
-			//     if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager._1.cctor_finished_or_no_cctor )
-			//       il2cpp_runtime_class_init_0(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager, v3);
-			//     instance = HG::Rendering::Runtime::HGEnvironmentManager::get_instance(0LL);
-			//     if ( instance )
-			//       return HG::Rendering::Runtime::HGEnvironmentManager::_Register(instance, volume, 0LL);
-			// LABEL_8:
-			//     sub_180B536AC(v6, v5);
-			//   }
-			//   Patch = IFix::WrappersManagerImpl::GetPatch(1239, 0LL);
-			//   if ( !Patch )
-			//     goto LABEL_8;
-			//   return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_8((ILFixDynamicMethodWrapper_27 *)Patch, (Object *)volume, 0LL);
-			// }
-			// 
-			return default(bool);
+		  HGEnvironmentManager *instance; // rax
+		  __int64 v4; // rdx
+		  __int64 v5; // rcx
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		
+		  if ( !IFix::WrappersManagerImpl::IsPatched(1497, 0LL) )
+		  {
+		    if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager->_1.cctor_finished_or_no_cctor )
+		      il2cpp_runtime_class_init_1(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
+		    instance = HG::Rendering::Runtime::HGEnvironmentManager::get_instance(0LL);
+		    if ( instance )
+		    {
+		      instance->fields.m_interpolateTimeFactor = value;
+		      return;
+		    }
+		LABEL_6:
+		    sub_1800D8260(v5, v4);
+		  }
+		  Patch = IFix::WrappersManagerImpl::GetPatch(1497, 0LL);
+		  if ( !Patch )
+		    goto LABEL_6;
+		  IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_86((ILFixDynamicMethodWrapper_20 *)Patch, value, 0LL);
 		}
-
-		public static bool Unregister(HGEnvironmentVolume volume)
+		
+	
+		// Constructors
+		public HGEnvironmentManager() {} // 0x00000001831D35B0-0x00000001831D3840
+		// HGEnvironmentManager()
+		void HG::Rendering::Runtime::HGEnvironmentManager::HGEnvironmentManager(HGEnvironmentManager *this, MethodInfo *method)
 		{
-			// // Boolean Unregister(HGEnvironmentVolume)
-			// bool HG::Rendering::Runtime::HGEnvironmentManager::Unregister(HGEnvironmentVolume *volume, MethodInfo *method)
-			// {
-			//   __int64 v3; // rdx
-			//   HGEnvironmentManager *instance; // rax
-			//   __int64 v5; // rdx
-			//   __int64 v6; // rcx
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			// 
-			//   if ( !byte_18D8EDC64 )
-			//   {
-			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
-			//     byte_18D8EDC64 = 1;
-			//   }
-			//   if ( !IFix::WrappersManagerImpl::IsPatched(1242, 0LL) )
-			//   {
-			//     if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager._1.cctor_finished_or_no_cctor )
-			//       il2cpp_runtime_class_init_0(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager, v3);
-			//     instance = HG::Rendering::Runtime::HGEnvironmentManager::get_instance(0LL);
-			//     if ( instance )
-			//       return HG::Rendering::Runtime::HGEnvironmentManager::_Unregister(instance, volume, 0LL);
-			// LABEL_8:
-			//     sub_180B536AC(v6, v5);
-			//   }
-			//   Patch = IFix::WrappersManagerImpl::GetPatch(1242, 0LL);
-			//   if ( !Patch )
-			//     goto LABEL_8;
-			//   return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_8((ILFixDynamicMethodWrapper_27 *)Patch, (Object *)volume, 0LL);
-			// }
-			// 
-			return default(bool);
+		  HGAtmosphereRenderer *v3; // rax
+		  Type *v4; // rdx
+		  HGEnvironmentPhase *m_defaultPhase; // rcx
+		  PropertyInfo_1 *v6; // r8
+		  Int32__Array **v7; // r9
+		  HGVolumetricFogRenderer *v8; // rax
+		  PropertyInfo_1 *v9; // r8
+		  Int32__Array **v10; // r9
+		  HGSkyRenderer *v11; // rax
+		  HGSkyRenderer *v12; // rdi
+		  Type *v13; // rdx
+		  PropertyInfo_1 *v14; // r8
+		  Int32__Array **v15; // r9
+		  HGSkydomeStarRenderer *v16; // rax
+		  HGSkydomeStarRenderer *v17; // rdi
+		  Type *v18; // rdx
+		  PropertyInfo_1 *v19; // r8
+		  Int32__Array **v20; // r9
+		  HGRainRenderer *v21; // rax
+		  HGRainRenderer *v22; // rdi
+		  Type *v23; // rdx
+		  PropertyInfo_1 *v24; // r8
+		  Int32__Array **v25; // r9
+		  HGSnowRenderer *v26; // rax
+		  HGSnowRenderer *v27; // rdi
+		  Type *v28; // rdx
+		  PropertyInfo_1 *v29; // r8
+		  Int32__Array **v30; // r9
+		  HashSet_1_System_Object_ *v31; // rax
+		  HashSet_1_HG_Rendering_Runtime_HGEnvironmentVolumeBase_ *v32; // rdi
+		  Type *v33; // rdx
+		  PropertyInfo_1 *v34; // r8
+		  Int32__Array **v35; // r9
+		  List_1_Beyond_Gameplay_Core_CinematicTimelineManagerBase_TimelineHandle_AsyncCompileAnimationOutput_ *v36; // rax
+		  List_1_HG_Rendering_Runtime_HGEnvironmentVolumeBase_ *v37; // rdi
+		  Type *v38; // rdx
+		  PropertyInfo_1 *v39; // r8
+		  Int32__Array **v40; // r9
+		  IndexedHashSet_1_System_Object_ *v41; // rax
+		  IndexedHashSet_1_HG_Rendering_Runtime_HGEnvironmentVolumeBase_ *v42; // rdi
+		  Type *v43; // rdx
+		  PropertyInfo_1 *v44; // r8
+		  Int32__Array **v45; // r9
+		  LowLevelList_1_System_Object_ *v46; // rax
+		  List_1_System_Single_ *v47; // rdi
+		  Type *v48; // rdx
+		  PropertyInfo_1 *v49; // r8
+		  Int32__Array **v50; // r9
+		  Type *v51; // rdx
+		  PropertyInfo_1 *v52; // r8
+		  Int32__Array **v53; // r9
+		  HGEnvironmentPhase *v54; // rax
+		  HGLightConfig *p_lightConfig; // rdi
+		  Type *v56; // rdx
+		  PropertyInfo_1 *v57; // r8
+		  Int32__Array **v58; // r9
+		  Vector3__StaticFields *static_fields; // rcx
+		  float z; // eax
+		  MethodInfo *v61; // [rsp+20h] [rbp-8h]
+		  MethodInfo *v62; // [rsp+20h] [rbp-8h]
+		  MethodInfo *v63; // [rsp+20h] [rbp-8h]
+		  MethodInfo *v64; // [rsp+20h] [rbp-8h]
+		  MethodInfo *v65; // [rsp+20h] [rbp-8h]
+		  MethodInfo *v66; // [rsp+20h] [rbp-8h]
+		  MethodInfo *v67; // [rsp+20h] [rbp-8h]
+		  MethodInfo *v68; // [rsp+20h] [rbp-8h]
+		  MethodInfo *v69; // [rsp+20h] [rbp-8h]
+		  MethodInfo *v70; // [rsp+20h] [rbp-8h]
+		  MethodInfo *v71; // [rsp+20h] [rbp-8h]
+		  MethodInfo *v72; // [rsp+20h] [rbp-8h]
+		
+		  v3 = (HGAtmosphereRenderer *)sub_1800368D0(TypeInfo::HG::Rendering::Runtime::HGAtmosphereRenderer);
+		  if ( !v3 )
+		    goto LABEL_2;
+		  this->fields.m_atmosphereRenderer = v3;
+		  sub_18002D1B0((SingleFieldAccessor *)&this->fields.m_atmosphereRenderer, v4, v6, v7, v61);
+		  v8 = (HGVolumetricFogRenderer *)sub_1800368D0(TypeInfo::HG::Rendering::Runtime::HGVolumetricFogRenderer);
+		  if ( !v8 )
+		    goto LABEL_2;
+		  this->fields.m_volumetricFogRenderer = v8;
+		  sub_18002D1B0((SingleFieldAccessor *)&this->fields.m_volumetricFogRenderer, v4, v9, v10, v62);
+		  v11 = (HGSkyRenderer *)sub_1800368D0(TypeInfo::HG::Rendering::Runtime::HGSkyRenderer);
+		  v12 = v11;
+		  if ( !v11 )
+		    goto LABEL_2;
+		  HG::Rendering::Runtime::HGSkyRenderer::HGSkyRenderer(v11, 0LL);
+		  this->fields.m_skyRenderer = v12;
+		  sub_18002D1B0((SingleFieldAccessor *)&this->fields.m_skyRenderer, v13, v14, v15, v63);
+		  v16 = (HGSkydomeStarRenderer *)sub_1800368D0(TypeInfo::HG::Rendering::Runtime::HGSkydomeStarRenderer);
+		  v17 = v16;
+		  if ( !v16 )
+		    goto LABEL_2;
+		  HG::Rendering::Runtime::HGSkydomeStarRenderer::HGSkydomeStarRenderer(v16, 0LL);
+		  this->fields.m_talosStarRenderer = v17;
+		  sub_18002D1B0((SingleFieldAccessor *)&this->fields.m_talosStarRenderer, v18, v19, v20, v64);
+		  v21 = (HGRainRenderer *)sub_1800368D0(TypeInfo::HG::Rendering::Runtime::HGRainRenderer);
+		  v22 = v21;
+		  if ( !v21 )
+		    goto LABEL_2;
+		  HG::Rendering::Runtime::HGRainRenderer::HGRainRenderer(v21, 0LL);
+		  this->fields.m_rainRenderer = v22;
+		  sub_18002D1B0((SingleFieldAccessor *)&this->fields.m_rainRenderer, v23, v24, v25, v65);
+		  v26 = (HGSnowRenderer *)sub_1800368D0(TypeInfo::HG::Rendering::Runtime::HGSnowRenderer);
+		  v27 = v26;
+		  if ( !v26 )
+		    goto LABEL_2;
+		  HG::Rendering::Runtime::HGSnowRenderer::HGSnowRenderer(v26, 0LL);
+		  this->fields.m_snowRenderer = v27;
+		  sub_18002D1B0((SingleFieldAccessor *)&this->fields.m_snowRenderer, v28, v29, v30, v66);
+		  v31 = (HashSet_1_System_Object_ *)sub_1800368D0(TypeInfo::System::Collections::Generic::HashSet<HG::Rendering::Runtime::HGEnvironmentVolumeBase>);
+		  v32 = (HashSet_1_HG_Rendering_Runtime_HGEnvironmentVolumeBase_ *)v31;
+		  if ( !v31 )
+		    goto LABEL_2;
+		  System::Collections::Generic::HashSet<System::Object>::HashSet(
+		    v31,
+		    MethodInfo::System::Collections::Generic::HashSet<HG::Rendering::Runtime::HGEnvironmentVolumeBase>::HashSet);
+		  this->fields.m_activeVolumes = v32;
+		  sub_18002D1B0((SingleFieldAccessor *)&this->fields, v33, v34, v35, v67);
+		  v36 = (List_1_Beyond_Gameplay_Core_CinematicTimelineManagerBase_TimelineHandle_AsyncCompileAnimationOutput_ *)sub_1800368D0(TypeInfo::System::Collections::Generic::List<HG::Rendering::Runtime::HGEnvironmentVolumeBase>);
+		  v37 = (List_1_HG_Rendering_Runtime_HGEnvironmentVolumeBase_ *)v36;
+		  if ( !v36 )
+		    goto LABEL_2;
+		  System::Collections::Generic::List<Beyond::Gameplay::Core::CinematicTimelineManagerBase_TimelineHandle::AsyncCompileAnimationOutput>::List(
+		    v36,
+		    MethodInfo::System::Collections::Generic::List<HG::Rendering::Runtime::HGEnvironmentVolumeBase>::List);
+		  this->fields.m_sortedVolumes = v37;
+		  sub_18002D1B0((SingleFieldAccessor *)&this->fields.m_sortedVolumes, v38, v39, v40, v68);
+		  v41 = (IndexedHashSet_1_System_Object_ *)sub_1800368D0(TypeInfo::Beyond::IndexedHashSet<HG::Rendering::Runtime::HGEnvironmentVolumeBase>);
+		  v42 = (IndexedHashSet_1_HG_Rendering_Runtime_HGEnvironmentVolumeBase_ *)v41;
+		  if ( !v41 )
+		    goto LABEL_2;
+		  Beyond::IndexedHashSet<System::Object>::IndexedHashSet(
+		    v41,
+		    MethodInfo::Beyond::IndexedHashSet<HG::Rendering::Runtime::HGEnvironmentVolumeBase>::IndexedHashSet);
+		  this->fields.m_interpolatedVolumes = v42;
+		  sub_18002D1B0((SingleFieldAccessor *)&this->fields.m_interpolatedVolumes, v43, v44, v45, v69);
+		  v46 = (LowLevelList_1_System_Object_ *)sub_1800368D0(TypeInfo::System::Collections::Generic::List<float>);
+		  v47 = (List_1_System_Single_ *)v46;
+		  if ( !v46 )
+		    goto LABEL_2;
+		  System::Collections::Generic::LowLevelList<System::Object>::LowLevelList(
+		    v46,
+		    MethodInfo::System::Collections::Generic::List<float>::List);
+		  this->fields.m_interpolatedVolumesFactor = v47;
+		  sub_18002D1B0((SingleFieldAccessor *)&this->fields.m_interpolatedVolumesFactor, v48, v49, v50, v70);
+		  this->fields.m_defaultPhase = (HGEnvironmentPhase *)UnityEngine::ScriptableObject::CreateInstance<System::Object>(MethodInfo::UnityEngine::ScriptableObject::CreateInstance<HG::Rendering::Runtime::HGEnvironmentPhase>);
+		  sub_18002D1B0((SingleFieldAccessor *)&this->fields.m_defaultPhase, v51, v52, v53, v71);
+		  m_defaultPhase = this->fields.m_defaultPhase;
+		  if ( !m_defaultPhase
+		    || (HG::Rendering::Runtime::HGEnvironmentPhase::ActivateAllEnvConfig(m_defaultPhase, 1, 0LL),
+		        (v54 = this->fields.m_defaultPhase) == 0LL) )
+		  {
+		LABEL_2:
+		    sub_1800D8260(m_defaultPhase, v4);
+		  }
+		  p_lightConfig = &v54->fields.lightConfig;
+		  if ( !TypeInfo::HG::Rendering::Runtime::HGLightConfig->_1.cctor_finished_or_no_cctor )
+		    il2cpp_runtime_class_init_1(TypeInfo::HG::Rendering::Runtime::HGLightConfig);
+		  HG::Rendering::Runtime::HGLightConfig::UpdateDirectFinalDirection(p_lightConfig, 0.0, 0LL);
+		  this->fields.m_interpolatedPhase = (HGEnvironmentPhase *)UnityEngine::ScriptableObject::CreateInstance<System::Object>(MethodInfo::UnityEngine::ScriptableObject::CreateInstance<HG::Rendering::Runtime::HGEnvironmentPhase>);
+		  sub_18002D1B0((SingleFieldAccessor *)&this->fields.m_interpolatedPhase, v56, v57, v58, v72);
+		  this->fields.m_sortNeeded = 0;
+		  this->fields.m_interpolateTimeFactor = 1.0;
+		  static_fields = TypeInfo::UnityEngine::Vector3->static_fields;
+		  z = static_fields->negativeInfinityVector.z;
+		  *(_QWORD *)&this->fields.m_lastInterpolateTriggerPosition.x = *(_QWORD *)&static_fields->negativeInfinityVector.x;
+		  this->fields.m_lastInterpolateTriggerPosition.z = z;
 		}
-
-		public static void PipelineUpdate(List<Camera> cameras, HGSettingParameters settingParameters)
+		
+		static HGEnvironmentManager() {} // 0x0000000184CE9170-0x0000000184CE9230
+		// HGEnvironmentManager()
+		void HG::Rendering::Runtime::HGEnvironmentManager::cctor(MethodInfo *method)
 		{
-			// // Void PipelineUpdate(List`1[UnityEngine.Camera], HGSettingParameters)
-			// void HG::Rendering::Runtime::HGEnvironmentManager::PipelineUpdate(
-			//         List_1_UnityEngine_Camera_ *cameras,
-			//         HGSettingParameters *settingParameters,
-			//         MethodInfo *method)
-			// {
-			//   struct ILFixDynamicMethodWrapper_2__Class *v5; // rax
-			//   ILFixDynamicMethodWrapper_2__StaticFields *static_fields; // rcx
-			//   ILFixDynamicMethodWrapper_2__Array *wrapperArray; // rdx
-			//   HGEnvironmentManager *instance; // rax
-			//   ILFixDynamicMethodWrapper_2__Array *v9; // rax
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			// 
-			//   if ( !byte_18D8EDC65 )
-			//   {
-			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
-			//     byte_18D8EDC65 = 1;
-			//   }
-			//   if ( !byte_18D8EDC37 )
-			//   {
-			//     sub_18003C530(&TypeInfo::IFix::ILFixDynamicMethodWrapper);
-			//     byte_18D8EDC37 = 1;
-			//   }
-			//   v5 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper._1.cctor_finished_or_no_cctor )
-			//   {
-			//     il2cpp_runtime_class_init_0(TypeInfo::IFix::ILFixDynamicMethodWrapper, settingParameters);
-			//     v5 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   }
-			//   static_fields = v5.static_fields;
-			//   wrapperArray = static_fields.wrapperArray;
-			//   if ( !static_fields.wrapperArray )
-			//     goto LABEL_13;
-			//   if ( wrapperArray.max_length.size <= 582 )
-			//     goto LABEL_24;
-			//   if ( !v5._1.cctor_finished_or_no_cctor )
-			//   {
-			//     il2cpp_runtime_class_init_0(v5, wrapperArray);
-			//     v5 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   }
-			//   static_fields = v5.static_fields;
-			//   v9 = static_fields.wrapperArray;
-			//   if ( !static_fields.wrapperArray )
-			//     goto LABEL_13;
-			//   if ( v9.max_length.size <= 0x246u )
-			//     sub_180070270(static_fields, wrapperArray);
-			//   if ( !v9[16].vector[6] )
-			//   {
-			// LABEL_24:
-			//     if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager._1.cctor_finished_or_no_cctor )
-			//       il2cpp_runtime_class_init_0(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager, wrapperArray);
-			//     instance = HG::Rendering::Runtime::HGEnvironmentManager::get_instance(0LL);
-			//     if ( instance )
-			//     {
-			//       HG::Rendering::Runtime::HGEnvironmentManager::_PipelineUpdate(instance, cameras, settingParameters, 0LL);
-			//       return;
-			//     }
-			// LABEL_13:
-			//     sub_180B536AC(static_fields, wrapperArray);
-			//   }
-			//   Patch = IFix::WrappersManagerImpl::GetPatch(582, 0LL);
-			//   if ( !Patch )
-			//     goto LABEL_13;
-			//   IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_1(
-			//     (ILFixDynamicMethodWrapper_37 *)Patch,
-			//     (Object *)cameras,
-			//     (Object *)settingParameters,
-			//     0LL);
-			// }
-			// 
+		  struct HGEnvironmentManager_c__Class *v1; // rax
+		  Object *v2; // rdi
+		  Func_1_Object_ *v3; // rax
+		  __int64 v4; // rdx
+		  __int64 v5; // rcx
+		  Func_1_Object_ *v6; // rbx
+		  Lazy_1_Object_ *v7; // rax
+		  Type__Class *v8; // rdi
+		  Type *static_fields; // rdx
+		  PropertyInfo_1 *v10; // r8
+		  Int32__Array **v11; // r9
+		  MethodInfo *v12; // [rsp+50h] [rbp+28h]
+		
+		  v1 = TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager::__c;
+		  if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager::__c->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager::__c);
+		    v1 = TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager::__c;
+		  }
+		  v2 = (Object *)v1->static_fields->__9;
+		  v3 = (Func_1_Object_ *)sub_1800368D0(TypeInfo::System::Func<HG::Rendering::Runtime::HGEnvironmentManager>);
+		  v6 = v3;
+		  if ( !v3
+		    || (System::Func<System::Object>::Func(
+		          v3,
+		          v2,
+		          MethodInfo::HG::Rendering::Runtime::HGEnvironmentManager::__c::__cctor_b__72_0,
+		          0LL),
+		        v7 = (Lazy_1_Object_ *)sub_1800368D0(TypeInfo::System::Lazy<HG::Rendering::Runtime::HGEnvironmentManager>),
+		        (v8 = (Type__Class *)v7) == 0LL) )
+		  {
+		    sub_1800D8260(v5, v4);
+		  }
+		  System::Lazy<System::Object>::Lazy(
+		    v7,
+		    v6,
+		    MethodInfo::System::Lazy<HG::Rendering::Runtime::HGEnvironmentManager>::Lazy);
+		  static_fields = (Type *)TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager->static_fields;
+		  static_fields->klass = v8;
+		  sub_18002D1B0(
+		    (SingleFieldAccessor *)TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager->static_fields,
+		    static_fields,
+		    v10,
+		    v11,
+		    v12);
 		}
-
-		public static Transform GetFinalTrigger(Camera camera, Transform interpolateTrigger)
+		
+	
+		// Methods
+		public static HGEnvironmentPhase GetInterpolatedPhase(HGCamera hgCamera) => default; // 0x00000001831065C0-0x0000000183106760
+		// HGEnvironmentPhase GetInterpolatedPhase(HGCamera)
+		HGEnvironmentPhase *HG::Rendering::Runtime::HGEnvironmentManager::GetInterpolatedPhase(
+		        HGCamera *hgCamera,
+		        MethodInfo *method)
 		{
-			// // Transform GetFinalTrigger(Camera, Transform)
-			// Transform *HG::Rendering::Runtime::HGEnvironmentManager::GetFinalTrigger(
-			//         Camera *camera,
-			//         Transform *interpolateTrigger,
-			//         MethodInfo *method)
-			// {
-			//   struct ILFixDynamicMethodWrapper_2__Class *v5; // rcx
-			//   ILFixDynamicMethodWrapper_2__Array *wrapperArray; // rdx
-			//   __int64 v7; // rdx
-			//   Transform *interpolateTriggerOverride; // rbx
-			//   HGRenderPipeline *currentPipeline; // rax
-			//   Transform *currentPlayerCenter; // rbx
-			//   HGRenderPipeline *v11; // rax
-			//   __int64 v13; // rdx
-			//   Camera *main; // rbx
-			//   __int64 (__fastcall *v15)(Camera *); // rax
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			// 
-			//   if ( !byte_18D8EDC66 )
-			//   {
-			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
-			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGRenderPipeline);
-			//     sub_18003C530(&TypeInfo::UnityEngine::Object);
-			//     byte_18D8EDC66 = 1;
-			//   }
-			//   if ( !byte_18D8EDC37 )
-			//   {
-			//     sub_18003C530(&TypeInfo::IFix::ILFixDynamicMethodWrapper);
-			//     byte_18D8EDC37 = 1;
-			//   }
-			//   v5 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper._1.cctor_finished_or_no_cctor )
-			//   {
-			//     il2cpp_runtime_class_init_0(TypeInfo::IFix::ILFixDynamicMethodWrapper, interpolateTrigger);
-			//     v5 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   }
-			//   wrapperArray = v5.static_fields.wrapperArray;
-			//   if ( !wrapperArray )
-			//     goto LABEL_58;
-			//   if ( wrapperArray.max_length.size <= 721 )
-			//     goto LABEL_72;
-			//   if ( !v5._1.cctor_finished_or_no_cctor )
-			//   {
-			//     il2cpp_runtime_class_init_0(v5, wrapperArray);
-			//     v5 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   }
-			//   v5 = (struct ILFixDynamicMethodWrapper_2__Class *)v5.static_fields.wrapperArray;
-			//   if ( !v5 )
-			//     goto LABEL_58;
-			//   if ( LODWORD(v5._0.namespaze) <= 0x2D1 )
-			//     sub_180070270(v5, wrapperArray);
-			//   if ( !v5[15]._0.nestedTypes )
-			//   {
-			// LABEL_72:
-			//     if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager._1.cctor_finished_or_no_cctor )
-			//       il2cpp_runtime_class_init_0(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager, wrapperArray);
-			//     interpolateTriggerOverride = HG::Rendering::Runtime::HGEnvironmentManager::get_interpolateTriggerOverride(0LL);
-			//     if ( !TypeInfo::UnityEngine::Object._1.cctor_finished_or_no_cctor )
-			//       il2cpp_runtime_class_init_0(TypeInfo::UnityEngine::Object, v7);
-			//     if ( !byte_18D8F4EFB )
-			//     {
-			//       sub_18003C530(&TypeInfo::UnityEngine::Object);
-			//       byte_18D8F4EFB = 1;
-			//     }
-			//     if ( !TypeInfo::UnityEngine::Object._1.cctor_finished_or_no_cctor )
-			//       il2cpp_runtime_class_init_0(TypeInfo::UnityEngine::Object, v7);
-			//     if ( !byte_18D8F4EAF )
-			//     {
-			//       sub_18003C530(&TypeInfo::UnityEngine::Object);
-			//       byte_18D8F4EAF = 1;
-			//     }
-			//     if ( interpolateTriggerOverride )
-			//     {
-			//       if ( !TypeInfo::UnityEngine::Object._1.cctor_finished_or_no_cctor )
-			//         il2cpp_runtime_class_init_0(TypeInfo::UnityEngine::Object, v7);
-			//       if ( interpolateTriggerOverride.fields._._.m_CachedPtr )
-			//       {
-			//         if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager._1.cctor_finished_or_no_cctor )
-			//           il2cpp_runtime_class_init_0(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager, v7);
-			//         return HG::Rendering::Runtime::HGEnvironmentManager::get_interpolateTriggerOverride(0LL);
-			//       }
-			//     }
-			//     if ( !TypeInfo::HG::Rendering::Runtime::HGRenderPipeline._1.cctor_finished_or_no_cctor )
-			//       il2cpp_runtime_class_init_0(TypeInfo::HG::Rendering::Runtime::HGRenderPipeline, v7);
-			//     currentPipeline = HG::Rendering::Runtime::HGRenderPipeline::get_currentPipeline(0LL);
-			//     if ( !currentPipeline )
-			//       goto LABEL_58;
-			//     currentPlayerCenter = currentPipeline.fields.currentPlayerCenter;
-			//     if ( !TypeInfo::UnityEngine::Object._1.cctor_finished_or_no_cctor )
-			//       il2cpp_runtime_class_init_0(TypeInfo::UnityEngine::Object, wrapperArray);
-			//     if ( !byte_18D8F4EFB )
-			//     {
-			//       sub_18003C530(&TypeInfo::UnityEngine::Object);
-			//       byte_18D8F4EFB = 1;
-			//     }
-			//     if ( !TypeInfo::UnityEngine::Object._1.cctor_finished_or_no_cctor )
-			//       il2cpp_runtime_class_init_0(TypeInfo::UnityEngine::Object, wrapperArray);
-			//     if ( !byte_18D8F4EAF )
-			//     {
-			//       sub_18003C530(&TypeInfo::UnityEngine::Object);
-			//       byte_18D8F4EAF = 1;
-			//     }
-			//     if ( !currentPlayerCenter )
-			//       goto LABEL_42;
-			//     if ( !TypeInfo::UnityEngine::Object._1.cctor_finished_or_no_cctor )
-			//       il2cpp_runtime_class_init_0(TypeInfo::UnityEngine::Object, wrapperArray);
-			//     if ( !currentPlayerCenter.fields._._.m_CachedPtr )
-			//     {
-			// LABEL_42:
-			//       main = UnityEngine::Camera::get_main(0LL);
-			//       if ( !TypeInfo::UnityEngine::Object._1.cctor_finished_or_no_cctor )
-			//         il2cpp_runtime_class_init_0(TypeInfo::UnityEngine::Object, v13);
-			//       if ( !byte_18D8F4EFB )
-			//       {
-			//         sub_18003C530(&TypeInfo::UnityEngine::Object);
-			//         byte_18D8F4EFB = 1;
-			//       }
-			//       if ( !TypeInfo::UnityEngine::Object._1.cctor_finished_or_no_cctor )
-			//         il2cpp_runtime_class_init_0(TypeInfo::UnityEngine::Object, v13);
-			//       if ( !byte_18D8F4EAF )
-			//       {
-			//         sub_18003C530(&TypeInfo::UnityEngine::Object);
-			//         byte_18D8F4EAF = 1;
-			//       }
-			//       if ( !main )
-			//         return 0LL;
-			//       if ( !TypeInfo::UnityEngine::Object._1.cctor_finished_or_no_cctor )
-			//         il2cpp_runtime_class_init_0(TypeInfo::UnityEngine::Object, v13);
-			//       if ( !main.fields._._._.m_CachedPtr )
-			//         return 0LL;
-			//       v15 = (__int64 (__fastcall *)(Camera *))qword_18D8F4D40;
-			//       if ( !qword_18D8F4D40 )
-			//       {
-			//         v15 = (__int64 (__fastcall *)(Camera *))sub_180017470("UnityEngine.Component::get_transform()");
-			//         qword_18D8F4D40 = (__int64)v15;
-			//       }
-			//       return (Transform *)v15(main);
-			//     }
-			//     if ( !TypeInfo::HG::Rendering::Runtime::HGRenderPipeline._1.cctor_finished_or_no_cctor )
-			//       il2cpp_runtime_class_init_0(TypeInfo::HG::Rendering::Runtime::HGRenderPipeline, wrapperArray);
-			//     v11 = HG::Rendering::Runtime::HGRenderPipeline::get_currentPipeline(0LL);
-			//     if ( v11 )
-			//       return v11.fields.currentPlayerCenter;
-			// LABEL_58:
-			//     sub_180B536AC(v5, wrapperArray);
-			//   }
-			//   Patch = IFix::WrappersManagerImpl::GetPatch(721, 0LL);
-			//   if ( !Patch )
-			//     goto LABEL_58;
-			//   return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_275(Patch, (Object *)camera, (Object *)interpolateTrigger, 0LL);
-			// }
-			// 
-			return null;
+		  struct ILFixDynamicMethodWrapper_2__Class *v2; // rax
+		  ILFixDynamicMethodWrapper_2__StaticFields *static_fields; // rdx
+		  ILFixDynamicMethodWrapper_2__StaticFields *wrapperArray; // rcx
+		  HGEnvironmentVolumeCameraComponent *m_envVolumeCameraComponent; // rdi
+		  bool m_useEnvVolumeInterpolatedPhase; // cl
+		  ILFixDynamicMethodWrapper_2__Array *v9; // r8
+		  int32_t v10; // ecx
+		  ILFixDynamicMethodWrapper_2 *v11; // rax
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  ILFixDynamicMethodWrapper_2__Array *v13; // r8
+		  ILFixDynamicMethodWrapper_2 *v14; // rax
+		  ILFixDynamicMethodWrapper_2__Array *v15; // r8
+		  ILFixDynamicMethodWrapper_2 *v16; // rax
+		  ILFixDynamicMethodWrapper_2__Array *v17; // rax
+		
+		  v2 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(TypeInfo::IFix::ILFixDynamicMethodWrapper);
+		    v2 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  static_fields = v2->static_fields;
+		  wrapperArray = (ILFixDynamicMethodWrapper_2__StaticFields *)static_fields->wrapperArray;
+		  if ( !static_fields->wrapperArray )
+		    goto LABEL_29;
+		  if ( SLODWORD(wrapperArray[3].wrapperArray) > 446 )
+		  {
+		    if ( !v2->_1.cctor_finished_or_no_cctor )
+		    {
+		      il2cpp_runtime_class_init_1(v2);
+		      v2 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		    }
+		    static_fields = v2->static_fields;
+		    v9 = static_fields->wrapperArray;
+		    if ( !static_fields->wrapperArray )
+		      goto LABEL_29;
+		    if ( v9->max_length.size <= 0x1BEu )
+		      goto LABEL_65;
+		    if ( v9[12].vector[14] )
+		    {
+		      v10 = 446;
+		      goto LABEL_36;
+		    }
+		  }
+		  if ( !hgCamera )
+		    goto LABEL_29;
+		  if ( !v2->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(v2);
+		    v2 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  wrapperArray = v2->static_fields;
+		  static_fields = (ILFixDynamicMethodWrapper_2__StaticFields *)wrapperArray->wrapperArray;
+		  if ( !wrapperArray->wrapperArray )
+		    goto LABEL_29;
+		  if ( SLODWORD(static_fields[3].wrapperArray) <= 447 )
+		    goto LABEL_10;
+		  if ( !v2->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(v2);
+		    v2 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  wrapperArray = v2->static_fields;
+		  static_fields = (ILFixDynamicMethodWrapper_2__StaticFields *)wrapperArray->wrapperArray;
+		  if ( !wrapperArray->wrapperArray )
+		    goto LABEL_29;
+		  if ( LODWORD(static_fields[3].wrapperArray) <= 0x1BF )
+		    goto LABEL_65;
+		  if ( static_fields[451].wrapperArray )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(447, 0LL);
+		    if ( !Patch )
+		      goto LABEL_29;
+		    m_envVolumeCameraComponent = IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_207(Patch, (Object *)hgCamera, 0LL);
+		    v2 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  else
+		  {
+		LABEL_10:
+		    m_envVolumeCameraComponent = hgCamera->fields.m_envVolumeCameraComponent;
+		  }
+		  if ( !m_envVolumeCameraComponent )
+		    goto LABEL_29;
+		  if ( !v2->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(v2);
+		    v2 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  wrapperArray = v2->static_fields;
+		  static_fields = (ILFixDynamicMethodWrapper_2__StaticFields *)wrapperArray->wrapperArray;
+		  if ( !wrapperArray->wrapperArray )
+		    goto LABEL_29;
+		  if ( SLODWORD(static_fields[3].wrapperArray) <= 448 )
+		    goto LABEL_16;
+		  if ( !v2->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(v2);
+		    v2 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  static_fields = v2->static_fields;
+		  v13 = static_fields->wrapperArray;
+		  if ( !static_fields->wrapperArray )
+		    goto LABEL_29;
+		  if ( v13->max_length.size <= 0x1C0u )
+		    goto LABEL_65;
+		  if ( v13[12].vector[16] )
+		  {
+		    v14 = IFix::WrappersManagerImpl::GetPatch(448, 0LL);
+		    if ( !v14 )
+		      goto LABEL_29;
+		    m_useEnvVolumeInterpolatedPhase = IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_14(
+		                                        (ILFixDynamicMethodWrapper_20 *)v14,
+		                                        (Object *)m_envVolumeCameraComponent,
+		                                        0LL);
+		    v2 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  else
+		  {
+		LABEL_16:
+		    m_useEnvVolumeInterpolatedPhase = m_envVolumeCameraComponent->fields.m_useEnvVolumeInterpolatedPhase;
+		  }
+		  if ( m_useEnvVolumeInterpolatedPhase )
+		  {
+		    if ( !v2->_1.cctor_finished_or_no_cctor )
+		    {
+		      il2cpp_runtime_class_init_1(v2);
+		      v2 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		    }
+		    wrapperArray = v2->static_fields;
+		    static_fields = (ILFixDynamicMethodWrapper_2__StaticFields *)wrapperArray->wrapperArray;
+		    if ( !wrapperArray->wrapperArray )
+		      goto LABEL_29;
+		    if ( SLODWORD(static_fields[3].wrapperArray) <= 447 )
+		      goto LABEL_22;
+		    if ( !v2->_1.cctor_finished_or_no_cctor )
+		    {
+		      il2cpp_runtime_class_init_1(v2);
+		      v2 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		    }
+		    static_fields = v2->static_fields;
+		    v15 = static_fields->wrapperArray;
+		    if ( !static_fields->wrapperArray )
+		      goto LABEL_29;
+		    if ( v15->max_length.size <= 0x1BFu )
+		      goto LABEL_65;
+		    if ( v15[12].vector[15] )
+		    {
+		      v16 = IFix::WrappersManagerImpl::GetPatch(447, 0LL);
+		      if ( !v16 )
+		        goto LABEL_29;
+		      hgCamera = (HGCamera *)IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_207(v16, (Object *)hgCamera, 0LL);
+		      v2 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		    }
+		    else
+		    {
+		LABEL_22:
+		      hgCamera = (HGCamera *)hgCamera->fields.m_envVolumeCameraComponent;
+		    }
+		    if ( !hgCamera )
+		      goto LABEL_29;
+		    if ( !v2->_1.cctor_finished_or_no_cctor )
+		    {
+		      il2cpp_runtime_class_init_1(v2);
+		      v2 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		    }
+		    wrapperArray = v2->static_fields;
+		    static_fields = (ILFixDynamicMethodWrapper_2__StaticFields *)wrapperArray->wrapperArray;
+		    if ( !wrapperArray->wrapperArray )
+		      goto LABEL_29;
+		    if ( SLODWORD(static_fields[3].wrapperArray) <= 451 )
+		      return (HGEnvironmentPhase *)hgCamera->fields._name_k__BackingField;
+		    if ( !v2->_1.cctor_finished_or_no_cctor )
+		    {
+		      il2cpp_runtime_class_init_1(v2);
+		      v2 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		    }
+		    wrapperArray = v2->static_fields;
+		    v17 = wrapperArray->wrapperArray;
+		    if ( !wrapperArray->wrapperArray )
+		      goto LABEL_29;
+		    if ( v17->max_length.size > 0x1C3u )
+		    {
+		      if ( !v17[12].vector[19] )
+		        return (HGEnvironmentPhase *)hgCamera->fields._name_k__BackingField;
+		      v10 = 451;
+		LABEL_36:
+		      v11 = IFix::WrappersManagerImpl::GetPatch(v10, 0LL);
+		      if ( v11 )
+		        return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_210(v11, (Object *)hgCamera, 0LL);
+		LABEL_29:
+		      sub_1800D8260(wrapperArray, static_fields);
+		    }
+		LABEL_65:
+		    sub_1800D2AB0(wrapperArray, static_fields);
+		  }
+		  if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager->_1.cctor_finished_or_no_cctor )
+		    il2cpp_runtime_class_init_1(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
+		  return HG::Rendering::Runtime::HGEnvironmentManager::get_s_interpolatedPhase(0LL);
 		}
-
-		public static void UpdateCameraComponent(HGCamera camera)
+		
+		public static List<float> GetInterpolatedVolumesFactor(HGCamera hgCamera) => default; // 0x0000000183CC5CF0-0x0000000183CC5E90
+		// List`1[System.Single] GetInterpolatedVolumesFactor(HGCamera)
+		List_1_System_Single_ *HG::Rendering::Runtime::HGEnvironmentManager::GetInterpolatedVolumesFactor(
+		        HGCamera *hgCamera,
+		        MethodInfo *method)
 		{
-			// // Void UpdateCameraComponent(HGCamera)
-			// void HG::Rendering::Runtime::HGEnvironmentManager::UpdateCameraComponent(HGCamera *camera, MethodInfo *method)
-			// {
-			//   struct ILFixDynamicMethodWrapper_2__Class *v3; // rcx
-			//   ILFixDynamicMethodWrapper_2__Array *wrapperArray; // rdx
-			//   Camera *v5; // rsi
-			//   __int64 (__fastcall *v6)(Camera *); // rax
-			//   __int64 v7; // rdx
-			//   Transform *v8; // rdi
-			//   Transform *FinalTrigger; // rdi
-			//   HGEnvironmentManager *instance; // rax
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			//   __int64 v12; // rax
-			// 
-			//   if ( !byte_18D8EDC67 )
-			//   {
-			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
-			//     byte_18D8EDC67 = 1;
-			//   }
-			//   if ( !byte_18D8EDC37 )
-			//   {
-			//     sub_18003C530(&TypeInfo::IFix::ILFixDynamicMethodWrapper);
-			//     byte_18D8EDC37 = 1;
-			//   }
-			//   v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper._1.cctor_finished_or_no_cctor )
-			//   {
-			//     il2cpp_runtime_class_init_0(TypeInfo::IFix::ILFixDynamicMethodWrapper, method);
-			//     v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   }
-			//   wrapperArray = v3.static_fields.wrapperArray;
-			//   if ( !wrapperArray )
-			//     goto LABEL_16;
-			//   if ( wrapperArray.max_length.size <= 720 )
-			//     goto LABEL_30;
-			//   if ( !v3._1.cctor_finished_or_no_cctor )
-			//   {
-			//     il2cpp_runtime_class_init_0(v3, wrapperArray);
-			//     v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   }
-			//   v3 = (struct ILFixDynamicMethodWrapper_2__Class *)v3.static_fields.wrapperArray;
-			//   if ( !v3 )
-			//     goto LABEL_16;
-			//   if ( LODWORD(v3._0.namespaze) <= 0x2D0 )
-			//     sub_180070270(v3, wrapperArray);
-			//   if ( !v3[15]._0.methods )
-			//   {
-			// LABEL_30:
-			//     if ( camera )
-			//     {
-			//       v5 = camera.fields.camera;
-			//       if ( v5 )
-			//       {
-			//         v6 = (__int64 (__fastcall *)(Camera *))qword_18D8F4D40;
-			//         if ( !qword_18D8F4D40 )
-			//         {
-			//           v6 = (__int64 (__fastcall *)(Camera *))il2cpp_resolve_icall_0("UnityEngine.Component::get_transform()");
-			//           if ( !v6 )
-			//           {
-			//             v12 = sub_1802DBBE8("UnityEngine.Component::get_transform()");
-			//             sub_18000F750(v12, 0LL);
-			//           }
-			//           qword_18D8F4D40 = (__int64)v6;
-			//         }
-			//         v8 = (Transform *)v6(v5);
-			//         if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager._1.cctor_finished_or_no_cctor )
-			//           il2cpp_runtime_class_init_0(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager, v7);
-			//         FinalTrigger = HG::Rendering::Runtime::HGEnvironmentManager::GetFinalTrigger(v5, v8, 0LL);
-			//         instance = HG::Rendering::Runtime::HGEnvironmentManager::get_instance(0LL);
-			//         if ( instance )
-			//         {
-			//           HG::Rendering::Runtime::HGEnvironmentManager::_UpdateCameraComponent(instance, camera, FinalTrigger, 0LL);
-			//           return;
-			//         }
-			//       }
-			//     }
-			// LABEL_16:
-			//     sub_180B536AC(v3, wrapperArray);
-			//   }
-			//   Patch = IFix::WrappersManagerImpl::GetPatch(720, 0LL);
-			//   if ( !Patch )
-			//     goto LABEL_16;
-			//   IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_0((ILFixDynamicMethodWrapper_37 *)Patch, (Object *)camera, 0LL);
-			// }
-			// 
+		  struct ILFixDynamicMethodWrapper_2__Class *v2; // rax
+		  ILFixDynamicMethodWrapper_2__StaticFields *static_fields; // rdx
+		  ILFixDynamicMethodWrapper_2__StaticFields *wrapperArray; // rcx
+		  HGEnvironmentVolumeCameraComponent *m_envVolumeCameraComponent; // rdi
+		  bool m_useEnvVolumeInterpolatedPhase; // cl
+		  ILFixDynamicMethodWrapper_2__Array *v9; // r8
+		  int32_t v10; // ecx
+		  ILFixDynamicMethodWrapper_2 *v11; // rax
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  ILFixDynamicMethodWrapper_2__Array *v13; // r8
+		  ILFixDynamicMethodWrapper_2 *v14; // rax
+		  ILFixDynamicMethodWrapper_2__Array *v15; // r8
+		  ILFixDynamicMethodWrapper_2 *v16; // rax
+		  ILFixDynamicMethodWrapper_2__Array *v17; // rax
+		
+		  v2 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(TypeInfo::IFix::ILFixDynamicMethodWrapper);
+		    v2 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  static_fields = v2->static_fields;
+		  wrapperArray = (ILFixDynamicMethodWrapper_2__StaticFields *)static_fields->wrapperArray;
+		  if ( !static_fields->wrapperArray )
+		    goto LABEL_29;
+		  if ( SLODWORD(wrapperArray[3].wrapperArray) > 1088 )
+		  {
+		    if ( !v2->_1.cctor_finished_or_no_cctor )
+		    {
+		      il2cpp_runtime_class_init_1(v2);
+		      v2 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		    }
+		    static_fields = v2->static_fields;
+		    v9 = static_fields->wrapperArray;
+		    if ( !static_fields->wrapperArray )
+		      goto LABEL_29;
+		    if ( v9->max_length.size <= 0x440u )
+		      goto LABEL_65;
+		    if ( v9[30].vector[8] )
+		    {
+		      v10 = 1088;
+		      goto LABEL_36;
+		    }
+		  }
+		  if ( !hgCamera )
+		    goto LABEL_29;
+		  if ( !v2->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(v2);
+		    v2 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  wrapperArray = v2->static_fields;
+		  static_fields = (ILFixDynamicMethodWrapper_2__StaticFields *)wrapperArray->wrapperArray;
+		  if ( !wrapperArray->wrapperArray )
+		    goto LABEL_29;
+		  if ( SLODWORD(static_fields[3].wrapperArray) <= 447 )
+		    goto LABEL_10;
+		  if ( !v2->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(v2);
+		    v2 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  wrapperArray = v2->static_fields;
+		  static_fields = (ILFixDynamicMethodWrapper_2__StaticFields *)wrapperArray->wrapperArray;
+		  if ( !wrapperArray->wrapperArray )
+		    goto LABEL_29;
+		  if ( LODWORD(static_fields[3].wrapperArray) <= 0x1BF )
+		    goto LABEL_65;
+		  if ( static_fields[451].wrapperArray )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(447, 0LL);
+		    if ( !Patch )
+		      goto LABEL_29;
+		    m_envVolumeCameraComponent = IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_207(Patch, (Object *)hgCamera, 0LL);
+		    v2 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  else
+		  {
+		LABEL_10:
+		    m_envVolumeCameraComponent = hgCamera->fields.m_envVolumeCameraComponent;
+		  }
+		  if ( !m_envVolumeCameraComponent )
+		    goto LABEL_29;
+		  if ( !v2->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(v2);
+		    v2 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  wrapperArray = v2->static_fields;
+		  static_fields = (ILFixDynamicMethodWrapper_2__StaticFields *)wrapperArray->wrapperArray;
+		  if ( !wrapperArray->wrapperArray )
+		    goto LABEL_29;
+		  if ( SLODWORD(static_fields[3].wrapperArray) <= 448 )
+		    goto LABEL_16;
+		  if ( !v2->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(v2);
+		    v2 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  static_fields = v2->static_fields;
+		  v13 = static_fields->wrapperArray;
+		  if ( !static_fields->wrapperArray )
+		    goto LABEL_29;
+		  if ( v13->max_length.size <= 0x1C0u )
+		    goto LABEL_65;
+		  if ( v13[12].vector[16] )
+		  {
+		    v14 = IFix::WrappersManagerImpl::GetPatch(448, 0LL);
+		    if ( !v14 )
+		      goto LABEL_29;
+		    m_useEnvVolumeInterpolatedPhase = IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_14(
+		                                        (ILFixDynamicMethodWrapper_20 *)v14,
+		                                        (Object *)m_envVolumeCameraComponent,
+		                                        0LL);
+		    v2 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  else
+		  {
+		LABEL_16:
+		    m_useEnvVolumeInterpolatedPhase = m_envVolumeCameraComponent->fields.m_useEnvVolumeInterpolatedPhase;
+		  }
+		  if ( m_useEnvVolumeInterpolatedPhase )
+		  {
+		    if ( !v2->_1.cctor_finished_or_no_cctor )
+		    {
+		      il2cpp_runtime_class_init_1(v2);
+		      v2 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		    }
+		    wrapperArray = v2->static_fields;
+		    static_fields = (ILFixDynamicMethodWrapper_2__StaticFields *)wrapperArray->wrapperArray;
+		    if ( !wrapperArray->wrapperArray )
+		      goto LABEL_29;
+		    if ( SLODWORD(static_fields[3].wrapperArray) <= 447 )
+		      goto LABEL_22;
+		    if ( !v2->_1.cctor_finished_or_no_cctor )
+		    {
+		      il2cpp_runtime_class_init_1(v2);
+		      v2 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		    }
+		    static_fields = v2->static_fields;
+		    v15 = static_fields->wrapperArray;
+		    if ( !static_fields->wrapperArray )
+		      goto LABEL_29;
+		    if ( v15->max_length.size <= 0x1BFu )
+		      goto LABEL_65;
+		    if ( v15[12].vector[15] )
+		    {
+		      v16 = IFix::WrappersManagerImpl::GetPatch(447, 0LL);
+		      if ( !v16 )
+		        goto LABEL_29;
+		      hgCamera = (HGCamera *)IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_207(v16, (Object *)hgCamera, 0LL);
+		      v2 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		    }
+		    else
+		    {
+		LABEL_22:
+		      hgCamera = (HGCamera *)hgCamera->fields.m_envVolumeCameraComponent;
+		    }
+		    if ( !hgCamera )
+		      goto LABEL_29;
+		    if ( !v2->_1.cctor_finished_or_no_cctor )
+		    {
+		      il2cpp_runtime_class_init_1(v2);
+		      v2 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		    }
+		    wrapperArray = v2->static_fields;
+		    static_fields = (ILFixDynamicMethodWrapper_2__StaticFields *)wrapperArray->wrapperArray;
+		    if ( !wrapperArray->wrapperArray )
+		      goto LABEL_29;
+		    if ( SLODWORD(static_fields[3].wrapperArray) <= 790 )
+		      return (List_1_System_Single_ *)hgCamera->fields._sceneRTSize_k__BackingField;
+		    if ( !v2->_1.cctor_finished_or_no_cctor )
+		    {
+		      il2cpp_runtime_class_init_1(v2);
+		      v2 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		    }
+		    wrapperArray = v2->static_fields;
+		    v17 = wrapperArray->wrapperArray;
+		    if ( !wrapperArray->wrapperArray )
+		      goto LABEL_29;
+		    if ( v17->max_length.size > 0x316u )
+		    {
+		      if ( !v17[22].bounds )
+		        return (List_1_System_Single_ *)hgCamera->fields._sceneRTSize_k__BackingField;
+		      v10 = 790;
+		LABEL_36:
+		      v11 = IFix::WrappersManagerImpl::GetPatch(v10, 0LL);
+		      if ( v11 )
+		        return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_316(v11, (Object *)hgCamera, 0LL);
+		LABEL_29:
+		      sub_1800D8260(wrapperArray, static_fields);
+		    }
+		LABEL_65:
+		    sub_1800D2AB0(wrapperArray, static_fields);
+		  }
+		  if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager->_1.cctor_finished_or_no_cctor )
+		    il2cpp_runtime_class_init_1(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
+		  return HG::Rendering::Runtime::HGEnvironmentManager::get_s_interpolatedVolumesFactor(0LL);
 		}
-
-		public static void PerCameraUpdate(HGCamera camera, ref ScriptableRenderContext renderContext)
+		
+		public static IndexedHashSet<HGEnvironmentVolumeBase> GetInterpolatedVolumes(HGCamera hgCamera) => default; // 0x0000000183CC5B50-0x0000000183CC5CF0
+		// IndexedHashSet`1[HG.Rendering.Runtime.HGEnvironmentVolumeBase] GetInterpolatedVolumes(HGCamera)
+		IndexedHashSet_1_HG_Rendering_Runtime_HGEnvironmentVolumeBase_ *HG::Rendering::Runtime::HGEnvironmentManager::GetInterpolatedVolumes(
+		        HGCamera *hgCamera,
+		        MethodInfo *method)
 		{
-			// // Void PerCameraUpdate(HGCamera, ScriptableRenderContext ByRef)
-			// void HG::Rendering::Runtime::HGEnvironmentManager::PerCameraUpdate(
-			//         HGCamera *camera,
-			//         ScriptableRenderContext *renderContext,
-			//         MethodInfo *method)
-			// {
-			//   struct ILFixDynamicMethodWrapper_2__Class *static_fields; // rcx
-			//   _DWORD *wrapperArray; // rdx
-			//   Object *instance; // rdi
-			//   struct ILFixDynamicMethodWrapper_2__Class *v8; // rax
-			//   HGAdditionalCameraData *m_AdditionalCameraData; // rax
-			//   HGRainRenderer *s_rainRenderer; // rax
-			//   HGSnowRenderer *s_snowRenderer; // rax
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			//   __int64 v13; // r8
-			//   ILFixDynamicMethodWrapper_2 *v14; // rax
-			//   const Il2CppImage *image; // rax
-			//   ILFixDynamicMethodWrapper_2 *v16; // rax
-			// 
-			//   if ( !byte_18D8EDC68 )
-			//   {
-			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
-			//     byte_18D8EDC68 = 1;
-			//   }
-			//   if ( !byte_18D8EDC37 )
-			//   {
-			//     sub_18003C530(&TypeInfo::IFix::ILFixDynamicMethodWrapper);
-			//     byte_18D8EDC37 = 1;
-			//   }
-			//   static_fields = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper._1.cctor_finished_or_no_cctor )
-			//   {
-			//     il2cpp_runtime_class_init_0(TypeInfo::IFix::ILFixDynamicMethodWrapper, renderContext);
-			//     static_fields = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   }
-			//   wrapperArray = static_fields.static_fields.wrapperArray;
-			//   if ( !wrapperArray )
-			//     goto LABEL_36;
-			//   if ( (int)wrapperArray[6] > 725 )
-			//   {
-			//     if ( !static_fields._1.cctor_finished_or_no_cctor )
-			//     {
-			//       il2cpp_runtime_class_init_0(static_fields, wrapperArray);
-			//       static_fields = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//     }
-			//     wrapperArray = static_fields.static_fields.wrapperArray;
-			//     if ( !wrapperArray )
-			//       goto LABEL_36;
-			//     if ( wrapperArray[6] <= 0x2D5u )
-			//       goto LABEL_59;
-			//     if ( *((_QWORD *)wrapperArray + 729) )
-			//     {
-			//       Patch = IFix::WrappersManagerImpl::GetPatch(725, 0LL);
-			//       if ( Patch )
-			//       {
-			//         IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_288(Patch, (Object *)camera, renderContext, 0LL);
-			//         return;
-			//       }
-			//       goto LABEL_36;
-			//     }
-			//   }
-			//   if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager._1.cctor_finished_or_no_cctor )
-			//     il2cpp_runtime_class_init_0(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager, wrapperArray);
-			//   instance = (Object *)HG::Rendering::Runtime::HGEnvironmentManager::get_instance(0LL);
-			//   if ( !instance )
-			//     goto LABEL_36;
-			//   if ( !byte_18D8EDC6D )
-			//   {
-			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
-			//     byte_18D8EDC6D = 1;
-			//   }
-			//   if ( !byte_18D8EDC37 )
-			//   {
-			//     sub_18003C530(&TypeInfo::IFix::ILFixDynamicMethodWrapper);
-			//     byte_18D8EDC37 = 1;
-			//   }
-			//   v8 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper._1.cctor_finished_or_no_cctor )
-			//   {
-			//     il2cpp_runtime_class_init_0(TypeInfo::IFix::ILFixDynamicMethodWrapper, wrapperArray);
-			//     v8 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   }
-			//   static_fields = (struct ILFixDynamicMethodWrapper_2__Class *)v8.static_fields;
-			//   wrapperArray = static_fields._0.image;
-			//   if ( !static_fields._0.image )
-			//     goto LABEL_36;
-			//   if ( (int)wrapperArray[6] > 726 )
-			//   {
-			//     if ( !v8._1.cctor_finished_or_no_cctor )
-			//     {
-			//       il2cpp_runtime_class_init_0(v8, wrapperArray);
-			//       v8 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//     }
-			//     wrapperArray = v8.static_fields;
-			//     v13 = *(_QWORD *)wrapperArray;
-			//     if ( !*(_QWORD *)wrapperArray )
-			//       goto LABEL_36;
-			//     if ( *(_DWORD *)(v13 + 24) <= 0x2D6u )
-			//       goto LABEL_59;
-			//     if ( *(_QWORD *)(v13 + 5840) )
-			//     {
-			//       v14 = IFix::WrappersManagerImpl::GetPatch(726, 0LL);
-			//       if ( v14 )
-			//       {
-			//         IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_285(v14, instance, (Object *)camera, renderContext, 0LL);
-			//         return;
-			//       }
-			//       goto LABEL_36;
-			//     }
-			//   }
-			//   if ( !camera )
-			//     goto LABEL_36;
-			//   if ( !byte_18D8EDC37 )
-			//   {
-			//     sub_18003C530(&TypeInfo::IFix::ILFixDynamicMethodWrapper);
-			//     v8 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//     byte_18D8EDC37 = 1;
-			//   }
-			//   if ( !v8._1.cctor_finished_or_no_cctor )
-			//   {
-			//     il2cpp_runtime_class_init_0(v8, wrapperArray);
-			//     v8 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   }
-			//   static_fields = (struct ILFixDynamicMethodWrapper_2__Class *)v8.static_fields;
-			//   wrapperArray = static_fields._0.image;
-			//   if ( !static_fields._0.image )
-			//     goto LABEL_36;
-			//   if ( (int)wrapperArray[6] <= 727 )
-			//     goto LABEL_27;
-			//   if ( !v8._1.cctor_finished_or_no_cctor )
-			//   {
-			//     il2cpp_runtime_class_init_0(v8, wrapperArray);
-			//     v8 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   }
-			//   static_fields = (struct ILFixDynamicMethodWrapper_2__Class *)v8.static_fields;
-			//   image = static_fields._0.image;
-			//   if ( !static_fields._0.image )
-			//     goto LABEL_36;
-			//   if ( image.typeCount <= 0x2D7 )
-			// LABEL_59:
-			//     sub_180070270(static_fields, wrapperArray);
-			//   if ( image[81].assembly )
-			//   {
-			//     v16 = IFix::WrappersManagerImpl::GetPatch(727, 0LL);
-			//     if ( !v16 )
-			//       goto LABEL_36;
-			//     if ( !IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_8((ILFixDynamicMethodWrapper_27 *)v16, (Object *)camera, 0LL) )
-			//       goto LABEL_30;
-			//     return;
-			//   }
-			// LABEL_27:
-			//   m_AdditionalCameraData = camera.fields.m_AdditionalCameraData;
-			//   if ( !m_AdditionalCameraData )
-			//     goto LABEL_36;
-			//   if ( m_AdditionalCameraData.fields.hgRenderPath != 1 && m_AdditionalCameraData.fields.hgRenderPath != 2 )
-			//   {
-			// LABEL_30:
-			//     if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager._1.cctor_finished_or_no_cctor )
-			//       il2cpp_runtime_class_init_0(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager, wrapperArray);
-			//     s_rainRenderer = HG::Rendering::Runtime::HGEnvironmentManager::get_s_rainRenderer(0LL);
-			//     if ( s_rainRenderer )
-			//     {
-			//       HG::Rendering::Runtime::HGRainRenderer::UpdateRainAndWetnessData(s_rainRenderer, camera, renderContext, 0LL);
-			//       s_snowRenderer = HG::Rendering::Runtime::HGEnvironmentManager::get_s_snowRenderer(0LL);
-			//       if ( s_snowRenderer )
-			//       {
-			//         HG::Rendering::Runtime::HGSnowRenderer::UpdateSnowData(s_snowRenderer, camera, renderContext, 0LL);
-			//         return;
-			//       }
-			//     }
-			// LABEL_36:
-			//     sub_180B536AC(static_fields, wrapperArray);
-			//   }
-			// }
-			// 
+		  struct ILFixDynamicMethodWrapper_2__Class *v2; // rax
+		  ILFixDynamicMethodWrapper_2__StaticFields *static_fields; // rdx
+		  ILFixDynamicMethodWrapper_2__StaticFields *wrapperArray; // rcx
+		  HGEnvironmentVolumeCameraComponent *m_envVolumeCameraComponent; // rdi
+		  bool m_useEnvVolumeInterpolatedPhase; // cl
+		  ILFixDynamicMethodWrapper_2__Array *v9; // r8
+		  int32_t v10; // ecx
+		  ILFixDynamicMethodWrapper_2 *v11; // rax
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  ILFixDynamicMethodWrapper_2__Array *v13; // r8
+		  ILFixDynamicMethodWrapper_2 *v14; // rax
+		  ILFixDynamicMethodWrapper_2__Array *v15; // r8
+		  ILFixDynamicMethodWrapper_2 *v16; // rax
+		  ILFixDynamicMethodWrapper_2__Array *v17; // rax
+		
+		  v2 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(TypeInfo::IFix::ILFixDynamicMethodWrapper);
+		    v2 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  static_fields = v2->static_fields;
+		  wrapperArray = (ILFixDynamicMethodWrapper_2__StaticFields *)static_fields->wrapperArray;
+		  if ( !static_fields->wrapperArray )
+		    goto LABEL_29;
+		  if ( SLODWORD(wrapperArray[3].wrapperArray) > 1086 )
+		  {
+		    if ( !v2->_1.cctor_finished_or_no_cctor )
+		    {
+		      il2cpp_runtime_class_init_1(v2);
+		      v2 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		    }
+		    static_fields = v2->static_fields;
+		    v9 = static_fields->wrapperArray;
+		    if ( !static_fields->wrapperArray )
+		      goto LABEL_29;
+		    if ( v9->max_length.size <= 0x43Eu )
+		      goto LABEL_65;
+		    if ( v9[30].vector[6] )
+		    {
+		      v10 = 1086;
+		      goto LABEL_36;
+		    }
+		  }
+		  if ( !hgCamera )
+		    goto LABEL_29;
+		  if ( !v2->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(v2);
+		    v2 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  wrapperArray = v2->static_fields;
+		  static_fields = (ILFixDynamicMethodWrapper_2__StaticFields *)wrapperArray->wrapperArray;
+		  if ( !wrapperArray->wrapperArray )
+		    goto LABEL_29;
+		  if ( SLODWORD(static_fields[3].wrapperArray) <= 447 )
+		    goto LABEL_10;
+		  if ( !v2->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(v2);
+		    v2 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  wrapperArray = v2->static_fields;
+		  static_fields = (ILFixDynamicMethodWrapper_2__StaticFields *)wrapperArray->wrapperArray;
+		  if ( !wrapperArray->wrapperArray )
+		    goto LABEL_29;
+		  if ( LODWORD(static_fields[3].wrapperArray) <= 0x1BF )
+		    goto LABEL_65;
+		  if ( static_fields[451].wrapperArray )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(447, 0LL);
+		    if ( !Patch )
+		      goto LABEL_29;
+		    m_envVolumeCameraComponent = IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_207(Patch, (Object *)hgCamera, 0LL);
+		    v2 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  else
+		  {
+		LABEL_10:
+		    m_envVolumeCameraComponent = hgCamera->fields.m_envVolumeCameraComponent;
+		  }
+		  if ( !m_envVolumeCameraComponent )
+		    goto LABEL_29;
+		  if ( !v2->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(v2);
+		    v2 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  wrapperArray = v2->static_fields;
+		  static_fields = (ILFixDynamicMethodWrapper_2__StaticFields *)wrapperArray->wrapperArray;
+		  if ( !wrapperArray->wrapperArray )
+		    goto LABEL_29;
+		  if ( SLODWORD(static_fields[3].wrapperArray) <= 448 )
+		    goto LABEL_16;
+		  if ( !v2->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(v2);
+		    v2 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  static_fields = v2->static_fields;
+		  v13 = static_fields->wrapperArray;
+		  if ( !static_fields->wrapperArray )
+		    goto LABEL_29;
+		  if ( v13->max_length.size <= 0x1C0u )
+		    goto LABEL_65;
+		  if ( v13[12].vector[16] )
+		  {
+		    v14 = IFix::WrappersManagerImpl::GetPatch(448, 0LL);
+		    if ( !v14 )
+		      goto LABEL_29;
+		    m_useEnvVolumeInterpolatedPhase = IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_14(
+		                                        (ILFixDynamicMethodWrapper_20 *)v14,
+		                                        (Object *)m_envVolumeCameraComponent,
+		                                        0LL);
+		    v2 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  else
+		  {
+		LABEL_16:
+		    m_useEnvVolumeInterpolatedPhase = m_envVolumeCameraComponent->fields.m_useEnvVolumeInterpolatedPhase;
+		  }
+		  if ( m_useEnvVolumeInterpolatedPhase )
+		  {
+		    if ( !v2->_1.cctor_finished_or_no_cctor )
+		    {
+		      il2cpp_runtime_class_init_1(v2);
+		      v2 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		    }
+		    wrapperArray = v2->static_fields;
+		    static_fields = (ILFixDynamicMethodWrapper_2__StaticFields *)wrapperArray->wrapperArray;
+		    if ( !wrapperArray->wrapperArray )
+		      goto LABEL_29;
+		    if ( SLODWORD(static_fields[3].wrapperArray) <= 447 )
+		      goto LABEL_22;
+		    if ( !v2->_1.cctor_finished_or_no_cctor )
+		    {
+		      il2cpp_runtime_class_init_1(v2);
+		      v2 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		    }
+		    static_fields = v2->static_fields;
+		    v15 = static_fields->wrapperArray;
+		    if ( !static_fields->wrapperArray )
+		      goto LABEL_29;
+		    if ( v15->max_length.size <= 0x1BFu )
+		      goto LABEL_65;
+		    if ( v15[12].vector[15] )
+		    {
+		      v16 = IFix::WrappersManagerImpl::GetPatch(447, 0LL);
+		      if ( !v16 )
+		        goto LABEL_29;
+		      hgCamera = (HGCamera *)IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_207(v16, (Object *)hgCamera, 0LL);
+		      v2 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		    }
+		    else
+		    {
+		LABEL_22:
+		      hgCamera = (HGCamera *)hgCamera->fields.m_envVolumeCameraComponent;
+		    }
+		    if ( !hgCamera )
+		      goto LABEL_29;
+		    if ( !v2->_1.cctor_finished_or_no_cctor )
+		    {
+		      il2cpp_runtime_class_init_1(v2);
+		      v2 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		    }
+		    wrapperArray = v2->static_fields;
+		    static_fields = (ILFixDynamicMethodWrapper_2__StaticFields *)wrapperArray->wrapperArray;
+		    if ( !wrapperArray->wrapperArray )
+		      goto LABEL_29;
+		    if ( SLODWORD(static_fields[3].wrapperArray) <= 789 )
+		      return *(IndexedHashSet_1_HG_Rendering_Runtime_HGEnvironmentVolumeBase_ **)&hgCamera->fields._taauRTSizeParam_k__BackingField.z;
+		    if ( !v2->_1.cctor_finished_or_no_cctor )
+		    {
+		      il2cpp_runtime_class_init_1(v2);
+		      v2 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		    }
+		    wrapperArray = v2->static_fields;
+		    v17 = wrapperArray->wrapperArray;
+		    if ( !wrapperArray->wrapperArray )
+		      goto LABEL_29;
+		    if ( v17->max_length.size > 0x315u )
+		    {
+		      if ( !v17[22].monitor )
+		        return *(IndexedHashSet_1_HG_Rendering_Runtime_HGEnvironmentVolumeBase_ **)&hgCamera->fields._taauRTSizeParam_k__BackingField.z;
+		      v10 = 789;
+		LABEL_36:
+		      v11 = IFix::WrappersManagerImpl::GetPatch(v10, 0LL);
+		      if ( v11 )
+		        return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_315(v11, (Object *)hgCamera, 0LL);
+		LABEL_29:
+		      sub_1800D8260(wrapperArray, static_fields);
+		    }
+		LABEL_65:
+		    sub_1800D2AB0(wrapperArray, static_fields);
+		  }
+		  if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager->_1.cctor_finished_or_no_cctor )
+		    il2cpp_runtime_class_init_1(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
+		  return HG::Rendering::Runtime::HGEnvironmentManager::get_s_interpolatedVolumes(0LL);
 		}
-
-		private bool _Register(HGEnvironmentVolume volume)
+		
+		public static List<HGEnvironmentVolumeBase> CopyInterpolatedVolumesTo(HGCamera hgCamera, List<HGEnvironmentVolumeBase> buffer) => default; // 0x0000000189CE1624-0x0000000189CE16F4
+		// List`1[HG.Rendering.Runtime.HGEnvironmentVolumeBase] CopyInterpolatedVolumesTo(HGCamera, List`1[HG.Rendering.Runtime.HGEnvironmentVolumeBase])
+		List_1_HG_Rendering_Runtime_HGEnvironmentVolumeBase_ *HG::Rendering::Runtime::HGEnvironmentManager::CopyInterpolatedVolumesTo(
+		        HGCamera *hgCamera,
+		        List_1_HG_Rendering_Runtime_HGEnvironmentVolumeBase_ *buffer,
+		        MethodInfo *method)
 		{
-			// // Boolean _Register(HGEnvironmentVolume)
-			// bool HG::Rendering::Runtime::HGEnvironmentManager::_Register(
-			//         HGEnvironmentManager *this,
-			//         HGEnvironmentVolume *volume,
-			//         MethodInfo *method)
-			// {
-			//   __int64 v5; // rdx
-			//   HashSet_1_System_Object_ *m_activeVolumes; // rcx
-			//   int32_t i; // edi
-			//   List_1_HG_Rendering_Runtime_HGEnvironmentVolume_ *m_sortedVolumes; // rax
-			//   List_1_System_Object_ *v9; // rcx
-			//   Object *Item; // rax
-			//   Object_1 *gameObject; // rax
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			// 
-			//   if ( !byte_18D8EDC69 )
-			//   {
-			//     sub_18003C530(&MethodInfo::System::Collections::Generic::HashSet<HG::Rendering::Runtime::HGEnvironmentVolume>::Add);
-			//     sub_18003C530(&MethodInfo::System::Collections::Generic::HashSet<HG::Rendering::Runtime::HGEnvironmentVolume>::Contains);
-			//     sub_18003C530(&MethodInfo::System::Collections::Generic::List<HG::Rendering::Runtime::HGEnvironmentVolume>::Insert);
-			//     sub_18003C530(&MethodInfo::System::Collections::Generic::List<HG::Rendering::Runtime::HGEnvironmentVolume>::get_Count);
-			//     sub_18003C530(&MethodInfo::System::Collections::Generic::List<HG::Rendering::Runtime::HGEnvironmentVolume>::get_Item);
-			//     sub_18003C530(&off_18C9B5590);
-			//     byte_18D8EDC69 = 1;
-			//   }
-			//   if ( IFix::WrappersManagerImpl::IsPatched(1240, 0LL) )
-			//   {
-			//     Patch = IFix::WrappersManagerImpl::GetPatch(1240, 0LL);
-			//     if ( !Patch )
-			//       goto LABEL_15;
-			//     return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_0(
-			//              (ILFixDynamicMethodWrapper_36 *)Patch,
-			//              (Object *)this,
-			//              (Object *)volume,
-			//              0LL);
-			//   }
-			//   else
-			//   {
-			//     m_activeVolumes = (HashSet_1_System_Object_ *)this.fields.m_activeVolumes;
-			//     if ( !m_activeVolumes )
-			//       goto LABEL_15;
-			//     if ( System::Collections::Generic::HashSet<System::Object>::Contains(
-			//            m_activeVolumes,
-			//            (Object *)volume,
-			//            MethodInfo::System::Collections::Generic::HashSet<HG::Rendering::Runtime::HGEnvironmentVolume>::Contains) )
-			//     {
-			//       if ( !volume )
-			//         goto LABEL_15;
-			//       gameObject = (Object_1 *)UnityEngine::Component::get_gameObject((Component *)volume, 0LL);
-			//       HG::Rendering::HGRPLogger::LogWarning(
-			//         gameObject,
-			//         (String *)"Env Volume already exist in activeVolumes, register failed",
-			//         0LL);
-			//       return 0;
-			//     }
-			//     else
-			//     {
-			//       m_activeVolumes = (HashSet_1_System_Object_ *)this.fields.m_activeVolumes;
-			//       if ( !m_activeVolumes )
-			//         goto LABEL_15;
-			//       System::Collections::Generic::HashSet<System::Object>::Add(
-			//         m_activeVolumes,
-			//         (Object *)volume,
-			//         MethodInfo::System::Collections::Generic::HashSet<HG::Rendering::Runtime::HGEnvironmentVolume>::Add);
-			//       for ( i = 0; ; ++i )
-			//       {
-			//         m_sortedVolumes = this.fields.m_sortedVolumes;
-			//         if ( !m_sortedVolumes )
-			//           goto LABEL_15;
-			//         v9 = (List_1_System_Object_ *)this.fields.m_sortedVolumes;
-			//         if ( i >= m_sortedVolumes.fields._size )
-			//           break;
-			//         Item = System::Collections::Generic::List<System::Object>::get_Item(
-			//                  v9,
-			//                  i,
-			//                  MethodInfo::System::Collections::Generic::List<HG::Rendering::Runtime::HGEnvironmentVolume>::get_Item);
-			//         if ( !volume )
-			//           goto LABEL_15;
-			//         if ( HG::Rendering::Runtime::HGEnvironmentVolume::CompareTo(volume, (HGEnvironmentVolume *)Item, 0LL) == -1 )
-			//         {
-			//           m_activeVolumes = (HashSet_1_System_Object_ *)this.fields.m_sortedVolumes;
-			//           if ( m_activeVolumes )
-			//           {
-			//             System::Collections::Generic::List<System::Object>::Insert(
-			//               (List_1_System_Object_ *)m_activeVolumes,
-			//               i,
-			//               (Object *)volume,
-			//               MethodInfo::System::Collections::Generic::List<HG::Rendering::Runtime::HGEnvironmentVolume>::Insert);
-			//             return 1;
-			//           }
-			// LABEL_15:
-			//           sub_180B536AC(m_activeVolumes, v5);
-			//         }
-			//       }
-			//       System::Collections::Generic::List<System::Object>::Insert(
-			//         v9,
-			//         m_sortedVolumes.fields._size,
-			//         (Object *)volume,
-			//         MethodInfo::System::Collections::Generic::List<HG::Rendering::Runtime::HGEnvironmentVolume>::Insert);
-			//       return 1;
-			//     }
-			//   }
-			// }
-			// 
-			return default(bool);
+		  __int64 v5; // rdx
+		  __int64 v6; // rcx
+		  int32_t v7; // ebx
+		  IndexedHashSet_1_HG_Rendering_Runtime_HGEnvironmentVolumeBase_ *InterpolatedVolumes; // rsi
+		  Object *Item; // rax
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		
+		  v7 = 0;
+		  if ( IFix::WrappersManagerImpl::IsPatched(1493, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(1493, 0LL);
+		    if ( Patch )
+		      return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_611(Patch, (Object *)hgCamera, (Object *)buffer, 0LL);
+		LABEL_8:
+		    sub_1800D8260(v6, v5);
+		  }
+		  if ( !buffer )
+		    goto LABEL_8;
+		  sub_183127A90(
+		    buffer,
+		    MethodInfo::System::Collections::Generic::List<HG::Rendering::Runtime::HGEnvironmentVolumeBase>::Clear);
+		  sub_1800036A0(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
+		  InterpolatedVolumes = HG::Rendering::Runtime::HGEnvironmentManager::GetInterpolatedVolumes(hgCamera, 0LL);
+		  if ( !InterpolatedVolumes )
+		    goto LABEL_8;
+		  while ( v7 < Beyond::UniqueList<System::Object>::get_length(
+		                 (UniqueList_1_System_Object_ *)InterpolatedVolumes,
+		                 MethodInfo::Beyond::IndexedHashSet<HG::Rendering::Runtime::HGEnvironmentVolumeBase>::get_Count) )
+		  {
+		    Item = Beyond::IndexedHashSet<System::Object>::get_Item(
+		             (IndexedHashSet_1_System_Object_ *)InterpolatedVolumes,
+		             v7,
+		             MethodInfo::Beyond::IndexedHashSet<HG::Rendering::Runtime::HGEnvironmentVolumeBase>::get_Item);
+		    sub_182F01190((List_1_System_Object_ *)buffer, Item);
+		    ++v7;
+		  }
+		  return buffer;
 		}
-
-		private bool _Unregister(HGEnvironmentVolume volume)
+		
+		public static bool Register(HGEnvironmentVolumeBase volume) => default; // 0x000000018389EA40-0x000000018389EAA0
+		// Boolean Register(HGEnvironmentVolumeBase)
+		bool HG::Rendering::Runtime::HGEnvironmentManager::Register(HGEnvironmentVolumeBase *volume, MethodInfo *method)
 		{
-			// // Boolean _Unregister(HGEnvironmentVolume)
-			// bool HG::Rendering::Runtime::HGEnvironmentManager::_Unregister(
-			//         HGEnvironmentManager *this,
-			//         HGEnvironmentVolume *volume,
-			//         MethodInfo *method)
-			// {
-			//   __int64 v5; // rdx
-			//   HashSet_1_System_Object_ *m_activeVolumes; // rcx
-			//   bool v7; // al
-			//   Object_1 *gameObject; // rax
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			// 
-			//   if ( !byte_18D8EDC6A )
-			//   {
-			//     sub_18003C530(&MethodInfo::System::Collections::Generic::Dictionary<HG::Rendering::Runtime::HGCamera,HG::Rendering::Runtime::HGEnvironmentVolume::InterpolateDataPerCamera>::Clear);
-			//     sub_18003C530(&MethodInfo::System::Collections::Generic::HashSet<HG::Rendering::Runtime::HGEnvironmentVolume>::Contains);
-			//     sub_18003C530(&MethodInfo::System::Collections::Generic::HashSet<HG::Rendering::Runtime::HGEnvironmentVolume>::Remove);
-			//     sub_18003C530(&MethodInfo::System::Collections::Generic::List<HG::Rendering::Runtime::HGEnvironmentVolume>::Remove);
-			//     sub_18003C530(&off_18C9B55A8);
-			//     byte_18D8EDC6A = 1;
-			//   }
-			//   if ( IFix::WrappersManagerImpl::IsPatched(1243, 0LL) )
-			//   {
-			//     Patch = IFix::WrappersManagerImpl::GetPatch(1243, 0LL);
-			//     if ( !Patch )
-			//       goto LABEL_11;
-			//     return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_0(
-			//              (ILFixDynamicMethodWrapper_36 *)Patch,
-			//              (Object *)this,
-			//              (Object *)volume,
-			//              0LL);
-			//   }
-			//   else
-			//   {
-			//     m_activeVolumes = (HashSet_1_System_Object_ *)this.fields.m_activeVolumes;
-			//     if ( !m_activeVolumes )
-			//       goto LABEL_11;
-			//     v7 = System::Collections::Generic::HashSet<System::Object>::Contains(
-			//            m_activeVolumes,
-			//            (Object *)volume,
-			//            MethodInfo::System::Collections::Generic::HashSet<HG::Rendering::Runtime::HGEnvironmentVolume>::Contains);
-			//     if ( !volume )
-			//       goto LABEL_11;
-			//     if ( v7 )
-			//     {
-			//       m_activeVolumes = (HashSet_1_System_Object_ *)volume.fields.dataPerCameras;
-			//       volume.fields._timeFadingFactor_k__BackingField = 0.0;
-			//       if ( m_activeVolumes )
-			//       {
-			//         System::Collections::Generic::Dictionary<System::Object,HG::Rendering::Runtime::HGEnvironmentVolume::InterpolateDataPerCamera>::Clear(
-			//           (Dictionary_2_System_Object_HG_Rendering_Runtime_HGEnvironmentVolume_InterpolateDataPerCamera_ *)m_activeVolumes,
-			//           MethodInfo::System::Collections::Generic::Dictionary<HG::Rendering::Runtime::HGCamera,HG::Rendering::Runtime::HGEnvironmentVolume::InterpolateDataPerCamera>::Clear);
-			//         m_activeVolumes = (HashSet_1_System_Object_ *)this.fields.m_activeVolumes;
-			//         if ( m_activeVolumes )
-			//         {
-			//           System::Collections::Generic::HashSet<System::Object>::Remove(
-			//             m_activeVolumes,
-			//             (Object *)volume,
-			//             MethodInfo::System::Collections::Generic::HashSet<HG::Rendering::Runtime::HGEnvironmentVolume>::Remove);
-			//           m_activeVolumes = (HashSet_1_System_Object_ *)this.fields.m_sortedVolumes;
-			//           if ( m_activeVolumes )
-			//           {
-			//             System::Collections::Generic::List<System::Object>::Remove(
-			//               (List_1_System_Object_ *)m_activeVolumes,
-			//               (Object *)volume,
-			//               MethodInfo::System::Collections::Generic::List<HG::Rendering::Runtime::HGEnvironmentVolume>::Remove);
-			//             return 1;
-			//           }
-			//         }
-			//       }
-			// LABEL_11:
-			//       sub_180B536AC(m_activeVolumes, v5);
-			//     }
-			//     gameObject = (Object_1 *)UnityEngine::Component::get_gameObject((Component *)volume, 0LL);
-			//     HG::Rendering::HGRPLogger::LogWarning(
-			//       gameObject,
-			//       (String *)"Env Volume not exist in activeVolumes, unregister failed",
-			//       0LL);
-			//     return 0;
-			//   }
-			// }
-			// 
-			return default(bool);
+		  HGEnvironmentManager *instance; // rax
+		  __int64 v4; // rdx
+		  __int64 v5; // rcx
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		
+		  if ( !IFix::WrappersManagerImpl::IsPatched(1482, 0LL) )
+		  {
+		    if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager->_1.cctor_finished_or_no_cctor )
+		      il2cpp_runtime_class_init_1(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
+		    instance = HG::Rendering::Runtime::HGEnvironmentManager::get_instance(0LL);
+		    if ( instance )
+		      return HG::Rendering::Runtime::HGEnvironmentManager::_Register(instance, volume, 0LL);
+		LABEL_6:
+		    sub_1800D8260(v5, v4);
+		  }
+		  Patch = IFix::WrappersManagerImpl::GetPatch(1482, 0LL);
+		  if ( !Patch )
+		    goto LABEL_6;
+		  return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_14((ILFixDynamicMethodWrapper_20 *)Patch, (Object *)volume, 0LL);
 		}
-
-		private void _PipelineUpdate(List<Camera> cameras, HGSettingParameters settingParameters)
+		
+		public static bool Unregister(HGEnvironmentVolumeBase volume) => default; // 0x000000018389E8C0-0x000000018389E920
+		// Boolean Unregister(HGEnvironmentVolumeBase)
+		bool HG::Rendering::Runtime::HGEnvironmentManager::Unregister(HGEnvironmentVolumeBase *volume, MethodInfo *method)
 		{
-			// // Void _PipelineUpdate(List`1[UnityEngine.Camera], HGSettingParameters)
-			// // Hidden C++ exception states: #wind=1 #try_helpers=1
-			// void HG::Rendering::Runtime::HGEnvironmentManager::_PipelineUpdate(
-			//         HGEnvironmentManager *this,
-			//         List_1_UnityEngine_Camera_ *cameras,
-			//         HGSettingParameters *settingParameters,
-			//         MethodInfo *method)
-			// {
-			//   Object *v4; // r12
-			//   struct ILFixDynamicMethodWrapper_2__Class *v7; // rcx
-			//   ILFixDynamicMethodWrapper_2__Array *wrapperArray; // rbx
-			//   ILFixDynamicMethodWrapper_2__Array *v9; // rbx
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			//   __int64 v11; // rdx
-			//   __int64 v12; // rcx
-			//   List_1_System_Object_ *m_sortedVolumes; // rdi
-			//   struct HGEnvironmentManager_c__Class *v14; // rcx
-			//   Comparison_1_HG_Rendering_Runtime_HGEnvironmentVolume_ *_9__61_0; // rbx
-			//   Object *v16; // r14
-			//   Comparison_1_Object_ *v17; // rax
-			//   __int64 v18; // rdx
-			//   __int64 v19; // rcx
-			//   OneofDescriptorProto *v20; // rdx
-			//   FileDescriptor *v21; // r8
-			//   MessageDescriptor *v22; // r9
-			//   OneofDescriptorProto *v23; // rdx
-			//   FileDescriptor *v24; // r8
-			//   MessageDescriptor *v25; // r9
-			//   unsigned __int64 v26; // rdx
-			//   Light *SunSourceLight; // rbx
-			//   void *z_low; // rcx
-			//   HGEnvironmentPhase *m_interpolatedPhase; // rdi
-			//   __int64 v30; // rdx
-			//   __int64 v31; // rcx
-			//   HGEnvironmentPhase *v32; // rdi
-			//   __int64 v33; // rdx
-			//   __int64 v34; // rcx
-			//   HGEnvironmentPhase *v35; // rdi
-			//   __int64 v36; // rdx
-			//   __int64 v37; // rcx
-			//   HGEnvironmentPhase *v38; // rdi
-			//   __int64 (__fastcall *v39)(Light *); // rax
-			//   __int64 v40; // rdx
-			//   __int64 v41; // rcx
-			//   __int64 v42; // rdi
-			//   __int64 (__fastcall *v43)(__int64); // rax
-			//   __int64 v44; // rax
-			//   __int64 v45; // rdx
-			//   __int64 v46; // rcx
-			//   __int64 v47; // r14
-			//   HGEnvironmentPhase *v48; // rdi
-			//   void (__fastcall *v49)(__int64, OneofDescriptorProto **); // rax
-			//   __int64 (__fastcall *v50)(Light *); // rax
-			//   GameObject *v51; // rax
-			//   __int64 v52; // rdx
-			//   __int64 v53; // rcx
-			//   FileDescriptor *v54; // r8
-			//   MessageDescriptor *v55; // r9
-			//   Object *v56; // r14
-			//   void (__fastcall __noreturn **v57)(); // rbx
-			//   __int64 v58; // rdx
-			//   __int64 v59; // r8
-			//   signed __int64 v60; // r9
-			//   Camera *fields; // rdi
-			//   HGCamera *v62; // rax
-			//   __int64 v63; // rcx
-			//   HGEnvironmentVolumeCameraComponent *m_envVolumeCameraComponent; // rax
-			//   HGEnvironmentPhase *v65; // rcx
-			//   __int64 v66; // r15
-			//   __int64 v67; // rax
-			//   unsigned int v68; // eax
-			//   unsigned int v69; // edx
-			//   __int64 v70; // rax
-			//   unsigned __int64 v71; // rdx
-			//   signed __int64 v72; // rtt
-			//   __int64 v73; // r15
-			//   __int64 v74; // rax
-			//   __int64 v75; // r15
-			//   _QWORD **v76; // rcx
-			//   __int64 v77; // r8
-			//   __int64 v78; // rax
-			//   __int64 v79; // rdx
-			//   __int64 v80; // r15
-			//   unsigned int v81; // eax
-			//   __int64 v82; // rax
-			//   signed __int64 v83; // rtt
-			//   __int64 v84; // rdi
-			//   __int64 v85; // rax
-			//   __int64 v86; // rdi
-			//   _QWORD **v87; // rcx
-			//   __int64 v88; // rcx
-			//   __int64 v89; // rax
-			//   unsigned __int8 (__fastcall *v90)(Object *); // rax
-			//   void (__fastcall *v91)(Object *, _QWORD); // rax
-			//   HGEnvironmentPhase *v92; // rax
-			//   HGEnvironmentPhase *v93; // rax
-			//   HGEnvironmentPhase *v94; // rax
-			//   HGEnvironmentPhase *v95; // rax
-			//   HGEnvironmentPhase *v96; // rax
-			//   HGEnvironmentPhase *v97; // rax
-			//   HGEnvironmentPhase *v98; // rax
-			//   HGEnvironmentPhase *v99; // rax
-			//   HGEnvironmentPhase *v100; // rax
-			//   HGEnvironmentPhase *v101; // rax
-			//   Vector3 *v102; // rax
-			//   HGEnvironmentPhase *v103; // rax
-			//   __int128 v104; // xmm6
-			//   __int128 v105; // xmm7
-			//   __int128 v106; // xmm8
-			//   __int128 v107; // xmm9
-			//   __int128 v108; // xmm10
-			//   __int128 v109; // xmm11
-			//   __int64 v110; // xmm12_8
-			//   float shb8; // ebx
-			//   void (__fastcall *v112)(_QWORD); // rax
-			//   void (__fastcall *v113)(_QWORD); // rax
-			//   void (__fastcall *v114)(__int64); // rax
-			//   void (__fastcall *v115)(_OWORD *); // rax
-			//   void (__fastcall *v116)(__int64); // rax
-			//   __int64 v117; // rdx
-			//   HGRainRenderer *s_rainRenderer; // rax
-			//   HGSnowRenderer *s_snowRenderer; // rax
-			//   __int64 v120; // rax
-			//   __int64 v121; // rax
-			//   __int64 v122; // rax
-			//   __int64 v123; // rax
-			//   __int64 v124; // rax
-			//   __int64 v125; // rax
-			//   __int64 v126; // rax
-			//   __int64 v127; // rax
-			//   __int64 v128; // rax
-			//   __int64 v129; // rax
-			//   __int64 v130; // rax
-			//   MethodInfo *methoda; // [rsp+20h] [rbp-198h]
-			//   MethodInfo *methodb; // [rsp+20h] [rbp-198h]
-			//   String *v133; // [rsp+28h] [rbp-190h]
-			//   String *v134; // [rsp+28h] [rbp-190h]
-			//   MethodInfo *v135; // [rsp+30h] [rbp-188h]
-			//   MethodInfo *v136; // [rsp+30h] [rbp-188h]
-			//   unsigned __int8 v137; // [rsp+30h] [rbp-188h]
-			//   Vector3 v138; // [rsp+40h] [rbp-178h] BYREF
-			//   Color directColor; // [rsp+50h] [rbp-168h] BYREF
-			//   OneofDescriptor v140; // [rsp+60h] [rbp-158h] BYREF
-			//   _OWORD v141[6]; // [rsp+B0h] [rbp-108h] BYREF
-			//   __int64 v142; // [rsp+110h] [rbp-A8h]
-			//   float v143; // [rsp+118h] [rbp-A0h]
-			// 
-			//   v4 = (Object *)settingParameters;
-			//   if ( !byte_18D8EDC6B )
-			//   {
-			//     sub_18003C530(&TypeInfo::System::Comparison<HG::Rendering::Runtime::HGEnvironmentVolume>);
-			//     sub_18003C530(&MethodInfo::System::Collections::Generic::List_1_T_::Enumerator<UnityEngine::Camera>::Dispose);
-			//     sub_18003C530(&MethodInfo::System::Collections::Generic::List_1_T_::Enumerator<UnityEngine::Camera>::MoveNext);
-			//     sub_18003C530(&MethodInfo::System::Collections::Generic::List_1_T_::Enumerator<UnityEngine::Camera>::get_Current);
-			//     sub_18003C530(&MethodInfo::UnityEngine::GameObject::GetComponent<UnityEngine::Rendering::LensFlareComponentSRP>);
-			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGCamera);
-			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
-			//     sub_18003C530(&MethodInfo::System::Collections::Generic::List<UnityEngine::Camera>::GetEnumerator);
-			//     sub_18003C530(&MethodInfo::System::Collections::Generic::List<HG::Rendering::Runtime::HGEnvironmentVolume>::Sort);
-			//     sub_18003C530(&TypeInfo::UnityEngine::Object);
-			//     sub_18003C530(&MethodInfo::HG::Rendering::Runtime::HGEnvironmentManager::__c::__PipelineUpdate_b__61_0);
-			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager::__c);
-			//     byte_18D8EDC6B = 1;
-			//   }
-			//   memset(&v140.fields._._File_k__BackingField, 0, 24);
-			//   if ( !byte_18D8EDC37 )
-			//   {
-			//     sub_18003C530(&TypeInfo::IFix::ILFixDynamicMethodWrapper);
-			//     byte_18D8EDC37 = 1;
-			//   }
-			//   v7 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper._1.cctor_finished_or_no_cctor )
-			//   {
-			//     il2cpp_runtime_class_init_0(TypeInfo::IFix::ILFixDynamicMethodWrapper, cameras);
-			//     v7 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   }
-			//   wrapperArray = v7.static_fields.wrapperArray;
-			//   if ( !wrapperArray )
-			//     sub_180B536AC(v7, cameras);
-			//   if ( wrapperArray.max_length.size > 583 )
-			//   {
-			//     if ( !v7._1.cctor_finished_or_no_cctor )
-			//     {
-			//       il2cpp_runtime_class_init_0(v7, cameras);
-			//       v7 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//     }
-			//     v9 = v7.static_fields.wrapperArray;
-			//     if ( !v9 )
-			//       sub_180B536AC(v7, cameras);
-			//     if ( v9.max_length.size <= 0x247u )
-			//       sub_180070270(v7, cameras);
-			//     if ( v9[16].vector[7] )
-			//     {
-			//       Patch = IFix::WrappersManagerImpl::GetPatch(583, 0LL);
-			//       if ( !Patch )
-			//         sub_180B536AC(v12, v11);
-			//       IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_11(
-			//         (ILFixDynamicMethodWrapper_28 *)Patch,
-			//         (Object *)this,
-			//         (Object *)cameras,
-			//         v4,
-			//         0LL);
-			//       return;
-			//     }
-			//   }
-			//   if ( this.fields.m_sortNeeded )
-			//   {
-			//     m_sortedVolumes = (List_1_System_Object_ *)this.fields.m_sortedVolumes;
-			//     v14 = TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager::__c;
-			//     if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager::__c._1.cctor_finished_or_no_cctor )
-			//     {
-			//       il2cpp_runtime_class_init_0(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager::__c, cameras);
-			//       v14 = TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager::__c;
-			//     }
-			//     _9__61_0 = v14.static_fields.__9__61_0;
-			//     if ( !_9__61_0 )
-			//     {
-			//       if ( !v14._1.cctor_finished_or_no_cctor )
-			//       {
-			//         il2cpp_runtime_class_init_0(v14, cameras);
-			//         v14 = TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager::__c;
-			//       }
-			//       v16 = (Object *)v14.static_fields.__9;
-			//       v17 = (Comparison_1_Object_ *)sub_180004920(TypeInfo::System::Comparison<HG::Rendering::Runtime::HGEnvironmentVolume>);
-			//       _9__61_0 = (Comparison_1_HG_Rendering_Runtime_HGEnvironmentVolume_ *)v17;
-			//       if ( !v17 )
-			//         sub_180B536AC(v19, v18);
-			//       System::Comparison<System::Object>::Comparison(
-			//         v17,
-			//         v16,
-			//         MethodInfo::HG::Rendering::Runtime::HGEnvironmentManager::__c::__PipelineUpdate_b__61_0,
-			//         0LL);
-			//       TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager::__c.static_fields.__9__61_0 = _9__61_0;
-			//       sub_1800054D0(
-			//         (OneofDescriptor *)&TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager::__c.static_fields.__9__61_0,
-			//         v20,
-			//         v21,
-			//         v22,
-			//         (String__Array *)methoda,
-			//         v133,
-			//         v135);
-			//     }
-			//     if ( !m_sortedVolumes )
-			//       sub_180B536AC(v14, cameras);
-			//     System::Collections::Generic::List<System::Object>::Sort(
-			//       m_sortedVolumes,
-			//       (Comparison_1_Object_ *)_9__61_0,
-			//       MethodInfo::System::Collections::Generic::List<HG::Rendering::Runtime::HGEnvironmentVolume>::Sort);
-			//     this.fields.m_sortNeeded = 0;
-			//   }
-			//   if ( !this.fields.m_interpolatedPhase )
-			//     sub_180B536AC(v7, cameras);
-			//   HG::Rendering::Runtime::HGEnvironmentPhase::CopyFrom(
-			//     this.fields.m_interpolatedPhase,
-			//     this.fields.m_defaultPhase,
-			//     0LL);
-			//   this.fields.m_interpolateTrigger = HG::Rendering::Runtime::HGEnvironmentManager::_GetInterpolateTrigger(this, 0LL);
-			//   sub_1800054D0(
-			//     (OneofDescriptor *)&this.fields.m_interpolateTrigger,
-			//     v23,
-			//     v24,
-			//     v25,
-			//     (String__Array *)methoda,
-			//     v133,
-			//     v135);
-			//   HG::Rendering::Runtime::HGEnvironmentManager::_InterpolateVolumes(this, this.fields.m_interpolateTrigger, 0LL);
-			//   SunSourceLight = UnityEngine::Light::GetSunSourceLight(0LL);
-			//   if ( !TypeInfo::UnityEngine::Object._1.cctor_finished_or_no_cctor )
-			//     il2cpp_runtime_class_init_0(TypeInfo::UnityEngine::Object, v26);
-			//   if ( !byte_18D8F4EFB )
-			//   {
-			//     sub_18003C530(&TypeInfo::UnityEngine::Object);
-			//     byte_18D8F4EFB = 1;
-			//   }
-			//   z_low = TypeInfo::UnityEngine::Object;
-			//   if ( !TypeInfo::UnityEngine::Object._1.cctor_finished_or_no_cctor )
-			//     il2cpp_runtime_class_init_0(TypeInfo::UnityEngine::Object, v26);
-			//   if ( !byte_18D8F4EAF )
-			//   {
-			//     sub_18003C530(&TypeInfo::UnityEngine::Object);
-			//     byte_18D8F4EAF = 1;
-			//   }
-			//   if ( SunSourceLight )
-			//   {
-			//     z_low = TypeInfo::UnityEngine::Object;
-			//     if ( !TypeInfo::UnityEngine::Object._1.cctor_finished_or_no_cctor )
-			//       il2cpp_runtime_class_init_0(TypeInfo::UnityEngine::Object, v26);
-			//     if ( SunSourceLight.fields._._._.m_CachedPtr )
-			//     {
-			//       m_interpolatedPhase = this.fields.m_interpolatedPhase;
-			//       if ( !m_interpolatedPhase )
-			//         sub_180B536AC(z_low, v26);
-			//       directColor = m_interpolatedPhase.fields.lightConfig.directColor;
-			//       HG::Rendering::Runtime::HGEnvironmentUtils::SetColorIfNecessary(SunSourceLight, &directColor, 0LL);
-			//       v32 = this.fields.m_interpolatedPhase;
-			//       if ( !v32 )
-			//         sub_180B536AC(v31, v30);
-			//       HG::Rendering::Runtime::HGEnvironmentUtils::SetIntensityIfNecessary(
-			//         SunSourceLight,
-			//         v32.fields.lightConfig.directIntensityDividePi,
-			//         0LL);
-			//       v35 = this.fields.m_interpolatedPhase;
-			//       if ( !v35 )
-			//         sub_180B536AC(v34, v33);
-			//       HG::Rendering::Runtime::HGEnvironmentUtils::SetSpecularIntensityIfNecessary(
-			//         SunSourceLight,
-			//         v35.fields.lightConfig.directSpecularIntensity,
-			//         0LL);
-			//       v38 = this.fields.m_interpolatedPhase;
-			//       if ( !v38 )
-			//         sub_180B536AC(v37, v36);
-			//       HG::Rendering::Runtime::HGEnvironmentUtils::SetSoftSourceRaidiusIfNecessary(
-			//         SunSourceLight,
-			//         v38.fields.lightConfig.directSoftSourceRadius,
-			//         0LL);
-			//       v39 = (__int64 (__fastcall *)(Light *))qword_18D8F4D48;
-			//       if ( !qword_18D8F4D48 )
-			//       {
-			//         v39 = (__int64 (__fastcall *)(Light *))il2cpp_resolve_icall_0("UnityEngine.Component::get_gameObject()");
-			//         if ( !v39 )
-			//         {
-			//           v120 = sub_1802DBBE8("UnityEngine.Component::get_gameObject()");
-			//           sub_18000F750(v120, 0LL);
-			//         }
-			//         qword_18D8F4D48 = (__int64)v39;
-			//       }
-			//       v42 = v39(SunSourceLight);
-			//       if ( !v42 )
-			//         sub_180B536AC(v41, v40);
-			//       v43 = (__int64 (__fastcall *)(__int64))qword_18D8F4DC8;
-			//       if ( !qword_18D8F4DC8 )
-			//       {
-			//         v43 = (__int64 (__fastcall *)(__int64))il2cpp_resolve_icall_0("UnityEngine.GameObject::get_transform()");
-			//         if ( !v43 )
-			//         {
-			//           v121 = sub_1802DBBE8("UnityEngine.GameObject::get_transform()");
-			//           sub_18000F750(v121, 0LL);
-			//         }
-			//         qword_18D8F4DC8 = (__int64)v43;
-			//       }
-			//       v44 = v43(v42);
-			//       v47 = v44;
-			//       v48 = this.fields.m_interpolatedPhase;
-			//       if ( !v48 )
-			//         sub_180B536AC(v46, v45);
-			//       if ( !v44 )
-			//         sub_180B536AC(v46, v45);
-			//       *(Quaternion *)&v140.fields._Proto_k__BackingField = v48.fields.lightConfig.rotationDirect;
-			//       v49 = (void (__fastcall *)(__int64, OneofDescriptorProto **))qword_18D8F5308;
-			//       if ( !qword_18D8F5308 )
-			//       {
-			//         v49 = (void (__fastcall *)(__int64, OneofDescriptorProto **))il2cpp_resolve_icall_0(
-			//                                                                        "UnityEngine.Transform::set_rotation_Injected(Unit"
-			//                                                                        "yEngine.Quaternion&)");
-			//         if ( !v49 )
-			//         {
-			//           v122 = sub_1802DBBE8("UnityEngine.Transform::set_rotation_Injected(UnityEngine.Quaternion&)");
-			//           sub_18000F750(v122, 0LL);
-			//         }
-			//         qword_18D8F5308 = (__int64)v49;
-			//       }
-			//       v49(v47, &v140.fields._Proto_k__BackingField);
-			//       v50 = (__int64 (__fastcall *)(Light *))qword_18D8F4D48;
-			//       if ( !qword_18D8F4D48 )
-			//       {
-			//         v50 = (__int64 (__fastcall *)(Light *))il2cpp_resolve_icall_0("UnityEngine.Component::get_gameObject()");
-			//         if ( !v50 )
-			//         {
-			//           v123 = sub_1802DBBE8("UnityEngine.Component::get_gameObject()");
-			//           sub_18000F750(v123, 0LL);
-			//         }
-			//         qword_18D8F4D48 = (__int64)v50;
-			//       }
-			//       v51 = (GameObject *)v50(SunSourceLight);
-			//       if ( !v51 )
-			//         sub_180B536AC(v53, v52);
-			//       v56 = UnityEngine::GameObject::GetComponent<System::Object>(
-			//               v51,
-			//               MethodInfo::UnityEngine::GameObject::GetComponent<UnityEngine::Rendering::LensFlareComponentSRP>);
-			//       *(_QWORD *)&v138.x = v56;
-			//       if ( !TypeInfo::UnityEngine::Object._1.cctor_finished_or_no_cctor )
-			//         il2cpp_runtime_class_init_0(TypeInfo::UnityEngine::Object, v26);
-			//       if ( !byte_18D8F4EAE )
-			//       {
-			//         sub_18003C530(&TypeInfo::UnityEngine::Object);
-			//         byte_18D8F4EAE = 1;
-			//       }
-			//       z_low = TypeInfo::UnityEngine::Object;
-			//       if ( !TypeInfo::UnityEngine::Object._1.cctor_finished_or_no_cctor )
-			//         il2cpp_runtime_class_init_0(TypeInfo::UnityEngine::Object, v26);
-			//       if ( !byte_18D8F4EAF )
-			//       {
-			//         sub_18003C530(&TypeInfo::UnityEngine::Object);
-			//         byte_18D8F4EAF = 1;
-			//       }
-			//       if ( v56 )
-			//       {
-			//         z_low = TypeInfo::UnityEngine::Object;
-			//         if ( !TypeInfo::UnityEngine::Object._1.cctor_finished_or_no_cctor )
-			//           il2cpp_runtime_class_init_0(TypeInfo::UnityEngine::Object, v26);
-			//         if ( v56[1].klass )
-			//         {
-			//           LOBYTE(v136) = 0;
-			//           if ( !cameras )
-			//             sub_180B536AC(z_low, v26);
-			//           *(_OWORD *)&v140.monitor = 0LL;
-			//           v140.klass = (OneofDescriptor__Class *)cameras;
-			//           sub_1800054D0(&v140, (OneofDescriptorProto *)v26, v54, v55, (String__Array *)methodb, v134, v136);
-			//           v57 = 0LL;
-			//           LODWORD(v140.monitor) = 0;
-			//           HIDWORD(v140.monitor) = cameras.fields._version;
-			//           *(_QWORD *)&v140.fields._._Index_k__BackingField = 0LL;
-			//           *(_OWORD *)&v140.fields._._File_k__BackingField = *(_OWORD *)&v140.klass;
-			//           v140.fields.fields = 0LL;
-			//           *(_QWORD *)&directColor.r = 0LL;
-			//           *(_QWORD *)&directColor.b = &v140.fields._._File_k__BackingField;
-			//           while ( System::Collections::Generic::List_1_T_::Enumerator<System::Object>::MoveNext(
-			//                     (List_1_T_Enumerator_System_Object_ *)&v140.fields._._File_k__BackingField,
-			//                     MethodInfo::System::Collections::Generic::List_1_T_::Enumerator<UnityEngine::Camera>::MoveNext) )
-			//           {
-			//             fields = (Camera *)v140.fields.fields;
-			//             if ( !TypeInfo::HG::Rendering::Runtime::HGCamera._1.cctor_finished_or_no_cctor )
-			//               il2cpp_runtime_class_init_0(TypeInfo::HG::Rendering::Runtime::HGCamera, v58);
-			//             v62 = HG::Rendering::Runtime::HGCamera::GetOrCreate(fields, 0, 0LL);
-			//             if ( !v62 )
-			//               sub_1802DC2C8(v63, v58);
-			//             m_envVolumeCameraComponent = v62.fields.m_envVolumeCameraComponent;
-			//             if ( !m_envVolumeCameraComponent )
-			//               sub_1802DC2C8(v63, v58);
-			//             v65 = m_envVolumeCameraComponent.fields.m_interpolatedPhase;
-			//             if ( !v65 )
-			//               sub_1802DC2C8(0LL, v58);
-			//             if ( v65.fields.lensFlareConfig.enable )
-			//             {
-			//               v137 = 1;
-			//               break;
-			//             }
-			//           }
-			//           if ( !byte_18D8EDC37 )
-			//           {
-			//             v58 = _InterlockedExchangeAdd64((volatile signed __int64 *)&TypeInfo::IFix::ILFixDynamicMethodWrapper, 0LL);
-			//             if ( (v58 & 1) != 0 )
-			//             {
-			//               v66 = ((unsigned int)v58 >> 1) & 0xFFFFFFF;
-			//               switch ( (unsigned int)v58 >> 29 )
-			//               {
-			//                 case 1u:
-			//                   v67 = sub_18003C670((unsigned int)v66);
-			//                   goto LABEL_85;
-			//                 case 2u:
-			//                   v67 = sub_18003C380((unsigned int)v66);
-			//                   goto LABEL_85;
-			//                 case 3u:
-			//                 case 6u:
-			//                   v68 = ((unsigned int)v58 >> 1) & 0xFFFFFFF;
-			//                   v69 = (unsigned int)v58 >> 29;
-			//                   if ( v69 )
-			//                   {
-			//                     if ( v69 == 3 )
-			//                     {
-			//                       v67 = sub_180039480(v68);
-			//                       goto LABEL_85;
-			//                     }
-			//                     if ( v69 == 6 )
-			//                     {
-			//                       v70 = sub_1802DF9C0(v68);
-			//                       v67 = sub_18005F4B0(v70, 0LL);
-			// LABEL_85:
-			//                       v58 = v67;
-			//                       goto LABEL_112;
-			//                     }
-			//                     goto LABEL_95;
-			//                   }
-			//                   if ( !v68 || (v58 = (__int64)off_18A2C5600, v68 != 1) )
-			// LABEL_95:
-			//                     v58 = 0LL;
-			// LABEL_112:
-			//                   if ( !v58 )
-			//                     goto LABEL_114;
-			//                   v58 = _InterlockedExchange64((volatile __int64 *)&TypeInfo::IFix::ILFixDynamicMethodWrapper, v58);
-			//                   byte_18D8EDC37 = 1;
-			//                   break;
-			//                 case 4u:
-			//                   v67 = sub_1802DF920((unsigned int)v66);
-			//                   goto LABEL_85;
-			//                 case 5u:
-			//                   v59 = 8 * v66;
-			//                   if ( *(_QWORD *)(qword_18D8F6F98 + 8 * v66) )
-			//                   {
-			//                     v58 = *(_QWORD *)(v59 + qword_18D8F6F98);
-			//                   }
-			//                   else
-			//                   {
-			//                     v60 = il2cpp_string_new_len(
-			//                             qword_18D8E5198
-			//                           + *(int *)(v59 + *(int *)(qword_18D8E51A0 + 8) + qword_18D8E5198 + 4)
-			//                           + *(int *)(qword_18D8E51A0 + 16),
-			//                             *(unsigned int *)(v59 + *(int *)(qword_18D8E51A0 + 8) + qword_18D8E5198));
-			//                     v58 = _InterlockedCompareExchange64(
-			//                             (volatile signed __int64 *)(qword_18D8F6F98 + 8 * v66),
-			//                             v60,
-			//                             0LL);
-			//                     if ( !v58 )
-			//                     {
-			//                       if ( dword_18D8E43F8 )
-			//                       {
-			//                         v71 = (((unsigned __int64)(qword_18D8F6F98 + 8 * v66) >> 12) & 0x1FFFFF) >> 6;
-			//                         v59 = ((unsigned __int64)(qword_18D8F6F98 + 8 * v66) >> 12) & 0x3F;
-			//                         _m_prefetchw(&qword_18D6870D0[v71]);
-			//                         do
-			//                           v72 = qword_18D6870D0[v71];
-			//                         while ( v72 != _InterlockedCompareExchange64(&qword_18D6870D0[v71], v72 | (1LL << v59), v72) );
-			//                       }
-			//                       v58 = v60;
-			//                     }
-			//                   }
-			//                   goto LABEL_112;
-			//                 case 7u:
-			//                   v73 = sub_1802DF920((unsigned int)v66);
-			//                   v74 = *(_QWORD *)(v73 + 16);
-			//                   v75 = (v73 - *(_QWORD *)(v74 + 128)) >> 5;
-			//                   if ( *(_BYTE *)(v74 + 42) == 21 )
-			//                   {
-			//                     v76 = *(_QWORD ***)(v74 + 96);
-			//                     if ( *v76 )
-			//                     {
-			//                       v77 = **v76 - *(int *)(qword_18D8E51A0 + 160) - qword_18D8E5198;
-			//                       v74 = sub_180039550(v77 / 92 + v77);
-			//                     }
-			//                     else
-			//                     {
-			//                       v74 = 0LL;
-			//                     }
-			//                   }
-			//                   LODWORD(v138.x) = v75 + *(_DWORD *)(*(_QWORD *)(v74 + 104) + 32LL);
-			//                   v78 = sub_1801B8ECC(
-			//                           (unsigned int)&v138,
-			//                           (int)qword_18D8E5198 + *(_DWORD *)(qword_18D8E51A0 + 64),
-			//                           *(int *)(qword_18D8E51A0 + 68) / 0xCuLL,
-			//                           12,
-			//                           (__int64)sub_1802C7760);
-			//                   if ( !v78 || (v79 = *(unsigned int *)(v78 + 8), (_DWORD)v79 == -1) )
-			//                     v58 = 0LL;
-			//                   else
-			//                     v58 = qword_18D8E5198 + *(int *)(qword_18D8E51A0 + 72) + v79;
-			//                   goto LABEL_112;
-			//                 default:
-			//                   goto LABEL_114;
-			//               }
-			//             }
-			//             else
-			//             {
-			// LABEL_114:
-			//               byte_18D8EDC37 = 1;
-			//             }
-			//           }
-			//           z_low = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//           if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper._1.cctor_finished_or_no_cctor )
-			//           {
-			//             il2cpp_runtime_class_init_0(TypeInfo::IFix::ILFixDynamicMethodWrapper, v58);
-			//             z_low = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//           }
-			//           v26 = **((_QWORD **)z_low + 23);
-			//           if ( !v26 )
-			//             goto LABEL_230;
-			//           if ( *(int *)(v26 + 24) > 609 )
-			//           {
-			//             if ( !*((_DWORD *)z_low + 56) )
-			//             {
-			//               il2cpp_runtime_class_init_0(z_low, v26);
-			//               z_low = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//             }
-			//             v26 = **((_QWORD **)z_low + 23);
-			//             if ( !v26 )
-			//               goto LABEL_230;
-			//             if ( *(_DWORD *)(v26 + 24) <= 0x261u )
-			//               goto LABEL_226;
-			//             if ( *(_QWORD *)(v26 + 4904) )
-			//             {
-			//               if ( !byte_18D919D50 )
-			//               {
-			//                 v59 = _InterlockedExchangeAdd64(
-			//                         (volatile signed __int64 *)&TypeInfo::IFix::ILFixDynamicMethodWrapper,
-			//                         0LL);
-			//                 if ( (v59 & 1) != 0 )
-			//                 {
-			//                   v80 = ((unsigned int)v59 >> 1) & 0xFFFFFFF;
-			//                   switch ( (unsigned int)v59 >> 29 )
-			//                   {
-			//                     case 1u:
-			//                       v57 = (void (__fastcall __noreturn **)())sub_18003C670((unsigned int)v80);
-			//                       goto LABEL_151;
-			//                     case 2u:
-			//                       v57 = (void (__fastcall __noreturn **)())sub_18003C380((unsigned int)v80);
-			//                       goto LABEL_151;
-			//                     case 3u:
-			//                     case 6u:
-			//                       v81 = ((unsigned int)v59 >> 1) & 0xFFFFFFF;
-			//                       v59 = (unsigned int)v59 >> 29;
-			//                       if ( (_DWORD)v59 )
-			//                       {
-			//                         if ( (_DWORD)v59 == 3 )
-			//                         {
-			//                           v57 = (void (__fastcall __noreturn **)())sub_180039480(v81);
-			//                         }
-			//                         else if ( (_DWORD)v59 == 6 )
-			//                         {
-			//                           v82 = sub_1802DF9C0(v81);
-			//                           v57 = (void (__fastcall __noreturn **)())sub_18005F4B0(v82, 0LL);
-			//                         }
-			//                       }
-			//                       else if ( v81 == 1 )
-			//                       {
-			//                         v57 = off_18A2C5600;
-			//                       }
-			//                       goto LABEL_151;
-			//                     case 4u:
-			//                       v57 = (void (__fastcall __noreturn **)())sub_1802DF920((unsigned int)v80);
-			//                       goto LABEL_151;
-			//                     case 5u:
-			//                       v59 = 8 * v80;
-			//                       if ( *(_QWORD *)(qword_18D8F6F98 + 8 * v80) )
-			//                       {
-			//                         v57 = *(void (__fastcall __noreturn ***)())(v59 + qword_18D8F6F98);
-			//                       }
-			//                       else
-			//                       {
-			//                         v60 = il2cpp_string_new_len(
-			//                                 qword_18D8E5198
-			//                               + *(int *)(v59 + *(int *)(qword_18D8E51A0 + 8) + qword_18D8E5198 + 4)
-			//                               + *(int *)(qword_18D8E51A0 + 16),
-			//                                 *(unsigned int *)(v59 + *(int *)(qword_18D8E51A0 + 8) + qword_18D8E5198));
-			//                         v57 = (void (__fastcall __noreturn **)())_InterlockedCompareExchange64(
-			//                                                                    (volatile signed __int64 *)(qword_18D8F6F98 + 8 * v80),
-			//                                                                    v60,
-			//                                                                    0LL);
-			//                         if ( !v57 )
-			//                         {
-			//                           if ( dword_18D8E43F8 )
-			//                           {
-			//                             v26 = (((unsigned __int64)(qword_18D8F6F98 + 8 * v80) >> 12) & 0x1FFFFF) >> 6;
-			//                             v59 = ((unsigned __int64)(qword_18D8F6F98 + 8 * v80) >> 12) & 0x3F;
-			//                             _m_prefetchw(&qword_18D6870D0[v26]);
-			//                             do
-			//                               v83 = qword_18D6870D0[v26];
-			//                             while ( v83 != _InterlockedCompareExchange64(&qword_18D6870D0[v26], v83 | (1LL << v59), v83) );
-			//                           }
-			//                           v57 = (void (__fastcall __noreturn **)())v60;
-			//                         }
-			//                       }
-			//                       goto LABEL_151;
-			//                     case 7u:
-			//                       v84 = sub_1802DF920((unsigned int)v80);
-			//                       v85 = *(_QWORD *)(v84 + 16);
-			//                       v86 = (v84 - *(_QWORD *)(v85 + 128)) >> 5;
-			//                       if ( *(_BYTE *)(v85 + 42) == 21 )
-			//                       {
-			//                         v87 = *(_QWORD ***)(v85 + 96);
-			//                         if ( *v87 )
-			//                         {
-			//                           v88 = **v87 - *(int *)(qword_18D8E51A0 + 160) - qword_18D8E5198;
-			//                           v85 = sub_180039550(v88 / 92 + v88);
-			//                         }
-			//                         else
-			//                         {
-			//                           v85 = 0LL;
-			//                         }
-			//                       }
-			//                       LODWORD(v138.x) = v86 + *(_DWORD *)(*(_QWORD *)(v85 + 104) + 32LL);
-			//                       v89 = sub_1801B8ECC(
-			//                               (unsigned int)&v138,
-			//                               (int)qword_18D8E5198 + *(_DWORD *)(qword_18D8E51A0 + 64),
-			//                               *(int *)(qword_18D8E51A0 + 68) / 0xCuLL,
-			//                               12,
-			//                               (__int64)sub_1802C7760);
-			//                       if ( v89 )
-			//                       {
-			//                         v26 = *(unsigned int *)(v89 + 8);
-			//                         if ( (_DWORD)v26 != -1 )
-			//                           v57 = (void (__fastcall __noreturn **)())(v26
-			//                                                                   + qword_18D8E5198
-			//                                                                   + *(int *)(qword_18D8E51A0 + 72));
-			//                       }
-			// LABEL_151:
-			//                       if ( v57 )
-			//                         _InterlockedExchange64(
-			//                           (volatile __int64 *)&TypeInfo::IFix::ILFixDynamicMethodWrapper,
-			//                           (__int64)v57);
-			//                       break;
-			//                     default:
-			//                       break;
-			//                   }
-			//                 }
-			//                 byte_18D919D50 = 1;
-			//                 z_low = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//               }
-			//               if ( !*((_DWORD *)z_low + 56) )
-			//               {
-			//                 il2cpp_runtime_class_init_0(z_low, v26);
-			//                 z_low = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//               }
-			//               z_low = (void *)**((_QWORD **)z_low + 23);
-			//               if ( !z_low )
-			//                 goto LABEL_230;
-			//               if ( *((_DWORD *)z_low + 6) > 0x261u )
-			//               {
-			//                 z_low = (void *)*((_QWORD *)z_low + 613);
-			//                 if ( !z_low )
-			//                   goto LABEL_230;
-			//                 IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_13((ILFixDynamicMethodWrapper_28 *)z_low, v56, v137, 0LL);
-			//                 goto LABEL_168;
-			//               }
-			// LABEL_226:
-			//               sub_180070260(z_low, v26, v59, v60);
-			//             }
-			//           }
-			//           v90 = (unsigned __int8 (__fastcall *)(Object *))qword_18D8F4D28;
-			//           if ( !qword_18D8F4D28 )
-			//           {
-			//             v90 = (unsigned __int8 (__fastcall *)(Object *))il2cpp_resolve_icall_0("UnityEngine.Behaviour::get_enabled()");
-			//             if ( !v90 )
-			//             {
-			//               v124 = sub_1802DBBE8("UnityEngine.Behaviour::get_enabled()");
-			//               sub_18000F750(v124, 0LL);
-			//             }
-			//             qword_18D8F4D28 = (__int64)v90;
-			//           }
-			//           if ( v90(v56) != v137 )
-			//           {
-			//             v91 = (void (__fastcall *)(Object *, _QWORD))qword_18D8F4D30;
-			//             if ( !qword_18D8F4D30 )
-			//             {
-			//               v91 = (void (__fastcall *)(Object *, _QWORD))il2cpp_resolve_icall_0("UnityEngine.Behaviour::set_enabled(System.Boolean)");
-			//               if ( !v91 )
-			//               {
-			//                 v125 = sub_1802DBBE8("UnityEngine.Behaviour::set_enabled(System.Boolean)");
-			//                 sub_18000F750(v125, 0LL);
-			//               }
-			//               qword_18D8F4D30 = (__int64)v91;
-			//             }
-			//             v91(v56, v137);
-			//           }
-			// LABEL_168:
-			//           v92 = this.fields.m_interpolatedPhase;
-			//           if ( v92 )
-			//           {
-			//             if ( !v92.fields.lensFlareConfig.enable )
-			//             {
-			// LABEL_180:
-			//               v4 = (Object *)settingParameters;
-			//               goto LABEL_181;
-			//             }
-			//             HG::Rendering::Runtime::HGEnvironmentUtils::SetLensFlareDataIfNecessary(
-			//               (LensFlareComponentSRP *)v56,
-			//               v92.fields.lensFlareConfig.lensFlareData,
-			//               0LL);
-			//             v93 = this.fields.m_interpolatedPhase;
-			//             if ( v93 )
-			//             {
-			//               *(float *)&v56[2].klass = v93.fields.lensFlareConfig.intensity;
-			//               v94 = this.fields.m_interpolatedPhase;
-			//               if ( v94 )
-			//               {
-			//                 *(float *)&v56[6].klass = v94.fields.lensFlareConfig.scale;
-			//                 v95 = this.fields.m_interpolatedPhase;
-			//                 if ( v95 )
-			//                 {
-			//                   LOBYTE(v56[5].klass) = v95.fields.lensFlareConfig.useOcclusion;
-			//                   v96 = this.fields.m_interpolatedPhase;
-			//                   if ( v96 )
-			//                   {
-			//                     HIDWORD(v56[5].klass) = LODWORD(v96.fields.lensFlareConfig.occlusionRadius);
-			//                     v97 = this.fields.m_interpolatedPhase;
-			//                     if ( v97 )
-			//                     {
-			//                       LODWORD(v56[5].monitor) = v97.fields.lensFlareConfig.sampleCount;
-			//                       v98 = this.fields.m_interpolatedPhase;
-			//                       if ( v98 )
-			//                       {
-			//                         HIDWORD(v56[5].monitor) = LODWORD(v98.fields.lensFlareConfig.occlusionOffset);
-			//                         v99 = this.fields.m_interpolatedPhase;
-			//                         if ( v99 )
-			//                         {
-			//                           BYTE4(v56[6].klass) = v99.fields.lensFlareConfig.allowOffScreen;
-			//                           v100 = this.fields.m_interpolatedPhase;
-			//                           if ( v100 )
-			//                           {
-			//                             HIDWORD(v56[5].monitor) = LODWORD(v100.fields.lensFlareConfig.occlusionOffset);
-			//                             BYTE5(v56[6].klass) = 1;
-			//                             v101 = this.fields.m_interpolatedPhase;
-			//                             if ( v101 )
-			//                             {
-			//                               *(_QWORD *)&v138.x = _mm_unpacklo_ps((__m128)0LL, (__m128)0LL).m128_u64[0];
-			//                               v138.z = 1.0;
-			//                               *(Quaternion *)&v140.klass = v101.fields.lightConfig.rotationLensFlare;
-			//                               v102 = UnityEngine::Quaternion::op_Multiply(
-			//                                        (Vector3 *)&directColor,
-			//                                        (Quaternion *)&v140,
-			//                                        &v138,
-			//                                        0LL);
-			//                               z_low = (void *)LODWORD(v102.z);
-			//                               v56[6].monitor = *(MonitorData **)&v102.x;
-			//                               LODWORD(v56[7].klass) = (_DWORD)z_low;
-			//                               goto LABEL_180;
-			//                             }
-			//                           }
-			//                         }
-			//                       }
-			//                     }
-			//                   }
-			//                 }
-			//               }
-			//             }
-			//           }
-			// LABEL_230:
-			//           sub_1802DC2C8(z_low, v26);
-			//         }
-			//       }
-			//     }
-			//   }
-			// LABEL_181:
-			//   v103 = this.fields.m_interpolatedPhase;
-			//   if ( !v103 )
-			//     goto LABEL_202;
-			//   v104 = *(_OWORD *)&v103.fields.skyConfig.skyAmbientSH.shr0;
-			//   v105 = *(_OWORD *)&v103.fields.skyConfig.skyAmbientSH.shr4;
-			//   v106 = *(_OWORD *)&v103.fields.skyConfig.skyAmbientSH.shr8;
-			//   v107 = *(_OWORD *)&v103.fields.skyConfig.skyAmbientSH.shg3;
-			//   v108 = *(_OWORD *)&v103.fields.skyConfig.skyAmbientSH.shg7;
-			//   v109 = *(_OWORD *)&v103.fields.skyConfig.skyAmbientSH.shb2;
-			//   v110 = *(_QWORD *)&v103.fields.skyConfig.skyAmbientSH.shb6;
-			//   shb8 = v103.fields.skyConfig.skyAmbientSH.shb8;
-			//   v112 = (void (__fastcall *)(_QWORD))qword_18D8F4680;
-			//   if ( !qword_18D8F4680 )
-			//   {
-			//     v112 = (void (__fastcall *)(_QWORD))il2cpp_resolve_icall_0("UnityEngine.RenderSettings::set_skybox(UnityEngine.Material)");
-			//     if ( !v112 )
-			//     {
-			//       v126 = sub_1802DBBE8("UnityEngine.RenderSettings::set_skybox(UnityEngine.Material)");
-			//       sub_18000F750(v126, 0LL);
-			//     }
-			//     qword_18D8F4680 = (__int64)v112;
-			//   }
-			//   v112(0LL);
-			//   v113 = (void (__fastcall *)(_QWORD))qword_18D8F4688;
-			//   if ( !qword_18D8F4688 )
-			//   {
-			//     v113 = (void (__fastcall *)(_QWORD))il2cpp_resolve_icall_0("UnityEngine.RenderSettings::set_sun(UnityEngine.Light)");
-			//     if ( !v113 )
-			//     {
-			//       v127 = sub_1802DBBE8("UnityEngine.RenderSettings::set_sun(UnityEngine.Light)");
-			//       sub_18000F750(v127, 0LL);
-			//     }
-			//     qword_18D8F4688 = (__int64)v113;
-			//   }
-			//   v113(0LL);
-			//   v114 = (void (__fastcall *)(__int64))qword_18D8F4678;
-			//   if ( !qword_18D8F4678 )
-			//   {
-			//     v114 = (void (__fastcall *)(__int64))il2cpp_resolve_icall_0(
-			//                                            "UnityEngine.RenderSettings::set_ambientMode(UnityEngine.Rendering.AmbientMode)");
-			//     if ( !v114 )
-			//     {
-			//       v128 = sub_1802DBBE8("UnityEngine.RenderSettings::set_ambientMode(UnityEngine.Rendering.AmbientMode)");
-			//       sub_18000F750(v128, 0LL);
-			//     }
-			//     qword_18D8F4678 = (__int64)v114;
-			//   }
-			//   v114(4LL);
-			//   v141[0] = v104;
-			//   v141[1] = v105;
-			//   v141[2] = v106;
-			//   v141[3] = v107;
-			//   v141[4] = v108;
-			//   v141[5] = v109;
-			//   v142 = v110;
-			//   v143 = shb8;
-			//   v115 = (void (__fastcall *)(_OWORD *))qword_18D8F4698;
-			//   if ( !qword_18D8F4698 )
-			//   {
-			//     v115 = (void (__fastcall *)(_OWORD *))il2cpp_resolve_icall_0(
-			//                                             "UnityEngine.RenderSettings::set_ambientProbe_Injected(UnityEngine.Rendering."
-			//                                             "SphericalHarmonicsL2&)");
-			//     if ( !v115 )
-			//     {
-			//       v129 = sub_1802DBBE8("UnityEngine.RenderSettings::set_ambientProbe_Injected(UnityEngine.Rendering.SphericalHarmonicsL2&)");
-			//       sub_18000F750(v129, 0LL);
-			//     }
-			//     qword_18D8F4698 = (__int64)v115;
-			//   }
-			//   v115(v141);
-			//   v116 = (void (__fastcall *)(__int64))qword_18D8F4690;
-			//   if ( !qword_18D8F4690 )
-			//   {
-			//     v116 = (void (__fastcall *)(__int64))il2cpp_resolve_icall_0(
-			//                                            "UnityEngine.RenderSettings::set_defaultReflectionMode(UnityEngine.Rendering.D"
-			//                                            "efaultReflectionMode)");
-			//     if ( !v116 )
-			//     {
-			//       v130 = sub_1802DBBE8("UnityEngine.RenderSettings::set_defaultReflectionMode(UnityEngine.Rendering.DefaultReflectionMode)");
-			//       sub_18000F750(v130, 0LL);
-			//     }
-			//     qword_18D8F4690 = (__int64)v116;
-			//   }
-			//   v116(1LL);
-			//   if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager._1.cctor_finished_or_no_cctor )
-			//     il2cpp_runtime_class_init_0(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager, v117);
-			//   s_rainRenderer = HG::Rendering::Runtime::HGEnvironmentManager::get_s_rainRenderer(0LL);
-			//   if ( !s_rainRenderer
-			//     || (HG::Rendering::Runtime::HGRainRenderer::RainAndWetnessPipelineUpdate(
-			//           s_rainRenderer,
-			//           (HGSettingParameters *)v4,
-			//           0LL),
-			//         (s_snowRenderer = HG::Rendering::Runtime::HGEnvironmentManager::get_s_snowRenderer(0LL)) == 0LL) )
-			//   {
-			// LABEL_202:
-			//     sub_1802DC2C8(z_low, v26);
-			//   }
-			//   HG::Rendering::Runtime::HGSnowRenderer::SnowPipelineUpdate(s_snowRenderer, (HGSettingParameters *)v4, 0LL);
-			// }
-			// 
+		  HGEnvironmentManager *instance; // rax
+		  __int64 v4; // rdx
+		  __int64 v5; // rcx
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		
+		  if ( !IFix::WrappersManagerImpl::IsPatched(1485, 0LL) )
+		  {
+		    if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager->_1.cctor_finished_or_no_cctor )
+		      il2cpp_runtime_class_init_1(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
+		    instance = HG::Rendering::Runtime::HGEnvironmentManager::get_instance(0LL);
+		    if ( instance )
+		      return HG::Rendering::Runtime::HGEnvironmentManager::_Unregister(instance, volume, 0LL);
+		LABEL_6:
+		    sub_1800D8260(v5, v4);
+		  }
+		  Patch = IFix::WrappersManagerImpl::GetPatch(1485, 0LL);
+		  if ( !Patch )
+		    goto LABEL_6;
+		  return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_14((ILFixDynamicMethodWrapper_20 *)Patch, (Object *)volume, 0LL);
 		}
-
-		private void _UpdateCameraComponent(HGCamera hgCamera, Transform interpolateTrigger)
+		
+		public static void PipelineUpdate(List<Camera> cameras, HGSettingParameters settingParameters) {} // 0x0000000182EDFC60-0x0000000182EDFCF0
+		// Void PipelineUpdate(List`1[UnityEngine.Camera], HGSettingParameters)
+		void HG::Rendering::Runtime::HGEnvironmentManager::PipelineUpdate(
+		        List_1_UnityEngine_Camera_ *cameras,
+		        HGSettingParameters *settingParameters,
+		        MethodInfo *method)
 		{
-			// // Void _UpdateCameraComponent(HGCamera, Transform)
-			// // Hidden C++ exception states: #wind=3 #try_helpers=1
-			// void HG::Rendering::Runtime::HGEnvironmentManager::_UpdateCameraComponent(
-			//         HGEnvironmentManager *this,
-			//         HGCamera *hgCamera,
-			//         Transform *interpolateTrigger,
-			//         MethodInfo *method)
-			// {
-			//   Object *v4; // r15
-			//   Object *v5; // r13
-			//   HGEnvironmentManager *v6; // r14
-			//   struct ILFixDynamicMethodWrapper_2__Class *v7; // rcx
-			//   ILFixDynamicMethodWrapper_2__Array *wrapperArray; // rbx
-			//   ILFixDynamicMethodWrapper_2__Array *v9; // rbx
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			//   __int64 v11; // rdx
-			//   __int64 v12; // rcx
-			//   MessageDescriptor *klass; // rsi
-			//   __int64 v14; // rdx
-			//   struct ILFixDynamicMethodWrapper_2__Class *v15; // rcx
-			//   ILFixDynamicMethodWrapper_2__Array *v16; // rbx
-			//   ILFixDynamicMethodWrapper_2__Array *v17; // rbx
-			//   ILFixDynamicMethodWrapper_2 *v18; // rax
-			//   __int64 v19; // rdx
-			//   __int64 v20; // rcx
-			//   IndexedHashSet_1_HG_Rendering_Runtime_HGEnvironmentVolume_ *fieldsInDeclarationOrder; // rbx
-			//   __int64 v22; // rdx
-			//   struct ILFixDynamicMethodWrapper_2__Class *v23; // rcx
-			//   ILFixDynamicMethodWrapper_2__Array *v24; // rbx
-			//   ILFixDynamicMethodWrapper_2__Array *v25; // rbx
-			//   ILFixDynamicMethodWrapper_2 *v26; // rax
-			//   __int64 v27; // rdx
-			//   __int64 v28; // rcx
-			//   List_1_System_Single_ *fieldsInNumberOrder; // rbx
-			//   Object_1 *m_interpolateTrigger; // rbx
-			//   void (__fastcall *v31)(Object *, String **); // rax
-			//   MethodInfo *v32; // r9
-			//   Vector3 *v33; // rax
-			//   OneofDescriptorProto *v34; // rdx
-			//   FileDescriptor *v35; // r8
-			//   MessageDescriptor *v36; // r9
-			//   unsigned int z_low; // ebx
-			//   struct Math__Class *v38; // rcx
-			//   __m128 v39; // xmm2
-			//   __m128d v40; // xmm3
-			//   double v41; // xmm0_8
-			//   float v42; // xmm0_4
-			//   float m_interpolateTimeFactor; // xmm8_4
-			//   List_1_HG_Rendering_Runtime_HGEnvironmentVolume_ *m_sortedVolumes; // rbx
-			//   unsigned __int64 m_interpolatedVolumes; // rdx
-			//   signed __int64 items; // rcx
-			//   Object *current; // r15
-			//   unsigned int v48; // r8d
-			//   __int64 v49; // rdi
-			//   void (__fastcall __noreturn **v50)(); // rax
-			//   unsigned int v51; // eax
-			//   unsigned int v52; // r8d
-			//   __int64 v53; // rax
-			//   signed __int64 v54; // r9
-			//   char v55; // r8
-			//   signed __int64 v56; // rtt
-			//   __int64 v57; // rdi
-			//   __int64 v58; // rax
-			//   __int64 v59; // rdi
-			//   _QWORD **v60; // rcx
-			//   __int64 v61; // r8
-			//   __int64 v62; // rax
-			//   unsigned int v63; // r8d
-			//   __int64 v64; // rdi
-			//   void (__fastcall __noreturn **v65)(); // rax
-			//   unsigned int v66; // eax
-			//   unsigned int v67; // r8d
-			//   __int64 v68; // rax
-			//   signed __int64 v69; // r9
-			//   char v70; // r8
-			//   signed __int64 v71; // rtt
-			//   __int64 v72; // rdi
-			//   __int64 v73; // rax
-			//   __int64 v74; // rdi
-			//   _QWORD **v75; // rcx
-			//   __int64 v76; // r8
-			//   __int64 v77; // rax
-			//   unsigned __int8 (__fastcall *v78)(Object *); // rax
-			//   void (__fastcall *v79)(Transform *, OneofDescriptorProto **); // rax
-			//   unsigned __int64 v80; // rdx
-			//   unsigned __int64 v81; // r8
-			//   signed __int64 v82; // r9
-			//   OneofDescriptorProto *Proto_k__BackingField; // xmm6_8
-			//   float v84; // esi
-			//   __int64 v85; // rdi
-			//   void (__fastcall __noreturn **v86)(); // rax
-			//   unsigned int v87; // eax
-			//   __int64 v88; // rax
-			//   unsigned int v89; // r8d
-			//   signed __int64 v90; // rtt
-			//   __int64 v91; // rax
-			//   struct ILFixDynamicMethodWrapper_2__Class *v92; // rcx
-			//   ILFixDynamicMethodWrapper_2__Array *v93; // rdx
-			//   ILFixDynamicMethodWrapper_2__Array *v94; // rcx
-			//   ILFixDynamicMethodWrapper_2 *v95; // rax
-			//   __int64 v96; // rdx
-			//   __int64 v97; // rcx
-			//   __int64 v98; // rdx
-			//   bool v99; // r14
-			//   Dictionary_2_System_Object_HG_Rendering_Runtime_HGEnvironmentVolume_InterpolateDataPerCamera_ *monitor; // rcx
-			//   __int64 v101; // rdx
-			//   __int64 v102; // rcx
-			//   Dictionary_2_System_Object_HG_Rendering_Runtime_HGEnvironmentVolume_InterpolateDataPerCamera_ *v103; // rcx
-			//   Dictionary_2_System_Object_HG_Rendering_Runtime_HGEnvironmentVolume_InterpolateDataPerCamera_ *v104; // rsi
-			//   struct MethodInfo *v105; // rdi
-			//   int32_t Entry; // eax
-			//   __int64 v107; // rdx
-			//   __int64 v108; // r8
-			//   __int64 v109; // r9
-			//   Dictionary_2_System_Object_HG_Rendering_Runtime_HGEnvironmentVolume_InterpolateDataPerCamera_ *v110; // rcx
-			//   __int64 v111; // rdx
-			//   __int64 v112; // rcx
-			//   Dictionary_2_System_Object_HG_Rendering_Runtime_HGEnvironmentVolume_InterpolateDataPerCamera_ *v113; // rsi
-			//   struct MethodInfo *v114; // rdi
-			//   int32_t v115; // eax
-			//   __int64 v116; // rdx
-			//   __int64 v117; // r8
-			//   __int64 v118; // r9
-			//   Dictionary_2_TKey_TValue_Entry_System_Object_HG_Rendering_Runtime_HGEnvironmentVolume_InterpolateDataPerCamera___Array *v119; // rcx
-			//   float Epsilon; // xmm0_4
-			//   Dictionary_2_System_Object_Beyond_Gameplay_ShopSystem_UnlockInfo_ *v121; // rcx
-			//   Dictionary_2_TKey_TValue_Entry_System_Object_HG_Rendering_Runtime_HGEnvironmentVolume_InterpolateDataPerCamera___Array *entries; // rcx
-			//   float (*v123)(void); // rax
-			//   __int64 v124; // rdx
-			//   float v125; // xmm0_4
-			//   __m128i FullName_k__BackingField_low; // xmm1
-			//   float (*v127)(void); // rax
-			//   float v128; // xmm0_4
-			//   Dictionary_2_System_Object_HG_Rendering_Runtime_HGEnvironmentVolume_InterpolateDataPerCamera_ *v129; // rcx
-			//   MessageDescriptor *containingType; // rsi
-			//   HGEnvironmentManager *v131; // r14
-			//   float z; // eax
-			//   Object *v133; // rdi
-			//   IndexedHashSet_1_HG_Rendering_Runtime_HGEnvironmentVolume_ *v134; // rax
-			//   __int64 v135; // rdx
-			//   __int64 v136; // rcx
-			//   List_1_System_Single_ *m_interpolatedVolumesFactor; // r9
-			//   signed __int64 v138; // rtt
-			//   __int64 v139; // rax
-			//   __int64 v140; // rdx
-			//   __int64 v141; // rdx
-			//   float v142; // xmm6_4
-			//   List_1_System_Single_ *v143; // rax
-			//   __int64 v144; // rdx
-			//   __int64 v145; // rcx
-			//   __int64 v146; // r8
-			//   List_1_System_Single_ *v147; // rbx
-			//   struct MethodInfo *v148; // rdi
-			//   Il2CppClass *v149; // rcx
-			//   HGEnvironmentPhase *v150; // rdi
-			//   IndexedHashSet_1_HG_Rendering_Runtime_HGEnvironmentVolume_ *v151; // rbx
-			//   List_1_System_Single_ *v152; // rax
-			//   __int64 v153; // rax
-			//   int v154; // ecx
-			//   __int64 v155; // rax
-			//   __int64 v156; // rax
-			//   __int64 v157; // rax
-			//   __int64 v158; // rax
-			//   __int64 v159; // rax
-			//   __int64 v160; // [rsp+0h] [rbp-188h] BYREF
-			//   MethodInfo *methoda; // [rsp+20h] [rbp-168h]
-			//   IndexedHashSet_1_HG_Rendering_Runtime_HGEnvironmentVolume_ *interpolatedVolumes; // [rsp+28h] [rbp-160h]
-			//   List_1_System_Single_ *interpolatedVolumesFactor; // [rsp+30h] [rbp-158h]
-			//   OneofDescriptor v164; // [rsp+40h] [rbp-148h] BYREF
-			//   __int128 v165; // [rsp+90h] [rbp-F8h] BYREF
-			//   __int64 v166; // [rsp+A0h] [rbp-E8h]
-			//   List_1_T_Enumerator_System_Object_ v167; // [rsp+A8h] [rbp-E0h] BYREF
-			//   Vector3 v168; // [rsp+C0h] [rbp-C8h] BYREF
-			//   Vector3 v169; // [rsp+D0h] [rbp-B8h] BYREF
-			//   int v170; // [rsp+E0h] [rbp-A8h] BYREF
-			//   Il2CppExceptionWrapper *v171; // [rsp+F8h] [rbp-90h] BYREF
-			//   Il2CppExceptionWrapper *v172; // [rsp+100h] [rbp-88h] BYREF
-			// 
-			//   v4 = (Object *)interpolateTrigger;
-			//   v5 = (Object *)hgCamera;
-			//   v6 = this;
-			//   if ( !byte_18D8EDC6C )
-			//   {
-			//     sub_18003C530(&MethodInfo::System::Collections::Generic::Dictionary<HG::Rendering::Runtime::HGCamera,HG::Rendering::Runtime::HGEnvironmentVolume::InterpolateDataPerCamera>::Add);
-			//     sub_18003C530(&MethodInfo::System::Collections::Generic::Dictionary<HG::Rendering::Runtime::HGCamera,HG::Rendering::Runtime::HGEnvironmentVolume::InterpolateDataPerCamera>::ContainsKey);
-			//     sub_18003C530(&MethodInfo::System::Collections::Generic::Dictionary<HG::Rendering::Runtime::HGCamera,HG::Rendering::Runtime::HGEnvironmentVolume::InterpolateDataPerCamera>::Remove);
-			//     sub_18003C530(&MethodInfo::System::Collections::Generic::Dictionary<HG::Rendering::Runtime::HGCamera,HG::Rendering::Runtime::HGEnvironmentVolume::InterpolateDataPerCamera>::get_Item);
-			//     sub_18003C530(&MethodInfo::System::Collections::Generic::Dictionary<HG::Rendering::Runtime::HGCamera,HG::Rendering::Runtime::HGEnvironmentVolume::InterpolateDataPerCamera>::set_Item);
-			//     sub_18003C530(&MethodInfo::System::Collections::Generic::List_1_T_::Enumerator<float>::Dispose);
-			//     sub_18003C530(&MethodInfo::System::Collections::Generic::List_1_T_::Enumerator<HG::Rendering::Runtime::HGEnvironmentVolume>::Dispose);
-			//     sub_18003C530(&MethodInfo::System::Collections::Generic::List_1_T_::Enumerator<HG::Rendering::Runtime::HGEnvironmentVolume>::MoveNext);
-			//     sub_18003C530(&MethodInfo::System::Collections::Generic::List_1_T_::Enumerator<float>::MoveNext);
-			//     sub_18003C530(&MethodInfo::System::Collections::Generic::List_1_T_::Enumerator<HG::Rendering::Runtime::HGEnvironmentVolume>::get_Current);
-			//     sub_18003C530(&MethodInfo::System::Collections::Generic::List_1_T_::Enumerator<float>::get_Current);
-			//     sub_18003C530(&MethodInfo::Beyond::IndexedHashSet<HG::Rendering::Runtime::HGEnvironmentVolume>::Add);
-			//     sub_18003C530(&MethodInfo::Beyond::IndexedHashSet<HG::Rendering::Runtime::HGEnvironmentVolume>::Clear);
-			//     sub_18003C530(&MethodInfo::Beyond::IndexedHashSet<HG::Rendering::Runtime::HGEnvironmentVolume>::GetEnumerator);
-			//     sub_18003C530(&MethodInfo::System::Collections::Generic::List<float>::Add);
-			//     sub_18003C530(&MethodInfo::System::Collections::Generic::List<float>::Clear);
-			//     sub_18003C530(&MethodInfo::System::Collections::Generic::List<HG::Rendering::Runtime::HGEnvironmentVolume>::GetEnumerator);
-			//     sub_18003C530(&MethodInfo::System::Collections::Generic::List<float>::GetEnumerator);
-			//     sub_18003C530(&TypeInfo::UnityEngine::Mathf);
-			//     sub_18003C530(&TypeInfo::UnityEngine::Object);
-			//     byte_18D8EDC6C = 1;
-			//   }
-			//   memset(&v167, 0, sizeof(v167));
-			//   v165 = 0LL;
-			//   v166 = 0LL;
-			//   if ( !byte_18D8EDC37 )
-			//   {
-			//     sub_18003C530(&TypeInfo::IFix::ILFixDynamicMethodWrapper);
-			//     byte_18D8EDC37 = 1;
-			//   }
-			//   v7 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper._1.cctor_finished_or_no_cctor )
-			//   {
-			//     il2cpp_runtime_class_init_0(TypeInfo::IFix::ILFixDynamicMethodWrapper, hgCamera);
-			//     v7 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   }
-			//   wrapperArray = v7.static_fields.wrapperArray;
-			//   if ( !wrapperArray )
-			//     sub_180B536AC(v7, hgCamera);
-			//   if ( wrapperArray.max_length.size > 722 )
-			//   {
-			//     if ( !v7._1.cctor_finished_or_no_cctor )
-			//     {
-			//       il2cpp_runtime_class_init_0(v7, hgCamera);
-			//       v7 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//     }
-			//     v9 = v7.static_fields.wrapperArray;
-			//     if ( !v9 )
-			//       sub_180B536AC(v7, hgCamera);
-			//     if ( v9.max_length.size <= 0x2D2u )
-			//       sub_180070270(v7, hgCamera);
-			//     if ( v9[20].vector[2] )
-			//     {
-			//       Patch = IFix::WrappersManagerImpl::GetPatch(722, 0LL);
-			//       if ( !Patch )
-			//         sub_180B536AC(v12, v11);
-			//       IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_11((ILFixDynamicMethodWrapper_28 *)Patch, (Object *)v6, v5, v4, 0LL);
-			//       return;
-			//     }
-			//   }
-			//   if ( !v5 )
-			//     sub_180B536AC(v7, hgCamera);
-			//   klass = (MessageDescriptor *)v5[157].klass;
-			//   v164.fields.containingType = klass;
-			//   if ( !klass )
-			//     sub_180B536AC(v7, hgCamera);
-			//   if ( !*(_QWORD *)&klass.fields._._Index_k__BackingField )
-			//     sub_180B536AC(v7, hgCamera);
-			//   HG::Rendering::Runtime::HGEnvironmentPhase::CopyFrom(
-			//     *(HGEnvironmentPhase **)&klass.fields._._Index_k__BackingField,
-			//     v6.fields.m_defaultPhase,
-			//     0LL);
-			//   if ( !byte_18D8EDC37 )
-			//   {
-			//     sub_18003C530(&TypeInfo::IFix::ILFixDynamicMethodWrapper);
-			//     byte_18D8EDC37 = 1;
-			//   }
-			//   v15 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper._1.cctor_finished_or_no_cctor )
-			//   {
-			//     il2cpp_runtime_class_init_0(TypeInfo::IFix::ILFixDynamicMethodWrapper, v14);
-			//     v15 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   }
-			//   v16 = v15.static_fields.wrapperArray;
-			//   if ( !v16 )
-			//     sub_180B536AC(v15, v14);
-			//   if ( v16.max_length.size <= 723 )
-			//     goto LABEL_32;
-			//   if ( !v15._1.cctor_finished_or_no_cctor )
-			//   {
-			//     il2cpp_runtime_class_init_0(v15, v14);
-			//     v15 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   }
-			//   v17 = v15.static_fields.wrapperArray;
-			//   if ( !v17 )
-			//     sub_180B536AC(v15, v14);
-			//   if ( v17.max_length.size <= 0x2D3u )
-			//     sub_180070270(v15, v14);
-			//   if ( v17[20].vector[3] )
-			//   {
-			//     v18 = IFix::WrappersManagerImpl::GetPatch(723, 0LL);
-			//     if ( !v18 )
-			//       sub_180B536AC(v20, v19);
-			//     fieldsInDeclarationOrder = IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_276(v18, (Object *)klass, 0LL);
-			//   }
-			//   else
-			//   {
-			// LABEL_32:
-			//     fieldsInDeclarationOrder = (IndexedHashSet_1_HG_Rendering_Runtime_HGEnvironmentVolume_ *)klass.fields.fieldsInDeclarationOrder;
-			//   }
-			//   if ( !fieldsInDeclarationOrder )
-			//     sub_180B536AC(v15, v14);
-			//   Beyond::IndexedHashSet<System::Object>::Clear(
-			//     (IndexedHashSet_1_System_Object_ *)fieldsInDeclarationOrder,
-			//     MethodInfo::Beyond::IndexedHashSet<HG::Rendering::Runtime::HGEnvironmentVolume>::Clear);
-			//   if ( !byte_18D8EDC37 )
-			//   {
-			//     sub_18003C530(&TypeInfo::IFix::ILFixDynamicMethodWrapper);
-			//     byte_18D8EDC37 = 1;
-			//   }
-			//   v23 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper._1.cctor_finished_or_no_cctor )
-			//   {
-			//     il2cpp_runtime_class_init_0(TypeInfo::IFix::ILFixDynamicMethodWrapper, v22);
-			//     v23 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   }
-			//   v24 = v23.static_fields.wrapperArray;
-			//   if ( !v24 )
-			//     sub_180B536AC(v23, v22);
-			//   if ( v24.max_length.size <= 724 )
-			//     goto LABEL_47;
-			//   if ( !v23._1.cctor_finished_or_no_cctor )
-			//   {
-			//     il2cpp_runtime_class_init_0(v23, v22);
-			//     v23 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   }
-			//   v25 = v23.static_fields.wrapperArray;
-			//   if ( !v25 )
-			//     sub_180B536AC(v23, v22);
-			//   if ( v25.max_length.size <= 0x2D4u )
-			//     sub_180070270(v23, v22);
-			//   if ( v25[20].vector[4] )
-			//   {
-			//     v26 = IFix::WrappersManagerImpl::GetPatch(724, 0LL);
-			//     if ( !v26 )
-			//       sub_180B536AC(v28, v27);
-			//     fieldsInNumberOrder = IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_277(v26, (Object *)klass, 0LL);
-			//   }
-			//   else
-			//   {
-			// LABEL_47:
-			//     fieldsInNumberOrder = (List_1_System_Single_ *)klass.fields.fieldsInNumberOrder;
-			//   }
-			//   if ( !fieldsInNumberOrder )
-			//     sub_180B536AC(v23, v22);
-			//   ++fieldsInNumberOrder.fields._version;
-			//   fieldsInNumberOrder.fields._size = 0;
-			//   if ( !TypeInfo::UnityEngine::Object._1.cctor_finished_or_no_cctor )
-			//     il2cpp_runtime_class_init_0(TypeInfo::UnityEngine::Object, v22);
-			//   if ( !byte_18D8F4EFA )
-			//   {
-			//     sub_18003C530(&TypeInfo::UnityEngine::Object);
-			//     byte_18D8F4EFA = 1;
-			//   }
-			//   if ( !TypeInfo::UnityEngine::Object._1.cctor_finished_or_no_cctor )
-			//     il2cpp_runtime_class_init_0(TypeInfo::UnityEngine::Object, v22);
-			//   if ( !byte_18D8F4EAF )
-			//   {
-			//     sub_18003C530(&TypeInfo::UnityEngine::Object);
-			//     byte_18D8F4EAF = 1;
-			//   }
-			//   if ( !v4 )
-			//     goto LABEL_272;
-			//   if ( !TypeInfo::UnityEngine::Object._1.cctor_finished_or_no_cctor )
-			//     il2cpp_runtime_class_init_0(TypeInfo::UnityEngine::Object, v22);
-			//   if ( !v4[1].klass )
-			//   {
-			// LABEL_272:
-			//     v153 = sub_18281C140(&v168);
-			//     v154 = *(_DWORD *)(v153 + 8);
-			//     klass.fields._._FullName_k__BackingField = *(String **)v153;
-			//     LODWORD(klass.fields._._File_k__BackingField) = v154;
-			//     return;
-			//   }
-			//   m_interpolateTrigger = (Object_1 *)v6.fields.m_interpolateTrigger;
-			//   if ( !TypeInfo::UnityEngine::Object._1.cctor_finished_or_no_cctor )
-			//     il2cpp_runtime_class_init_0(TypeInfo::UnityEngine::Object, v22);
-			//   if ( !UnityEngine::Object::op_Equality((Object_1 *)v4, m_interpolateTrigger, 0LL) )
-			//   {
-			// LABEL_271:
-			//     v150 = *(HGEnvironmentPhase **)&klass.fields._._Index_k__BackingField;
-			//     v151 = HG::Rendering::Runtime::HGEnvironmentVolumeCameraComponent::get_interpolatedVolumes(
-			//              (HGEnvironmentVolumeCameraComponent *)klass,
-			//              0LL);
-			//     v152 = HG::Rendering::Runtime::HGEnvironmentVolumeCameraComponent::get_interpolatedVolumesFactor(
-			//              (HGEnvironmentVolumeCameraComponent *)klass,
-			//              0LL);
-			//     HG::Rendering::Runtime::HGEnvironmentManager::_InterpolateVolumesImpl(
-			//       v6,
-			//       (HGCamera *)v5,
-			//       (Transform *)v4,
-			//       v150,
-			//       (Vector3 *)&klass.fields._._FullName_k__BackingField,
-			//       v151,
-			//       v152,
-			//       0LL);
-			//     return;
-			//   }
-			//   v164.fields._._FullName_k__BackingField = 0LL;
-			//   LODWORD(v164.fields._._File_k__BackingField) = 0;
-			//   v31 = (void (__fastcall *)(Object *, String **))qword_18D8F52E0;
-			//   if ( !qword_18D8F52E0 )
-			//   {
-			//     v31 = (void (__fastcall *)(Object *, String **))il2cpp_resolve_icall_0(
-			//                                                       "UnityEngine.Transform::get_position_Injected(UnityEngine.Vector3&)");
-			//     if ( !v31 )
-			//     {
-			//       v155 = sub_1802DBBE8("UnityEngine.Transform::get_position_Injected(UnityEngine.Vector3&)");
-			//       sub_18000F750(v155, 0LL);
-			//     }
-			//     qword_18D8F52E0 = (__int64)v31;
-			//   }
-			//   v31(v4, &v164.fields._._FullName_k__BackingField);
-			//   v164.fields._Proto_k__BackingField = *(OneofDescriptorProto **)&v6.fields.m_lastInterpolateTriggerPosition.x;
-			//   *(float *)&v164.fields._IsSynthetic_k__BackingField = v6.fields.m_lastInterpolateTriggerPosition.z;
-			//   v164.fields.fields = (IList_1_Google_Protobuf_Reflection_FieldDescriptor_ *)v164.fields._._FullName_k__BackingField;
-			//   LODWORD(v164.fields.accessor) = v164.fields._._File_k__BackingField;
-			//   v33 = UnityEngine::Vector3::op_Subtraction(
-			//           &v168,
-			//           (Vector3 *)&v164.fields.fields,
-			//           (Vector3 *)&v164.fields._Proto_k__BackingField,
-			//           v32);
-			//   v164.fields.fields = *(IList_1_Google_Protobuf_Reflection_FieldDescriptor_ **)&v33.x;
-			//   z_low = LODWORD(v33.z);
-			//   if ( !byte_18D8E3AA7 )
-			//   {
-			//     sub_18003C530(&TypeInfo::System::Math);
-			//     byte_18D8E3AA7 = 1;
-			//   }
-			//   v38 = TypeInfo::System::Math;
-			//   if ( !TypeInfo::System::Math._1.cctor_finished_or_no_cctor )
-			//     il2cpp_runtime_class_init_0(TypeInfo::System::Math, v34);
-			//   v39 = (__m128)_mm_cvtsi32_si128(z_low);
-			//   v39.m128_f32[0] = (float)(v39.m128_f32[0] * v39.m128_f32[0])
-			//                   + (float)((float)(*((float *)&v164.fields.fields + 1) * *((float *)&v164.fields.fields + 1))
-			//                           + (float)(*(float *)&v164.fields.fields * *(float *)&v164.fields.fields));
-			//   v40 = _mm_cvtps_pd(v39);
-			//   if ( v40.m128d_f64[0] < 0.0 )
-			//     v41 = sub_1801C22C0(v38, v34, v35);
-			//   else
-			//     *(_QWORD *)&v41 = *(_OWORD *)&_mm_sqrt_pd(v40);
-			//   v42 = v41;
-			//   if ( v42 <= 5.0 )
-			//     m_interpolateTimeFactor = v6.fields.m_interpolateTimeFactor;
-			//   else
-			//     m_interpolateTimeFactor = 10000.0;
-			//   m_sortedVolumes = v6.fields.m_sortedVolumes;
-			//   if ( !m_sortedVolumes )
-			//     sub_180B536AC(v38, v34);
-			//   *(_OWORD *)&v164.monitor = 0LL;
-			//   v164.klass = (OneofDescriptor__Class *)m_sortedVolumes;
-			//   sub_1800054D0(
-			//     &v164,
-			//     v34,
-			//     v35,
-			//     v36,
-			//     (String__Array *)methoda,
-			//     (String *)interpolatedVolumes,
-			//     (MethodInfo *)interpolatedVolumesFactor);
-			//   LODWORD(v164.monitor) = 0;
-			//   HIDWORD(v164.monitor) = m_sortedVolumes.fields._version;
-			//   *(_QWORD *)&v164.fields._._Index_k__BackingField = 0LL;
-			//   *(_OWORD *)&v167._list = *(_OWORD *)&v164.klass;
-			//   v167._current = 0LL;
-			//   v164.klass = 0LL;
-			//   v164.monitor = (MonitorData *)&v167;
-			//   while ( System::Collections::Generic::List_1_T_::Enumerator<System::Object>::MoveNext(
-			//             &v167,
-			//             MethodInfo::System::Collections::Generic::List_1_T_::Enumerator<HG::Rendering::Runtime::HGEnvironmentVolume>::MoveNext) )
-			//   {
-			//     current = v167._current;
-			//     if ( !TypeInfo::UnityEngine::Object._1.cctor_finished_or_no_cctor )
-			//       il2cpp_runtime_class_init_0(TypeInfo::UnityEngine::Object, m_interpolatedVolumes);
-			//     if ( !byte_18D8F4EFA )
-			//     {
-			//       v48 = _InterlockedExchangeAdd64((volatile signed __int64 *)&TypeInfo::UnityEngine::Object, 0LL);
-			//       if ( (v48 & 1) != 0 )
-			//       {
-			//         v49 = (v48 >> 1) & 0xFFFFFFF;
-			//         switch ( v48 >> 29 )
-			//         {
-			//           case 1u:
-			//             v50 = (void (__fastcall __noreturn **)())sub_18003C670((unsigned int)v49);
-			//             goto LABEL_110;
-			//           case 2u:
-			//             v50 = (void (__fastcall __noreturn **)())sub_18003C380((unsigned int)v49);
-			//             goto LABEL_110;
-			//           case 3u:
-			//           case 6u:
-			//             v51 = (v48 >> 1) & 0xFFFFFFF;
-			//             v52 = v48 >> 29;
-			//             if ( v52 )
-			//             {
-			//               if ( v52 == 3 )
-			//               {
-			//                 v50 = (void (__fastcall __noreturn **)())sub_180039480(v51);
-			//                 goto LABEL_110;
-			//               }
-			//               if ( v52 == 6 )
-			//               {
-			//                 v53 = sub_1802DF9C0(v51);
-			//                 v50 = (void (__fastcall __noreturn **)())sub_18005F4B0(v53, 0LL);
-			//                 goto LABEL_110;
-			//               }
-			//             }
-			//             else if ( v51 == 1 )
-			//             {
-			//               v50 = off_18A2C5600;
-			//               goto LABEL_110;
-			//             }
-			// LABEL_109:
-			//             v50 = 0LL;
-			// LABEL_110:
-			//             if ( v50 )
-			//               _InterlockedExchange64((volatile __int64 *)&TypeInfo::UnityEngine::Object, (__int64)v50);
-			//             break;
-			//           case 4u:
-			//             v50 = (void (__fastcall __noreturn **)())sub_1802DF920((unsigned int)v49);
-			//             goto LABEL_110;
-			//           case 5u:
-			//             if ( *(_QWORD *)(qword_18D8F6F98 + 8 * v49) )
-			//             {
-			//               v50 = *(void (__fastcall __noreturn ***)())(qword_18D8F6F98 + 8 * v49);
-			//             }
-			//             else
-			//             {
-			//               v54 = il2cpp_string_new_len(
-			//                       qword_18D8E5198
-			//                     + *(int *)(qword_18D8E51A0 + 16)
-			//                     + *(int *)(qword_18D8E5198 + *(int *)(qword_18D8E51A0 + 8) + 8 * v49 + 4),
-			//                       *(unsigned int *)(qword_18D8E5198 + *(int *)(qword_18D8E51A0 + 8) + 8 * v49));
-			//               v50 = (void (__fastcall __noreturn **)())_InterlockedCompareExchange64(
-			//                                                          (volatile signed __int64 *)(qword_18D8F6F98 + 8 * v49),
-			//                                                          v54,
-			//                                                          0LL);
-			//               if ( !v50 )
-			//               {
-			//                 if ( dword_18D8E43F8 )
-			//                 {
-			//                   m_interpolatedVolumes = (((unsigned __int64)(qword_18D8F6F98 + 8 * v49) >> 12) & 0x1FFFFF) >> 6;
-			//                   v55 = ((unsigned __int64)(qword_18D8F6F98 + 8 * v49) >> 12) & 0x3F;
-			//                   _m_prefetchw(&qword_18D6870D0[m_interpolatedVolumes]);
-			//                   do
-			//                     v56 = qword_18D6870D0[m_interpolatedVolumes];
-			//                   while ( v56 != _InterlockedCompareExchange64(
-			//                                    &qword_18D6870D0[m_interpolatedVolumes],
-			//                                    v56 | (1LL << v55),
-			//                                    v56) );
-			//                 }
-			//                 v50 = (void (__fastcall __noreturn **)())v54;
-			//               }
-			//             }
-			//             goto LABEL_110;
-			//           case 7u:
-			//             v57 = sub_1802DF920((unsigned int)v49);
-			//             v58 = *(_QWORD *)(v57 + 16);
-			//             v59 = (v57 - *(_QWORD *)(v58 + 128)) >> 5;
-			//             if ( *(_BYTE *)(v58 + 42) == 21 )
-			//             {
-			//               v60 = *(_QWORD ***)(v58 + 96);
-			//               if ( *v60 )
-			//               {
-			//                 v61 = **v60 - (qword_18D8E5198 + *(int *)(qword_18D8E51A0 + 160));
-			//                 v58 = sub_180039550(v61 / 92 + v61);
-			//               }
-			//               else
-			//               {
-			//                 v58 = 0LL;
-			//               }
-			//             }
-			//             v170 = v59 + *(_DWORD *)(*(_QWORD *)(v58 + 104) + 32LL);
-			//             v62 = sub_1801B8ECC(
-			//                     (unsigned int)&v170,
-			//                     (int)qword_18D8E5198 + *(_DWORD *)(qword_18D8E51A0 + 64),
-			//                     *(int *)(qword_18D8E51A0 + 68) / 0xCuLL,
-			//                     12,
-			//                     (__int64)sub_1802C7760);
-			//             if ( !v62 )
-			//               goto LABEL_109;
-			//             m_interpolatedVolumes = *(unsigned int *)(v62 + 8);
-			//             if ( (_DWORD)m_interpolatedVolumes == -1 )
-			//               goto LABEL_109;
-			//             v50 = (void (__fastcall __noreturn **)())(m_interpolatedVolumes
-			//                                                     + qword_18D8E5198
-			//                                                     + *(int *)(qword_18D8E51A0 + 72));
-			//             goto LABEL_110;
-			//           default:
-			//             break;
-			//         }
-			//       }
-			//       byte_18D8F4EFA = 1;
-			//     }
-			//     if ( !TypeInfo::UnityEngine::Object._1.cctor_finished_or_no_cctor )
-			//       il2cpp_runtime_class_init_0(TypeInfo::UnityEngine::Object, m_interpolatedVolumes);
-			//     if ( !byte_18D8F4EAF )
-			//     {
-			//       v63 = _InterlockedExchangeAdd64((volatile signed __int64 *)&TypeInfo::UnityEngine::Object, 0LL);
-			//       if ( (v63 & 1) != 0 )
-			//       {
-			//         v64 = (v63 >> 1) & 0xFFFFFFF;
-			//         switch ( v63 >> 29 )
-			//         {
-			//           case 1u:
-			//             v65 = (void (__fastcall __noreturn **)())sub_18003C670((unsigned int)v64);
-			//             goto LABEL_143;
-			//           case 2u:
-			//             v65 = (void (__fastcall __noreturn **)())sub_18003C380((unsigned int)v64);
-			//             goto LABEL_143;
-			//           case 3u:
-			//           case 6u:
-			//             v66 = (v63 >> 1) & 0xFFFFFFF;
-			//             v67 = v63 >> 29;
-			//             if ( v67 )
-			//             {
-			//               if ( v67 == 3 )
-			//               {
-			//                 v65 = (void (__fastcall __noreturn **)())sub_180039480(v66);
-			//                 goto LABEL_143;
-			//               }
-			//               if ( v67 == 6 )
-			//               {
-			//                 v68 = sub_1802DF9C0(v66);
-			//                 v65 = (void (__fastcall __noreturn **)())sub_18005F4B0(v68, 0LL);
-			//                 goto LABEL_143;
-			//               }
-			//             }
-			//             else if ( v66 == 1 )
-			//             {
-			//               v65 = off_18A2C5600;
-			//               goto LABEL_143;
-			//             }
-			// LABEL_142:
-			//             v65 = 0LL;
-			// LABEL_143:
-			//             if ( v65 )
-			//               _InterlockedExchange64((volatile __int64 *)&TypeInfo::UnityEngine::Object, (__int64)v65);
-			//             break;
-			//           case 4u:
-			//             v65 = (void (__fastcall __noreturn **)())sub_1802DF920((unsigned int)v64);
-			//             goto LABEL_143;
-			//           case 5u:
-			//             if ( *(_QWORD *)(qword_18D8F6F98 + 8 * v64) )
-			//             {
-			//               v65 = *(void (__fastcall __noreturn ***)())(qword_18D8F6F98 + 8 * v64);
-			//             }
-			//             else
-			//             {
-			//               v69 = il2cpp_string_new_len(
-			//                       qword_18D8E5198
-			//                     + *(int *)(qword_18D8E5198 + *(int *)(qword_18D8E51A0 + 8) + 8 * v64 + 4)
-			//                     + *(int *)(qword_18D8E51A0 + 16),
-			//                       *(unsigned int *)(qword_18D8E5198 + *(int *)(qword_18D8E51A0 + 8) + 8 * v64));
-			//               v65 = (void (__fastcall __noreturn **)())_InterlockedCompareExchange64(
-			//                                                          (volatile signed __int64 *)(qword_18D8F6F98 + 8 * v64),
-			//                                                          v69,
-			//                                                          0LL);
-			//               if ( !v65 )
-			//               {
-			//                 if ( dword_18D8E43F8 )
-			//                 {
-			//                   m_interpolatedVolumes = (((unsigned __int64)(qword_18D8F6F98 + 8 * v64) >> 12) & 0x1FFFFF) >> 6;
-			//                   v70 = ((unsigned __int64)(qword_18D8F6F98 + 8 * v64) >> 12) & 0x3F;
-			//                   _m_prefetchw(&qword_18D6870D0[m_interpolatedVolumes]);
-			//                   do
-			//                     v71 = qword_18D6870D0[m_interpolatedVolumes];
-			//                   while ( v71 != _InterlockedCompareExchange64(
-			//                                    &qword_18D6870D0[m_interpolatedVolumes],
-			//                                    v71 | (1LL << v70),
-			//                                    v71) );
-			//                 }
-			//                 v65 = (void (__fastcall __noreturn **)())v69;
-			//               }
-			//             }
-			//             goto LABEL_143;
-			//           case 7u:
-			//             v72 = sub_1802DF920((unsigned int)v64);
-			//             v73 = *(_QWORD *)(v72 + 16);
-			//             v74 = (v72 - *(_QWORD *)(v73 + 128)) >> 5;
-			//             if ( *(_BYTE *)(v73 + 42) == 21 )
-			//             {
-			//               v75 = *(_QWORD ***)(v73 + 96);
-			//               if ( *v75 )
-			//               {
-			//                 v76 = **v75 - (qword_18D8E5198 + *(int *)(qword_18D8E51A0 + 160));
-			//                 v73 = sub_180039550(v76 / 92 + v76);
-			//               }
-			//               else
-			//               {
-			//                 v73 = 0LL;
-			//               }
-			//             }
-			//             LODWORD(v168.x) = v74 + *(_DWORD *)(*(_QWORD *)(v73 + 104) + 32LL);
-			//             v77 = sub_1801B8ECC(
-			//                     (unsigned int)&v168,
-			//                     (int)qword_18D8E5198 + *(_DWORD *)(qword_18D8E51A0 + 64),
-			//                     *(int *)(qword_18D8E51A0 + 68) / 0xCuLL,
-			//                     12,
-			//                     (__int64)sub_1802C7760);
-			//             if ( !v77 )
-			//               goto LABEL_142;
-			//             m_interpolatedVolumes = *(unsigned int *)(v77 + 8);
-			//             if ( (_DWORD)m_interpolatedVolumes == -1 )
-			//               goto LABEL_142;
-			//             v65 = (void (__fastcall __noreturn **)())(m_interpolatedVolumes
-			//                                                     + qword_18D8E5198
-			//                                                     + *(int *)(qword_18D8E51A0 + 72));
-			//             goto LABEL_143;
-			//           default:
-			//             break;
-			//         }
-			//       }
-			//       byte_18D8F4EAF = 1;
-			//     }
-			//     if ( current )
-			//     {
-			//       if ( !TypeInfo::UnityEngine::Object._1.cctor_finished_or_no_cctor )
-			//         il2cpp_runtime_class_init_0(TypeInfo::UnityEngine::Object, m_interpolatedVolumes);
-			//       if ( current[1].klass && LODWORD(current[2].monitor) == 2 )
-			//       {
-			//         v78 = (unsigned __int8 (__fastcall *)(Object *))qword_18D8F4D38;
-			//         if ( !qword_18D8F4D38 )
-			//         {
-			//           v78 = (unsigned __int8 (__fastcall *)(Object *))il2cpp_resolve_icall_0("UnityEngine.Behaviour::get_isActiveAndEnabled()");
-			//           if ( !v78 )
-			//           {
-			//             v156 = sub_1802DBBE8("UnityEngine.Behaviour::get_isActiveAndEnabled()");
-			//             sub_18000F750(v156, 0LL);
-			//           }
-			//           qword_18D8F4D38 = (__int64)v78;
-			//         }
-			//         if ( v78(current) && (unsigned __int8)sub_1800023D0(11LL, current) )
-			//         {
-			//           v164.fields._Proto_k__BackingField = 0LL;
-			//           *(_DWORD *)&v164.fields._IsSynthetic_k__BackingField = 0;
-			//           v79 = (void (__fastcall *)(Transform *, OneofDescriptorProto **))qword_18D8F52E0;
-			//           if ( !qword_18D8F52E0 )
-			//           {
-			//             v79 = (void (__fastcall *)(Transform *, OneofDescriptorProto **))il2cpp_resolve_icall_0(
-			//                                                                                "UnityEngine.Transform::get_position_Injec"
-			//                                                                                "ted(UnityEngine.Vector3&)");
-			//             if ( !v79 )
-			//             {
-			//               v157 = sub_1802DBBE8("UnityEngine.Transform::get_position_Injected(UnityEngine.Vector3&)");
-			//               sub_18000F750(v157, 0LL);
-			//             }
-			//             qword_18D8F52E0 = (__int64)v79;
-			//           }
-			//           v79(interpolateTrigger, &v164.fields._Proto_k__BackingField);
-			//           Proto_k__BackingField = v164.fields._Proto_k__BackingField;
-			//           v84 = *(float *)&v164.fields._IsSynthetic_k__BackingField;
-			//           if ( !byte_18D8EDC37 )
-			//           {
-			//             v81 = _InterlockedExchangeAdd64((volatile signed __int64 *)&TypeInfo::IFix::ILFixDynamicMethodWrapper, 0LL);
-			//             if ( (v81 & 1) != 0 )
-			//             {
-			//               v85 = ((unsigned int)v81 >> 1) & 0xFFFFFFF;
-			//               switch ( (unsigned int)v81 >> 29 )
-			//               {
-			//                 case 1u:
-			//                   v86 = (void (__fastcall __noreturn **)())sub_18003C670((unsigned int)v85);
-			//                   goto LABEL_181;
-			//                 case 2u:
-			//                   v86 = (void (__fastcall __noreturn **)())sub_18003C380((unsigned int)v85);
-			//                   goto LABEL_181;
-			//                 case 3u:
-			//                 case 6u:
-			//                   v87 = ((unsigned int)v81 >> 1) & 0xFFFFFFF;
-			//                   v81 = (unsigned int)v81 >> 29;
-			//                   if ( (_DWORD)v81 )
-			//                   {
-			//                     if ( (_DWORD)v81 == 3 )
-			//                     {
-			//                       v86 = (void (__fastcall __noreturn **)())sub_180039480(v87);
-			//                       goto LABEL_181;
-			//                     }
-			//                     if ( (_DWORD)v81 == 6 )
-			//                     {
-			//                       v88 = sub_1802DF9C0(v87);
-			//                       v86 = (void (__fastcall __noreturn **)())sub_18005F4B0(v88, 0LL);
-			//                       goto LABEL_181;
-			//                     }
-			// LABEL_170:
-			//                     v86 = 0LL;
-			//                     goto LABEL_181;
-			//                   }
-			//                   if ( v87 != 1 )
-			//                     goto LABEL_170;
-			//                   v86 = off_18A2C5600;
-			// LABEL_181:
-			//                   if ( v86 )
-			//                     _InterlockedExchange64((volatile __int64 *)&TypeInfo::IFix::ILFixDynamicMethodWrapper, (__int64)v86);
-			//                   break;
-			//                 case 4u:
-			//                   v86 = (void (__fastcall __noreturn **)())sub_1802DF920((unsigned int)v85);
-			//                   goto LABEL_181;
-			//                 case 5u:
-			//                   if ( *(_QWORD *)(qword_18D8F6F98 + 8 * v85) )
-			//                   {
-			//                     v86 = *(void (__fastcall __noreturn ***)())(qword_18D8F6F98 + 8 * v85);
-			//                   }
-			//                   else
-			//                   {
-			//                     v82 = il2cpp_string_new_len(
-			//                             qword_18D8E5198
-			//                           + *(int *)(qword_18D8E5198 + *(int *)(qword_18D8E51A0 + 8) + 8 * v85 + 4)
-			//                           + *(int *)(qword_18D8E51A0 + 16),
-			//                             *(unsigned int *)(qword_18D8E5198 + *(int *)(qword_18D8E51A0 + 8) + 8 * v85));
-			//                     v86 = (void (__fastcall __noreturn **)())_InterlockedCompareExchange64(
-			//                                                                (volatile signed __int64 *)(qword_18D8F6F98 + 8 * v85),
-			//                                                                v82,
-			//                                                                0LL);
-			//                     if ( !v86 )
-			//                     {
-			//                       v81 = qword_18D8F6F98 + 8 * v85;
-			//                       if ( dword_18D8E43F8 )
-			//                       {
-			//                         v89 = (v81 >> 12) & 0x1FFFFF;
-			//                         v80 = (unsigned __int64)v89 >> 6;
-			//                         v81 = v89 & 0x3F;
-			//                         _m_prefetchw(&qword_18D6870D0[v80]);
-			//                         do
-			//                           v90 = qword_18D6870D0[v80];
-			//                         while ( v90 != _InterlockedCompareExchange64(&qword_18D6870D0[v80], v90 | (1LL << v81), v90) );
-			//                       }
-			//                       v86 = (void (__fastcall __noreturn **)())v82;
-			//                     }
-			//                   }
-			//                   goto LABEL_181;
-			//                 case 7u:
-			//                   v91 = sub_1802DF920((unsigned int)v85);
-			//                   v86 = (void (__fastcall __noreturn **)())sub_18003D1A0(v91, &v164.fields._._FullName_k__BackingField);
-			//                   goto LABEL_181;
-			//                 default:
-			//                   break;
-			//               }
-			//             }
-			//             byte_18D8EDC37 = 1;
-			//           }
-			//           v92 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//           if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper._1.cctor_finished_or_no_cctor )
-			//           {
-			//             il2cpp_runtime_class_init_0(TypeInfo::IFix::ILFixDynamicMethodWrapper, v80);
-			//             v92 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//           }
-			//           v93 = v92.static_fields.wrapperArray;
-			//           if ( !v93 )
-			//             sub_1802DC2C8(v92, 0LL);
-			//           if ( v93.max_length.size <= 594 )
-			//             goto LABEL_195;
-			//           if ( !v92._1.cctor_finished_or_no_cctor )
-			//           {
-			//             il2cpp_runtime_class_init_0(v92, v93);
-			//             v92 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//           }
-			//           v94 = v92.static_fields.wrapperArray;
-			//           if ( !v94 )
-			//             sub_1802DC2C8(0LL, v93);
-			//           if ( v94.max_length.size <= 0x252u )
-			//             sub_180070260(v94, v93, v81, v82);
-			//           if ( v94[16].vector[18] )
-			//           {
-			//             v95 = IFix::WrappersManagerImpl::GetPatch(594, 0LL);
-			//             if ( !v95 )
-			//               sub_1802DC2C8(v97, v96);
-			//             v164.fields.fields = (IList_1_Google_Protobuf_Reflection_FieldDescriptor_ *)Proto_k__BackingField;
-			//             *(float *)&v164.fields.accessor = v84;
-			//             v99 = IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_231(v95, current, (Vector3 *)&v164.fields.fields, 0LL);
-			//           }
-			//           else
-			//           {
-			// LABEL_195:
-			//             *(_QWORD *)&v169.x = Proto_k__BackingField;
-			//             v169.z = v84;
-			//             if ( HG::Rendering::Runtime::HGEnvironmentVolume::_DistanceToEdge(
-			//                    (HGEnvironmentVolume *)current,
-			//                    &v169,
-			//                    0LL) > 0.0 )
-			//             {
-			//               v99 = 1;
-			//               goto LABEL_197;
-			//             }
-			//             v99 = 0;
-			//           }
-			//           if ( v99 )
-			//           {
-			// LABEL_197:
-			//             monitor = (Dictionary_2_System_Object_HG_Rendering_Runtime_HGEnvironmentVolume_InterpolateDataPerCamera_ *)current[5].monitor;
-			//             if ( !monitor )
-			//               sub_1802DC2C8(0LL, v98);
-			//             if ( !System::Collections::Generic::Dictionary<System::Object,HG::Rendering::Runtime::HGEnvironmentVolume::InterpolateDataPerCamera>::ContainsKey(
-			//                     monitor,
-			//                     v5,
-			//                     MethodInfo::System::Collections::Generic::Dictionary<HG::Rendering::Runtime::HGCamera,HG::Rendering::Runtime::HGEnvironmentVolume::InterpolateDataPerCamera>::ContainsKey) )
-			//             {
-			//               v103 = (Dictionary_2_System_Object_HG_Rendering_Runtime_HGEnvironmentVolume_InterpolateDataPerCamera_ *)current[5].monitor;
-			//               if ( !v103 )
-			//                 sub_1802DC2C8(0LL, v101);
-			//               System::Collections::Generic::Dictionary<System::Object,HG::Rendering::Runtime::HGEnvironmentVolume::InterpolateDataPerCamera>::Add(
-			//                 v103,
-			//                 v5,
-			//                 (HGEnvironmentVolume_InterpolateDataPerCamera)_mm_cvtsi128_si32((__m128i)0LL),
-			//                 MethodInfo::System::Collections::Generic::Dictionary<HG::Rendering::Runtime::HGCamera,HG::Rendering::Runtime::HGEnvironmentVolume::InterpolateDataPerCamera>::Add);
-			//             }
-			//             v104 = (Dictionary_2_System_Object_HG_Rendering_Runtime_HGEnvironmentVolume_InterpolateDataPerCamera_ *)current[5].monitor;
-			//             if ( !v104 )
-			//               sub_1802DC2C8(v102, v101);
-			//             v105 = MethodInfo::System::Collections::Generic::Dictionary<HG::Rendering::Runtime::HGCamera,HG::Rendering::Runtime::HGEnvironmentVolume::InterpolateDataPerCamera>::get_Item;
-			//             if ( !*((_QWORD *)MethodInfo::System::Collections::Generic::Dictionary<HG::Rendering::Runtime::HGCamera,HG::Rendering::Runtime::HGEnvironmentVolume::InterpolateDataPerCamera>::get_Item.klass.rgctx_data[22].rgctxDataDummy
-			//                   + 4) )
-			//               (*(void (**)(void))MethodInfo::System::Collections::Generic::Dictionary<HG::Rendering::Runtime::HGCamera,HG::Rendering::Runtime::HGEnvironmentVolume::InterpolateDataPerCamera>::get_Item.klass.rgctx_data[22].rgctxDataDummy)();
-			//             Entry = System::Collections::Generic::Dictionary<System::Object,HG::Rendering::Runtime::HGEnvironmentVolume::InterpolateDataPerCamera>::FindEntry(
-			//                       v104,
-			//                       v5,
-			//                       (MethodInfo *)v105.klass.rgctx_data[22].rgctxDataDummy);
-			//             if ( Entry < 0 )
-			//               System::ThrowHelper::ThrowKeyNotFoundException(v5, 0LL);
-			//             entries = v104.fields._entries;
-			//             if ( !entries )
-			//               sub_1802DC2C8(0LL, v107);
-			//             if ( (unsigned int)Entry >= entries.max_length.size )
-			//               sub_180070260(entries, Entry, v108, v109);
-			//             *(float *)&v164.fields._._FullName_k__BackingField = entries.vector[Entry].value.timeFadingFactor;
-			//             if ( !v99 || LOBYTE(current[5].klass) )
-			//             {
-			//               v127 = (float (*)(void))qword_18D8F5188;
-			//               if ( !qword_18D8F5188 )
-			//               {
-			//                 v127 = (float (*)(void))il2cpp_resolve_icall_0("UnityEngine.Time::get_deltaTime()");
-			//                 if ( !v127 )
-			//                 {
-			//                   v159 = sub_1802DBBE8("UnityEngine.Time::get_deltaTime()");
-			//                   sub_18000F750(v159, 0LL);
-			//                 }
-			//                 qword_18D8F5188 = (__int64)v127;
-			//               }
-			//               v128 = (float)(v127() * m_interpolateTimeFactor) / *(float *)&current[3].monitor;
-			//               FullName_k__BackingField_low = (__m128i)LODWORD(v164.fields._._FullName_k__BackingField);
-			//               *(float *)FullName_k__BackingField_low.m128i_i32 = *(float *)&v164.fields._._FullName_k__BackingField
-			//                                                                - v128;
-			//             }
-			//             else
-			//             {
-			//               v123 = (float (*)(void))qword_18D8F5188;
-			//               if ( !qword_18D8F5188 )
-			//               {
-			//                 v123 = (float (*)(void))il2cpp_resolve_icall_0("UnityEngine.Time::get_deltaTime()");
-			//                 if ( !v123 )
-			//                 {
-			//                   v158 = sub_1802DBBE8("UnityEngine.Time::get_deltaTime()");
-			//                   sub_18000F750(v158, 0LL);
-			//                 }
-			//                 qword_18D8F5188 = (__int64)v123;
-			//               }
-			//               v125 = (float)(v123() * m_interpolateTimeFactor) / *((float *)&current[3].klass + 1);
-			//               FullName_k__BackingField_low = (__m128i)LODWORD(v164.fields._._FullName_k__BackingField);
-			//               *(float *)FullName_k__BackingField_low.m128i_i32 = *(float *)&v164.fields._._FullName_k__BackingField
-			//                                                                + v125;
-			//             }
-			//             if ( *(float *)FullName_k__BackingField_low.m128i_i32 >= 0.0 )
-			//             {
-			//               if ( *(float *)FullName_k__BackingField_low.m128i_i32 > 1.0 )
-			//                 FullName_k__BackingField_low = (__m128i)0x3F800000u;
-			//             }
-			//             else
-			//             {
-			//               FullName_k__BackingField_low = 0LL;
-			//             }
-			//             v129 = (Dictionary_2_System_Object_HG_Rendering_Runtime_HGEnvironmentVolume_InterpolateDataPerCamera_ *)current[5].monitor;
-			//             if ( !v129 )
-			//               sub_1802DC2C8(0LL, v124);
-			//             System::Collections::Generic::Dictionary<System::Object,HG::Rendering::Runtime::HGEnvironmentVolume::InterpolateDataPerCamera>::set_Item(
-			//               v129,
-			//               v5,
-			//               (HGEnvironmentVolume_InterpolateDataPerCamera)_mm_cvtsi128_si32(FullName_k__BackingField_low),
-			//               MethodInfo::System::Collections::Generic::Dictionary<HG::Rendering::Runtime::HGCamera,HG::Rendering::Runtime::HGEnvironmentVolume::InterpolateDataPerCamera>::set_Item);
-			//           }
-			//           else
-			//           {
-			//             v110 = (Dictionary_2_System_Object_HG_Rendering_Runtime_HGEnvironmentVolume_InterpolateDataPerCamera_ *)current[5].monitor;
-			//             if ( !v110 )
-			//               sub_1802DC2C8(0LL, v98);
-			//             if ( System::Collections::Generic::Dictionary<System::Object,HG::Rendering::Runtime::HGEnvironmentVolume::InterpolateDataPerCamera>::ContainsKey(
-			//                    v110,
-			//                    v5,
-			//                    MethodInfo::System::Collections::Generic::Dictionary<HG::Rendering::Runtime::HGCamera,HG::Rendering::Runtime::HGEnvironmentVolume::InterpolateDataPerCamera>::ContainsKey) )
-			//             {
-			//               v113 = (Dictionary_2_System_Object_HG_Rendering_Runtime_HGEnvironmentVolume_InterpolateDataPerCamera_ *)current[5].monitor;
-			//               if ( !v113 )
-			//                 sub_1802DC2C8(v112, v111);
-			//               v114 = MethodInfo::System::Collections::Generic::Dictionary<HG::Rendering::Runtime::HGCamera,HG::Rendering::Runtime::HGEnvironmentVolume::InterpolateDataPerCamera>::get_Item;
-			//               if ( !*((_QWORD *)MethodInfo::System::Collections::Generic::Dictionary<HG::Rendering::Runtime::HGCamera,HG::Rendering::Runtime::HGEnvironmentVolume::InterpolateDataPerCamera>::get_Item.klass.rgctx_data[22].rgctxDataDummy
-			//                     + 4) )
-			//                 (*(void (**)(void))MethodInfo::System::Collections::Generic::Dictionary<HG::Rendering::Runtime::HGCamera,HG::Rendering::Runtime::HGEnvironmentVolume::InterpolateDataPerCamera>::get_Item.klass.rgctx_data[22].rgctxDataDummy)();
-			//               v115 = System::Collections::Generic::Dictionary<System::Object,HG::Rendering::Runtime::HGEnvironmentVolume::InterpolateDataPerCamera>::FindEntry(
-			//                        v113,
-			//                        v5,
-			//                        (MethodInfo *)v114.klass.rgctx_data[22].rgctxDataDummy);
-			//               if ( v115 < 0 )
-			//                 System::ThrowHelper::ThrowKeyNotFoundException(v5, 0LL);
-			//               v119 = v113.fields._entries;
-			//               if ( !v119 )
-			//                 sub_1802DC2C8(0LL, v116);
-			//               v98 = v115;
-			//               if ( (unsigned int)v115 >= v119.max_length.size )
-			//                 sub_180070260(v119, v115, v117, v118);
-			//               Epsilon = TypeInfo::UnityEngine::Mathf.static_fields.Epsilon;
-			//               *(float *)&v164.fields._._FullName_k__BackingField = v119.vector[v115].value.timeFadingFactor;
-			//               if ( Epsilon <= *(float *)&v164.fields._._FullName_k__BackingField )
-			//                 goto LABEL_197;
-			//               v121 = (Dictionary_2_System_Object_Beyond_Gameplay_ShopSystem_UnlockInfo_ *)current[5].monitor;
-			//               if ( !v121 )
-			//                 sub_1802DC2C8(0LL, v115);
-			//               System::Collections::Generic::Dictionary<System::Object,Beyond::Gameplay::ShopSystem::UnlockInfo>::Remove(
-			//                 v121,
-			//                 v5,
-			//                 MethodInfo::System::Collections::Generic::Dictionary<HG::Rendering::Runtime::HGCamera,HG::Rendering::Runtime::HGEnvironmentVolume::InterpolateDataPerCamera>::Remove);
-			//             }
-			//           }
-			//         }
-			//       }
-			//     }
-			//   }
-			//   containingType = v164.fields.containingType;
-			//   if ( !v164.fields.containingType )
-			//     goto LABEL_324;
-			//   items = *(_QWORD *)&v164.fields.containingType.fields._._Index_k__BackingField;
-			//   if ( !items )
-			//     goto LABEL_324;
-			//   v131 = this;
-			//   HG::Rendering::Runtime::HGEnvironmentPhase::CopyFrom(
-			//     (HGEnvironmentPhase *)items,
-			//     this.fields.m_interpolatedPhase,
-			//     0LL);
-			//   z = this.fields.m_lastInterpolateTriggerPosition.z;
-			//   containingType.fields._._FullName_k__BackingField = *(String **)&this.fields.m_lastInterpolateTriggerPosition.x;
-			//   *(float *)&containingType.fields._._File_k__BackingField = z;
-			//   m_interpolatedVolumes = (unsigned __int64)this.fields.m_interpolatedVolumes;
-			//   if ( !m_interpolatedVolumes )
-			//     goto LABEL_324;
-			//   Beyond::IndexedHashSet<System::Object>::GetEnumerator(
-			//     (List_1_T_Enumerator_System_Object_ *)&v164,
-			//     (IndexedHashSet_1_System_Object_ *)m_interpolatedVolumes,
-			//     MethodInfo::Beyond::IndexedHashSet<HG::Rendering::Runtime::HGEnvironmentVolume>::GetEnumerator);
-			//   *(_OWORD *)&v167._list = *(_OWORD *)&v164.klass;
-			//   v167._current = *(Object **)&v164.fields._._Index_k__BackingField;
-			//   v164.klass = 0LL;
-			//   v164.monitor = (MonitorData *)&v167;
-			//   try
-			//   {
-			//     while ( System::Collections::Generic::List_1_T_::Enumerator<System::Object>::MoveNext(
-			//               &v167,
-			//               MethodInfo::System::Collections::Generic::List_1_T_::Enumerator<HG::Rendering::Runtime::HGEnvironmentVolume>::MoveNext) )
-			//     {
-			//       v133 = v167._current;
-			//       v134 = HG::Rendering::Runtime::HGEnvironmentVolumeCameraComponent::get_interpolatedVolumes(
-			//                (HGEnvironmentVolumeCameraComponent *)containingType,
-			//                0LL);
-			//       if ( !v134 )
-			//         sub_1802DC2C8(v136, v135);
-			//       Beyond::IndexedHashSet<System::Object>::Add(
-			//         (IndexedHashSet_1_System_Object_ *)v134,
-			//         v133,
-			//         MethodInfo::Beyond::IndexedHashSet<HG::Rendering::Runtime::HGEnvironmentVolume>::Add);
-			//     }
-			//   }
-			//   catch ( Il2CppExceptionWrapper *v171 )
-			//   {
-			//     m_interpolatedVolumes = (unsigned __int64)&v160;
-			//     v164.klass = (OneofDescriptor__Class *)v171.ex;
-			//     items = (signed __int64)v164.klass;
-			//     if ( v164.klass )
-			//       sub_18000F780(v164.klass);
-			//     containingType = v164.fields.containingType;
-			//     v131 = this;
-			//   }
-			//   m_interpolatedVolumesFactor = v131.fields.m_interpolatedVolumesFactor;
-			//   if ( !m_interpolatedVolumesFactor )
-			// LABEL_324:
-			//     sub_1802DC2C8(items, m_interpolatedVolumes);
-			//   *(_OWORD *)&v164.monitor = 0LL;
-			//   v164.klass = (OneofDescriptor__Class *)m_interpolatedVolumesFactor;
-			//   if ( dword_18D8E43F8 )
-			//   {
-			//     m_interpolatedVolumes = (((unsigned __int64)&v164 >> 12) & 0x1FFFFF) >> 6;
-			//     _m_prefetchw(&qword_18D6870D0[m_interpolatedVolumes]);
-			//     do
-			//     {
-			//       items = qword_18D6870D0[m_interpolatedVolumes] | (1LL << (((unsigned __int64)&v164 >> 12) & 0x3F));
-			//       v138 = qword_18D6870D0[m_interpolatedVolumes];
-			//     }
-			//     while ( v138 != _InterlockedCompareExchange64(&qword_18D6870D0[m_interpolatedVolumes], items, v138) );
-			//   }
-			//   LODWORD(v164.monitor) = 0;
-			//   HIDWORD(v164.monitor) = m_interpolatedVolumesFactor.fields._version;
-			//   v164.fields._._Index_k__BackingField = 0;
-			//   v165 = *(_OWORD *)&v164.klass;
-			//   v166 = *(_QWORD *)&v164.fields._._Index_k__BackingField;
-			//   v164.klass = 0LL;
-			//   v164.monitor = (MonitorData *)&v165;
-			//   try
-			//   {
-			//     while ( 1 )
-			//     {
-			//       v139 = v165;
-			//       if ( !(_QWORD)v165 )
-			//         sub_1802DC2C8(items, m_interpolatedVolumes);
-			//       v140 = HIDWORD(v165);
-			//       if ( HIDWORD(v165) != *(_DWORD *)(v165 + 28) || DWORD2(v165) >= *(_DWORD *)(v165 + 24) )
-			//         break;
-			//       v141 = *(_QWORD *)(v165 + 16);
-			//       if ( !v141 )
-			//         sub_1802DC2C8(SDWORD2(v165), 0LL);
-			//       if ( DWORD2(v165) >= *(_DWORD *)(v141 + 24) )
-			//         sub_180070260(
-			//           SDWORD2(v165),
-			//           v141,
-			//           MethodInfo::System::Collections::Generic::List_1_T_::Enumerator<float>::MoveNext,
-			//           m_interpolatedVolumesFactor);
-			//       v142 = *(float *)(v141 + 4LL * SDWORD2(v165) + 32);
-			//       *(float *)&v166 = v142;
-			//       ++DWORD2(v165);
-			//       v143 = HG::Rendering::Runtime::HGEnvironmentVolumeCameraComponent::get_interpolatedVolumesFactor(
-			//                (HGEnvironmentVolumeCameraComponent *)containingType,
-			//                0LL);
-			//       v147 = v143;
-			//       if ( !v143 )
-			//         sub_1802DC2C8(v145, v144);
-			//       v148 = MethodInfo::System::Collections::Generic::List<float>::Add;
-			//       ++v143.fields._version;
-			//       items = (signed __int64)v143.fields._items;
-			//       m_interpolatedVolumes = v143.fields._size;
-			//       if ( !items )
-			//         sub_1802DC2C8(0LL, m_interpolatedVolumes);
-			//       if ( (unsigned int)m_interpolatedVolumes < *(_DWORD *)(items + 24) )
-			//       {
-			//         v143.fields._size = m_interpolatedVolumes + 1;
-			//         if ( (unsigned int)m_interpolatedVolumes >= *(_DWORD *)(items + 24) )
-			//           sub_180070260(items, m_interpolatedVolumes, v146, m_interpolatedVolumesFactor);
-			//         *(float *)(items + 4 * m_interpolatedVolumes + 32) = v142;
-			//       }
-			//       else
-			//       {
-			//         if ( !*((_QWORD *)v148.klass.rgctx_data[11].rgctxDataDummy + 4) )
-			//           (*(void (**)(void))v148.klass.rgctx_data[11].rgctxDataDummy)();
-			//         System::Collections::Generic::List<float>::AddWithResize(
-			//           v147,
-			//           v142,
-			//           (MethodInfo *)v148.klass.rgctx_data[11].rgctxDataDummy);
-			//       }
-			//     }
-			//     v149 = MethodInfo::System::Collections::Generic::List_1_T_::Enumerator<float>::MoveNext.klass;
-			//     if ( ((__int64)v149.vtable[0].methodPtr & 1) == 0 )
-			//     {
-			//       sub_18003C700(v149);
-			//       v140 = HIDWORD(v165);
-			//       v139 = v165;
-			//     }
-			//     if ( !v139 )
-			//       sub_1802DC2C8(v149, v140);
-			//     if ( (_DWORD)v140 != *(_DWORD *)(v139 + 28) )
-			//       System::ThrowHelper::ThrowInvalidOperationException_InvalidOperation_EnumFailedVersion(0LL);
-			//     DWORD2(v165) = *(_DWORD *)(v139 + 24) + 1;
-			//     LODWORD(v166) = 0;
-			//   }
-			//   catch ( Il2CppExceptionWrapper *v172 )
-			//   {
-			//     v164.klass = (OneofDescriptor__Class *)v172.ex;
-			//     if ( v164.klass )
-			//       sub_18000F780(v164.klass);
-			//     v5 = (Object *)hgCamera;
-			//     klass = v164.fields.containingType;
-			//     v6 = this;
-			//     v4 = (Object *)interpolateTrigger;
-			//     goto LABEL_271;
-			//   }
-			// }
-			// 
+		  struct ILFixDynamicMethodWrapper_2__Class *v5; // rcx
+		  ILFixDynamicMethodWrapper_2__Array *wrapperArray; // rax
+		  HGEnvironmentManager *instance; // rax
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		
+		  v5 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(TypeInfo::IFix::ILFixDynamicMethodWrapper);
+		    v5 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  wrapperArray = v5->static_fields->wrapperArray;
+		  if ( !wrapperArray )
+		    goto LABEL_9;
+		  if ( wrapperArray->max_length.size <= 610 )
+		    goto LABEL_20;
+		  if ( !v5->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(v5);
+		    v5 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  v5 = (struct ILFixDynamicMethodWrapper_2__Class *)v5->static_fields->wrapperArray;
+		  if ( !v5 )
+		    goto LABEL_9;
+		  if ( LODWORD(v5->_0.namespaze) <= 0x262 )
+		    sub_1800D2AB0(v5, settingParameters);
+		  if ( !v5[13]._0.namespaze )
+		  {
+		LABEL_20:
+		    if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager->_1.cctor_finished_or_no_cctor )
+		      il2cpp_runtime_class_init_1(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
+		    instance = HG::Rendering::Runtime::HGEnvironmentManager::get_instance(0LL);
+		    if ( instance )
+		    {
+		      HG::Rendering::Runtime::HGEnvironmentManager::_PipelineUpdate(instance, cameras, settingParameters, 0LL);
+		      return;
+		    }
+		LABEL_9:
+		    sub_1800D8260(v5, settingParameters);
+		  }
+		  Patch = IFix::WrappersManagerImpl::GetPatch(610, 0LL);
+		  if ( !Patch )
+		    goto LABEL_9;
+		  IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_1(
+		    (ILFixDynamicMethodWrapper_39 *)Patch,
+		    (Object *)cameras,
+		    (Object *)settingParameters,
+		    0LL);
 		}
-
-		private void _PerCameraUpdate(HGCamera hgCamera, ref ScriptableRenderContext renderContext)
+		
+		public static Transform GetFinalTrigger(Camera camera, Transform interpolateTrigger) => default; // 0x00000001831C9B60-0x00000001831C9DE0
+		// Transform GetFinalTrigger(Camera, Transform)
+		Transform *HG::Rendering::Runtime::HGEnvironmentManager::GetFinalTrigger(
+		        Camera *camera,
+		        Transform *interpolateTrigger,
+		        MethodInfo *method)
 		{
-			// // Void _PerCameraUpdate(HGCamera, ScriptableRenderContext ByRef)
-			// void HG::Rendering::Runtime::HGEnvironmentManager::_PerCameraUpdate(
-			//         HGEnvironmentManager *this,
-			//         HGCamera *hgCamera,
-			//         ScriptableRenderContext *renderContext,
-			//         MethodInfo *method)
-			// {
-			//   struct ILFixDynamicMethodWrapper_2__Class *v7; // rcx
-			//   ILFixDynamicMethodWrapper_2__Array *wrapperArray; // rdx
-			//   HGAdditionalCameraData *m_AdditionalCameraData; // rax
-			//   HGRainRenderer *s_rainRenderer; // rax
-			//   HGSnowRenderer *s_snowRenderer; // rax
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			//   ILFixDynamicMethodWrapper_2 *v13; // rax
-			// 
-			//   if ( !byte_18D8EDC6D )
-			//   {
-			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
-			//     byte_18D8EDC6D = 1;
-			//   }
-			//   if ( !byte_18D8EDC37 )
-			//   {
-			//     sub_18003C530(&TypeInfo::IFix::ILFixDynamicMethodWrapper);
-			//     byte_18D8EDC37 = 1;
-			//   }
-			//   v7 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper._1.cctor_finished_or_no_cctor )
-			//   {
-			//     il2cpp_runtime_class_init_0(TypeInfo::IFix::ILFixDynamicMethodWrapper, hgCamera);
-			//     v7 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   }
-			//   wrapperArray = v7.static_fields.wrapperArray;
-			//   if ( !wrapperArray )
-			//     goto LABEL_25;
-			//   if ( wrapperArray.max_length.size > 726 )
-			//   {
-			//     if ( !v7._1.cctor_finished_or_no_cctor )
-			//     {
-			//       il2cpp_runtime_class_init_0(v7, wrapperArray);
-			//       v7 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//     }
-			//     wrapperArray = v7.static_fields.wrapperArray;
-			//     if ( !wrapperArray )
-			//       goto LABEL_25;
-			//     if ( wrapperArray.max_length.size <= 0x2D6u )
-			//       goto LABEL_41;
-			//     if ( wrapperArray[20].vector[6] )
-			//     {
-			//       Patch = IFix::WrappersManagerImpl::GetPatch(726, 0LL);
-			//       if ( Patch )
-			//       {
-			//         IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_285(Patch, (Object *)this, (Object *)hgCamera, renderContext, 0LL);
-			//         return;
-			//       }
-			//       goto LABEL_25;
-			//     }
-			//   }
-			//   if ( !hgCamera )
-			//     goto LABEL_25;
-			//   if ( !byte_18D8EDC37 )
-			//   {
-			//     sub_18003C530(&TypeInfo::IFix::ILFixDynamicMethodWrapper);
-			//     v7 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//     byte_18D8EDC37 = 1;
-			//   }
-			//   if ( !v7._1.cctor_finished_or_no_cctor )
-			//   {
-			//     il2cpp_runtime_class_init_0(v7, wrapperArray);
-			//     v7 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   }
-			//   wrapperArray = v7.static_fields.wrapperArray;
-			//   if ( !wrapperArray )
-			//     goto LABEL_25;
-			//   if ( wrapperArray.max_length.size <= 727 )
-			//     goto LABEL_16;
-			//   if ( !v7._1.cctor_finished_or_no_cctor )
-			//   {
-			//     il2cpp_runtime_class_init_0(v7, wrapperArray);
-			//     v7 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   }
-			//   v7 = (struct ILFixDynamicMethodWrapper_2__Class *)v7.static_fields.wrapperArray;
-			//   if ( !v7 )
-			//     goto LABEL_25;
-			//   if ( LODWORD(v7._0.namespaze) <= 0x2D7 )
-			// LABEL_41:
-			//     sub_180070270(v7, wrapperArray);
-			//   if ( v7[15]._1.unity_user_data )
-			//   {
-			//     v13 = IFix::WrappersManagerImpl::GetPatch(727, 0LL);
-			//     if ( !v13 )
-			//       goto LABEL_25;
-			//     if ( !IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_8((ILFixDynamicMethodWrapper_27 *)v13, (Object *)hgCamera, 0LL) )
-			//       goto LABEL_19;
-			//     return;
-			//   }
-			// LABEL_16:
-			//   m_AdditionalCameraData = hgCamera.fields.m_AdditionalCameraData;
-			//   if ( !m_AdditionalCameraData )
-			//     goto LABEL_25;
-			//   if ( m_AdditionalCameraData.fields.hgRenderPath != 1 && m_AdditionalCameraData.fields.hgRenderPath != 2 )
-			//   {
-			// LABEL_19:
-			//     if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager._1.cctor_finished_or_no_cctor )
-			//       il2cpp_runtime_class_init_0(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager, wrapperArray);
-			//     s_rainRenderer = HG::Rendering::Runtime::HGEnvironmentManager::get_s_rainRenderer(0LL);
-			//     if ( s_rainRenderer )
-			//     {
-			//       HG::Rendering::Runtime::HGRainRenderer::UpdateRainAndWetnessData(s_rainRenderer, hgCamera, renderContext, 0LL);
-			//       s_snowRenderer = HG::Rendering::Runtime::HGEnvironmentManager::get_s_snowRenderer(0LL);
-			//       if ( s_snowRenderer )
-			//       {
-			//         HG::Rendering::Runtime::HGSnowRenderer::UpdateSnowData(s_snowRenderer, hgCamera, renderContext, 0LL);
-			//         return;
-			//       }
-			//     }
-			// LABEL_25:
-			//     sub_180B536AC(v7, wrapperArray);
-			//   }
-			// }
-			// 
+		  struct ILFixDynamicMethodWrapper_2__Class *v5; // rcx
+		  ILFixDynamicMethodWrapper_2__Array *wrapperArray; // r8
+		  Transform *interpolateTriggerOverride; // rax
+		  struct Object_1__Class *v8; // rcx
+		  Transform *v9; // rbx
+		  HGRenderPipeline *currentPipeline; // rax
+		  struct Object_1__Class *v11; // rcx
+		  Transform *currentEnvCenter; // rbx
+		  HGRenderPipeline *v13; // rax
+		  Camera *main; // rax
+		  struct Object_1__Class *v16; // rcx
+		  Camera *v17; // rbx
+		  __int64 (__fastcall *v18)(Camera *); // rax
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		
+		  v5 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(TypeInfo::IFix::ILFixDynamicMethodWrapper);
+		    v5 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  wrapperArray = v5->static_fields->wrapperArray;
+		  if ( !wrapperArray )
+		    goto LABEL_33;
+		  if ( wrapperArray->max_length.size <= 786 )
+		    goto LABEL_53;
+		  if ( !v5->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(v5);
+		    v5 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  v5 = (struct ILFixDynamicMethodWrapper_2__Class *)v5->static_fields->wrapperArray;
+		  if ( !v5 )
+		    goto LABEL_33;
+		  if ( LODWORD(v5->_0.namespaze) <= 0x312 )
+		    sub_1800D2AB0(v5, interpolateTrigger);
+		  if ( !*(_QWORD *)&v5[16]._1.naturalAligment )
+		  {
+		LABEL_53:
+		    if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager->_1.cctor_finished_or_no_cctor )
+		      il2cpp_runtime_class_init_1(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
+		    interpolateTriggerOverride = HG::Rendering::Runtime::HGEnvironmentManager::get_interpolateTriggerOverride(0LL);
+		    v8 = TypeInfo::UnityEngine::Object;
+		    v9 = interpolateTriggerOverride;
+		    if ( !TypeInfo::UnityEngine::Object->_1.cctor_finished_or_no_cctor )
+		    {
+		      il2cpp_runtime_class_init_1(TypeInfo::UnityEngine::Object);
+		      v8 = TypeInfo::UnityEngine::Object;
+		      if ( !TypeInfo::UnityEngine::Object->_1.cctor_finished_or_no_cctor )
+		      {
+		        il2cpp_runtime_class_init_1(TypeInfo::UnityEngine::Object);
+		        v8 = TypeInfo::UnityEngine::Object;
+		      }
+		    }
+		    if ( v9 )
+		    {
+		      if ( !v8->_1.cctor_finished_or_no_cctor )
+		        il2cpp_runtime_class_init_1(v8);
+		      if ( v9->fields._._.m_CachedPtr )
+		      {
+		        if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager->_1.cctor_finished_or_no_cctor )
+		          il2cpp_runtime_class_init_1(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
+		        return HG::Rendering::Runtime::HGEnvironmentManager::get_interpolateTriggerOverride(0LL);
+		      }
+		    }
+		    if ( !TypeInfo::HG::Rendering::Runtime::HGRenderPipeline->_1.cctor_finished_or_no_cctor )
+		      il2cpp_runtime_class_init_1(TypeInfo::HG::Rendering::Runtime::HGRenderPipeline);
+		    currentPipeline = HG::Rendering::Runtime::HGRenderPipeline::get_currentPipeline(0LL);
+		    if ( !currentPipeline )
+		      goto LABEL_33;
+		    v11 = TypeInfo::UnityEngine::Object;
+		    currentEnvCenter = currentPipeline->fields.currentEnvCenter;
+		    if ( !TypeInfo::UnityEngine::Object->_1.cctor_finished_or_no_cctor )
+		    {
+		      il2cpp_runtime_class_init_1(TypeInfo::UnityEngine::Object);
+		      v11 = TypeInfo::UnityEngine::Object;
+		      if ( !TypeInfo::UnityEngine::Object->_1.cctor_finished_or_no_cctor )
+		      {
+		        il2cpp_runtime_class_init_1(TypeInfo::UnityEngine::Object);
+		        v11 = TypeInfo::UnityEngine::Object;
+		      }
+		    }
+		    if ( !currentEnvCenter )
+		      goto LABEL_24;
+		    if ( !v11->_1.cctor_finished_or_no_cctor )
+		      il2cpp_runtime_class_init_1(v11);
+		    if ( !currentEnvCenter->fields._._.m_CachedPtr )
+		    {
+		LABEL_24:
+		      main = UnityEngine::Camera::get_main(0LL);
+		      v16 = TypeInfo::UnityEngine::Object;
+		      v17 = main;
+		      if ( !TypeInfo::UnityEngine::Object->_1.cctor_finished_or_no_cctor )
+		      {
+		        il2cpp_runtime_class_init_1(TypeInfo::UnityEngine::Object);
+		        v16 = TypeInfo::UnityEngine::Object;
+		        if ( !TypeInfo::UnityEngine::Object->_1.cctor_finished_or_no_cctor )
+		        {
+		          il2cpp_runtime_class_init_1(TypeInfo::UnityEngine::Object);
+		          v16 = TypeInfo::UnityEngine::Object;
+		        }
+		      }
+		      if ( !v17 )
+		        return 0LL;
+		      if ( !v16->_1.cctor_finished_or_no_cctor )
+		        il2cpp_runtime_class_init_1(v16);
+		      if ( !v17->fields._._._.m_CachedPtr )
+		        return 0LL;
+		      v18 = (__int64 (__fastcall *)(Camera *))qword_18F36FBC0;
+		      if ( !qword_18F36FBC0 )
+		      {
+		        v18 = (__int64 (__fastcall *)(Camera *))sub_180059EA0("UnityEngine.Component::get_transform()");
+		        qword_18F36FBC0 = (__int64)v18;
+		      }
+		      return (Transform *)v18(v17);
+		    }
+		    if ( !TypeInfo::HG::Rendering::Runtime::HGRenderPipeline->_1.cctor_finished_or_no_cctor )
+		      il2cpp_runtime_class_init_1(TypeInfo::HG::Rendering::Runtime::HGRenderPipeline);
+		    v13 = HG::Rendering::Runtime::HGRenderPipeline::get_currentPipeline(0LL);
+		    if ( v13 )
+		      return v13->fields.currentEnvCenter;
+		LABEL_33:
+		    sub_1800D8260(v5, interpolateTrigger);
+		  }
+		  Patch = IFix::WrappersManagerImpl::GetPatch(786, 0LL);
+		  if ( !Patch )
+		    goto LABEL_33;
+		  return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_314(Patch, (Object *)camera, (Object *)interpolateTrigger, 0LL);
 		}
-
-		private Transform _GetInterpolateTrigger()
+		
+		public static void UpdateCameraComponent(HGCamera camera) {} // 0x00000001831CB200-0x00000001831CB2E0
+		// Void UpdateCameraComponent(HGCamera)
+		void HG::Rendering::Runtime::HGEnvironmentManager::UpdateCameraComponent(HGCamera *camera, MethodInfo *method)
 		{
-			// // Transform _GetInterpolateTrigger()
-			// Transform *HG::Rendering::Runtime::HGEnvironmentManager::_GetInterpolateTrigger(
-			//         HGEnvironmentManager *this,
-			//         MethodInfo *method)
-			// {
-			//   struct ILFixDynamicMethodWrapper_2__Class *v3; // rax
-			//   ILFixDynamicMethodWrapper_2__StaticFields *static_fields; // rcx
-			//   ILFixDynamicMethodWrapper_2__Array *wrapperArray; // rdx
-			//   Transform *m_interpolateTriggerOverride; // rbx
-			//   HGRenderPipeline *currentPipeline; // rax
-			//   Transform *currentPlayerCenter; // rbx
-			//   HGRenderPipeline *v9; // rax
-			//   __int64 v11; // rdx
-			//   Camera *main; // rbx
-			//   __int64 (__fastcall *v13)(Camera *); // rax
-			//   ILFixDynamicMethodWrapper_2__Array *v14; // rax
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			// 
-			//   if ( !byte_18D8EDC6E )
-			//   {
-			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGRenderPipeline);
-			//     sub_18003C530(&TypeInfo::UnityEngine::Object);
-			//     byte_18D8EDC6E = 1;
-			//   }
-			//   if ( !byte_18D8EDC37 )
-			//   {
-			//     sub_18003C530(&TypeInfo::IFix::ILFixDynamicMethodWrapper);
-			//     byte_18D8EDC37 = 1;
-			//   }
-			//   v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper._1.cctor_finished_or_no_cctor )
-			//   {
-			//     il2cpp_runtime_class_init_0(TypeInfo::IFix::ILFixDynamicMethodWrapper, method);
-			//     v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   }
-			//   static_fields = v3.static_fields;
-			//   wrapperArray = static_fields.wrapperArray;
-			//   if ( !static_fields.wrapperArray )
-			//     goto LABEL_56;
-			//   if ( wrapperArray.max_length.size <= 590 )
-			//     goto LABEL_9;
-			//   if ( !v3._1.cctor_finished_or_no_cctor )
-			//   {
-			//     il2cpp_runtime_class_init_0(v3, wrapperArray);
-			//     v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   }
-			//   static_fields = v3.static_fields;
-			//   v14 = static_fields.wrapperArray;
-			//   if ( !static_fields.wrapperArray )
-			//     goto LABEL_56;
-			//   if ( v14.max_length.size <= 0x24Eu )
-			//     sub_180070270(static_fields, wrapperArray);
-			//   if ( !v14[16].vector[14] )
-			//   {
-			// LABEL_9:
-			//     m_interpolateTriggerOverride = this.fields.m_interpolateTriggerOverride;
-			//     if ( !TypeInfo::UnityEngine::Object._1.cctor_finished_or_no_cctor )
-			//       il2cpp_runtime_class_init_0(TypeInfo::UnityEngine::Object, wrapperArray);
-			//     if ( !byte_18D8F4EFB )
-			//     {
-			//       sub_18003C530(&TypeInfo::UnityEngine::Object);
-			//       byte_18D8F4EFB = 1;
-			//     }
-			//     if ( !TypeInfo::UnityEngine::Object._1.cctor_finished_or_no_cctor )
-			//       il2cpp_runtime_class_init_0(TypeInfo::UnityEngine::Object, wrapperArray);
-			//     if ( !byte_18D8F4EAF )
-			//     {
-			//       sub_18003C530(&TypeInfo::UnityEngine::Object);
-			//       byte_18D8F4EAF = 1;
-			//     }
-			//     if ( m_interpolateTriggerOverride )
-			//     {
-			//       if ( !TypeInfo::UnityEngine::Object._1.cctor_finished_or_no_cctor )
-			//         il2cpp_runtime_class_init_0(TypeInfo::UnityEngine::Object, wrapperArray);
-			//       if ( m_interpolateTriggerOverride.fields._._.m_CachedPtr )
-			//         return this.fields.m_interpolateTriggerOverride;
-			//     }
-			//     if ( !TypeInfo::HG::Rendering::Runtime::HGRenderPipeline._1.cctor_finished_or_no_cctor )
-			//       il2cpp_runtime_class_init_0(TypeInfo::HG::Rendering::Runtime::HGRenderPipeline, wrapperArray);
-			//     currentPipeline = HG::Rendering::Runtime::HGRenderPipeline::get_currentPipeline(0LL);
-			//     if ( !currentPipeline )
-			//       goto LABEL_56;
-			//     currentPlayerCenter = currentPipeline.fields.currentPlayerCenter;
-			//     if ( !TypeInfo::UnityEngine::Object._1.cctor_finished_or_no_cctor )
-			//       il2cpp_runtime_class_init_0(TypeInfo::UnityEngine::Object, wrapperArray);
-			//     if ( !byte_18D8F4EFB )
-			//     {
-			//       sub_18003C530(&TypeInfo::UnityEngine::Object);
-			//       byte_18D8F4EFB = 1;
-			//     }
-			//     if ( !TypeInfo::UnityEngine::Object._1.cctor_finished_or_no_cctor )
-			//       il2cpp_runtime_class_init_0(TypeInfo::UnityEngine::Object, wrapperArray);
-			//     if ( !byte_18D8F4EAF )
-			//     {
-			//       sub_18003C530(&TypeInfo::UnityEngine::Object);
-			//       byte_18D8F4EAF = 1;
-			//     }
-			//     if ( !currentPlayerCenter )
-			//       goto LABEL_40;
-			//     if ( !TypeInfo::UnityEngine::Object._1.cctor_finished_or_no_cctor )
-			//       il2cpp_runtime_class_init_0(TypeInfo::UnityEngine::Object, wrapperArray);
-			//     if ( !currentPlayerCenter.fields._._.m_CachedPtr )
-			//     {
-			// LABEL_40:
-			//       main = UnityEngine::Camera::get_main(0LL);
-			//       if ( !TypeInfo::UnityEngine::Object._1.cctor_finished_or_no_cctor )
-			//         il2cpp_runtime_class_init_0(TypeInfo::UnityEngine::Object, v11);
-			//       if ( !byte_18D8F4EFB )
-			//       {
-			//         sub_18003C530(&TypeInfo::UnityEngine::Object);
-			//         byte_18D8F4EFB = 1;
-			//       }
-			//       if ( !TypeInfo::UnityEngine::Object._1.cctor_finished_or_no_cctor )
-			//         il2cpp_runtime_class_init_0(TypeInfo::UnityEngine::Object, v11);
-			//       if ( !byte_18D8F4EAF )
-			//       {
-			//         sub_18003C530(&TypeInfo::UnityEngine::Object);
-			//         byte_18D8F4EAF = 1;
-			//       }
-			//       if ( !main )
-			//         return 0LL;
-			//       if ( !TypeInfo::UnityEngine::Object._1.cctor_finished_or_no_cctor )
-			//         il2cpp_runtime_class_init_0(TypeInfo::UnityEngine::Object, v11);
-			//       if ( !main.fields._._._.m_CachedPtr )
-			//         return 0LL;
-			//       v13 = (__int64 (__fastcall *)(Camera *))qword_18D8F4D40;
-			//       if ( !qword_18D8F4D40 )
-			//       {
-			//         v13 = (__int64 (__fastcall *)(Camera *))sub_180017470("UnityEngine.Component::get_transform()");
-			//         qword_18D8F4D40 = (__int64)v13;
-			//       }
-			//       return (Transform *)v13(main);
-			//     }
-			//     if ( !TypeInfo::HG::Rendering::Runtime::HGRenderPipeline._1.cctor_finished_or_no_cctor )
-			//       il2cpp_runtime_class_init_0(TypeInfo::HG::Rendering::Runtime::HGRenderPipeline, wrapperArray);
-			//     v9 = HG::Rendering::Runtime::HGRenderPipeline::get_currentPipeline(0LL);
-			//     if ( v9 )
-			//       return v9.fields.currentPlayerCenter;
-			// LABEL_56:
-			//     sub_180B536AC(static_fields, wrapperArray);
-			//   }
-			//   Patch = IFix::WrappersManagerImpl::GetPatch(590, 0LL);
-			//   if ( !Patch )
-			//     goto LABEL_56;
-			//   return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_226(Patch, (Object *)this, 0LL);
-			// }
-			// 
-			return null;
+		  struct ILFixDynamicMethodWrapper_2__Class *v3; // rcx
+		  ILFixDynamicMethodWrapper_2__Array *wrapperArray; // rdx
+		  Camera *v5; // rsi
+		  __int64 (__fastcall *v6)(Camera *); // rax
+		  Transform *v7; // rdi
+		  Transform *FinalTrigger; // rdi
+		  HGEnvironmentManager *instance; // rax
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v11; // rax
+		
+		  v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(TypeInfo::IFix::ILFixDynamicMethodWrapper);
+		    v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  wrapperArray = v3->static_fields->wrapperArray;
+		  if ( !wrapperArray )
+		    goto LABEL_12;
+		  if ( wrapperArray->max_length.size <= 785 )
+		    goto LABEL_26;
+		  if ( !v3->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(v3);
+		    v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  v3 = (struct ILFixDynamicMethodWrapper_2__Class *)v3->static_fields->wrapperArray;
+		  if ( !v3 )
+		    goto LABEL_12;
+		  if ( LODWORD(v3->_0.namespaze) <= 0x311 )
+		    sub_1800D2AB0(v3, wrapperArray);
+		  if ( !*(_QWORD *)&v3[16]._1.interfaces_count )
+		  {
+		LABEL_26:
+		    if ( camera )
+		    {
+		      v5 = camera->fields.camera;
+		      if ( v5 )
+		      {
+		        v6 = (__int64 (__fastcall *)(Camera *))qword_18F36FBC0;
+		        if ( !qword_18F36FBC0 )
+		        {
+		          v6 = (__int64 (__fastcall *)(Camera *))il2cpp_resolve_icall_1("UnityEngine.Component::get_transform()");
+		          if ( !v6 )
+		          {
+		            v11 = sub_1802EE1B8("UnityEngine.Component::get_transform()");
+		            sub_18007E1B0(v11, 0LL);
+		          }
+		          qword_18F36FBC0 = (__int64)v6;
+		        }
+		        v7 = (Transform *)v6(v5);
+		        if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager->_1.cctor_finished_or_no_cctor )
+		          il2cpp_runtime_class_init_1(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
+		        FinalTrigger = HG::Rendering::Runtime::HGEnvironmentManager::GetFinalTrigger(v5, v7, 0LL);
+		        instance = HG::Rendering::Runtime::HGEnvironmentManager::get_instance(0LL);
+		        if ( instance )
+		        {
+		          HG::Rendering::Runtime::HGEnvironmentManager::_UpdateCameraComponent(instance, camera, FinalTrigger, 0LL);
+		          return;
+		        }
+		      }
+		    }
+		LABEL_12:
+		    sub_1800D8260(v3, wrapperArray);
+		  }
+		  Patch = IFix::WrappersManagerImpl::GetPatch(785, 0LL);
+		  if ( !Patch )
+		    goto LABEL_12;
+		  IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_0((ILFixDynamicMethodWrapper_39 *)Patch, (Object *)camera, 0LL);
 		}
-
-		private void _InterpolateVolumes(Transform interpolateTrigger)
+		
+		public static void PerCameraUpdate(HGCamera camera, ref ScriptableRenderContext renderContext) {} // 0x0000000182EDF860-0x0000000182EDFA90
+		// Void PerCameraUpdate(HGCamera, ScriptableRenderContext ByRef)
+		void HG::Rendering::Runtime::HGEnvironmentManager::PerCameraUpdate(
+		        HGCamera *camera,
+		        ScriptableRenderContext *renderContext,
+		        MethodInfo *method)
 		{
-			// // Void _InterpolateVolumes(Transform)
-			// void HG::Rendering::Runtime::HGEnvironmentManager::_InterpolateVolumes(
-			//         HGEnvironmentManager *this,
-			//         Transform *interpolateTrigger,
-			//         MethodInfo *method)
-			// {
-			//   IndexedHashSet_1_System_Object_ *m_interpolatedVolumes; // rcx
-			//   Dictionary_2_System_Object_System_Int32___Class *klass; // rdx
-			//   Vector3 *p_m_lastInterpolateTriggerPosition; // rsi
-			//   __int64 v8; // rax
-			//   float v9; // ecx
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			//   char v11[24]; // [rsp+40h] [rbp-18h] BYREF
-			// 
-			//   if ( !byte_18D8EDC6F )
-			//   {
-			//     sub_18003C530(&MethodInfo::Beyond::IndexedHashSet<HG::Rendering::Runtime::HGEnvironmentVolume>::Clear);
-			//     sub_18003C530(&MethodInfo::System::Collections::Generic::List<float>::Clear);
-			//     sub_18003C530(&TypeInfo::UnityEngine::Object);
-			//     byte_18D8EDC6F = 1;
-			//   }
-			//   if ( !byte_18D8EDC37 )
-			//   {
-			//     sub_18003C530(&TypeInfo::IFix::ILFixDynamicMethodWrapper);
-			//     byte_18D8EDC37 = 1;
-			//   }
-			//   m_interpolatedVolumes = (IndexedHashSet_1_System_Object_ *)TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper._1.cctor_finished_or_no_cctor )
-			//   {
-			//     il2cpp_runtime_class_init_0(TypeInfo::IFix::ILFixDynamicMethodWrapper, interpolateTrigger);
-			//     m_interpolatedVolumes = (IndexedHashSet_1_System_Object_ *)TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   }
-			//   klass = m_interpolatedVolumes[5].fields.m_indexDict.klass;
-			//   if ( !klass )
-			//     goto LABEL_26;
-			//   if ( SLODWORD(klass._0.namespaze) <= 591 )
-			//     goto LABEL_9;
-			//   if ( !LODWORD(m_interpolatedVolumes[7].klass) )
-			//   {
-			//     il2cpp_runtime_class_init_0(m_interpolatedVolumes, klass);
-			//     m_interpolatedVolumes = (IndexedHashSet_1_System_Object_ *)TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   }
-			//   m_interpolatedVolumes = (IndexedHashSet_1_System_Object_ *)m_interpolatedVolumes[5].fields.m_indexDict.klass;
-			//   if ( !m_interpolatedVolumes )
-			// LABEL_26:
-			//     sub_180B536AC(m_interpolatedVolumes, klass);
-			//   if ( LODWORD(m_interpolatedVolumes.fields.m_indexDict) <= 0x24F )
-			//     sub_180070270(m_interpolatedVolumes, klass);
-			//   if ( m_interpolatedVolumes[148].fields.m_indexDict )
-			//   {
-			//     Patch = IFix::WrappersManagerImpl::GetPatch(591, 0LL);
-			//     if ( Patch )
-			//     {
-			//       IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_1(
-			//         (ILFixDynamicMethodWrapper_37 *)Patch,
-			//         (Object *)this,
-			//         (Object *)interpolateTrigger,
-			//         0LL);
-			//       return;
-			//     }
-			//     goto LABEL_26;
-			//   }
-			// LABEL_9:
-			//   m_interpolatedVolumes = (IndexedHashSet_1_System_Object_ *)this.fields.m_interpolatedVolumes;
-			//   if ( !m_interpolatedVolumes )
-			//     goto LABEL_26;
-			//   Beyond::IndexedHashSet<System::Object>::Clear(
-			//     m_interpolatedVolumes,
-			//     MethodInfo::Beyond::IndexedHashSet<HG::Rendering::Runtime::HGEnvironmentVolume>::Clear);
-			//   m_interpolatedVolumes = (IndexedHashSet_1_System_Object_ *)this.fields.m_interpolatedVolumesFactor;
-			//   if ( !m_interpolatedVolumes )
-			//     goto LABEL_26;
-			//   ++HIDWORD(m_interpolatedVolumes.fields.m_indexDict);
-			//   LODWORD(m_interpolatedVolumes.fields.m_indexDict) = 0;
-			//   if ( !TypeInfo::UnityEngine::Object._1.cctor_finished_or_no_cctor )
-			//     il2cpp_runtime_class_init_0(TypeInfo::UnityEngine::Object, klass);
-			//   if ( !byte_18D8F4EFA )
-			//   {
-			//     sub_18003C530(&TypeInfo::UnityEngine::Object);
-			//     byte_18D8F4EFA = 1;
-			//   }
-			//   if ( !TypeInfo::UnityEngine::Object._1.cctor_finished_or_no_cctor )
-			//     il2cpp_runtime_class_init_0(TypeInfo::UnityEngine::Object, klass);
-			//   if ( !byte_18D8F4EAF )
-			//   {
-			//     sub_18003C530(&TypeInfo::UnityEngine::Object);
-			//     byte_18D8F4EAF = 1;
-			//   }
-			//   if ( interpolateTrigger )
-			//   {
-			//     if ( !TypeInfo::UnityEngine::Object._1.cctor_finished_or_no_cctor )
-			//       il2cpp_runtime_class_init_0(TypeInfo::UnityEngine::Object, klass);
-			//     p_m_lastInterpolateTriggerPosition = &this.fields.m_lastInterpolateTriggerPosition;
-			//     if ( interpolateTrigger.fields._._.m_CachedPtr )
-			//     {
-			//       HG::Rendering::Runtime::HGEnvironmentManager::_InterpolateVolumesImpl(
-			//         this,
-			//         0LL,
-			//         interpolateTrigger,
-			//         this.fields.m_interpolatedPhase,
-			//         &this.fields.m_lastInterpolateTriggerPosition,
-			//         this.fields.m_interpolatedVolumes,
-			//         this.fields.m_interpolatedVolumesFactor,
-			//         0LL);
-			//       return;
-			//     }
-			//   }
-			//   else
-			//   {
-			//     p_m_lastInterpolateTriggerPosition = &this.fields.m_lastInterpolateTriggerPosition;
-			//   }
-			//   v8 = sub_18281C140(v11);
-			//   v9 = *(float *)(v8 + 8);
-			//   *(_QWORD *)&p_m_lastInterpolateTriggerPosition.x = *(_QWORD *)v8;
-			//   p_m_lastInterpolateTriggerPosition.z = v9;
-			// }
-			// 
+		  ScriptableRenderContext *v4; // rsi
+		  struct ILFixDynamicMethodWrapper_2__Class *v5; // rcx
+		  ILFixDynamicMethodWrapper_2__Array *wrapperArray; // r8
+		  Object *instance; // rdi
+		  HGAdditionalCameraData *m_AdditionalCameraData; // rax
+		  int32_t hgRenderPath; // eax
+		  HGAdditionalCameraData *v10; // rax
+		  int32_t v11; // eax
+		  HGRainRenderer *s_rainRenderer; // rax
+		  HGSnowRenderer *s_snowRenderer; // rax
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  ILFixDynamicMethodWrapper_2 *v15; // rax
+		  ILFixDynamicMethodWrapper_2 *v16; // rax
+		  ILFixDynamicMethodWrapper_2 *v17; // rax
+		  ILFixDynamicMethodWrapper_2 *v18; // rax
+		
+		  v4 = renderContext;
+		  v5 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(TypeInfo::IFix::ILFixDynamicMethodWrapper);
+		    v5 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  wrapperArray = v5->static_fields->wrapperArray;
+		  if ( !wrapperArray )
+		    goto LABEL_37;
+		  if ( wrapperArray->max_length.size > 792 )
+		  {
+		    if ( !v5->_1.cctor_finished_or_no_cctor )
+		    {
+		      il2cpp_runtime_class_init_1(v5);
+		      v5 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		    }
+		    renderContext = (ScriptableRenderContext *)v5->static_fields->wrapperArray;
+		    if ( !renderContext )
+		      goto LABEL_37;
+		    if ( LODWORD(renderContext[3].m_Ptr) <= 0x318 )
+		      goto LABEL_74;
+		    if ( renderContext[796].m_Ptr )
+		    {
+		      Patch = IFix::WrappersManagerImpl::GetPatch(792, 0LL);
+		      if ( Patch )
+		      {
+		        IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_327(Patch, (Object *)camera, v4, 0LL);
+		        return;
+		      }
+		      goto LABEL_37;
+		    }
+		  }
+		  if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager->_1.cctor_finished_or_no_cctor )
+		    il2cpp_runtime_class_init_1(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
+		  instance = (Object *)HG::Rendering::Runtime::HGEnvironmentManager::get_instance(0LL);
+		  if ( !instance )
+		    goto LABEL_37;
+		  v5 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(TypeInfo::IFix::ILFixDynamicMethodWrapper);
+		    v5 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  renderContext = (ScriptableRenderContext *)v5->static_fields;
+		  if ( !renderContext->m_Ptr )
+		    goto LABEL_37;
+		  if ( *((int *)renderContext->m_Ptr + 6) > 793 )
+		  {
+		    if ( !v5->_1.cctor_finished_or_no_cctor )
+		    {
+		      il2cpp_runtime_class_init_1(v5);
+		      v5 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		    }
+		    renderContext = (ScriptableRenderContext *)v5->static_fields->wrapperArray;
+		    if ( !renderContext )
+		      goto LABEL_37;
+		    if ( LODWORD(renderContext[3].m_Ptr) <= 0x319 )
+		      goto LABEL_74;
+		    if ( renderContext[797].m_Ptr )
+		    {
+		      v15 = IFix::WrappersManagerImpl::GetPatch(793, 0LL);
+		      if ( v15 )
+		      {
+		        IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_325(v15, instance, (Object *)camera, v4, 0LL);
+		        return;
+		      }
+		      goto LABEL_37;
+		    }
+		  }
+		  if ( !camera )
+		    goto LABEL_37;
+		  if ( !v5->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(v5);
+		    v5 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  renderContext = (ScriptableRenderContext *)v5->static_fields->wrapperArray;
+		  if ( !renderContext )
+		    goto LABEL_37;
+		  if ( SLODWORD(renderContext[3].m_Ptr) <= 794 )
+		    goto LABEL_77;
+		  if ( !v5->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(v5);
+		    v5 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  renderContext = (ScriptableRenderContext *)v5->static_fields->wrapperArray;
+		  if ( !renderContext )
+		    goto LABEL_37;
+		  if ( LODWORD(renderContext[3].m_Ptr) <= 0x31A )
+		    goto LABEL_74;
+		  if ( !renderContext[798].m_Ptr )
+		  {
+		LABEL_77:
+		    if ( !v5->_1.cctor_finished_or_no_cctor )
+		    {
+		      il2cpp_runtime_class_init_1(v5);
+		      v5 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		    }
+		    renderContext = (ScriptableRenderContext *)v5->static_fields->wrapperArray;
+		    if ( !renderContext )
+		      goto LABEL_37;
+		    if ( SLODWORD(renderContext[3].m_Ptr) <= 703 )
+		      goto LABEL_21;
+		    if ( !v5->_1.cctor_finished_or_no_cctor )
+		    {
+		      il2cpp_runtime_class_init_1(v5);
+		      v5 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		    }
+		    renderContext = (ScriptableRenderContext *)v5->static_fields->wrapperArray;
+		    if ( !renderContext )
+		      goto LABEL_37;
+		    if ( LODWORD(renderContext[3].m_Ptr) <= 0x2BF )
+		      goto LABEL_74;
+		    if ( renderContext[707].m_Ptr )
+		    {
+		      v17 = IFix::WrappersManagerImpl::GetPatch(703, 0LL);
+		      if ( !v17 )
+		        goto LABEL_37;
+		      hgRenderPath = IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_1(
+		                       (ILFixDynamicMethodWrapper_31 *)v17,
+		                       (Object *)camera,
+		                       0LL);
+		      v5 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		    }
+		    else
+		    {
+		LABEL_21:
+		      m_AdditionalCameraData = camera->fields.m_AdditionalCameraData;
+		      if ( !m_AdditionalCameraData )
+		        goto LABEL_37;
+		      hgRenderPath = m_AdditionalCameraData->fields.hgRenderPath;
+		    }
+		    if ( hgRenderPath == 1 )
+		      return;
+		    if ( !v5->_1.cctor_finished_or_no_cctor )
+		    {
+		      il2cpp_runtime_class_init_1(v5);
+		      v5 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		    }
+		    renderContext = (ScriptableRenderContext *)v5->static_fields->wrapperArray;
+		    if ( !renderContext )
+		      goto LABEL_37;
+		    if ( SLODWORD(renderContext[3].m_Ptr) <= 703 )
+		      goto LABEL_28;
+		    if ( !v5->_1.cctor_finished_or_no_cctor )
+		    {
+		      il2cpp_runtime_class_init_1(v5);
+		      v5 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		    }
+		    v5 = (struct ILFixDynamicMethodWrapper_2__Class *)v5->static_fields->wrapperArray;
+		    if ( !v5 )
+		      goto LABEL_37;
+		    if ( LODWORD(v5->_0.namespaze) > 0x2BF )
+		    {
+		      if ( v5[15]._0.name )
+		      {
+		        v18 = IFix::WrappersManagerImpl::GetPatch(703, 0LL);
+		        if ( !v18 )
+		          goto LABEL_37;
+		        v11 = IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_1((ILFixDynamicMethodWrapper_31 *)v18, (Object *)camera, 0LL);
+		        goto LABEL_30;
+		      }
+		LABEL_28:
+		      v10 = camera->fields.m_AdditionalCameraData;
+		      if ( !v10 )
+		        goto LABEL_37;
+		      v11 = v10->fields.hgRenderPath;
+		LABEL_30:
+		      if ( v11 == 2 )
+		        return;
+		LABEL_31:
+		      if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager->_1.cctor_finished_or_no_cctor )
+		        il2cpp_runtime_class_init_1(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
+		      s_rainRenderer = HG::Rendering::Runtime::HGEnvironmentManager::get_s_rainRenderer(0LL);
+		      if ( s_rainRenderer )
+		      {
+		        HG::Rendering::Runtime::HGRainRenderer::UpdateRainAndWetnessData(s_rainRenderer, camera, v4, 0LL);
+		        s_snowRenderer = HG::Rendering::Runtime::HGEnvironmentManager::get_s_snowRenderer(0LL);
+		        if ( s_snowRenderer )
+		        {
+		          HG::Rendering::Runtime::HGSnowRenderer::UpdateSnowData(s_snowRenderer, camera, v4, 0LL);
+		          return;
+		        }
+		      }
+		LABEL_37:
+		      sub_1800D8260(v5, renderContext);
+		    }
+		LABEL_74:
+		    sub_1800D2AB0(v5, renderContext);
+		  }
+		  v16 = IFix::WrappersManagerImpl::GetPatch(794, 0LL);
+		  if ( !v16 )
+		    goto LABEL_37;
+		  if ( !IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_14((ILFixDynamicMethodWrapper_20 *)v16, (Object *)camera, 0LL) )
+		    goto LABEL_31;
 		}
-
-		private void _InterpolateVolumesImpl(HGCamera hgCamera, Transform interpolateTrigger, HGEnvironmentPhase interpolatedPhaseTarget, ref Vector3 lastInterpolateTriggerPosition, IndexedHashSet<HGEnvironmentVolume> interpolatedVolumes, List<float> interpolatedVolumesFactor)
+		
+		private bool _Register(HGEnvironmentVolumeBase volume) => default; // 0x00000001838A0610-0x00000001838A0710
+		// Boolean _Register(HGEnvironmentVolumeBase)
+		bool HG::Rendering::Runtime::HGEnvironmentManager::_Register(
+		        HGEnvironmentManager *this,
+		        HGEnvironmentVolumeBase *volume,
+		        MethodInfo *method)
 		{
-			// // Void _InterpolateVolumesImpl(HGCamera, Transform, HGEnvironmentPhase, Vector3 ByRef, IndexedHashSet`1[HG.Rendering.Runtime.HGEnvironmentVolume], List`1[System.Single])
-			// // Hidden C++ exception states: #wind=1
-			// void HG::Rendering::Runtime::HGEnvironmentManager::_InterpolateVolumesImpl(
-			//         HGEnvironmentManager *this,
-			//         HGCamera *hgCamera,
-			//         Transform *interpolateTrigger,
-			//         HGEnvironmentPhase *interpolatedPhaseTarget,
-			//         Vector3 *lastInterpolateTriggerPosition,
-			//         IndexedHashSet_1_HG_Rendering_Runtime_HGEnvironmentVolume_ *interpolatedVolumes,
-			//         List_1_System_Single_ *interpolatedVolumesFactor,
-			//         MethodInfo *method)
-			// {
-			//   struct ILFixDynamicMethodWrapper_2__Class *v12; // rcx
-			//   ILFixDynamicMethodWrapper_2__Array *wrapperArray; // rbx
-			//   ILFixDynamicMethodWrapper_2__Array *v14; // rbx
-			//   __int64 v15; // rdx
-			//   __int64 v16; // rcx
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rbx
-			//   void (__fastcall *v18)(Transform *, Vector3 *); // rax
-			//   MethodInfo *v19; // r9
-			//   Vector3 *v20; // rax
-			//   __int64 v21; // rdx
-			//   __int64 v22; // r8
-			//   unsigned int z_low; // esi
-			//   struct Math__Class *v24; // rcx
-			//   __m128 v25; // xmm2
-			//   __m128d v26; // xmm3
-			//   __m128d v27; // xmm0
-			//   float v28; // xmm0_4
-			//   float m_interpolateTimeFactor; // xmm10_4
-			//   __m128d v30; // xmm9
-			//   void (__fastcall *v31)(Transform *, Vector3 *); // rax
-			//   OneofDescriptorProto *v32; // rdx
-			//   __int64 v33; // rcx
-			//   FileDescriptor *v34; // r8
-			//   MessageDescriptor *v35; // r9
-			//   List_1_HG_Rendering_Runtime_HGEnvironmentVolume_ *m_sortedVolumes; // rbx
-			//   IndexedHashSet_1_HG_Rendering_Runtime_HGEnvironmentVolume_ *v37; // rsi
-			//   unsigned __int64 v38; // rdx
-			//   Object *current; // rbx
-			//   unsigned int v40; // r8d
-			//   __int64 v41; // rdi
-			//   void (__fastcall __noreturn **v42)(); // rax
-			//   unsigned int v43; // eax
-			//   unsigned int v44; // r8d
-			//   __int64 v45; // rax
-			//   signed __int64 v46; // r9
-			//   char v47; // r8
-			//   signed __int64 v48; // rtt
-			//   __int64 v49; // rdi
-			//   __int64 v50; // rax
-			//   __int64 v51; // rdi
-			//   _QWORD **v52; // rcx
-			//   __int64 v53; // r8
-			//   __int64 v54; // rax
-			//   unsigned int v55; // r8d
-			//   __int64 v56; // rdi
-			//   void (__fastcall __noreturn **v57)(); // rax
-			//   unsigned int v58; // eax
-			//   unsigned int v59; // r8d
-			//   __int64 v60; // rax
-			//   signed __int64 v61; // r9
-			//   char v62; // r8
-			//   signed __int64 v63; // rtt
-			//   __int64 v64; // rdi
-			//   __int64 v65; // rax
-			//   __int64 v66; // rdi
-			//   _QWORD **v67; // rcx
-			//   __int64 v68; // r8
-			//   __int64 v69; // rax
-			//   unsigned __int8 (__fastcall *v70)(Object *); // rax
-			//   HGEnvironmentPhase *v71; // rax
-			//   __int64 v72; // rdx
-			//   __int64 v73; // rcx
-			//   __int64 v74; // rdx
-			//   __int64 v75; // rcx
-			//   __int64 v76; // rdx
-			//   __int64 v77; // rcx
-			//   void (__fastcall *v78)(Transform *, Vector3 *); // rax
-			//   __int64 v79; // rdx
-			//   bool v80; // si
-			//   Dictionary_2_System_Object_HG_Rendering_Runtime_HGEnvironmentVolume_InterpolateDataPerCamera_ *monitor; // rcx
-			//   __int64 v82; // rdx
-			//   Dictionary_2_System_Object_HG_Rendering_Runtime_HGEnvironmentVolume_InterpolateDataPerCamera_ *v83; // rcx
-			//   __int64 v84; // rdx
-			//   Dictionary_2_System_Object_Beyond_Gameplay_ShopSystem_UnlockInfo_ *v85; // rcx
-			//   char v86; // di
-			//   Object *v87; // rdx
-			//   Dictionary_2_System_Object_HG_Rendering_Runtime_HGEnvironmentVolume_InterpolateDataPerCamera_ *v88; // rcx
-			//   __int64 v89; // rdx
-			//   Dictionary_2_System_Object_HG_Rendering_Runtime_HGEnvironmentVolume_InterpolateDataPerCamera_ *v90; // rcx
-			//   Dictionary_2_System_Object_HG_Rendering_Runtime_HGEnvironmentVolume_InterpolateDataPerCamera_ *v91; // rcx
-			//   __m128i klass_high; // xmm6
-			//   __m128i v93; // xmm0
-			//   Dictionary_2_System_Object_HG_Rendering_Runtime_HGEnvironmentVolume_InterpolateDataPerCamera_ *v94; // rcx
-			//   HGEnvironmentPhase *v95; // rax
-			//   __int64 v96; // rdx
-			//   __int64 v97; // rcx
-			//   __int64 v98; // rdx
-			//   __int64 v99; // rcx
-			//   __int64 v100; // rdx
-			//   __int64 v101; // rcx
-			//   __int64 v102; // r8
-			//   __int64 v103; // r9
-			//   struct MethodInfo *v104; // rbx
-			//   Single__Array *items; // rcx
-			//   __int64 size; // rdx
-			//   void (__fastcall *v107)(Transform *, Vector3 *); // rax
-			//   float v108; // xmm6_4
-			//   __int64 v109; // rdx
-			//   ILFixDynamicMethodWrapper_2 *v110; // rcx
-			//   HGEnvironmentPhase *v111; // rax
-			//   __int64 v112; // rdx
-			//   __int64 v113; // rcx
-			//   __int64 v114; // rdx
-			//   __int64 v115; // rcx
-			//   __int64 v116; // rdx
-			//   __int64 v117; // rcx
-			//   void (__fastcall *v118)(Transform *, Vector3 *); // rax
-			//   unsigned __int64 v119; // rdx
-			//   unsigned __int64 v120; // r8
-			//   signed __int64 v121; // r9
-			//   __int64 v122; // xmm6_8
-			//   float z; // esi
-			//   __int64 v124; // rdi
-			//   void (__fastcall __noreturn **v125)(); // rax
-			//   unsigned int v126; // eax
-			//   __int64 v127; // rax
-			//   unsigned int v128; // r8d
-			//   signed __int64 v129; // rtt
-			//   __int64 v130; // rdi
-			//   __int64 v131; // rax
-			//   __int64 v132; // rdi
-			//   _QWORD **v133; // rcx
-			//   __int64 v134; // r8
-			//   __int64 v135; // rax
-			//   struct ILFixDynamicMethodWrapper_2__Class *v136; // rcx
-			//   ILFixDynamicMethodWrapper_2__Array *v137; // rdx
-			//   ILFixDynamicMethodWrapper_2__Array *v138; // rcx
-			//   ILFixDynamicMethodWrapper_2 *v139; // rax
-			//   __int64 v140; // rdx
-			//   __int64 v141; // rcx
-			//   HGEnvironmentPhase *v142; // rax
-			//   __int64 v143; // rdx
-			//   __int64 v144; // rcx
-			//   __int64 v145; // rdx
-			//   __int64 v146; // rcx
-			//   __int64 v147; // rdx
-			//   __int64 v148; // rcx
-			//   __int64 v149; // r8
-			//   __int64 v150; // r9
-			//   struct MethodInfo *v151; // rbx
-			//   Single__Array *v152; // rcx
-			//   __int64 v153; // rdx
-			//   __int64 v154; // rax
-			//   __int64 v155; // rax
-			//   __int64 v156; // rax
-			//   __int64 v157; // rax
-			//   __int64 v158; // rax
-			//   __int64 v159; // rax
-			//   Object *P3; // [rsp+20h] [rbp-1D8h]
-			//   String *P4; // [rsp+28h] [rbp-1D0h]
-			//   MethodInfo *P5; // [rsp+30h] [rbp-1C8h]
-			//   Vector3 v163; // [rsp+50h] [rbp-1A8h] BYREF
-			//   Vector3 v164[2]; // [rsp+60h] [rbp-198h] BYREF
-			//   Vector3 v165; // [rsp+80h] [rbp-178h] BYREF
-			//   OneofDescriptor v166; // [rsp+90h] [rbp-168h] BYREF
-			//   Vector3 v167; // [rsp+E0h] [rbp-118h] BYREF
-			//   Vector3 v168; // [rsp+F0h] [rbp-108h] BYREF
-			//   Vector3 v169; // [rsp+100h] [rbp-F8h] BYREF
-			//   Vector3 v170; // [rsp+110h] [rbp-E8h] BYREF
-			//   List_1_T_Enumerator_System_Object_ v171; // [rsp+120h] [rbp-D8h] BYREF
-			//   int v172; // [rsp+138h] [rbp-C0h] BYREF
-			//   int v173; // [rsp+148h] [rbp-B0h] BYREF
-			//   Il2CppExceptionWrapper *v174; // [rsp+158h] [rbp-A0h] BYREF
-			//   Vector3 v175[9]; // [rsp+160h] [rbp-98h] BYREF
-			// 
-			//   if ( !byte_18D8EDC70 )
-			//   {
-			//     sub_18003C530(&MethodInfo::System::Collections::Generic::Dictionary<HG::Rendering::Runtime::HGCamera,HG::Rendering::Runtime::HGEnvironmentVolume::InterpolateDataPerCamera>::Add);
-			//     sub_18003C530(&MethodInfo::System::Collections::Generic::Dictionary<HG::Rendering::Runtime::HGCamera,HG::Rendering::Runtime::HGEnvironmentVolume::InterpolateDataPerCamera>::ContainsKey);
-			//     sub_18003C530(&MethodInfo::System::Collections::Generic::Dictionary<HG::Rendering::Runtime::HGCamera,HG::Rendering::Runtime::HGEnvironmentVolume::InterpolateDataPerCamera>::Remove);
-			//     sub_18003C530(&MethodInfo::System::Collections::Generic::Dictionary<HG::Rendering::Runtime::HGCamera,HG::Rendering::Runtime::HGEnvironmentVolume::InterpolateDataPerCamera>::get_Item);
-			//     sub_18003C530(&MethodInfo::System::Collections::Generic::Dictionary<HG::Rendering::Runtime::HGCamera,HG::Rendering::Runtime::HGEnvironmentVolume::InterpolateDataPerCamera>::set_Item);
-			//     sub_18003C530(&MethodInfo::System::Collections::Generic::List_1_T_::Enumerator<HG::Rendering::Runtime::HGEnvironmentVolume>::Dispose);
-			//     sub_18003C530(&MethodInfo::System::Collections::Generic::List_1_T_::Enumerator<HG::Rendering::Runtime::HGEnvironmentVolume>::MoveNext);
-			//     sub_18003C530(&MethodInfo::System::Collections::Generic::List_1_T_::Enumerator<HG::Rendering::Runtime::HGEnvironmentVolume>::get_Current);
-			//     sub_18003C530(&MethodInfo::Beyond::IndexedHashSet<HG::Rendering::Runtime::HGEnvironmentVolume>::Add);
-			//     sub_18003C530(&MethodInfo::System::Collections::Generic::List<float>::Add);
-			//     sub_18003C530(&MethodInfo::System::Collections::Generic::List<HG::Rendering::Runtime::HGEnvironmentVolume>::GetEnumerator);
-			//     sub_18003C530(&TypeInfo::UnityEngine::Mathf);
-			//     sub_18003C530(&TypeInfo::UnityEngine::Object);
-			//     byte_18D8EDC70 = 1;
-			//   }
-			//   if ( !byte_18D8EDC37 )
-			//   {
-			//     sub_18003C530(&TypeInfo::IFix::ILFixDynamicMethodWrapper);
-			//     byte_18D8EDC37 = 1;
-			//   }
-			//   v12 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper._1.cctor_finished_or_no_cctor )
-			//   {
-			//     il2cpp_runtime_class_init_0(TypeInfo::IFix::ILFixDynamicMethodWrapper, hgCamera);
-			//     v12 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   }
-			//   wrapperArray = v12.static_fields.wrapperArray;
-			//   if ( !wrapperArray )
-			//     sub_180B536AC(v12, hgCamera);
-			//   if ( wrapperArray.max_length.size > 592 )
-			//   {
-			//     if ( !v12._1.cctor_finished_or_no_cctor )
-			//     {
-			//       il2cpp_runtime_class_init_0(v12, hgCamera);
-			//       v12 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//     }
-			//     v14 = v12.static_fields.wrapperArray;
-			//     if ( !v14 )
-			//       sub_180B536AC(v12, hgCamera);
-			//     if ( v14.max_length.size <= 0x250u )
-			//       sub_180070270(v12, hgCamera);
-			//     if ( v14[16].vector[16] )
-			//     {
-			//       Patch = IFix::WrappersManagerImpl::GetPatch(592, 0LL);
-			//       if ( !Patch )
-			//         sub_180B536AC(v16, v15);
-			//       IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_233(
-			//         Patch,
-			//         (Object *)this,
-			//         (Object *)hgCamera,
-			//         (Object *)interpolateTrigger,
-			//         (Object *)interpolatedPhaseTarget,
-			//         lastInterpolateTriggerPosition,
-			//         (Object *)interpolatedVolumes,
-			//         (Object *)interpolatedVolumesFactor,
-			//         0LL);
-			//       return;
-			//     }
-			//   }
-			//   if ( !interpolateTrigger )
-			//     sub_180B536AC(v12, hgCamera);
-			//   *(_QWORD *)&v163.x = 0LL;
-			//   v163.z = 0.0;
-			//   v18 = (void (__fastcall *)(Transform *, Vector3 *))qword_18D8F52E0;
-			//   if ( !qword_18D8F52E0 )
-			//   {
-			//     v18 = (void (__fastcall *)(Transform *, Vector3 *))il2cpp_resolve_icall_0(
-			//                                                          "UnityEngine.Transform::get_position_Injected(UnityEngine.Vector3&)");
-			//     if ( !v18 )
-			//     {
-			//       v154 = sub_1802DBBE8("UnityEngine.Transform::get_position_Injected(UnityEngine.Vector3&)");
-			//       sub_18000F750(v154, 0LL);
-			//     }
-			//     qword_18D8F52E0 = (__int64)v18;
-			//   }
-			//   v18(interpolateTrigger, &v163);
-			//   v164[0] = *lastInterpolateTriggerPosition;
-			//   v165 = v163;
-			//   v20 = UnityEngine::Vector3::op_Subtraction(&v170, &v165, v164, v19);
-			//   *(_QWORD *)&v164[0].x = *(_QWORD *)&v20.x;
-			//   z_low = LODWORD(v20.z);
-			//   if ( !byte_18D8E3AA7 )
-			//   {
-			//     sub_18003C530(&TypeInfo::System::Math);
-			//     byte_18D8E3AA7 = 1;
-			//   }
-			//   v24 = TypeInfo::System::Math;
-			//   if ( !TypeInfo::System::Math._1.cctor_finished_or_no_cctor )
-			//     il2cpp_runtime_class_init_0(TypeInfo::System::Math, v21);
-			//   v25 = (__m128)_mm_cvtsi32_si128(z_low);
-			//   v25.m128_f32[0] = (float)(v25.m128_f32[0] * v25.m128_f32[0])
-			//                   + (float)((float)(v164[0].y * v164[0].y) + (float)(v164[0].x * v164[0].x));
-			//   v26 = _mm_cvtps_pd(v25);
-			//   if ( v26.m128d_f64[0] < 0.0 )
-			//   {
-			//     v27.m128d_f64[1] = v26.m128d_f64[1];
-			//     v27.m128d_f64[0] = sub_1801C22C0(v24, v21, v22);
-			//   }
-			//   else
-			//   {
-			//     v27 = _mm_sqrt_pd(v26);
-			//   }
-			//   v28 = v27.m128d_f64[0];
-			//   if ( v28 <= 5.0 )
-			//     m_interpolateTimeFactor = this.fields.m_interpolateTimeFactor;
-			//   else
-			//     m_interpolateTimeFactor = 10000.0;
-			//   *(float *)v27.m128d_f64 = UnityEngine::Time::get_deltaTime(0LL);
-			//   v30 = v27;
-			//   memset(&v163, 0, sizeof(v163));
-			//   v31 = (void (__fastcall *)(Transform *, Vector3 *))qword_18D8F52E0;
-			//   if ( !qword_18D8F52E0 )
-			//   {
-			//     v31 = (void (__fastcall *)(Transform *, Vector3 *))il2cpp_resolve_icall_0(
-			//                                                          "UnityEngine.Transform::get_position_Injected(UnityEngine.Vector3&)");
-			//     if ( !v31 )
-			//     {
-			//       v155 = sub_1802DBBE8("UnityEngine.Transform::get_position_Injected(UnityEngine.Vector3&)");
-			//       sub_18000F750(v155, 0LL);
-			//     }
-			//     qword_18D8F52E0 = (__int64)v31;
-			//   }
-			//   v31(interpolateTrigger, &v163);
-			//   *lastInterpolateTriggerPosition = v163;
-			//   m_sortedVolumes = this.fields.m_sortedVolumes;
-			//   if ( !m_sortedVolumes )
-			//     sub_180B536AC(v33, v32);
-			//   *(_OWORD *)&v166.monitor = 0LL;
-			//   v166.klass = (OneofDescriptor__Class *)m_sortedVolumes;
-			//   sub_1800054D0(&v166, v32, v34, v35, (String__Array *)P3, P4, P5);
-			//   LODWORD(v166.monitor) = 0;
-			//   HIDWORD(v166.monitor) = m_sortedVolumes.fields._version;
-			//   *(_QWORD *)&v166.fields._._Index_k__BackingField = 0LL;
-			//   *(_OWORD *)&v171._list = *(_OWORD *)&v166.klass;
-			//   v171._current = 0LL;
-			//   v166.klass = 0LL;
-			//   v166.monitor = (MonitorData *)&v171;
-			//   try
-			//   {
-			// LABEL_36:
-			//     v37 = interpolatedVolumes;
-			//     while ( 1 )
-			//     {
-			//       while ( 1 )
-			//       {
-			//         while ( 1 )
-			//         {
-			//           while ( 1 )
-			//           {
-			//             if ( !System::Collections::Generic::List_1_T_::Enumerator<System::Object>::MoveNext(
-			//                     &v171,
-			//                     MethodInfo::System::Collections::Generic::List_1_T_::Enumerator<HG::Rendering::Runtime::HGEnvironmentVolume>::MoveNext) )
-			//               return;
-			//             current = v171._current;
-			//             if ( !TypeInfo::UnityEngine::Object._1.cctor_finished_or_no_cctor )
-			//               il2cpp_runtime_class_init_0(TypeInfo::UnityEngine::Object, v38);
-			//             if ( !byte_18D8F4EFA )
-			//             {
-			//               v40 = _InterlockedExchangeAdd64((volatile signed __int64 *)&TypeInfo::UnityEngine::Object, 0LL);
-			//               if ( (v40 & 1) != 0 )
-			//               {
-			//                 v41 = (v40 >> 1) & 0xFFFFFFF;
-			//                 switch ( v40 >> 29 )
-			//                 {
-			//                   case 1u:
-			//                     v42 = (void (__fastcall __noreturn **)())sub_18003C670((unsigned int)v41);
-			//                     goto LABEL_68;
-			//                   case 2u:
-			//                     v42 = (void (__fastcall __noreturn **)())sub_18003C380((unsigned int)v41);
-			//                     goto LABEL_68;
-			//                   case 3u:
-			//                   case 6u:
-			//                     v43 = (v40 >> 1) & 0xFFFFFFF;
-			//                     v44 = v40 >> 29;
-			//                     if ( v44 )
-			//                     {
-			//                       if ( v44 == 3 )
-			//                       {
-			//                         v42 = (void (__fastcall __noreturn **)())sub_180039480(v43);
-			//                         goto LABEL_68;
-			//                       }
-			//                       if ( v44 == 6 )
-			//                       {
-			//                         v45 = sub_1802DF9C0(v43);
-			//                         v42 = (void (__fastcall __noreturn **)())sub_18005F4B0(v45, 0LL);
-			//                         goto LABEL_68;
-			//                       }
-			//                     }
-			//                     else if ( v43 == 1 )
-			//                     {
-			//                       v42 = off_18A2C5600;
-			//                       goto LABEL_68;
-			//                     }
-			// LABEL_67:
-			//                     v42 = 0LL;
-			// LABEL_68:
-			//                     if ( v42 )
-			//                       _InterlockedExchange64((volatile __int64 *)&TypeInfo::UnityEngine::Object, (__int64)v42);
-			//                     break;
-			//                   case 4u:
-			//                     v42 = (void (__fastcall __noreturn **)())sub_1802DF920((unsigned int)v41);
-			//                     goto LABEL_68;
-			//                   case 5u:
-			//                     if ( *(_QWORD *)(qword_18D8F6F98 + 8 * v41) )
-			//                     {
-			//                       v42 = *(void (__fastcall __noreturn ***)())(qword_18D8F6F98 + 8 * v41);
-			//                     }
-			//                     else
-			//                     {
-			//                       v46 = il2cpp_string_new_len(
-			//                               qword_18D8E5198
-			//                             + *(int *)(qword_18D8E5198 + *(int *)(qword_18D8E51A0 + 8) + 8 * v41 + 4)
-			//                             + *(int *)(qword_18D8E51A0 + 16),
-			//                               *(unsigned int *)(qword_18D8E5198 + *(int *)(qword_18D8E51A0 + 8) + 8 * v41));
-			//                       v42 = (void (__fastcall __noreturn **)())_InterlockedCompareExchange64(
-			//                                                                  (volatile signed __int64 *)(qword_18D8F6F98 + 8 * v41),
-			//                                                                  v46,
-			//                                                                  0LL);
-			//                       if ( !v42 )
-			//                       {
-			//                         if ( dword_18D8E43F8 )
-			//                         {
-			//                           v38 = (((unsigned __int64)(qword_18D8F6F98 + 8 * v41) >> 12) & 0x1FFFFF) >> 6;
-			//                           v47 = ((unsigned __int64)(qword_18D8F6F98 + 8 * v41) >> 12) & 0x3F;
-			//                           _m_prefetchw(&qword_18D6870D0[v38]);
-			//                           do
-			//                             v48 = qword_18D6870D0[v38];
-			//                           while ( v48 != _InterlockedCompareExchange64(&qword_18D6870D0[v38], v48 | (1LL << v47), v48) );
-			//                         }
-			//                         v42 = (void (__fastcall __noreturn **)())v46;
-			//                       }
-			//                     }
-			//                     goto LABEL_68;
-			//                   case 7u:
-			//                     v49 = sub_1802DF920((unsigned int)v41);
-			//                     v50 = *(_QWORD *)(v49 + 16);
-			//                     v51 = (v49 - *(_QWORD *)(v50 + 128)) >> 5;
-			//                     if ( *(_BYTE *)(v50 + 42) == 21 )
-			//                     {
-			//                       v52 = *(_QWORD ***)(v50 + 96);
-			//                       if ( *v52 )
-			//                       {
-			//                         v53 = **v52 - (qword_18D8E5198 + *(int *)(qword_18D8E51A0 + 160));
-			//                         v50 = sub_180039550(v53 / 92 + v53);
-			//                       }
-			//                       else
-			//                       {
-			//                         v50 = 0LL;
-			//                       }
-			//                     }
-			//                     v172 = v51 + *(_DWORD *)(*(_QWORD *)(v50 + 104) + 32LL);
-			//                     v54 = sub_1801B8ECC(
-			//                             (unsigned int)&v172,
-			//                             (int)qword_18D8E5198 + *(_DWORD *)(qword_18D8E51A0 + 64),
-			//                             *(int *)(qword_18D8E51A0 + 68) / 0xCuLL,
-			//                             12,
-			//                             (__int64)sub_1802C7760);
-			//                     if ( !v54 )
-			//                       goto LABEL_67;
-			//                     v38 = *(unsigned int *)(v54 + 8);
-			//                     if ( (_DWORD)v38 == -1 )
-			//                       goto LABEL_67;
-			//                     v42 = (void (__fastcall __noreturn **)())(v38 + qword_18D8E5198 + *(int *)(qword_18D8E51A0 + 72));
-			//                     goto LABEL_68;
-			//                   default:
-			//                     break;
-			//                 }
-			//               }
-			//               byte_18D8F4EFA = 1;
-			//             }
-			//             if ( !TypeInfo::UnityEngine::Object._1.cctor_finished_or_no_cctor )
-			//               il2cpp_runtime_class_init_0(TypeInfo::UnityEngine::Object, v38);
-			//             if ( !byte_18D8F4EAF )
-			//             {
-			//               v55 = _InterlockedExchangeAdd64((volatile signed __int64 *)&TypeInfo::UnityEngine::Object, 0LL);
-			//               if ( (v55 & 1) != 0 )
-			//               {
-			//                 v56 = (v55 >> 1) & 0xFFFFFFF;
-			//                 switch ( v55 >> 29 )
-			//                 {
-			//                   case 1u:
-			//                     v57 = (void (__fastcall __noreturn **)())sub_18003C670((unsigned int)v56);
-			//                     goto LABEL_101;
-			//                   case 2u:
-			//                     v57 = (void (__fastcall __noreturn **)())sub_18003C380((unsigned int)v56);
-			//                     goto LABEL_101;
-			//                   case 3u:
-			//                   case 6u:
-			//                     v58 = (v55 >> 1) & 0xFFFFFFF;
-			//                     v59 = v55 >> 29;
-			//                     if ( v59 )
-			//                     {
-			//                       if ( v59 == 3 )
-			//                       {
-			//                         v57 = (void (__fastcall __noreturn **)())sub_180039480(v58);
-			//                         goto LABEL_101;
-			//                       }
-			//                       if ( v59 == 6 )
-			//                       {
-			//                         v60 = sub_1802DF9C0(v58);
-			//                         v57 = (void (__fastcall __noreturn **)())sub_18005F4B0(v60, 0LL);
-			//                         goto LABEL_101;
-			//                       }
-			//                     }
-			//                     else if ( v58 == 1 )
-			//                     {
-			//                       v57 = off_18A2C5600;
-			//                       goto LABEL_101;
-			//                     }
-			// LABEL_100:
-			//                     v57 = 0LL;
-			// LABEL_101:
-			//                     if ( v57 )
-			//                       _InterlockedExchange64((volatile __int64 *)&TypeInfo::UnityEngine::Object, (__int64)v57);
-			//                     break;
-			//                   case 4u:
-			//                     v57 = (void (__fastcall __noreturn **)())sub_1802DF920((unsigned int)v56);
-			//                     goto LABEL_101;
-			//                   case 5u:
-			//                     if ( *(_QWORD *)(qword_18D8F6F98 + 8 * v56) )
-			//                     {
-			//                       v57 = *(void (__fastcall __noreturn ***)())(qword_18D8F6F98 + 8 * v56);
-			//                     }
-			//                     else
-			//                     {
-			//                       v61 = il2cpp_string_new_len(
-			//                               qword_18D8E5198
-			//                             + *(int *)(qword_18D8E5198 + *(int *)(qword_18D8E51A0 + 8) + 8 * v56 + 4)
-			//                             + *(int *)(qword_18D8E51A0 + 16),
-			//                               *(unsigned int *)(qword_18D8E5198 + *(int *)(qword_18D8E51A0 + 8) + 8 * v56));
-			//                       v57 = (void (__fastcall __noreturn **)())_InterlockedCompareExchange64(
-			//                                                                  (volatile signed __int64 *)(qword_18D8F6F98 + 8 * v56),
-			//                                                                  v61,
-			//                                                                  0LL);
-			//                       if ( !v57 )
-			//                       {
-			//                         if ( dword_18D8E43F8 )
-			//                         {
-			//                           v38 = (((unsigned __int64)(qword_18D8F6F98 + 8 * v56) >> 12) & 0x1FFFFF) >> 6;
-			//                           v62 = ((unsigned __int64)(qword_18D8F6F98 + 8 * v56) >> 12) & 0x3F;
-			//                           _m_prefetchw(&qword_18D6870D0[v38]);
-			//                           do
-			//                             v63 = qword_18D6870D0[v38];
-			//                           while ( v63 != _InterlockedCompareExchange64(&qword_18D6870D0[v38], v63 | (1LL << v62), v63) );
-			//                         }
-			//                         v57 = (void (__fastcall __noreturn **)())v61;
-			//                       }
-			//                     }
-			//                     goto LABEL_101;
-			//                   case 7u:
-			//                     v64 = sub_1802DF920((unsigned int)v56);
-			//                     v65 = *(_QWORD *)(v64 + 16);
-			//                     v66 = (v64 - *(_QWORD *)(v65 + 128)) >> 5;
-			//                     if ( *(_BYTE *)(v65 + 42) == 21 )
-			//                     {
-			//                       v67 = *(_QWORD ***)(v65 + 96);
-			//                       if ( *v67 )
-			//                       {
-			//                         v68 = **v67 - (qword_18D8E5198 + *(int *)(qword_18D8E51A0 + 160));
-			//                         v65 = sub_180039550(v68 / 92 + v68);
-			//                       }
-			//                       else
-			//                       {
-			//                         v65 = 0LL;
-			//                       }
-			//                     }
-			//                     v173 = v66 + *(_DWORD *)(*(_QWORD *)(v65 + 104) + 32LL);
-			//                     v69 = sub_1801B8ECC(
-			//                             (unsigned int)&v173,
-			//                             (int)qword_18D8E5198 + *(_DWORD *)(qword_18D8E51A0 + 64),
-			//                             *(int *)(qword_18D8E51A0 + 68) / 0xCuLL,
-			//                             12,
-			//                             (__int64)sub_1802C7760);
-			//                     if ( !v69 )
-			//                       goto LABEL_100;
-			//                     v38 = *(unsigned int *)(v69 + 8);
-			//                     if ( (_DWORD)v38 == -1 )
-			//                       goto LABEL_100;
-			//                     v57 = (void (__fastcall __noreturn **)())(v38 + qword_18D8E5198 + *(int *)(qword_18D8E51A0 + 72));
-			//                     goto LABEL_101;
-			//                   default:
-			//                     break;
-			//                 }
-			//               }
-			//               byte_18D8F4EAF = 1;
-			//             }
-			//             if ( current )
-			//             {
-			//               if ( !TypeInfo::UnityEngine::Object._1.cctor_finished_or_no_cctor )
-			//                 il2cpp_runtime_class_init_0(TypeInfo::UnityEngine::Object, v38);
-			//               if ( current[1].klass )
-			//               {
-			//                 v70 = (unsigned __int8 (__fastcall *)(Object *))qword_18D8F4D38;
-			//                 if ( !qword_18D8F4D38 )
-			//                 {
-			//                   v70 = (unsigned __int8 (__fastcall *)(Object *))il2cpp_resolve_icall_0("UnityEngine.Behaviour::get_isActiveAndEnabled()");
-			//                   if ( !v70 )
-			//                   {
-			//                     v156 = sub_1802DBBE8("UnityEngine.Behaviour::get_isActiveAndEnabled()");
-			//                     sub_18000F750(v156, 0LL);
-			//                   }
-			//                   qword_18D8F4D38 = (__int64)v70;
-			//                 }
-			//                 if ( v70(current) && (unsigned __int8)sub_1800023D0(11LL, current) )
-			//                   break;
-			//               }
-			//             }
-			//           }
-			//           if ( !LODWORD(current[2].monitor) )
-			//             break;
-			//           if ( LODWORD(current[2].monitor) == 1 )
-			//           {
-			//             memset(&v163, 0, sizeof(v163));
-			//             v107 = (void (__fastcall *)(Transform *, Vector3 *))qword_18D8F52E0;
-			//             if ( !qword_18D8F52E0 )
-			//             {
-			//               v107 = (void (__fastcall *)(Transform *, Vector3 *))il2cpp_resolve_icall_0(
-			//                                                                     "UnityEngine.Transform::get_position_Injected(UnityEngine.Vector3&)");
-			//               if ( !v107 )
-			//               {
-			//                 v158 = sub_1802DBBE8("UnityEngine.Transform::get_position_Injected(UnityEngine.Vector3&)");
-			//                 sub_18000F750(v158, 0LL);
-			//               }
-			//               qword_18D8F52E0 = (__int64)v107;
-			//             }
-			//             v107(interpolateTrigger, &v163);
-			//             if ( IFix::WrappersManagerImpl::IsPatched(600, 0LL) )
-			//             {
-			//               v110 = IFix::WrappersManagerImpl::GetPatch(600, 0LL);
-			//               if ( !v110 )
-			//                 sub_1802DC2C8(0LL, v109);
-			//               v167 = v163;
-			//               v108 = IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_230(v110, current, &v167, 0LL);
-			//               goto LABEL_177;
-			//             }
-			//             if ( !LODWORD(current[2].klass) )
-			//             {
-			// LABEL_174:
-			//               v108 = 1.0;
-			//               goto LABEL_177;
-			//             }
-			//             *(Vector3 *)&v166.fields._Proto_k__BackingField = v163;
-			//             v108 = HG::Rendering::Runtime::HGEnvironmentVolume::_DistanceToEdge(
-			//                      (HGEnvironmentVolume *)current,
-			//                      (Vector3 *)&v166.fields._Proto_k__BackingField,
-			//                      0LL)
-			//                  / (float)(*(float *)&current[3].klass + COERCE_FLOAT(1));
-			//             if ( v108 >= 0.0 )
-			//             {
-			//               if ( v108 > 1.0 )
-			//                 goto LABEL_174;
-			//             }
-			//             else
-			//             {
-			//               v108 = 0.0;
-			//             }
-			// LABEL_177:
-			//             if ( v108 > TypeInfo::UnityEngine::Mathf.static_fields.Epsilon )
-			//             {
-			//               v111 = (HGEnvironmentPhase *)sub_18004A6C0(12LL, current);
-			//               if ( !interpolatedPhaseTarget )
-			//                 sub_1802DC2C8(v113, v112);
-			//               HG::Rendering::Runtime::HGEnvironmentPhase::Lerp(
-			//                 interpolatedPhaseTarget,
-			//                 interpolatedPhaseTarget,
-			//                 v111,
-			//                 v108,
-			//                 0LL);
-			//               if ( !v37 )
-			//                 sub_1802DC2C8(v115, v114);
-			//               Beyond::IndexedHashSet<System::Object>::Add(
-			//                 (IndexedHashSet_1_System_Object_ *)v37,
-			//                 current,
-			//                 MethodInfo::Beyond::IndexedHashSet<HG::Rendering::Runtime::HGEnvironmentVolume>::Add);
-			//               if ( !interpolatedVolumesFactor )
-			//                 sub_1802DC2C8(v117, v116);
-			// LABEL_122:
-			//               sub_1824B31B0(interpolatedVolumesFactor);
-			//             }
-			//           }
-			//           else if ( LODWORD(current[2].monitor) == 2 )
-			//           {
-			//             *(_QWORD *)&v165.x = 0LL;
-			//             v165.z = 0.0;
-			//             v78 = (void (__fastcall *)(Transform *, Vector3 *))qword_18D8F52E0;
-			//             if ( !qword_18D8F52E0 )
-			//             {
-			//               v78 = (void (__fastcall *)(Transform *, Vector3 *))il2cpp_resolve_icall_0(
-			//                                                                    "UnityEngine.Transform::get_position_Injected(UnityEngine.Vector3&)");
-			//               if ( !v78 )
-			//               {
-			//                 v157 = sub_1802DBBE8("UnityEngine.Transform::get_position_Injected(UnityEngine.Vector3&)");
-			//                 sub_18000F750(v157, 0LL);
-			//               }
-			//               qword_18D8F52E0 = (__int64)v78;
-			//             }
-			//             v78(interpolateTrigger, &v165);
-			//             *(Vector3 *)&v166.fields.fields = v165;
-			//             v80 = HG::Rendering::Runtime::HGEnvironmentVolume::Contains(
-			//                     (HGEnvironmentVolume *)current,
-			//                     (Vector3 *)&v166.fields.fields,
-			//                     0LL);
-			//             if ( !v80 && hgCamera )
-			//             {
-			//               monitor = (Dictionary_2_System_Object_HG_Rendering_Runtime_HGEnvironmentVolume_InterpolateDataPerCamera_ *)current[5].monitor;
-			//               if ( !monitor )
-			//                 sub_1802DC2C8(0LL, v79);
-			//               if ( !System::Collections::Generic::Dictionary<System::Object,HG::Rendering::Runtime::HGEnvironmentVolume::InterpolateDataPerCamera>::ContainsKey(
-			//                       monitor,
-			//                       (Object *)hgCamera,
-			//                       MethodInfo::System::Collections::Generic::Dictionary<HG::Rendering::Runtime::HGCamera,HG::Rendering::Runtime::HGEnvironmentVolume::InterpolateDataPerCamera>::ContainsKey) )
-			//                 goto LABEL_36;
-			//               v83 = (Dictionary_2_System_Object_HG_Rendering_Runtime_HGEnvironmentVolume_InterpolateDataPerCamera_ *)current[5].monitor;
-			//               if ( !v83 )
-			//                 sub_1802DC2C8(0LL, v82);
-			//               if ( TypeInfo::UnityEngine::Mathf.static_fields.Epsilon > System::Collections::Generic::Dictionary<System::Object,HG::Rendering::Runtime::HGEnvironmentVolume::InterpolateDataPerCamera>::get_Item(
-			//                                                                             v83,
-			//                                                                             (Object *)hgCamera,
-			//                                                                             MethodInfo::System::Collections::Generic::Dictionary<HG::Rendering::Runtime::HGCamera,HG::Rendering::Runtime::HGEnvironmentVolume::InterpolateDataPerCamera>::get_Item).timeFadingFactor )
-			//               {
-			//                 v85 = (Dictionary_2_System_Object_Beyond_Gameplay_ShopSystem_UnlockInfo_ *)current[5].monitor;
-			//                 if ( !v85 )
-			//                   sub_1802DC2C8(0LL, v84);
-			//                 System::Collections::Generic::Dictionary<System::Object,Beyond::Gameplay::ShopSystem::UnlockInfo>::Remove(
-			//                   v85,
-			//                   (Object *)hgCamera,
-			//                   MethodInfo::System::Collections::Generic::Dictionary<HG::Rendering::Runtime::HGCamera,HG::Rendering::Runtime::HGEnvironmentVolume::InterpolateDataPerCamera>::Remove);
-			//                 goto LABEL_36;
-			//               }
-			//             }
-			//             v86 = 0;
-			//             v87 = (Object *)hgCamera;
-			//             if ( hgCamera )
-			//             {
-			//               v88 = (Dictionary_2_System_Object_HG_Rendering_Runtime_HGEnvironmentVolume_InterpolateDataPerCamera_ *)current[5].monitor;
-			//               if ( !v88 )
-			//                 sub_1802DC2C8(0LL, hgCamera);
-			//               if ( !System::Collections::Generic::Dictionary<System::Object,HG::Rendering::Runtime::HGEnvironmentVolume::InterpolateDataPerCamera>::ContainsKey(
-			//                       v88,
-			//                       (Object *)hgCamera,
-			//                       MethodInfo::System::Collections::Generic::Dictionary<HG::Rendering::Runtime::HGCamera,HG::Rendering::Runtime::HGEnvironmentVolume::InterpolateDataPerCamera>::ContainsKey) )
-			//               {
-			//                 v90 = (Dictionary_2_System_Object_HG_Rendering_Runtime_HGEnvironmentVolume_InterpolateDataPerCamera_ *)current[5].monitor;
-			//                 if ( !v90 )
-			//                   sub_1802DC2C8(0LL, v89);
-			//                 System::Collections::Generic::Dictionary<System::Object,HG::Rendering::Runtime::HGEnvironmentVolume::InterpolateDataPerCamera>::Add(
-			//                   v90,
-			//                   (Object *)hgCamera,
-			//                   (HGEnvironmentVolume_InterpolateDataPerCamera)_mm_cvtsi128_si32((__m128i)0LL),
-			//                   MethodInfo::System::Collections::Generic::Dictionary<HG::Rendering::Runtime::HGCamera,HG::Rendering::Runtime::HGEnvironmentVolume::InterpolateDataPerCamera>::Add);
-			//               }
-			//               v86 = 1;
-			//               v91 = (Dictionary_2_System_Object_HG_Rendering_Runtime_HGEnvironmentVolume_InterpolateDataPerCamera_ *)current[5].monitor;
-			//               if ( !v91 )
-			//                 sub_1802DC2C8(0LL, v89);
-			//               klass_high = _mm_cvtsi32_si128((unsigned int)System::Collections::Generic::Dictionary<System::Object,HG::Rendering::Runtime::HGEnvironmentVolume::InterpolateDataPerCamera>::get_Item(
-			//                                                              v91,
-			//                                                              (Object *)hgCamera,
-			//                                                              MethodInfo::System::Collections::Generic::Dictionary<HG::Rendering::Runtime::HGCamera,HG::Rendering::Runtime::HGEnvironmentVolume::InterpolateDataPerCamera>::get_Item).timeFadingFactor);
-			//               v87 = (Object *)hgCamera;
-			//             }
-			//             else
-			//             {
-			//               klass_high = (__m128i)HIDWORD(current[5].klass);
-			//             }
-			//             if ( *(float *)v30.m128d_f64 > TypeInfo::UnityEngine::Mathf.static_fields.Epsilon )
-			//             {
-			//               if ( !v80 || LOBYTE(current[5].klass) )
-			//               {
-			//                 *(float *)klass_high.m128i_i32 = *(float *)klass_high.m128i_i32
-			//                                                - (float)((float)(*(float *)v30.m128d_f64 * m_interpolateTimeFactor)
-			//                                                        / *(float *)&current[3].monitor);
-			//               }
-			//               else
-			//               {
-			//                 v93 = (__m128i)v30;
-			//                 *(float *)v93.m128i_i32 = (float)((float)(*(float *)v30.m128d_f64 * m_interpolateTimeFactor)
-			//                                                 / *((float *)&current[3].klass + 1))
-			//                                         + *(float *)klass_high.m128i_i32;
-			//                 klass_high = v93;
-			//               }
-			//             }
-			//             if ( *(float *)klass_high.m128i_i32 >= 0.0 )
-			//             {
-			//               if ( *(float *)klass_high.m128i_i32 > 1.0 )
-			//                 klass_high = (__m128i)0x3F800000u;
-			//             }
-			//             else
-			//             {
-			//               klass_high = 0LL;
-			//             }
-			//             if ( v86 )
-			//             {
-			//               v94 = (Dictionary_2_System_Object_HG_Rendering_Runtime_HGEnvironmentVolume_InterpolateDataPerCamera_ *)current[5].monitor;
-			//               if ( !v94 )
-			//                 sub_1802DC2C8(0LL, v87);
-			//               System::Collections::Generic::Dictionary<System::Object,HG::Rendering::Runtime::HGEnvironmentVolume::InterpolateDataPerCamera>::set_Item(
-			//                 v94,
-			//                 v87,
-			//                 (HGEnvironmentVolume_InterpolateDataPerCamera)_mm_cvtsi128_si32(klass_high),
-			//                 MethodInfo::System::Collections::Generic::Dictionary<HG::Rendering::Runtime::HGCamera,HG::Rendering::Runtime::HGEnvironmentVolume::InterpolateDataPerCamera>::set_Item);
-			//             }
-			//             else
-			//             {
-			//               HIDWORD(current[5].klass) = klass_high.m128i_i32[0];
-			//             }
-			//             v37 = interpolatedVolumes;
-			//             if ( *(float *)klass_high.m128i_i32 > TypeInfo::UnityEngine::Mathf.static_fields.Epsilon )
-			//             {
-			//               v95 = (HGEnvironmentPhase *)sub_18004A6C0(12LL, current);
-			//               if ( !interpolatedPhaseTarget )
-			//                 sub_1802DC2C8(v97, v96);
-			//               HG::Rendering::Runtime::HGEnvironmentPhase::Lerp(
-			//                 interpolatedPhaseTarget,
-			//                 interpolatedPhaseTarget,
-			//                 v95,
-			//                 *(float *)klass_high.m128i_i32,
-			//                 0LL);
-			//               if ( !interpolatedVolumes )
-			//                 sub_1802DC2C8(v99, v98);
-			//               Beyond::IndexedHashSet<System::Object>::Add(
-			//                 (IndexedHashSet_1_System_Object_ *)interpolatedVolumes,
-			//                 current,
-			//                 MethodInfo::Beyond::IndexedHashSet<HG::Rendering::Runtime::HGEnvironmentVolume>::Add);
-			//               if ( !interpolatedVolumesFactor )
-			//                 sub_1802DC2C8(v101, v100);
-			//               v104 = MethodInfo::System::Collections::Generic::List<float>::Add;
-			//               ++interpolatedVolumesFactor.fields._version;
-			//               items = interpolatedVolumesFactor.fields._items;
-			//               size = interpolatedVolumesFactor.fields._size;
-			//               if ( !items )
-			//                 sub_1802DC2C8(0LL, size);
-			//               if ( (unsigned int)size < items.max_length.size )
-			//               {
-			//                 interpolatedVolumesFactor.fields._size = size + 1;
-			//                 if ( (unsigned int)size >= items.max_length.size )
-			//                   sub_180070260(items, size, v102, v103);
-			//                 LODWORD(items.vector[size]) = klass_high.m128i_i32[0];
-			//               }
-			//               else
-			//               {
-			//                 if ( !*((_QWORD *)v104.klass.rgctx_data[11].rgctxDataDummy + 4) )
-			//                   (*(void (**)(void))v104.klass.rgctx_data[11].rgctxDataDummy)();
-			//                 System::Collections::Generic::List<float>::AddWithResize(
-			//                   interpolatedVolumesFactor,
-			//                   *(float *)klass_high.m128i_i32,
-			//                   (MethodInfo *)v104.klass.rgctx_data[11].rgctxDataDummy);
-			//               }
-			//             }
-			//           }
-			//           else if ( LODWORD(current[2].monitor) == 3
-			//                  && *((float *)&current[3].monitor + 1) > TypeInfo::UnityEngine::Mathf.static_fields.Epsilon )
-			//           {
-			//             *(Vector3 *)&v166.fields._._File_k__BackingField = *UnityEngine::Transform::get_position(
-			//                                                                   v175,
-			//                                                                   interpolateTrigger,
-			//                                                                   0LL);
-			//             if ( HG::Rendering::Runtime::HGEnvironmentVolume::Contains(
-			//                    (HGEnvironmentVolume *)current,
-			//                    (Vector3 *)&v166.fields._._File_k__BackingField,
-			//                    0LL) )
-			//             {
-			//               v71 = (HGEnvironmentPhase *)sub_18004A6C0(12LL, current);
-			//               if ( !interpolatedPhaseTarget )
-			//                 sub_1802DC2C8(v73, v72);
-			//               HG::Rendering::Runtime::HGEnvironmentPhase::Lerp(
-			//                 interpolatedPhaseTarget,
-			//                 interpolatedPhaseTarget,
-			//                 v71,
-			//                 *((float *)&current[3].monitor + 1),
-			//                 0LL);
-			//               if ( !v37 )
-			//                 sub_1802DC2C8(v75, v74);
-			//               Beyond::IndexedHashSet<System::Object>::Add(
-			//                 (IndexedHashSet_1_System_Object_ *)v37,
-			//                 current,
-			//                 MethodInfo::Beyond::IndexedHashSet<HG::Rendering::Runtime::HGEnvironmentVolume>::Add);
-			//               if ( !interpolatedVolumesFactor )
-			//                 sub_1802DC2C8(v77, v76);
-			//               goto LABEL_122;
-			//             }
-			//           }
-			//         }
-			//         *(_QWORD *)&v164[0].x = 0LL;
-			//         v164[0].z = 0.0;
-			//         v118 = (void (__fastcall *)(Transform *, Vector3 *))qword_18D8F52E0;
-			//         if ( !qword_18D8F52E0 )
-			//         {
-			//           v118 = (void (__fastcall *)(Transform *, Vector3 *))il2cpp_resolve_icall_0(
-			//                                                                 "UnityEngine.Transform::get_position_Injected(UnityEngine.Vector3&)");
-			//           if ( !v118 )
-			//           {
-			//             v159 = sub_1802DBBE8("UnityEngine.Transform::get_position_Injected(UnityEngine.Vector3&)");
-			//             sub_18000F750(v159, 0LL);
-			//           }
-			//           qword_18D8F52E0 = (__int64)v118;
-			//         }
-			//         v118(interpolateTrigger, v164);
-			//         v122 = *(_QWORD *)&v164[0].x;
-			//         z = v164[0].z;
-			//         if ( !byte_18D8EDC37 )
-			//         {
-			//           v120 = _InterlockedExchangeAdd64((volatile signed __int64 *)&TypeInfo::IFix::ILFixDynamicMethodWrapper, 0LL);
-			//           if ( (v120 & 1) != 0 )
-			//           {
-			//             v124 = ((unsigned int)v120 >> 1) & 0xFFFFFFF;
-			//             switch ( (unsigned int)v120 >> 29 )
-			//             {
-			//               case 1u:
-			//                 v125 = (void (__fastcall __noreturn **)())sub_18003C670((unsigned int)v124);
-			//                 goto LABEL_213;
-			//               case 2u:
-			//                 v125 = (void (__fastcall __noreturn **)())sub_18003C380((unsigned int)v124);
-			//                 goto LABEL_213;
-			//               case 3u:
-			//               case 6u:
-			//                 v126 = ((unsigned int)v120 >> 1) & 0xFFFFFFF;
-			//                 v120 = (unsigned int)v120 >> 29;
-			//                 if ( (_DWORD)v120 )
-			//                 {
-			//                   if ( (_DWORD)v120 == 3 )
-			//                   {
-			//                     v125 = (void (__fastcall __noreturn **)())sub_180039480(v126);
-			//                     goto LABEL_213;
-			//                   }
-			//                   if ( (_DWORD)v120 == 6 )
-			//                   {
-			//                     v127 = sub_1802DF9C0(v126);
-			//                     v125 = (void (__fastcall __noreturn **)())sub_18005F4B0(v127, 0LL);
-			//                     goto LABEL_213;
-			//                   }
-			//                 }
-			//                 else if ( v126 == 1 )
-			//                 {
-			//                   v125 = off_18A2C5600;
-			//                   goto LABEL_213;
-			//                 }
-			// LABEL_212:
-			//                 v125 = 0LL;
-			// LABEL_213:
-			//                 if ( v125 )
-			//                   _InterlockedExchange64((volatile __int64 *)&TypeInfo::IFix::ILFixDynamicMethodWrapper, (__int64)v125);
-			//                 break;
-			//               case 4u:
-			//                 v125 = (void (__fastcall __noreturn **)())sub_1802DF920((unsigned int)v124);
-			//                 goto LABEL_213;
-			//               case 5u:
-			//                 if ( *(_QWORD *)(qword_18D8F6F98 + 8 * v124) )
-			//                 {
-			//                   v125 = *(void (__fastcall __noreturn ***)())(qword_18D8F6F98 + 8 * v124);
-			//                 }
-			//                 else
-			//                 {
-			//                   v121 = il2cpp_string_new_len(
-			//                            qword_18D8E5198
-			//                          + *(int *)(qword_18D8E5198 + *(int *)(qword_18D8E51A0 + 8) + 8 * v124 + 4)
-			//                          + *(int *)(qword_18D8E51A0 + 16),
-			//                            *(unsigned int *)(qword_18D8E5198 + *(int *)(qword_18D8E51A0 + 8) + 8 * v124));
-			//                   v125 = (void (__fastcall __noreturn **)())_InterlockedCompareExchange64(
-			//                                                               (volatile signed __int64 *)(qword_18D8F6F98 + 8 * v124),
-			//                                                               v121,
-			//                                                               0LL);
-			//                   if ( !v125 )
-			//                   {
-			//                     v120 = qword_18D8F6F98 + 8 * v124;
-			//                     if ( dword_18D8E43F8 )
-			//                     {
-			//                       v128 = (v120 >> 12) & 0x1FFFFF;
-			//                       v119 = (unsigned __int64)v128 >> 6;
-			//                       v120 = v128 & 0x3F;
-			//                       _m_prefetchw(&qword_18D6870D0[v119]);
-			//                       do
-			//                         v129 = qword_18D6870D0[v119];
-			//                       while ( v129 != _InterlockedCompareExchange64(&qword_18D6870D0[v119], v129 | (1LL << v120), v129) );
-			//                     }
-			//                     v125 = (void (__fastcall __noreturn **)())v121;
-			//                   }
-			//                 }
-			//                 goto LABEL_213;
-			//               case 7u:
-			//                 v130 = sub_1802DF920((unsigned int)v124);
-			//                 v131 = *(_QWORD *)(v130 + 16);
-			//                 v132 = (v130 - *(_QWORD *)(v131 + 128)) >> 5;
-			//                 if ( *(_BYTE *)(v131 + 42) == 21 )
-			//                 {
-			//                   v133 = *(_QWORD ***)(v131 + 96);
-			//                   if ( *v133 )
-			//                   {
-			//                     v134 = **v133 - (qword_18D8E5198 + *(int *)(qword_18D8E51A0 + 160));
-			//                     v131 = sub_180039550(v134 / 92 + v134);
-			//                   }
-			//                   else
-			//                   {
-			//                     v131 = 0LL;
-			//                   }
-			//                 }
-			//                 LODWORD(v170.x) = v132 + *(_DWORD *)(*(_QWORD *)(v131 + 104) + 32LL);
-			//                 v135 = sub_1801B8ECC(
-			//                          (unsigned int)&v170,
-			//                          (int)qword_18D8E5198 + *(_DWORD *)(qword_18D8E51A0 + 64),
-			//                          *(int *)(qword_18D8E51A0 + 68) / 0xCuLL,
-			//                          12,
-			//                          (__int64)sub_1802C7760);
-			//                 if ( !v135 )
-			//                   goto LABEL_212;
-			//                 v119 = *(unsigned int *)(v135 + 8);
-			//                 if ( (_DWORD)v119 == -1 )
-			//                   goto LABEL_212;
-			//                 v125 = (void (__fastcall __noreturn **)())(v119 + qword_18D8E5198 + *(int *)(qword_18D8E51A0 + 72));
-			//                 goto LABEL_213;
-			//               default:
-			//                 break;
-			//             }
-			//           }
-			//           byte_18D8EDC37 = 1;
-			//         }
-			//         v136 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//         if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper._1.cctor_finished_or_no_cctor )
-			//         {
-			//           il2cpp_runtime_class_init_0(TypeInfo::IFix::ILFixDynamicMethodWrapper, v119);
-			//           v136 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//         }
-			//         v137 = v136.static_fields.wrapperArray;
-			//         if ( !v137 )
-			//           sub_1802DC2C8(v136, 0LL);
-			//         if ( v137.max_length.size > 594 )
-			//         {
-			//           if ( !v136._1.cctor_finished_or_no_cctor )
-			//           {
-			//             il2cpp_runtime_class_init_0(v136, v137);
-			//             v136 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//           }
-			//           v138 = v136.static_fields.wrapperArray;
-			//           if ( !v138 )
-			//             sub_1802DC2C8(0LL, v137);
-			//           if ( v138.max_length.size <= 0x252u )
-			//             sub_180070260(v138, v137, v120, v121);
-			//           if ( v138[16].vector[18] )
-			//             break;
-			//         }
-			//         *(_QWORD *)&v169.x = v122;
-			//         v169.z = z;
-			//         v37 = interpolatedVolumes;
-			//         if ( HG::Rendering::Runtime::HGEnvironmentVolume::_DistanceToEdge((HGEnvironmentVolume *)current, &v169, 0LL) > 0.0 )
-			//           goto LABEL_229;
-			//       }
-			//       v139 = IFix::WrappersManagerImpl::GetPatch(594, 0LL);
-			//       if ( !v139 )
-			//         sub_1802DC2C8(v141, v140);
-			//       *(_QWORD *)&v168.x = v122;
-			//       v168.z = z;
-			//       v37 = interpolatedVolumes;
-			//       if ( IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_231(v139, current, &v168, 0LL) )
-			//       {
-			// LABEL_229:
-			//         sub_180003EE0(current.klass);
-			//         v142 = (HGEnvironmentPhase *)((__int64 (__fastcall *)(Object *, const PropertyInfo *))current.klass[1]._0.events)(
-			//                                        current,
-			//                                        current.klass[1]._0.properties);
-			//         if ( !interpolatedPhaseTarget )
-			//           sub_1802DC2C8(v144, v143);
-			//         HG::Rendering::Runtime::HGEnvironmentPhase::CopyFrom(interpolatedPhaseTarget, v142, 0LL);
-			//         v37 = interpolatedVolumes;
-			//         if ( !interpolatedVolumes )
-			//           sub_1802DC2C8(v146, v145);
-			//         Beyond::IndexedHashSet<System::Object>::Add(
-			//           (IndexedHashSet_1_System_Object_ *)interpolatedVolumes,
-			//           current,
-			//           MethodInfo::Beyond::IndexedHashSet<HG::Rendering::Runtime::HGEnvironmentVolume>::Add);
-			//         if ( !interpolatedVolumesFactor )
-			//           sub_1802DC2C8(v148, v147);
-			//         v151 = MethodInfo::System::Collections::Generic::List<float>::Add;
-			//         ++interpolatedVolumesFactor.fields._version;
-			//         v152 = interpolatedVolumesFactor.fields._items;
-			//         v153 = interpolatedVolumesFactor.fields._size;
-			//         if ( !v152 )
-			//           sub_1802DC2C8(0LL, v153);
-			//         if ( (unsigned int)v153 < v152.max_length.size )
-			//         {
-			//           interpolatedVolumesFactor.fields._size = v153 + 1;
-			//           if ( (unsigned int)v153 >= v152.max_length.size )
-			//             sub_180070260(v152, v153, v149, v150);
-			//           v152.vector[v153] = 1.0;
-			//         }
-			//         else
-			//         {
-			//           if ( !*((_QWORD *)v151.klass.rgctx_data[11].rgctxDataDummy + 4) )
-			//             (*(void (**)(void))v151.klass.rgctx_data[11].rgctxDataDummy)();
-			//           System::Collections::Generic::List<float>::AddWithResize(
-			//             interpolatedVolumesFactor,
-			//             1.0,
-			//             (MethodInfo *)v151.klass.rgctx_data[11].rgctxDataDummy);
-			//         }
-			//       }
-			//     }
-			//   }
-			//   catch ( Il2CppExceptionWrapper *v174 )
-			//   {
-			//     v166.klass = (OneofDescriptor__Class *)v174.ex;
-			//     if ( v166.klass )
-			//       sub_18000F780(v166.klass);
-			//   }
-			// }
-			// 
+		  __int64 v5; // rdx
+		  HashSet_1_System_Object_ *m_activeVolumes; // rcx
+		  int32_t i; // edi
+		  List_1_HG_Rendering_Runtime_HGEnvironmentVolumeBase_ *m_sortedVolumes; // rax
+		  List_1_System_Object_ *v9; // rcx
+		  Object *Item; // rax
+		  Object_1 *gameObject; // rax
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(1483, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(1483, 0LL);
+		    if ( !Patch )
+		      goto LABEL_13;
+		    return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_5(
+		             (ILFixDynamicMethodWrapper_33 *)Patch,
+		             (Object *)this,
+		             (Object *)volume,
+		             0LL);
+		  }
+		  else
+		  {
+		    m_activeVolumes = (HashSet_1_System_Object_ *)this->fields.m_activeVolumes;
+		    if ( !m_activeVolumes )
+		      goto LABEL_13;
+		    if ( System::Collections::Generic::HashSet<System::Object>::Contains(
+		           m_activeVolumes,
+		           (Object *)volume,
+		           MethodInfo::System::Collections::Generic::HashSet<HG::Rendering::Runtime::HGEnvironmentVolumeBase>::Contains) )
+		    {
+		      if ( !volume )
+		        goto LABEL_13;
+		      gameObject = (Object_1 *)UnityEngine::Component::get_gameObject((Component *)volume, 0LL);
+		      HG::Rendering::HGRPLogger::LogWarning(
+		        gameObject,
+		        (String *)"Env Volume already exist in activeVolumes, register failed",
+		        0LL);
+		      return 0;
+		    }
+		    else
+		    {
+		      m_activeVolumes = (HashSet_1_System_Object_ *)this->fields.m_activeVolumes;
+		      if ( !m_activeVolumes )
+		        goto LABEL_13;
+		      System::Collections::Generic::HashSet<System::Object>::Add(
+		        m_activeVolumes,
+		        (Object *)volume,
+		        MethodInfo::System::Collections::Generic::HashSet<HG::Rendering::Runtime::HGEnvironmentVolumeBase>::Add);
+		      for ( i = 0; ; ++i )
+		      {
+		        m_sortedVolumes = this->fields.m_sortedVolumes;
+		        if ( !m_sortedVolumes )
+		          goto LABEL_13;
+		        v9 = (List_1_System_Object_ *)this->fields.m_sortedVolumes;
+		        if ( i >= m_sortedVolumes->fields._size )
+		          break;
+		        Item = System::Collections::Generic::List<System::Object>::get_Item(
+		                 v9,
+		                 i,
+		                 MethodInfo::System::Collections::Generic::List<HG::Rendering::Runtime::HGEnvironmentVolumeBase>::get_Item);
+		        if ( !volume )
+		          goto LABEL_13;
+		        if ( HG::Rendering::Runtime::HGEnvironmentVolumeBase::CompareTo(volume, (HGEnvironmentVolumeBase *)Item, 0LL) == -1 )
+		        {
+		          m_activeVolumes = (HashSet_1_System_Object_ *)this->fields.m_sortedVolumes;
+		          if ( m_activeVolumes )
+		          {
+		            System::Collections::Generic::List<System::Object>::Insert(
+		              (List_1_System_Object_ *)m_activeVolumes,
+		              i,
+		              (Object *)volume,
+		              MethodInfo::System::Collections::Generic::List<HG::Rendering::Runtime::HGEnvironmentVolumeBase>::Insert);
+		            return 1;
+		          }
+		LABEL_13:
+		          sub_1800D8260(m_activeVolumes, v5);
+		        }
+		      }
+		      System::Collections::Generic::List<System::Object>::Insert(
+		        v9,
+		        m_sortedVolumes->fields._size,
+		        (Object *)volume,
+		        MethodInfo::System::Collections::Generic::List<HG::Rendering::Runtime::HGEnvironmentVolumeBase>::Insert);
+		      return 1;
+		    }
+		  }
 		}
-
-		[StaticFieldOffset(ThreadStatic = false, Offset = "0x00")]
-		private static readonly Lazy<HGEnvironmentManager> s_instance;
-
-		private readonly HashSet<HGEnvironmentVolume> m_activeVolumes;
-
-		private readonly List<HGEnvironmentVolume> m_sortedVolumes;
-
-		private readonly IndexedHashSet<HGEnvironmentVolume> m_interpolatedVolumes;
-
-		private readonly List<float> m_interpolatedVolumesFactor;
-
-		private readonly HGAtmosphereRenderer m_atmosphereRenderer;
-
-		private readonly HGVolumetricFogRenderer m_volumetricFogRenderer;
-
-		private readonly HGSkyRenderer m_skyRenderer;
-
-		private readonly HGSkydomeStarRenderer m_talosStarRenderer;
-
-		private readonly HGRainRenderer m_rainRenderer;
-
-		private readonly HGSnowRenderer m_snowRenderer;
-
-		private readonly HGEnvironmentPhase m_defaultPhase;
-
-		private readonly HGEnvironmentPhase m_interpolatedPhase;
-
-		private Transform m_interpolateTrigger;
-
-		private Transform m_interpolateTriggerOverride;
-
-		private bool m_sortNeeded;
-
-		private float m_interpolateTimeFactor;
-
-		private Vector3 m_lastInterpolateTriggerPosition;
+		
+		private bool _Unregister(HGEnvironmentVolumeBase volume) => default; // 0x000000018389E920-0x000000018389E9D0
+		// Boolean _Unregister(HGEnvironmentVolumeBase)
+		bool HG::Rendering::Runtime::HGEnvironmentManager::_Unregister(
+		        HGEnvironmentManager *this,
+		        HGEnvironmentVolumeBase *volume,
+		        MethodInfo *method)
+		{
+		  __int64 v5; // rdx
+		  HashSet_1_System_Object_ *m_activeVolumes; // rcx
+		  bool v7; // al
+		  Object_1 *gameObject; // rax
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(1486, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(1486, 0LL);
+		    if ( !Patch )
+		      goto LABEL_9;
+		    return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_5(
+		             (ILFixDynamicMethodWrapper_33 *)Patch,
+		             (Object *)this,
+		             (Object *)volume,
+		             0LL);
+		  }
+		  else
+		  {
+		    m_activeVolumes = (HashSet_1_System_Object_ *)this->fields.m_activeVolumes;
+		    if ( !m_activeVolumes )
+		      goto LABEL_9;
+		    v7 = System::Collections::Generic::HashSet<System::Object>::Contains(
+		           m_activeVolumes,
+		           (Object *)volume,
+		           MethodInfo::System::Collections::Generic::HashSet<HG::Rendering::Runtime::HGEnvironmentVolumeBase>::Contains);
+		    if ( !volume )
+		      goto LABEL_9;
+		    if ( v7 )
+		    {
+		      m_activeVolumes = (HashSet_1_System_Object_ *)volume->fields.dataPerCameras;
+		      volume->fields._timeFadingFactor_k__BackingField = 0.0;
+		      if ( m_activeVolumes )
+		      {
+		        System::Collections::Generic::Dictionary<Beyond::Gameplay::Core::WaterVolumePtr,System::ValueTuple<float,System::Int32Enum,System::Object>>::Clear(
+		          (Dictionary_2_Beyond_Gameplay_Core_WaterVolumePtr_System_ValueTuple_3_Single_Int32Enum_Object_ *)m_activeVolumes,
+		          MethodInfo::System::Collections::Generic::Dictionary<HG::Rendering::Runtime::HGCamera,HG::Rendering::Runtime::HGEnvironmentVolumeBase::InterpolateDataPerCamera>::Clear);
+		        m_activeVolumes = (HashSet_1_System_Object_ *)this->fields.m_activeVolumes;
+		        if ( m_activeVolumes )
+		        {
+		          System::Collections::Generic::HashSet<System::Object>::Remove(
+		            m_activeVolumes,
+		            (Object *)volume,
+		            MethodInfo::System::Collections::Generic::HashSet<HG::Rendering::Runtime::HGEnvironmentVolumeBase>::Remove);
+		          m_activeVolumes = (HashSet_1_System_Object_ *)this->fields.m_sortedVolumes;
+		          if ( m_activeVolumes )
+		          {
+		            System::Collections::Generic::List<System::Object>::Remove(
+		              (List_1_System_Object_ *)m_activeVolumes,
+		              (Object *)volume,
+		              MethodInfo::System::Collections::Generic::List<HG::Rendering::Runtime::HGEnvironmentVolumeBase>::Remove);
+		            return 1;
+		          }
+		        }
+		      }
+		LABEL_9:
+		      sub_1800D8260(m_activeVolumes, v5);
+		    }
+		    gameObject = (Object_1 *)UnityEngine::Component::get_gameObject((Component *)volume, 0LL);
+		    HG::Rendering::HGRPLogger::LogWarning(
+		      gameObject,
+		      (String *)"Env Volume not exist in activeVolumes, unregister failed",
+		      0LL);
+		    return 0;
+		  }
+		}
+		
+		private void _PipelineUpdate(List<Camera> cameras, HGSettingParameters settingParameters) {} // 0x0000000182EE0F70-0x0000000182EE24B0
+		// Void _PipelineUpdate(List`1[UnityEngine.Camera], HGSettingParameters)
+		// Hidden C++ exception states: #wind=1 #try_helpers=1
+		void HG::Rendering::Runtime::HGEnvironmentManager::_PipelineUpdate(
+		        HGEnvironmentManager *this,
+		        List_1_UnityEngine_Camera_ *cameras,
+		        HGSettingParameters *settingParameters,
+		        MethodInfo *method)
+		{
+		  Object *v4; // r13
+		  HGEnvironmentManager *v6; // r15
+		  struct ILFixDynamicMethodWrapper_2__Class *v7; // rcx
+		  ILFixDynamicMethodWrapper_2__Array *wrapperArray; // rbx
+		  ILFixDynamicMethodWrapper_2__Array *v9; // rbx
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v11; // rdx
+		  __int64 v12; // rcx
+		  List_1_System_Object_ *m_sortedVolumes; // rdi
+		  struct HGEnvironmentManager_c__Class *v14; // rcx
+		  Comparison_1_HG_Rendering_Runtime_HGEnvironmentVolumeBase_ *_9__66_0; // rbx
+		  Object *v16; // rsi
+		  Comparison_1_Object_ *v17; // rax
+		  __int64 v18; // rdx
+		  __int64 v19; // rcx
+		  Type *v20; // rdx
+		  PropertyInfo_1 *v21; // r8
+		  Int32__Array **v22; // r9
+		  Type *v23; // rdx
+		  PropertyInfo_1 *v24; // r8
+		  Int32__Array **v25; // r9
+		  __int64 v26; // rdx
+		  Transform *m_interpolateTrigger; // rdi
+		  struct ILFixDynamicMethodWrapper_2__Class *v28; // rcx
+		  ILFixDynamicMethodWrapper_2__Array *v29; // rbx
+		  ILFixDynamicMethodWrapper_2__Array *v30; // rbx
+		  ILFixDynamicMethodWrapper_2 *v31; // rax
+		  __int64 v32; // rdx
+		  __int64 v33; // rcx
+		  __int64 v34; // rdx
+		  __int64 v35; // rcx
+		  List_1_System_Single_ *m_interpolatedVolumesFactor; // rbx
+		  struct Object_1__Class *v37; // rcx
+		  Vector3 *p_m_lastInterpolateTriggerPosition; // rdx
+		  Vector3__StaticFields *static_fields; // rcx
+		  float z; // eax
+		  struct Object_1__Class *v41; // rdx
+		  Light *SunSourceLight; // rbx
+		  struct Object_1__Class *z_low; // rcx
+		  HGEnvironmentPhase *m_interpolatedPhase; // rdi
+		  __int64 v45; // rdx
+		  __int64 v46; // rcx
+		  HGEnvironmentPhase *v47; // rdi
+		  __int64 v48; // rdx
+		  __int64 v49; // rcx
+		  HGEnvironmentPhase *v50; // rdi
+		  __int64 v51; // rdx
+		  __int64 v52; // rcx
+		  HGEnvironmentPhase *v53; // rdi
+		  __int64 (__fastcall *v54)(Light *); // rax
+		  __int64 v55; // rdx
+		  __int64 v56; // rcx
+		  __int64 v57; // rdi
+		  __int64 (__fastcall *v58)(__int64); // rax
+		  __int64 v59; // rax
+		  __int64 v60; // rdx
+		  __int64 v61; // rcx
+		  __int64 v62; // rsi
+		  HGEnvironmentPhase *v63; // rdi
+		  void (__fastcall *v64)(__int64, Quaternion *); // rax
+		  __int64 (__fastcall *v65)(Light *); // rax
+		  GameObject *v66; // rax
+		  __int64 v67; // rdx
+		  __int64 v68; // rcx
+		  Behaviour *v69; // rsi
+		  PropertyInfo_1 *v70; // r8
+		  Int32__Array **v71; // r9
+		  Object *current; // rbx
+		  __int64 v73; // rdx
+		  __int64 v74; // rcx
+		  __int64 v75; // r8
+		  HGCamera *v76; // r12
+		  struct ILFixDynamicMethodWrapper_2__Class *v77; // rcx
+		  ILFixDynamicMethodWrapper_2__Array *v78; // rdx
+		  ILFixDynamicMethodWrapper_2__Array *v79; // rcx
+		  ILFixDynamicMethodWrapper_2 *v80; // r15
+		  Call *v81; // rax
+		  __m128i v82; // xmm1
+		  __m128i v83; // xmm2
+		  Object *anonObj; // r12
+		  _DWORD *v85; // xmm2_8
+		  __int64 v86; // rcx
+		  __int64 v87; // rdx
+		  __int64 v88; // rdi
+		  Object__Array *managedStack; // r14
+		  Il2CppClass *element_class; // rbx
+		  Object__Class *klass; // rsi
+		  Value_1 *currentTop; // r8
+		  signed __int64 v93; // rcx
+		  __int64 v94; // rdx
+		  signed __int64 v95; // rdi
+		  Object__Array *v96; // r14
+		  Il2CppClass *v97; // rbx
+		  HGCamera__Class *v98; // rsi
+		  __int64 v99; // rdx
+		  VirtualMachine *virtualMachine; // rcx
+		  unsigned __int64 v101; // rdx
+		  unsigned __int64 v102; // r8
+		  struct MethodInfo *v103; // rsi
+		  __int64 v104; // rbx
+		  void (__fastcall __noreturn **v105)(); // rax
+		  unsigned int v106; // eax
+		  __int64 v107; // rax
+		  signed __int64 v108; // r9
+		  unsigned int v109; // r8d
+		  signed __int64 v110; // rtt
+		  __int64 v111; // rbx
+		  __int64 v112; // rax
+		  __int64 v113; // rbx
+		  _QWORD **v114; // rcx
+		  __int64 v115; // r8
+		  __int64 v116; // rax
+		  __int64 Value1; // rax
+		  HGEnvironmentVolumeCameraComponent *m_envVolumeCameraComponent; // rdi
+		  const Il2CppRGCTXData *rgctx_data; // rax
+		  _BYTE *rgctxDataDummy; // rbx
+		  _BYTE *v121; // rax
+		  HGEnvironmentVolumeCameraComponent__Class *v122; // rsi
+		  HGEnvironmentPhase *interpolatedPhase; // rax
+		  __int64 v124; // rdx
+		  __int64 v125; // rcx
+		  bool v126; // bl
+		  Behaviour *v127; // rsi
+		  ILFixDynamicMethodWrapper_2 *v128; // rax
+		  HGEnvironmentPhase *v129; // rax
+		  Object *lensFlareData; // rbx
+		  Object *v131; // rdi
+		  bool v132; // zf
+		  unsigned __int64 v133; // rdx
+		  signed __int64 v134; // rtt
+		  Behaviour__Class *v135; // rbx
+		  struct Object_1__Class *v136; // rcx
+		  LensFlareCommonSRP *Instance; // rax
+		  LensFlareCommonSRP *v138; // rax
+		  ILFixDynamicMethodWrapper_2 *v139; // rax
+		  HGEnvironmentPhase *v140; // rax
+		  HGEnvironmentPhase *v141; // rax
+		  HGEnvironmentPhase *v142; // rax
+		  HGEnvironmentPhase *v143; // rax
+		  HGEnvironmentPhase *v144; // rax
+		  HGEnvironmentPhase *v145; // rax
+		  HGEnvironmentPhase *v146; // rax
+		  HGEnvironmentPhase *v147; // rax
+		  HGEnvironmentPhase *v148; // rax
+		  Vector3 *v149; // rax
+		  HGEnvironmentPhase *v150; // rax
+		  __int128 v151; // xmm6
+		  __int128 v152; // xmm7
+		  __int128 v153; // xmm8
+		  __int128 v154; // xmm9
+		  __int128 v155; // xmm10
+		  __int128 v156; // xmm11
+		  __int64 v157; // xmm12_8
+		  float shb8; // ebx
+		  void (__fastcall *v159)(_QWORD); // rax
+		  void (__fastcall *v160)(_QWORD); // rax
+		  void (__fastcall *v161)(__int64); // rax
+		  void (__fastcall *v162)(_OWORD *); // rax
+		  void (__fastcall *v163)(__int64); // rax
+		  HGRainRenderer *s_rainRenderer; // rax
+		  HGSnowRenderer *s_snowRenderer; // rax
+		  __int64 v166; // rax
+		  __int64 v167; // rax
+		  __int64 v168; // rax
+		  __int64 v169; // rax
+		  __int64 v170; // rax
+		  __int64 v171; // rax
+		  __int64 v172; // rax
+		  MethodInfo *methoda; // [rsp+20h] [rbp-208h]
+		  MethodInfo *methodb; // [rsp+20h] [rbp-208h]
+		  Vector3 v175; // [rsp+50h] [rbp-1D8h] BYREF
+		  _BYTE v176[24]; // [rsp+60h] [rbp-1C8h] BYREF
+		  Call call; // [rsp+80h] [rbp-1A8h] BYREF
+		  Behaviour *v178; // [rsp+A8h] [rbp-180h]
+		  List_1_T_Enumerator_System_Object_ v179; // [rsp+B0h] [rbp-178h] BYREF
+		  Vector3 v180[2]; // [rsp+C8h] [rbp-160h] BYREF
+		  Quaternion rotationDirect; // [rsp+E0h] [rbp-148h] BYREF
+		  _OWORD v182[6]; // [rsp+F0h] [rbp-138h] BYREF
+		  __int64 v183; // [rsp+150h] [rbp-D8h]
+		  float v184; // [rsp+158h] [rbp-D0h]
+		  Call v185[4]; // [rsp+160h] [rbp-C8h] BYREF
+		
+		  v4 = (Object *)settingParameters;
+		  v6 = this;
+		  memset(&v179, 0, sizeof(v179));
+		  v7 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(TypeInfo::IFix::ILFixDynamicMethodWrapper);
+		    v7 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  wrapperArray = v7->static_fields->wrapperArray;
+		  if ( !wrapperArray )
+		    sub_1800D8260(v7, cameras);
+		  if ( wrapperArray->max_length.size > 611 )
+		  {
+		    if ( !v7->_1.cctor_finished_or_no_cctor )
+		    {
+		      il2cpp_runtime_class_init_1(v7);
+		      v7 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		    }
+		    v9 = v7->static_fields->wrapperArray;
+		    if ( !v9 )
+		      sub_1800D8260(v7, cameras);
+		    if ( v9->max_length.size <= 0x263u )
+		      sub_1800D2AB0(v7, cameras);
+		    if ( v9[17].max_length.value )
+		    {
+		      Patch = IFix::WrappersManagerImpl::GetPatch(611, 0LL);
+		      if ( !Patch )
+		        sub_1800D8260(v12, v11);
+		      IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_11(
+		        (ILFixDynamicMethodWrapper_30 *)Patch,
+		        (Object *)v6,
+		        (Object *)cameras,
+		        v4,
+		        0LL);
+		      return;
+		    }
+		  }
+		  if ( v6->fields.m_sortNeeded )
+		  {
+		    m_sortedVolumes = (List_1_System_Object_ *)v6->fields.m_sortedVolumes;
+		    v14 = TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager::__c;
+		    if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager::__c->_1.cctor_finished_or_no_cctor )
+		    {
+		      il2cpp_runtime_class_init_1(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager::__c);
+		      v14 = TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager::__c;
+		    }
+		    _9__66_0 = v14->static_fields->__9__66_0;
+		    if ( !_9__66_0 )
+		    {
+		      if ( !v14->_1.cctor_finished_or_no_cctor )
+		      {
+		        il2cpp_runtime_class_init_1(v14);
+		        v14 = TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager::__c;
+		      }
+		      v16 = (Object *)v14->static_fields->__9;
+		      v17 = (Comparison_1_Object_ *)sub_1800368D0(TypeInfo::System::Comparison<HG::Rendering::Runtime::HGEnvironmentVolumeBase>);
+		      _9__66_0 = (Comparison_1_HG_Rendering_Runtime_HGEnvironmentVolumeBase_ *)v17;
+		      if ( !v17 )
+		        sub_1800D8260(v19, v18);
+		      System::Comparison<System::Object>::Comparison(
+		        v17,
+		        v16,
+		        MethodInfo::HG::Rendering::Runtime::HGEnvironmentManager::__c::__PipelineUpdate_b__66_0,
+		        0LL);
+		      TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager::__c->static_fields->__9__66_0 = _9__66_0;
+		      sub_18002D1B0(
+		        (SingleFieldAccessor *)&TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager::__c->static_fields->__9__66_0,
+		        v20,
+		        v21,
+		        v22,
+		        methoda);
+		    }
+		    if ( !m_sortedVolumes )
+		      sub_1800D8260(v14, cameras);
+		    System::Collections::Generic::List<System::Object>::Sort(
+		      m_sortedVolumes,
+		      (Comparison_1_Object_ *)_9__66_0,
+		      MethodInfo::System::Collections::Generic::List<HG::Rendering::Runtime::HGEnvironmentVolumeBase>::Sort);
+		    v6->fields.m_sortNeeded = 0;
+		  }
+		  if ( !v6->fields.m_interpolatedPhase )
+		    sub_1800D8260(v7, cameras);
+		  HG::Rendering::Runtime::HGEnvironmentPhase::AssignFrom(v6->fields.m_interpolatedPhase, v6->fields.m_defaultPhase, 0LL);
+		  v6->fields.m_interpolateTrigger = HG::Rendering::Runtime::HGEnvironmentManager::_GetInterpolateTrigger(v6, 0LL);
+		  sub_18002D1B0((SingleFieldAccessor *)&v6->fields.m_interpolateTrigger, v23, v24, v25, methoda);
+		  m_interpolateTrigger = v6->fields.m_interpolateTrigger;
+		  v28 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(TypeInfo::IFix::ILFixDynamicMethodWrapper);
+		    v28 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  v29 = v28->static_fields->wrapperArray;
+		  if ( !v29 )
+		    sub_1800D8260(v28, v26);
+		  if ( v29->max_length.size <= 621 )
+		    goto LABEL_34;
+		  if ( !v28->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(v28);
+		    v28 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  v30 = v28->static_fields->wrapperArray;
+		  if ( !v30 )
+		    sub_1800D8260(v28, v26);
+		  if ( v30->max_length.size <= 0x26Du )
+		    sub_1800D2AB0(v28, v26);
+		  if ( !v30[17].vector[9] )
+		  {
+		LABEL_34:
+		    if ( !v6->fields.m_interpolatedVolumes )
+		      sub_1800D8260(v28, v26);
+		    Beyond::IndexedHashSet<System::Object>::Clear(
+		      (IndexedHashSet_1_System_Object_ *)v6->fields.m_interpolatedVolumes,
+		      MethodInfo::Beyond::IndexedHashSet<HG::Rendering::Runtime::HGEnvironmentVolumeBase>::Clear);
+		    m_interpolatedVolumesFactor = v6->fields.m_interpolatedVolumesFactor;
+		    if ( !m_interpolatedVolumesFactor )
+		      sub_1800D8260(v35, v34);
+		    ++m_interpolatedVolumesFactor->fields._version;
+		    m_interpolatedVolumesFactor->fields._size = 0;
+		    v37 = TypeInfo::UnityEngine::Object;
+		    if ( !TypeInfo::UnityEngine::Object->_1.cctor_finished_or_no_cctor )
+		    {
+		      il2cpp_runtime_class_init_1(TypeInfo::UnityEngine::Object);
+		      v37 = TypeInfo::UnityEngine::Object;
+		      if ( !TypeInfo::UnityEngine::Object->_1.cctor_finished_or_no_cctor )
+		      {
+		        il2cpp_runtime_class_init_1(TypeInfo::UnityEngine::Object);
+		        v37 = TypeInfo::UnityEngine::Object;
+		      }
+		    }
+		    if ( m_interpolateTrigger )
+		    {
+		      if ( !v37->_1.cctor_finished_or_no_cctor )
+		        il2cpp_runtime_class_init_1(v37);
+		      p_m_lastInterpolateTriggerPosition = &v6->fields.m_lastInterpolateTriggerPosition;
+		      if ( m_interpolateTrigger->fields._._.m_CachedPtr )
+		      {
+		        HG::Rendering::Runtime::HGEnvironmentManager::_InterpolateVolumesImpl(
+		          v6,
+		          0LL,
+		          m_interpolateTrigger,
+		          v6->fields.m_interpolatedPhase,
+		          &v6->fields.m_lastInterpolateTriggerPosition,
+		          v6->fields.m_interpolatedVolumes,
+		          v6->fields.m_interpolatedVolumesFactor,
+		          0LL);
+		        goto LABEL_46;
+		      }
+		    }
+		    else
+		    {
+		      p_m_lastInterpolateTriggerPosition = &v6->fields.m_lastInterpolateTriggerPosition;
+		    }
+		    static_fields = TypeInfo::UnityEngine::Vector3->static_fields;
+		    z = static_fields->negativeInfinityVector.z;
+		    *(_QWORD *)&p_m_lastInterpolateTriggerPosition->x = *(_QWORD *)&static_fields->negativeInfinityVector.x;
+		    p_m_lastInterpolateTriggerPosition->z = z;
+		    goto LABEL_46;
+		  }
+		  v31 = IFix::WrappersManagerImpl::GetPatch(621, 0LL);
+		  if ( !v31 )
+		    sub_1800D8260(v33, v32);
+		  IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_1(
+		    (ILFixDynamicMethodWrapper_39 *)v31,
+		    (Object *)v6,
+		    (Object *)m_interpolateTrigger,
+		    0LL);
+		LABEL_46:
+		  SunSourceLight = UnityEngine::Light::GetSunSourceLight(0LL);
+		  z_low = TypeInfo::UnityEngine::Object;
+		  if ( !TypeInfo::UnityEngine::Object->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(TypeInfo::UnityEngine::Object);
+		    z_low = TypeInfo::UnityEngine::Object;
+		    if ( !TypeInfo::UnityEngine::Object->_1.cctor_finished_or_no_cctor )
+		    {
+		      il2cpp_runtime_class_init_1(TypeInfo::UnityEngine::Object);
+		      z_low = TypeInfo::UnityEngine::Object;
+		    }
+		  }
+		  if ( !SunSourceLight )
+		    goto LABEL_235;
+		  if ( !z_low->_1.cctor_finished_or_no_cctor )
+		    il2cpp_runtime_class_init_1(z_low);
+		  if ( !SunSourceLight->fields._._._.m_CachedPtr )
+		    goto LABEL_235;
+		  m_interpolatedPhase = v6->fields.m_interpolatedPhase;
+		  if ( !m_interpolatedPhase )
+		    sub_1800D8260(z_low, v41);
+		  *(Color *)v176 = m_interpolatedPhase->fields.lightConfig.directColor;
+		  HG::Rendering::Runtime::HGEnvironmentUtils::SetColorIfNecessary(SunSourceLight, (Color *)v176, 0LL);
+		  v47 = v6->fields.m_interpolatedPhase;
+		  if ( !v47 )
+		    sub_1800D8260(v46, v45);
+		  HG::Rendering::Runtime::HGEnvironmentUtils::SetIntensityIfNecessary(
+		    SunSourceLight,
+		    v47->fields.lightConfig.directIntensityDividePi,
+		    0LL);
+		  v50 = v6->fields.m_interpolatedPhase;
+		  if ( !v50 )
+		    sub_1800D8260(v49, v48);
+		  HG::Rendering::Runtime::HGEnvironmentUtils::SetSpecularIntensityIfNecessary(
+		    SunSourceLight,
+		    v50->fields.lightConfig.directSpecularIntensity,
+		    0LL);
+		  v53 = v6->fields.m_interpolatedPhase;
+		  if ( !v53 )
+		    sub_1800D8260(v52, v51);
+		  HG::Rendering::Runtime::HGEnvironmentUtils::SetSoftSourceRaidiusIfNecessary(
+		    SunSourceLight,
+		    v53->fields.lightConfig.directSoftSourceRadius,
+		    0LL);
+		  v54 = (__int64 (__fastcall *)(Light *))qword_18F36FBC8;
+		  if ( !qword_18F36FBC8 )
+		  {
+		    v54 = (__int64 (__fastcall *)(Light *))sub_180059EA0("UnityEngine.Component::get_gameObject()");
+		    qword_18F36FBC8 = (__int64)v54;
+		  }
+		  v57 = v54(SunSourceLight);
+		  if ( !v57 )
+		    sub_1800D8260(v56, v55);
+		  v58 = (__int64 (__fastcall *)(__int64))qword_18F36FC30;
+		  if ( !qword_18F36FC30 )
+		  {
+		    v58 = (__int64 (__fastcall *)(__int64))sub_180059EA0("UnityEngine.GameObject::get_transform()");
+		    qword_18F36FC30 = (__int64)v58;
+		  }
+		  v59 = v58(v57);
+		  v62 = v59;
+		  v63 = v6->fields.m_interpolatedPhase;
+		  if ( !v63 )
+		    sub_1800D8260(v61, v60);
+		  if ( !v59 )
+		    sub_1800D8260(v61, v60);
+		  rotationDirect = v63->fields.lightConfig.rotationDirect;
+		  v64 = (void (__fastcall *)(__int64, Quaternion *))qword_18F370118;
+		  if ( !qword_18F370118 )
+		  {
+		    v64 = (void (__fastcall *)(__int64, Quaternion *))sub_180059EA0(
+		                                                        "UnityEngine.Transform::set_rotation_Injected(UnityEngine.Quaternion&)");
+		    qword_18F370118 = (__int64)v64;
+		  }
+		  v64(v62, &rotationDirect);
+		  v65 = (__int64 (__fastcall *)(Light *))qword_18F36FBC8;
+		  if ( !qword_18F36FBC8 )
+		  {
+		    v65 = (__int64 (__fastcall *)(Light *))sub_180059EA0("UnityEngine.Component::get_gameObject()");
+		    qword_18F36FBC8 = (__int64)v65;
+		  }
+		  v66 = (GameObject *)v65(SunSourceLight);
+		  if ( !v66 )
+		    sub_1800D8260(v68, v67);
+		  v69 = (Behaviour *)UnityEngine::GameObject::GetComponent<System::Object>(
+		                       v66,
+		                       MethodInfo::UnityEngine::GameObject::GetComponent<UnityEngine::Rendering::LensFlareComponentSRP>);
+		  v178 = v69;
+		  z_low = TypeInfo::UnityEngine::Object;
+		  if ( !TypeInfo::UnityEngine::Object->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(TypeInfo::UnityEngine::Object);
+		    z_low = TypeInfo::UnityEngine::Object;
+		    if ( !TypeInfo::UnityEngine::Object->_1.cctor_finished_or_no_cctor )
+		    {
+		      il2cpp_runtime_class_init_1(TypeInfo::UnityEngine::Object);
+		      z_low = TypeInfo::UnityEngine::Object;
+		    }
+		  }
+		  if ( !v69 )
+		    goto LABEL_235;
+		  if ( !z_low->_1.cctor_finished_or_no_cctor )
+		    il2cpp_runtime_class_init_1(z_low);
+		  if ( !v69->fields._._.m_CachedPtr )
+		    goto LABEL_235;
+		  if ( !cameras )
+		    sub_1800D8260(z_low, v41);
+		  *(_OWORD *)&v176[8] = 0LL;
+		  *(_QWORD *)v176 = cameras;
+		  sub_18002D1B0((SingleFieldAccessor *)v176, (Type *)v41, v70, v71, methodb);
+		  *(_DWORD *)&v176[8] = 0;
+		  *(_DWORD *)&v176[12] = cameras->fields._version;
+		  *(_QWORD *)&v176[16] = 0LL;
+		  *(_OWORD *)&v179._list = *(_OWORD *)v176;
+		  v179._current = 0LL;
+		  *(_QWORD *)v176 = 0LL;
+		  *(_QWORD *)&v176[8] = &v179;
+		  while ( System::Collections::Generic::List_1_T_::Enumerator<System::Object>::MoveNext(
+		            &v179,
+		            MethodInfo::System::Collections::Generic::List_1_T_::Enumerator<UnityEngine::Camera>::MoveNext) )
+		  {
+		    current = v179._current;
+		    if ( !TypeInfo::HG::Rendering::Runtime::HGCamera->_1.cctor_finished_or_no_cctor )
+		      il2cpp_runtime_class_init_1(TypeInfo::HG::Rendering::Runtime::HGCamera);
+		    v76 = HG::Rendering::Runtime::HGCamera::GetOrCreate((Camera *)current, 0, 0LL);
+		    *(_QWORD *)&v175.x = v76;
+		    if ( !v76 )
+		      sub_1800D8250(v74, v73);
+		    v77 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		    if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper->_1.cctor_finished_or_no_cctor )
+		    {
+		      il2cpp_runtime_class_init_1(TypeInfo::IFix::ILFixDynamicMethodWrapper);
+		      v77 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		    }
+		    v78 = v77->static_fields->wrapperArray;
+		    if ( !v78 )
+		      sub_1800D8250(v77, 0LL);
+		    if ( v78->max_length.size <= 447 )
+		      goto LABEL_174;
+		    if ( !v77->_1.cctor_finished_or_no_cctor )
+		    {
+		      il2cpp_runtime_class_init_1(v77);
+		      v77 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		    }
+		    v78 = v77->static_fields->wrapperArray;
+		    if ( !v78 )
+		      sub_1800D8250(v77, 0LL);
+		    if ( v78->max_length.size <= 0x1BFu )
+		      sub_1800D2AA0(v77, v78, v75);
+		    if ( v78[12].vector[15] )
+		    {
+		      if ( !v77->_1.cctor_finished_or_no_cctor )
+		      {
+		        il2cpp_runtime_class_init_1(v77);
+		        v77 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		      }
+		      v79 = v77->static_fields->wrapperArray;
+		      if ( !v79 )
+		        sub_1800D8250(0LL, v78);
+		      if ( v79->max_length.size <= 0x1BFu )
+		        sub_1800D2AA0(v79, v78, v75);
+		      v80 = v79[12].vector[15];
+		      if ( !v80 )
+		        sub_1800D8250(v79, v78);
+		      memset(&call, 0, sizeof(call));
+		      v81 = IFix::Core::Call::Begin(v185, 0LL);
+		      v82 = *(__m128i *)&v81->argumentBase;
+		      *(_OWORD *)&call.argumentBase = *(_OWORD *)&v81->argumentBase;
+		      v83 = *(__m128i *)&v81->managedStack;
+		      *(__m128i *)&call.managedStack = v83;
+		      call.topWriteBack = v81->topWriteBack;
+		      if ( v80->fields.anonObj )
+		      {
+		        anonObj = v80->fields.anonObj;
+		        v85 = (_DWORD *)_mm_srli_si128(v83, 8).m128i_u64[0];
+		        v86 = (__int64)v85 - _mm_srli_si128(v82, 8).m128i_u64[0];
+		        v87 = (unsigned __int128)(v86 * (__int128)0x2AAAAAAAAAAAAAABLL) >> 64;
+		        v88 = v86 / 12;
+		        if ( !v85 )
+		          sub_1800D8250(v86, v87);
+		        *v85 = 8;
+		        if ( !call.currentTop )
+		          sub_1800D8250(v86, v87);
+		        call.currentTop->Value1 = v88;
+		        managedStack = call.managedStack;
+		        if ( !call.managedStack )
+		          sub_1800D8250(v86, v87);
+		        element_class = call.managedStack->klass->_0.element_class;
+		        klass = anonObj->klass;
+		        if ( !(unsigned __int8)il2cpp_class_is_assignable_from_1(element_class, anonObj->klass)
+		          && ((BYTE1(klass->vtable.Equals.methodPtr) & 0x10) == 0
+		           || ((element_class->flags & 0x20) == 0
+		            && *((_BYTE *)&element_class->byval_arg + 10) != 19
+		            && *((_BYTE *)&element_class->byval_arg + 10) != 30
+		            || !element_class->interopData
+		            || !element_class->interopData->guid
+		            || !sub_1802ED414(anonObj))
+		           && element_class != (Il2CppClass *)qword_18F35FF70) )
+		        {
+		          v166 = sub_18031E23C();
+		          sub_18007E190(v166, 0LL);
+		        }
+		        sub_180005370(managedStack, (int)v88, anonObj);
+		        currentTop = ++call.currentTop;
+		        v76 = *(HGCamera **)&v175.x;
+		      }
+		      else
+		      {
+		        currentTop = call.currentTop;
+		      }
+		      v93 = (char *)currentTop - (char *)call.evaluationStackBase;
+		      v94 = (unsigned __int128)(((char *)currentTop - (char *)call.evaluationStackBase) * (__int128)0x2AAAAAAAAAAAAAABLL) >> 64;
+		      v95 = currentTop - call.evaluationStackBase;
+		      if ( !currentTop )
+		        sub_1800D8250(v93, v94);
+		      currentTop->Type = 8;
+		      if ( !call.currentTop )
+		        sub_1800D8250(v93, v94);
+		      call.currentTop->Value1 = v95;
+		      v96 = call.managedStack;
+		      if ( !call.managedStack )
+		        sub_1800D8250(v93, v94);
+		      v97 = call.managedStack->klass->_0.element_class;
+		      v98 = v76->klass;
+		      if ( !(unsigned __int8)il2cpp_class_is_assignable_from_1(v97, v76->klass)
+		        && ((BYTE1(v98->vtable.Equals.methodPtr) & 0x10) == 0
+		         || ((v97->flags & 0x20) == 0
+		          && *((_BYTE *)&v97->byval_arg + 10) != 19
+		          && *((_BYTE *)&v97->byval_arg + 10) != 30
+		          || !v97->interopData
+		          || !v97->interopData->guid
+		          || !sub_1802ED414(v76))
+		         && v97 != (Il2CppClass *)qword_18F35FF70) )
+		      {
+		        v167 = sub_18031E23C();
+		        sub_18007E190(v167, 0LL);
+		      }
+		      sub_180005370(v96, (int)v95, v76);
+		      ++call.currentTop;
+		      virtualMachine = v80->fields.virtualMachine;
+		      if ( !virtualMachine )
+		        sub_1800D8250(0LL, v99);
+		      IFix::Core::VirtualMachine::Execute(
+		        virtualMachine,
+		        v80->fields.methodId,
+		        &call,
+		        (v80->fields.anonObj != 0LL) + 1,
+		        0,
+		        0LL);
+		      v103 = MethodInfo::IFix::Core::Call::GetAsType<HG::Rendering::Runtime::HGEnvironmentVolumeCameraComponent>;
+		      if ( !MethodInfo::IFix::Core::Call::GetAsType<HG::Rendering::Runtime::HGEnvironmentVolumeCameraComponent>->rgctx_data )
+		        sub_1800430B0(MethodInfo::IFix::Core::Call::GetAsType<HG::Rendering::Runtime::HGEnvironmentVolumeCameraComponent>);
+		      if ( !byte_18F3963A0 )
+		      {
+		        v102 = _InterlockedExchangeAdd64((volatile signed __int64 *)&MethodInfo::IFix::Core::Call::GetObject, 0LL);
+		        if ( (v102 & 1) != 0 )
+		        {
+		          v104 = ((unsigned int)v102 >> 1) & 0xFFFFFFF;
+		          switch ( (unsigned int)v102 >> 29 )
+		          {
+		            case 1u:
+		              v105 = (void (__fastcall __noreturn **)())sub_180036020((unsigned int)v104);
+		              goto LABEL_154;
+		            case 2u:
+		              v105 = (void (__fastcall __noreturn **)())sub_1800362C0((unsigned int)v104);
+		              goto LABEL_154;
+		            case 3u:
+		            case 6u:
+		              v106 = ((unsigned int)v102 >> 1) & 0xFFFFFFF;
+		              v102 = (unsigned int)v102 >> 29;
+		              if ( (_DWORD)v102 )
+		              {
+		                if ( (_DWORD)v102 == 3 )
+		                {
+		                  v105 = (void (__fastcall __noreturn **)())sub_180009A40(v106);
+		                  goto LABEL_154;
+		                }
+		                if ( (_DWORD)v102 == 6 )
+		                {
+		                  v107 = sub_1802F8800(v106);
+		                  v105 = (void (__fastcall __noreturn **)())sub_180026660(v107, 0LL);
+		                  goto LABEL_154;
+		                }
+		              }
+		              else if ( v106 == 1 )
+		              {
+		                v105 = off_18B8C2EC0;
+		                goto LABEL_154;
+		              }
+		LABEL_153:
+		              v105 = 0LL;
+		LABEL_154:
+		              if ( v105 )
+		                _InterlockedExchange64((volatile __int64 *)&MethodInfo::IFix::Core::Call::GetObject, (__int64)v105);
+		              break;
+		            case 4u:
+		              v105 = (void (__fastcall __noreturn **)())sub_1802F8760((unsigned int)v104);
+		              goto LABEL_154;
+		            case 5u:
+		              if ( *(_QWORD *)(qword_18F371F68 + 8 * v104) )
+		              {
+		                v105 = *(void (__fastcall __noreturn ***)())(qword_18F371F68 + 8 * v104);
+		              }
+		              else
+		              {
+		                v108 = il2cpp_string_new_len(
+		                         qword_18F360DF8
+		                       + *(int *)(qword_18F360DF8 + *(int *)(qword_18F360E00 + 8) + 8 * v104 + 4)
+		                       + *(int *)(qword_18F360E00 + 16),
+		                         *(unsigned int *)(qword_18F360DF8 + *(int *)(qword_18F360E00 + 8) + 8 * v104));
+		                v105 = (void (__fastcall __noreturn **)())_InterlockedCompareExchange64(
+		                                                            (volatile signed __int64 *)(qword_18F371F68 + 8 * v104),
+		                                                            v108,
+		                                                            0LL);
+		                if ( !v105 )
+		                {
+		                  v102 = qword_18F371F68 + 8 * v104;
+		                  if ( dword_18F35FD08 )
+		                  {
+		                    v109 = (v102 >> 12) & 0x1FFFFF;
+		                    v101 = (unsigned __int64)v109 >> 6;
+		                    v102 = v109 & 0x3F;
+		                    _m_prefetchw(&qword_18F103690[v101]);
+		                    do
+		                      v110 = qword_18F103690[v101];
+		                    while ( v110 != _InterlockedCompareExchange64(&qword_18F103690[v101], v110 | (1LL << v102), v110) );
+		                  }
+		                  v105 = (void (__fastcall __noreturn **)())v108;
+		                }
+		              }
+		              goto LABEL_154;
+		            case 7u:
+		              v111 = sub_1802F8760((unsigned int)v104);
+		              v112 = *(_QWORD *)(v111 + 16);
+		              v113 = (v111 - *(_QWORD *)(v112 + 128)) >> 5;
+		              if ( *(_BYTE *)(v112 + 42) == 21 )
+		              {
+		                v114 = *(_QWORD ***)(v112 + 96);
+		                if ( *v114 )
+		                {
+		                  v115 = **v114 - (qword_18F360DF8 + *(int *)(qword_18F360E00 + 160));
+		                  v112 = sub_180009B10(v115 / 92 + v115);
+		                }
+		                else
+		                {
+		                  v112 = 0LL;
+		                }
+		              }
+		              LODWORD(v180[0].x) = v113 + *(_DWORD *)(*(_QWORD *)(v112 + 104) + 32LL);
+		              v116 = sub_1801CD744(
+		                       (unsigned int)v180,
+		                       (int)qword_18F360DF8 + *(_DWORD *)(qword_18F360E00 + 64),
+		                       *(int *)(qword_18F360E00 + 68) / 0xCuLL,
+		                       12,
+		                       (__int64)sub_1802F7130);
+		              if ( !v116 )
+		                goto LABEL_153;
+		              v101 = *(unsigned int *)(v116 + 8);
+		              if ( (_DWORD)v101 == -1 )
+		                goto LABEL_153;
+		              v105 = (void (__fastcall __noreturn **)())(v101 + qword_18F360DF8 + *(int *)(qword_18F360E00 + 72));
+		              goto LABEL_154;
+		            default:
+		              break;
+		          }
+		        }
+		        byte_18F3963A0 = 1;
+		      }
+		      if ( !call.argumentBase )
+		        sub_1800D8250(0LL, v101);
+		      Value1 = call.argumentBase->Value1;
+		      if ( !call.managedStack )
+		        sub_1800D8250(call.argumentBase, v101);
+		      if ( (unsigned int)Value1 >= call.managedStack->max_length.size )
+		        sub_1800D2AA0(call.argumentBase, v101, v102);
+		      m_envVolumeCameraComponent = (HGEnvironmentVolumeCameraComponent *)call.managedStack->vector[Value1];
+		      sub_180005370(call.managedStack, call.argumentBase - call.evaluationStackBase, 0LL);
+		      rgctx_data = v103->rgctx_data;
+		      rgctxDataDummy = rgctx_data->rgctxDataDummy;
+		      if ( (*((_BYTE *)rgctx_data->rgctxDataDummy + 312) & 1) == 0 )
+		      {
+		        sub_1800360B0(rgctx_data->rgctxDataDummy, v78);
+		        rgctxDataDummy = v121;
+		      }
+		      if ( m_envVolumeCameraComponent )
+		      {
+		        v122 = m_envVolumeCameraComponent->klass;
+		        if ( !(unsigned __int8)il2cpp_class_is_assignable_from_1(rgctxDataDummy, m_envVolumeCameraComponent->klass)
+		          && ((BYTE1(v122->vtable.Equals.methodPtr) & 0x10) == 0
+		           || ((rgctxDataDummy[276] & 0x20) == 0 && rgctxDataDummy[42] != 19 && rgctxDataDummy[42] != 30
+		            || !*((_QWORD *)rgctxDataDummy + 14)
+		            || (v78 = *(ILFixDynamicMethodWrapper_2__Array **)(*((_QWORD *)rgctxDataDummy + 14) + 40LL)) == 0LL
+		            || !sub_1802ED414(m_envVolumeCameraComponent))
+		           && rgctxDataDummy != (_BYTE *)qword_18F35FF70) )
+		        {
+		          sub_18031E1F4(m_envVolumeCameraComponent, rgctxDataDummy);
+		        }
+		      }
+		      else
+		      {
+		        m_envVolumeCameraComponent = 0LL;
+		      }
+		    }
+		    else
+		    {
+		LABEL_174:
+		      m_envVolumeCameraComponent = v76->fields.m_envVolumeCameraComponent;
+		    }
+		    if ( !m_envVolumeCameraComponent )
+		      sub_1800D8250(v77, v78);
+		    interpolatedPhase = HG::Rendering::Runtime::HGEnvironmentVolumeCameraComponent::get_interpolatedPhase(
+		                          m_envVolumeCameraComponent,
+		                          0LL);
+		    if ( !interpolatedPhase )
+		      sub_1800D8250(v125, v124);
+		    if ( interpolatedPhase->fields.lensFlareConfig.enable )
+		    {
+		      v126 = 1;
+		      goto LABEL_180;
+		    }
+		  }
+		  v126 = 0;
+		LABEL_180:
+		  if ( IFix::WrappersManagerImpl::IsPatched(646, 0LL) )
+		  {
+		    v128 = IFix::WrappersManagerImpl::GetPatch(646, 0LL);
+		    if ( !v128 )
+		      goto LABEL_302;
+		    v127 = v178;
+		    IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_8((ILFixDynamicMethodWrapper_18 *)v128, (Object *)v178, v126, 0LL);
+		  }
+		  else
+		  {
+		    v127 = v178;
+		    if ( UnityEngine::Behaviour::get_enabled(v178, 0LL) != v126 )
+		      UnityEngine::Behaviour::set_enabled(v127, v126, 0LL);
+		  }
+		  v6 = this;
+		  v129 = this->fields.m_interpolatedPhase;
+		  if ( !v129 )
+		    goto LABEL_302;
+		  if ( v129->fields.lensFlareConfig.enable )
+		  {
+		    lensFlareData = (Object *)v129->fields.lensFlareConfig.lensFlareData;
+		    if ( IFix::WrappersManagerImpl::IsPatched(647, 0LL) )
+		    {
+		      v139 = IFix::WrappersManagerImpl::GetPatch(647, 0LL);
+		      if ( !v139 )
+		        goto LABEL_302;
+		      IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_1(
+		        (ILFixDynamicMethodWrapper_39 *)v139,
+		        (Object *)v127,
+		        lensFlareData,
+		        0LL);
+		    }
+		    else
+		    {
+		      v131 = (Object *)v127[1].klass;
+		      v41 = TypeInfo::UnityEngine::Object;
+		      if ( !TypeInfo::UnityEngine::Object->_1.cctor_finished_or_no_cctor )
+		      {
+		        il2cpp_runtime_class_init_1(TypeInfo::UnityEngine::Object);
+		        v41 = TypeInfo::UnityEngine::Object;
+		        if ( !TypeInfo::UnityEngine::Object->_1.cctor_finished_or_no_cctor )
+		        {
+		          il2cpp_runtime_class_init_1(TypeInfo::UnityEngine::Object);
+		          v41 = TypeInfo::UnityEngine::Object;
+		        }
+		      }
+		      LOBYTE(z_low) = lensFlareData == 0LL;
+		      if ( lensFlareData != 0LL || v131 != 0LL )
+		      {
+		        if ( lensFlareData )
+		        {
+		          if ( v131 )
+		          {
+		            v132 = v131 == lensFlareData;
+		          }
+		          else
+		          {
+		            if ( !v41->_1.cctor_finished_or_no_cctor )
+		              il2cpp_runtime_class_init_1(v41);
+		            v132 = lensFlareData[1].klass == 0LL;
+		          }
+		        }
+		        else
+		        {
+		          if ( !v41->_1.cctor_finished_or_no_cctor )
+		            il2cpp_runtime_class_init_1(v41);
+		          if ( !v131 )
+		            goto LABEL_302;
+		          v132 = v131[1].klass == 0LL;
+		        }
+		        if ( !v132 )
+		        {
+		          v127[1].klass = (Behaviour__Class *)lensFlareData;
+		          if ( dword_18F35FD08 )
+		          {
+		            v133 = (((unsigned __int64)&v127[1] >> 12) & 0x1FFFFF) >> 6;
+		            _m_prefetchw(&qword_18F103690[v133]);
+		            do
+		              v134 = qword_18F103690[v133];
+		            while ( v134 != _InterlockedCompareExchange64(
+		                              &qword_18F103690[v133],
+		                              v134 | (1LL << (((unsigned __int64)&v127[1] >> 12) & 0x3F)),
+		                              v134) );
+		          }
+		          if ( !UnityEngine::Behaviour::get_isActiveAndEnabled(v127, 0LL) )
+		            goto LABEL_309;
+		          v135 = v127[1].klass;
+		          v136 = TypeInfo::UnityEngine::Object;
+		          if ( !TypeInfo::UnityEngine::Object->_1.cctor_finished_or_no_cctor )
+		          {
+		            il2cpp_runtime_class_init_1(TypeInfo::UnityEngine::Object);
+		            v136 = TypeInfo::UnityEngine::Object;
+		            if ( !TypeInfo::UnityEngine::Object->_1.cctor_finished_or_no_cctor )
+		            {
+		              il2cpp_runtime_class_init_1(TypeInfo::UnityEngine::Object);
+		              v136 = TypeInfo::UnityEngine::Object;
+		            }
+		          }
+		          if ( !v135 )
+		            goto LABEL_309;
+		          if ( !v136->_1.cctor_finished_or_no_cctor )
+		            il2cpp_runtime_class_init_1(v136);
+		          if ( v135->_0.name )
+		          {
+		            if ( !TypeInfo::UnityEngine::Rendering::LensFlareCommonSRP->_1.cctor_finished_or_no_cctor )
+		              il2cpp_runtime_class_init_1(TypeInfo::UnityEngine::Rendering::LensFlareCommonSRP);
+		            Instance = UnityEngine::Rendering::LensFlareCommonSRP::get_Instance(0LL);
+		            if ( !Instance )
+		              goto LABEL_302;
+		            UnityEngine::Rendering::LensFlareCommonSRP::AddData(Instance, (LensFlareComponentSRP *)v127, 0LL);
+		          }
+		          else
+		          {
+		LABEL_309:
+		            if ( !TypeInfo::UnityEngine::Rendering::LensFlareCommonSRP->_1.cctor_finished_or_no_cctor )
+		              il2cpp_runtime_class_init_1(TypeInfo::UnityEngine::Rendering::LensFlareCommonSRP);
+		            v138 = UnityEngine::Rendering::LensFlareCommonSRP::get_Instance(0LL);
+		            if ( !v138 )
+		              goto LABEL_302;
+		            UnityEngine::Rendering::LensFlareCommonSRP::RemoveData(v138, (LensFlareComponentSRP *)v127, 0LL);
+		          }
+		        }
+		      }
+		    }
+		    v140 = this->fields.m_interpolatedPhase;
+		    if ( v140 )
+		    {
+		      *(float *)&v127[1].monitor = v140->fields.lensFlareConfig.intensity;
+		      v141 = this->fields.m_interpolatedPhase;
+		      if ( v141 )
+		      {
+		        *(float *)&v127[4].klass = v141->fields.lensFlareConfig.scale;
+		        v142 = this->fields.m_interpolatedPhase;
+		        if ( v142 )
+		        {
+		          LOBYTE(v127[3].monitor) = v142->fields.lensFlareConfig.useOcclusion;
+		          v143 = this->fields.m_interpolatedPhase;
+		          if ( v143 )
+		          {
+		            HIDWORD(v127[3].monitor) = LODWORD(v143->fields.lensFlareConfig.occlusionRadius);
+		            v144 = this->fields.m_interpolatedPhase;
+		            if ( v144 )
+		            {
+		              LODWORD(v127[3].fields._._.m_CachedPtr) = v144->fields.lensFlareConfig.sampleCount;
+		              v145 = this->fields.m_interpolatedPhase;
+		              if ( v145 )
+		              {
+		                HIDWORD(v127[3].fields._._.m_CachedPtr) = LODWORD(v145->fields.lensFlareConfig.occlusionOffset);
+		                v146 = this->fields.m_interpolatedPhase;
+		                if ( v146 )
+		                {
+		                  BYTE4(v127[4].klass) = v146->fields.lensFlareConfig.allowOffScreen;
+		                  v147 = this->fields.m_interpolatedPhase;
+		                  if ( v147 )
+		                  {
+		                    HIDWORD(v127[3].fields._._.m_CachedPtr) = LODWORD(v147->fields.lensFlareConfig.occlusionOffset);
+		                    BYTE5(v127[4].klass) = 1;
+		                    v148 = this->fields.m_interpolatedPhase;
+		                    if ( v148 )
+		                    {
+		                      *(_QWORD *)&v175.x = _mm_unpacklo_ps((__m128)0LL, (__m128)0LL).m128_u64[0];
+		                      v175.z = 1.0;
+		                      *(Quaternion *)v176 = v148->fields.lightConfig.rotationLensFlare;
+		                      v149 = UnityEngine::Quaternion::op_Multiply(v180, (Quaternion *)v176, &v175, 0LL);
+		                      z_low = (struct Object_1__Class *)LODWORD(v149->z);
+		                      v127[4].monitor = *(MonitorData **)&v149->x;
+		                      LODWORD(v127[4].fields._._.m_CachedPtr) = (_DWORD)z_low;
+		                      goto LABEL_234;
+		                    }
+		                  }
+		                }
+		              }
+		            }
+		          }
+		        }
+		      }
+		    }
+		LABEL_302:
+		    sub_1800D8250(z_low, v41);
+		  }
+		LABEL_234:
+		  v4 = (Object *)settingParameters;
+		LABEL_235:
+		  v150 = v6->fields.m_interpolatedPhase;
+		  if ( !v150 )
+		    goto LABEL_256;
+		  v151 = *(_OWORD *)&v150->fields.skyConfig.skyAmbientSH.shr0;
+		  v152 = *(_OWORD *)&v150->fields.skyConfig.skyAmbientSH.shr4;
+		  v153 = *(_OWORD *)&v150->fields.skyConfig.skyAmbientSH.shr8;
+		  v154 = *(_OWORD *)&v150->fields.skyConfig.skyAmbientSH.shg3;
+		  v155 = *(_OWORD *)&v150->fields.skyConfig.skyAmbientSH.shg7;
+		  v156 = *(_OWORD *)&v150->fields.skyConfig.skyAmbientSH.shb2;
+		  v157 = *(_QWORD *)&v150->fields.skyConfig.skyAmbientSH.shb6;
+		  shb8 = v150->fields.skyConfig.skyAmbientSH.shb8;
+		  v159 = (void (__fastcall *)(_QWORD))qword_18F36F598;
+		  if ( !qword_18F36F598 )
+		  {
+		    v159 = (void (__fastcall *)(_QWORD))il2cpp_resolve_icall_1("UnityEngine.RenderSettings::set_skybox(UnityEngine.Material)");
+		    if ( !v159 )
+		    {
+		      v168 = sub_1802EE1B8("UnityEngine.RenderSettings::set_skybox(UnityEngine.Material)");
+		      sub_18007E1B0(v168, 0LL);
+		    }
+		    qword_18F36F598 = (__int64)v159;
+		  }
+		  v159(0LL);
+		  v160 = (void (__fastcall *)(_QWORD))qword_18F36F5A0;
+		  if ( !qword_18F36F5A0 )
+		  {
+		    v160 = (void (__fastcall *)(_QWORD))il2cpp_resolve_icall_1("UnityEngine.RenderSettings::set_sun(UnityEngine.Light)");
+		    if ( !v160 )
+		    {
+		      v169 = sub_1802EE1B8("UnityEngine.RenderSettings::set_sun(UnityEngine.Light)");
+		      sub_18007E1B0(v169, 0LL);
+		    }
+		    qword_18F36F5A0 = (__int64)v160;
+		  }
+		  v160(0LL);
+		  v161 = (void (__fastcall *)(__int64))qword_18F36F590;
+		  if ( !qword_18F36F590 )
+		  {
+		    v161 = (void (__fastcall *)(__int64))il2cpp_resolve_icall_1(
+		                                           "UnityEngine.RenderSettings::set_ambientMode(UnityEngine.Rendering.AmbientMode)");
+		    if ( !v161 )
+		    {
+		      v170 = sub_1802EE1B8("UnityEngine.RenderSettings::set_ambientMode(UnityEngine.Rendering.AmbientMode)");
+		      sub_18007E1B0(v170, 0LL);
+		    }
+		    qword_18F36F590 = (__int64)v161;
+		  }
+		  v161(4LL);
+		  v182[0] = v151;
+		  v182[1] = v152;
+		  v182[2] = v153;
+		  v182[3] = v154;
+		  v182[4] = v155;
+		  v182[5] = v156;
+		  v183 = v157;
+		  v184 = shb8;
+		  v162 = (void (__fastcall *)(_OWORD *))qword_18F36F5B0;
+		  if ( !qword_18F36F5B0 )
+		  {
+		    v162 = (void (__fastcall *)(_OWORD *))il2cpp_resolve_icall_1(
+		                                            "UnityEngine.RenderSettings::set_ambientProbe_Injected(UnityEngine.Rendering."
+		                                            "SphericalHarmonicsL2&)");
+		    if ( !v162 )
+		    {
+		      v171 = sub_1802EE1B8("UnityEngine.RenderSettings::set_ambientProbe_Injected(UnityEngine.Rendering.SphericalHarmonicsL2&)");
+		      sub_18007E1B0(v171, 0LL);
+		    }
+		    qword_18F36F5B0 = (__int64)v162;
+		  }
+		  v162(v182);
+		  v163 = (void (__fastcall *)(__int64))qword_18F36F5A8;
+		  if ( !qword_18F36F5A8 )
+		  {
+		    v163 = (void (__fastcall *)(__int64))il2cpp_resolve_icall_1(
+		                                           "UnityEngine.RenderSettings::set_defaultReflectionMode(UnityEngine.Rendering.D"
+		                                           "efaultReflectionMode)");
+		    if ( !v163 )
+		    {
+		      v172 = sub_1802EE1B8("UnityEngine.RenderSettings::set_defaultReflectionMode(UnityEngine.Rendering.DefaultReflectionMode)");
+		      sub_18007E1B0(v172, 0LL);
+		    }
+		    qword_18F36F5A8 = (__int64)v163;
+		  }
+		  v163(1LL);
+		  if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager->_1.cctor_finished_or_no_cctor )
+		    il2cpp_runtime_class_init_1(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
+		  s_rainRenderer = HG::Rendering::Runtime::HGEnvironmentManager::get_s_rainRenderer(0LL);
+		  if ( !s_rainRenderer
+		    || (HG::Rendering::Runtime::HGRainRenderer::RainAndWetnessPipelineUpdate(
+		          s_rainRenderer,
+		          (HGSettingParameters *)v4,
+		          0LL),
+		        (s_snowRenderer = HG::Rendering::Runtime::HGEnvironmentManager::get_s_snowRenderer(0LL)) == 0LL) )
+		  {
+		LABEL_256:
+		    sub_1800D8250(z_low, v41);
+		  }
+		  HG::Rendering::Runtime::HGSnowRenderer::SnowPipelineUpdate(s_snowRenderer, (HGSettingParameters *)v4, 0LL);
+		}
+		
+		private void _UpdateCameraComponent(HGCamera hgCamera, Transform interpolateTrigger) {} // 0x00000001832731C0-0x00000001832748B0
+		// Void _UpdateCameraComponent(HGCamera, Transform)
+		// Hidden C++ exception states: #wind=3 #try_helpers=1
+		void HG::Rendering::Runtime::HGEnvironmentManager::_UpdateCameraComponent(
+		        HGEnvironmentManager *this,
+		        HGCamera *hgCamera,
+		        Transform *interpolateTrigger,
+		        MethodInfo *method)
+		{
+		  Object *v5; // r14
+		  HGEnvironmentManager *v6; // r13
+		  ILFixDynamicMethodWrapper_2__StaticFields *static_fields; // rcx
+		  ILFixDynamicMethodWrapper_2__Array *wrapperArray; // rbx
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v10; // rdx
+		  __int64 v11; // rcx
+		  ILFixDynamicMethodWrapper_2__StaticFields *v12; // rcx
+		  ILFixDynamicMethodWrapper_2__Array *v13; // rbx
+		  ILFixDynamicMethodWrapper_2 *v14; // rax
+		  __int64 v15; // rdx
+		  __int64 v16; // rcx
+		  HGEnvironmentVolumeCameraComponent *klass; // r15
+		  ILFixDynamicMethodWrapper_2__StaticFields *v18; // rcx
+		  ILFixDynamicMethodWrapper_2__Array *v19; // rbx
+		  ILFixDynamicMethodWrapper_2 *v20; // rax
+		  __int64 v21; // rdx
+		  __int64 v22; // rcx
+		  HGEnvironmentPhase *m_interpolatedPhase; // rbx
+		  __int64 v24; // rdx
+		  struct ILFixDynamicMethodWrapper_2__Class *v25; // rcx
+		  ILFixDynamicMethodWrapper_2__Array *v26; // rbx
+		  ILFixDynamicMethodWrapper_2__Array *v27; // rbx
+		  ILFixDynamicMethodWrapper_2 *v28; // rax
+		  __int64 v29; // rdx
+		  __int64 v30; // rcx
+		  IndexedHashSet_1_HG_Rendering_Runtime_HGEnvironmentVolumeBase_ *m_interpolatedVolumes; // rbx
+		  __int64 v32; // rdx
+		  struct ILFixDynamicMethodWrapper_2__Class *v33; // rcx
+		  ILFixDynamicMethodWrapper_2__Array *v34; // rbx
+		  ILFixDynamicMethodWrapper_2__Array *v35; // rbx
+		  ILFixDynamicMethodWrapper_2 *v36; // rax
+		  __int64 v37; // rdx
+		  __int64 v38; // rcx
+		  List_1_System_Single_ *m_interpolatedVolumesFactor; // rbx
+		  struct Object_1__Class *v40; // rcx
+		  Transform *v41; // rdi
+		  Transform *m_interpolateTrigger; // rbx
+		  bool v43; // zf
+		  void (__fastcall *v44)(Transform *, FieldDescriptor **); // rax
+		  MethodInfo *v45; // r9
+		  Vector3 *v46; // rax
+		  Type *v47; // rdx
+		  PropertyInfo_1 *v48; // r8
+		  Int32__Array **v49; // r9
+		  unsigned int z_low; // ebx
+		  struct Math__Class *v51; // rcx
+		  __m128 v52; // xmm2
+		  __m128d v53; // xmm3
+		  double v54; // xmm0_8
+		  float v55; // xmm0_4
+		  float m_interpolateTimeFactor; // xmm9_4
+		  List_1_HG_Rendering_Runtime_HGEnvironmentVolumeBase_ *m_sortedVolumes; // rbx
+		  unsigned __int64 size; // rdx
+		  signed __int64 items; // rcx
+		  __int64 v60; // r8
+		  _QWORD *p_klass; // r12
+		  struct Object_1__Class *v62; // rcx
+		  struct ILFixDynamicMethodWrapper_2__Class *v63; // rcx
+		  ILFixDynamicMethodWrapper_2__Array *v64; // rdx
+		  ILFixDynamicMethodWrapper_2__Array *v65; // rdx
+		  ILFixDynamicMethodWrapper_2__Array *v66; // rcx
+		  ILFixDynamicMethodWrapper_2 *v67; // r13
+		  Call *v68; // rax
+		  __m128i v69; // xmm6
+		  __m128i v70; // xmm2
+		  Object *anonObj; // r12
+		  _DWORD *v72; // xmm0_8
+		  char *v73; // rcx
+		  __int64 v74; // rdx
+		  __int64 v75; // r15
+		  Object__Array *v76; // r14
+		  __int64 v77; // rdi
+		  Object__Class *v78; // rsi
+		  char *v79; // rbx
+		  Value_1 *v80; // r15
+		  signed __int64 v81; // rcx
+		  __int64 v82; // rdx
+		  __int64 v83; // rdi
+		  Il2CppClass *element_class; // rbx
+		  __int64 v85; // rsi
+		  __int64 v86; // rdx
+		  VirtualMachine *virtualMachine; // rcx
+		  __int64 v88; // rdx
+		  __int64 v89; // rcx
+		  int v90; // eax
+		  unsigned __int8 (__fastcall *v91)(_QWORD *); // rax
+		  void (__fastcall *v92)(Transform *, FieldDescriptor **); // rax
+		  __int64 v93; // r8
+		  struct ILFixDynamicMethodWrapper_2__Class *v94; // rcx
+		  ILFixDynamicMethodWrapper_2__Array *v95; // rdx
+		  ILFixDynamicMethodWrapper_2__Array *v96; // rdx
+		  ILFixDynamicMethodWrapper_2__Array *v97; // rcx
+		  ILFixDynamicMethodWrapper_2 *v98; // rcx
+		  __int64 v99; // rdx
+		  bool v100; // si
+		  Dictionary_2_System_Object_HG_Rendering_Runtime_HGEnvironmentVolumeBase_InterpolateDataPerCamera_ *v101; // rcx
+		  __int64 v102; // rdx
+		  __int64 v103; // rcx
+		  Dictionary_2_System_Object_HG_Rendering_Runtime_HGEnvironmentVolumeBase_InterpolateDataPerCamera_ *v104; // rcx
+		  Dictionary_2_System_Object_HG_Rendering_Runtime_HGEnvironmentVolumeBase_InterpolateDataPerCamera_ *v105; // rdi
+		  struct MethodInfo *v106; // rbx
+		  int32_t Entry; // eax
+		  __int64 v108; // rdx
+		  __int64 v109; // r8
+		  Dictionary_2_System_Object_HG_Rendering_Runtime_HGEnvironmentVolumeBase_InterpolateDataPerCamera_ *v110; // rcx
+		  __int64 v111; // rdx
+		  __int64 v112; // rcx
+		  Dictionary_2_System_Object_HG_Rendering_Runtime_HGEnvironmentVolumeBase_InterpolateDataPerCamera_ *v113; // rdi
+		  struct MethodInfo *v114; // rbx
+		  int32_t v115; // eax
+		  __int64 v116; // rdx
+		  __int64 v117; // r8
+		  Dictionary_2_TKey_TValue_Entry_System_Object_HG_Rendering_Runtime_HGEnvironmentVolumeBase_InterpolateDataPerCamera___Array *v118; // rcx
+		  float Epsilon; // xmm0_4
+		  Dictionary_2_System_Object_Beyond_Gameplay_ShopSystem_UnlockInfo_ *v120; // rcx
+		  Dictionary_2_TKey_TValue_Entry_System_Object_HG_Rendering_Runtime_HGEnvironmentVolumeBase_InterpolateDataPerCamera___Array *entries; // rcx
+		  double (*v122)(void); // rax
+		  __int64 v123; // r8
+		  double v124; // xmm0_8
+		  float v125; // xmm6_4
+		  struct ILFixDynamicMethodWrapper_2__Class *v126; // rcx
+		  ILFixDynamicMethodWrapper_2__Array *v127; // rdx
+		  ILFixDynamicMethodWrapper_2__Array *v128; // rcx
+		  ILFixDynamicMethodWrapper_15 *v129; // rcx
+		  float v130; // xmm0_4
+		  float v131; // xmm6_4
+		  __m128i x_low; // xmm0
+		  double (*v133)(void); // rax
+		  __int64 v134; // r8
+		  double v135; // xmm0_8
+		  float v136; // xmm6_4
+		  struct ILFixDynamicMethodWrapper_2__Class *v137; // rcx
+		  ILFixDynamicMethodWrapper_2__Array *v138; // rcx
+		  ILFixDynamicMethodWrapper_15 *v139; // rcx
+		  float v140; // xmm0_4
+		  float v141; // xmm6_4
+		  Dictionary_2_System_Object_HG_Rendering_Runtime_HGEnvironmentVolumeBase_InterpolateDataPerCamera_ *v142; // rcx
+		  HGEnvironmentVolumeCameraComponent *v143; // r15
+		  HGEnvironmentPhase *v144; // rax
+		  HGEnvironmentManager *v145; // r13
+		  Vector3 *v146; // rax
+		  Object *current; // rbx
+		  IndexedHashSet_1_HG_Rendering_Runtime_HGEnvironmentVolumeBase_ *v148; // rax
+		  __int64 v149; // rdx
+		  __int64 v150; // rcx
+		  List_1_System_Single_ *v151; // r9
+		  signed __int64 v152; // rtt
+		  __int64 v153; // rax
+		  __int64 v154; // rdx
+		  __int64 v155; // rdx
+		  float v156; // xmm6_4
+		  List_1_System_Single_ *v157; // rax
+		  __int64 v158; // rdx
+		  __int64 v159; // rcx
+		  __int64 v160; // r8
+		  List_1_System_Single_ *v161; // rbx
+		  struct MethodInfo *v162; // rdi
+		  Il2CppClass *v163; // rcx
+		  HGEnvironmentPhase *interpolatedPhase; // rsi
+		  Vector3 *v165; // rdi
+		  IndexedHashSet_1_HG_Rendering_Runtime_HGEnvironmentVolumeBase_ *interpolatedVolumes; // rbx
+		  List_1_System_Single_ *interpolatedVolumesFactor; // rax
+		  Vector3 *lastInterpolateTriggerPosition; // rax
+		  Vector3__StaticFields *v169; // rdx
+		  float z; // ecx
+		  __int64 v171; // rax
+		  __int64 v172; // rax
+		  __int64 v173; // rax
+		  __int64 v174; // rax
+		  __int64 v175; // rax
+		  __int64 v176; // rax
+		  __int64 v177; // [rsp+0h] [rbp-1E8h] BYREF
+		  MethodInfo *methoda; // [rsp+20h] [rbp-1C8h]
+		  SingleFieldAccessor v179; // [rsp+50h] [rbp-198h] BYREF
+		  float v180; // [rsp+88h] [rbp-160h]
+		  Vector3 evaluationStackBase; // [rsp+90h] [rbp-158h] BYREF
+		  __int128 v182; // [rsp+A0h] [rbp-148h] BYREF
+		  Func_2_Google_Protobuf_IMessage_Object_ *getValueDelegate; // [rsp+B0h] [rbp-138h]
+		  HGEnvironmentVolumeCameraComponent *v184; // [rsp+B8h] [rbp-130h]
+		  List_1_T_Enumerator_System_Object_ v185; // [rsp+C0h] [rbp-128h] BYREF
+		  HGEnvironmentVolumeCameraComponent *v186; // [rsp+D8h] [rbp-110h]
+		  Vector3 v187; // [rsp+E0h] [rbp-108h] BYREF
+		  Vector3 v188; // [rsp+F0h] [rbp-F8h] BYREF
+		  Il2CppExceptionWrapper *v189; // [rsp+108h] [rbp-E0h] BYREF
+		  Il2CppExceptionWrapper *v190; // [rsp+110h] [rbp-D8h] BYREF
+		  __m128i v191; // [rsp+128h] [rbp-C0h]
+		  Value_1 **topWriteBack; // [rsp+138h] [rbp-B0h]
+		  Call v193[2]; // [rsp+140h] [rbp-A8h] BYREF
+		
+		  v5 = (Object *)hgCamera;
+		  v6 = this;
+		  memset(&v185, 0, sizeof(v185));
+		  v182 = 0LL;
+		  getValueDelegate = 0LL;
+		  if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper->_1.cctor_finished_or_no_cctor )
+		    il2cpp_runtime_class_init_1(TypeInfo::IFix::ILFixDynamicMethodWrapper);
+		  static_fields = TypeInfo::IFix::ILFixDynamicMethodWrapper->static_fields;
+		  if ( !static_fields->wrapperArray )
+		    sub_1800D8260(static_fields, hgCamera);
+		  if ( static_fields->wrapperArray->max_length.size > 788 )
+		  {
+		    if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper->_1.cctor_finished_or_no_cctor )
+		      il2cpp_runtime_class_init_1(TypeInfo::IFix::ILFixDynamicMethodWrapper);
+		    static_fields = TypeInfo::IFix::ILFixDynamicMethodWrapper->static_fields;
+		    wrapperArray = static_fields->wrapperArray;
+		    if ( !static_fields->wrapperArray )
+		      sub_1800D8260(static_fields, hgCamera);
+		    if ( wrapperArray->max_length.size <= 0x314u )
+		      sub_1800D2AB0(static_fields, hgCamera);
+		    if ( wrapperArray[22].klass )
+		    {
+		      Patch = IFix::WrappersManagerImpl::GetPatch(788, 0LL);
+		      if ( !Patch )
+		        sub_1800D8260(v11, v10);
+		      IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_11(
+		        (ILFixDynamicMethodWrapper_30 *)Patch,
+		        (Object *)v6,
+		        v5,
+		        (Object *)interpolateTrigger,
+		        0LL);
+		      return;
+		    }
+		  }
+		  if ( !v5 )
+		    sub_1800D8260(static_fields, hgCamera);
+		  if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper->_1.cctor_finished_or_no_cctor )
+		    il2cpp_runtime_class_init_1(TypeInfo::IFix::ILFixDynamicMethodWrapper);
+		  v12 = TypeInfo::IFix::ILFixDynamicMethodWrapper->static_fields;
+		  if ( !v12->wrapperArray )
+		    sub_1800D8260(v12, hgCamera);
+		  if ( v12->wrapperArray->max_length.size <= 447 )
+		    goto LABEL_24;
+		  if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper->_1.cctor_finished_or_no_cctor )
+		    il2cpp_runtime_class_init_1(TypeInfo::IFix::ILFixDynamicMethodWrapper);
+		  v12 = TypeInfo::IFix::ILFixDynamicMethodWrapper->static_fields;
+		  v13 = v12->wrapperArray;
+		  if ( !v12->wrapperArray )
+		    sub_1800D8260(v12, hgCamera);
+		  if ( v13->max_length.size <= 0x1BFu )
+		    sub_1800D2AB0(v12, hgCamera);
+		  if ( v13[12].vector[15] )
+		  {
+		    v14 = IFix::WrappersManagerImpl::GetPatch(447, 0LL);
+		    if ( !v14 )
+		      sub_1800D8260(v16, v15);
+		    klass = IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_207(v14, v5, 0LL);
+		  }
+		  else
+		  {
+		LABEL_24:
+		    klass = (HGEnvironmentVolumeCameraComponent *)v5[157].klass;
+		  }
+		  v186 = klass;
+		  v184 = klass;
+		  if ( !klass )
+		    sub_1800D8260(v12, hgCamera);
+		  if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper->_1.cctor_finished_or_no_cctor )
+		    il2cpp_runtime_class_init_1(TypeInfo::IFix::ILFixDynamicMethodWrapper);
+		  v18 = TypeInfo::IFix::ILFixDynamicMethodWrapper->static_fields;
+		  if ( !v18->wrapperArray )
+		    sub_1800D8260(v18, hgCamera);
+		  if ( v18->wrapperArray->max_length.size <= 451 )
+		    goto LABEL_37;
+		  if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper->_1.cctor_finished_or_no_cctor )
+		    il2cpp_runtime_class_init_1(TypeInfo::IFix::ILFixDynamicMethodWrapper);
+		  v18 = TypeInfo::IFix::ILFixDynamicMethodWrapper->static_fields;
+		  v19 = v18->wrapperArray;
+		  if ( !v18->wrapperArray )
+		    sub_1800D8260(v18, hgCamera);
+		  if ( v19->max_length.size <= 0x1C3u )
+		    sub_1800D2AB0(v18, hgCamera);
+		  if ( v19[12].vector[19] )
+		  {
+		    v20 = IFix::WrappersManagerImpl::GetPatch(451, 0LL);
+		    if ( !v20 )
+		      sub_1800D8260(v22, v21);
+		    m_interpolatedPhase = IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_210(v20, (Object *)klass, 0LL);
+		  }
+		  else
+		  {
+		LABEL_37:
+		    m_interpolatedPhase = klass->fields.m_interpolatedPhase;
+		  }
+		  if ( !m_interpolatedPhase )
+		    sub_1800D8260(v18, hgCamera);
+		  HG::Rendering::Runtime::HGEnvironmentPhase::AssignFrom(m_interpolatedPhase, v6->fields.m_defaultPhase, 0LL);
+		  v25 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(TypeInfo::IFix::ILFixDynamicMethodWrapper);
+		    v25 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  v26 = v25->static_fields->wrapperArray;
+		  if ( !v26 )
+		    sub_1800D8260(v25, v24);
+		  if ( v26->max_length.size <= 789 )
+		    goto LABEL_50;
+		  if ( !v25->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(v25);
+		    v25 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  v27 = v25->static_fields->wrapperArray;
+		  if ( !v27 )
+		    sub_1800D8260(v25, v24);
+		  if ( v27->max_length.size <= 0x315u )
+		    sub_1800D2AB0(v25, v24);
+		  if ( v27[22].monitor )
+		  {
+		    v28 = IFix::WrappersManagerImpl::GetPatch(789, 0LL);
+		    if ( !v28 )
+		      sub_1800D8260(v30, v29);
+		    m_interpolatedVolumes = IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_315(v28, (Object *)klass, 0LL);
+		  }
+		  else
+		  {
+		LABEL_50:
+		    m_interpolatedVolumes = klass->fields.m_interpolatedVolumes;
+		  }
+		  if ( !m_interpolatedVolumes )
+		    sub_1800D8260(v25, v24);
+		  Beyond::IndexedHashSet<System::Object>::Clear(
+		    (IndexedHashSet_1_System_Object_ *)m_interpolatedVolumes,
+		    MethodInfo::Beyond::IndexedHashSet<HG::Rendering::Runtime::HGEnvironmentVolumeBase>::Clear);
+		  v33 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(TypeInfo::IFix::ILFixDynamicMethodWrapper);
+		    v33 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  v34 = v33->static_fields->wrapperArray;
+		  if ( !v34 )
+		    sub_1800D8260(v33, v32);
+		  if ( v34->max_length.size <= 790 )
+		    goto LABEL_63;
+		  if ( !v33->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(v33);
+		    v33 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  v35 = v33->static_fields->wrapperArray;
+		  if ( !v35 )
+		    sub_1800D8260(v33, v32);
+		  if ( v35->max_length.size <= 0x316u )
+		    sub_1800D2AB0(v33, v32);
+		  if ( v35[22].bounds )
+		  {
+		    v36 = IFix::WrappersManagerImpl::GetPatch(790, 0LL);
+		    if ( !v36 )
+		      sub_1800D8260(v38, v37);
+		    m_interpolatedVolumesFactor = IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_316(v36, (Object *)klass, 0LL);
+		  }
+		  else
+		  {
+		LABEL_63:
+		    m_interpolatedVolumesFactor = klass->fields.m_interpolatedVolumesFactor;
+		  }
+		  if ( !m_interpolatedVolumesFactor )
+		    sub_1800D8260(v33, v32);
+		  ++m_interpolatedVolumesFactor->fields._version;
+		  m_interpolatedVolumesFactor->fields._size = 0;
+		  v40 = TypeInfo::UnityEngine::Object;
+		  if ( !TypeInfo::UnityEngine::Object->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(TypeInfo::UnityEngine::Object);
+		    v40 = TypeInfo::UnityEngine::Object;
+		    if ( !TypeInfo::UnityEngine::Object->_1.cctor_finished_or_no_cctor )
+		    {
+		      il2cpp_runtime_class_init_1(TypeInfo::UnityEngine::Object);
+		      v40 = TypeInfo::UnityEngine::Object;
+		    }
+		  }
+		  v41 = interpolateTrigger;
+		  if ( !interpolateTrigger )
+		    goto LABEL_277;
+		  if ( !v40->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(v40);
+		    v40 = TypeInfo::UnityEngine::Object;
+		  }
+		  if ( !interpolateTrigger->fields._._.m_CachedPtr )
+		  {
+		LABEL_277:
+		    lastInterpolateTriggerPosition = HG::Rendering::Runtime::HGEnvironmentVolumeCameraComponent::get_lastInterpolateTriggerPosition(
+		                                       klass,
+		                                       0LL);
+		    v169 = TypeInfo::UnityEngine::Vector3->static_fields;
+		    z = v169->negativeInfinityVector.z;
+		    *(_QWORD *)&lastInterpolateTriggerPosition->x = *(_QWORD *)&v169->negativeInfinityVector.x;
+		    lastInterpolateTriggerPosition->z = z;
+		    return;
+		  }
+		  m_interpolateTrigger = v6->fields.m_interpolateTrigger;
+		  if ( !v40->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(v40);
+		    v40 = TypeInfo::UnityEngine::Object;
+		    if ( !TypeInfo::UnityEngine::Object->_1.cctor_finished_or_no_cctor )
+		    {
+		      il2cpp_runtime_class_init_1(TypeInfo::UnityEngine::Object);
+		      v40 = TypeInfo::UnityEngine::Object;
+		    }
+		  }
+		  if ( m_interpolateTrigger )
+		  {
+		    v43 = interpolateTrigger == m_interpolateTrigger;
+		  }
+		  else
+		  {
+		    if ( !v40->_1.cctor_finished_or_no_cctor )
+		      il2cpp_runtime_class_init_1(v40);
+		    v43 = interpolateTrigger->fields._._.m_CachedPtr == 0LL;
+		  }
+		  if ( !v43 )
+		  {
+		LABEL_276:
+		    interpolatedPhase = HG::Rendering::Runtime::HGEnvironmentVolumeCameraComponent::get_interpolatedPhase(klass, 0LL);
+		    v165 = HG::Rendering::Runtime::HGEnvironmentVolumeCameraComponent::get_lastInterpolateTriggerPosition(klass, 0LL);
+		    interpolatedVolumes = HG::Rendering::Runtime::HGEnvironmentVolumeCameraComponent::get_interpolatedVolumes(
+		                            klass,
+		                            0LL);
+		    interpolatedVolumesFactor = HG::Rendering::Runtime::HGEnvironmentVolumeCameraComponent::get_interpolatedVolumesFactor(
+		                                  klass,
+		                                  0LL);
+		    HG::Rendering::Runtime::HGEnvironmentManager::_InterpolateVolumesImpl(
+		      v6,
+		      (HGCamera *)v5,
+		      interpolateTrigger,
+		      interpolatedPhase,
+		      v165,
+		      interpolatedVolumes,
+		      interpolatedVolumesFactor,
+		      0LL);
+		    return;
+		  }
+		  v179.fields._.descriptor = 0LL;
+		  LODWORD(v179.fields.setValueDelegate) = 0;
+		  v44 = (void (__fastcall *)(Transform *, FieldDescriptor **))qword_18F3700F0;
+		  if ( !qword_18F3700F0 )
+		  {
+		    v44 = (void (__fastcall *)(Transform *, FieldDescriptor **))sub_180059EA0(
+		                                                                  "UnityEngine.Transform::get_position_Injected(UnityEngine.Vector3&)");
+		    qword_18F3700F0 = (__int64)v44;
+		  }
+		  v44(interpolateTrigger, &v179.fields._.descriptor);
+		  v179.fields.hasDelegate = *(Func_2_Google_Protobuf_IMessage_Boolean_ **)&v6->fields.m_lastInterpolateTriggerPosition.x;
+		  v180 = v6->fields.m_lastInterpolateTriggerPosition.z;
+		  evaluationStackBase = *(Vector3 *)&v179.fields._.descriptor;
+		  v46 = UnityEngine::Vector3::op_Subtraction(&v187, &evaluationStackBase, (Vector3 *)&v179.fields.hasDelegate, v45);
+		  v179.fields._.descriptor = *(FieldDescriptor **)&v46->x;
+		  z_low = LODWORD(v46->z);
+		  v51 = TypeInfo::System::Math;
+		  if ( !TypeInfo::System::Math->_1.cctor_finished_or_no_cctor )
+		    il2cpp_runtime_class_init_1(TypeInfo::System::Math);
+		  v52 = (__m128)_mm_cvtsi32_si128(z_low);
+		  v52.m128_f32[0] = (float)(v52.m128_f32[0] * v52.m128_f32[0])
+		                  + (float)((float)(*((float *)&v179.fields._.descriptor + 1) * *((float *)&v179.fields._.descriptor + 1))
+		                          + (float)(*(float *)&v179.fields._.descriptor * *(float *)&v179.fields._.descriptor));
+		  v53 = _mm_cvtps_pd(v52);
+		  if ( v53.m128d_f64[0] < 0.0 )
+		    v54 = sub_1801D32D0(v51, v47, v48);
+		  else
+		    *(_QWORD *)&v54 = *(_OWORD *)&_mm_sqrt_pd(v53);
+		  v55 = v54;
+		  if ( v55 <= 5.0 )
+		    m_interpolateTimeFactor = v6->fields.m_interpolateTimeFactor;
+		  else
+		    m_interpolateTimeFactor = 10000.0;
+		  m_sortedVolumes = v6->fields.m_sortedVolumes;
+		  if ( !m_sortedVolumes )
+		    sub_1800D8260(v51, v47);
+		  *(_OWORD *)&v179.monitor = 0LL;
+		  v179.klass = (SingleFieldAccessor__Class *)m_sortedVolumes;
+		  sub_18002D1B0(&v179, v47, v48, v49, methoda);
+		  LODWORD(v179.monitor) = 0;
+		  HIDWORD(v179.monitor) = m_sortedVolumes->fields._version;
+		  v179.fields._.getValueDelegate = 0LL;
+		  *(_OWORD *)&v185._list = *(_OWORD *)&v179.klass;
+		  v185._current = 0LL;
+		  v179.klass = 0LL;
+		  v179.monitor = (MonitorData *)&v185;
+		  while ( System::Collections::Generic::List_1_T_::Enumerator<System::Object>::MoveNext(
+		            &v185,
+		            MethodInfo::System::Collections::Generic::List_1_T_::Enumerator<HG::Rendering::Runtime::HGEnvironmentVolumeBase>::MoveNext) )
+		  {
+		    p_klass = &v185._current->klass;
+		    v179.fields.hasDelegate = (Func_2_Google_Protobuf_IMessage_Boolean_ *)v185._current;
+		    v62 = TypeInfo::UnityEngine::Object;
+		    if ( !TypeInfo::UnityEngine::Object->_1.cctor_finished_or_no_cctor )
+		    {
+		      il2cpp_runtime_class_init_1(TypeInfo::UnityEngine::Object);
+		      v62 = TypeInfo::UnityEngine::Object;
+		      if ( !TypeInfo::UnityEngine::Object->_1.cctor_finished_or_no_cctor )
+		      {
+		        il2cpp_runtime_class_init_1(TypeInfo::UnityEngine::Object);
+		        v62 = TypeInfo::UnityEngine::Object;
+		      }
+		    }
+		    if ( p_klass )
+		    {
+		      if ( !v62->_1.cctor_finished_or_no_cctor )
+		        il2cpp_runtime_class_init_1(v62);
+		      if ( p_klass[2] )
+		      {
+		        v63 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		        if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper->_1.cctor_finished_or_no_cctor )
+		        {
+		          il2cpp_runtime_class_init_1(TypeInfo::IFix::ILFixDynamicMethodWrapper);
+		          v63 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		        }
+		        v64 = v63->static_fields->wrapperArray;
+		        if ( !v64 )
+		          sub_1800D8250(v63, 0LL);
+		        if ( v64->max_length.size <= 623 )
+		          goto LABEL_143;
+		        if ( !v63->_1.cctor_finished_or_no_cctor )
+		        {
+		          il2cpp_runtime_class_init_1(v63);
+		          v63 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		        }
+		        v65 = v63->static_fields->wrapperArray;
+		        if ( !v65 )
+		          sub_1800D8250(v63, 0LL);
+		        if ( v65->max_length.size <= 0x26Fu )
+		          sub_1800D2AA0(v63, v65, v60);
+		        if ( v65[17].vector[11] )
+		        {
+		          if ( !v63->_1.cctor_finished_or_no_cctor )
+		          {
+		            il2cpp_runtime_class_init_1(v63);
+		            v63 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		          }
+		          v66 = v63->static_fields->wrapperArray;
+		          if ( !v66 )
+		            sub_1800D8250(0LL, v65);
+		          if ( v66->max_length.size <= 0x26Fu )
+		            sub_1800D2AA0(v66, v65, v60);
+		          v67 = v66[17].vector[11];
+		          if ( !v67 )
+		            sub_1800D8250(v66, v65);
+		          v68 = IFix::Core::Call::Begin(v193, 0LL);
+		          v69 = *(__m128i *)&v68->argumentBase;
+		          v70 = *(__m128i *)&v68->managedStack;
+		          v191 = v70;
+		          topWriteBack = v68->topWriteBack;
+		          if ( v67->fields.anonObj )
+		          {
+		            anonObj = v67->fields.anonObj;
+		            v72 = (_DWORD *)_mm_srli_si128(v70, 8).m128i_u64[0];
+		            *(_QWORD *)&evaluationStackBase.x = _mm_srli_si128(v69, 8).m128i_u64[0];
+		            v73 = (char *)v72 - *(_QWORD *)&evaluationStackBase.x;
+		            v74 = (unsigned __int128)(((__int64)v72 - *(_QWORD *)&evaluationStackBase.x) * (__int128)0x2AAAAAAAAAAAAAABLL) >> 64;
+		            v75 = ((__int64)v72 - *(_QWORD *)&evaluationStackBase.x) / 12;
+		            if ( !v72 )
+		              sub_1800D8250(v73, v74);
+		            *v72 = 8;
+		            v72[1] = v75;
+		            v76 = (Object__Array *)v70.m128i_i64[0];
+		            if ( !v70.m128i_i64[0] )
+		              sub_1800D8250(v73, v74);
+		            v77 = *(_QWORD *)(*(_QWORD *)v70.m128i_i64[0] + 64LL);
+		            v78 = anonObj->klass;
+		            if ( !(unsigned __int8)il2cpp_class_is_assignable_from_1(v77, anonObj->klass)
+		              && ((BYTE1(v78->vtable.Equals.methodPtr) & 0x10) == 0
+		               || ((*(_BYTE *)(v77 + 276) & 0x20) == 0 && *(_BYTE *)(v77 + 42) != 19 && *(_BYTE *)(v77 + 42) != 30
+		                || !*(_QWORD *)(v77 + 112)
+		                || !*(_QWORD *)(*(_QWORD *)(v77 + 112) + 40LL)
+		                || !sub_1802ED414(anonObj))
+		               && v77 != qword_18F35FF70) )
+		            {
+		              v171 = sub_18031E23C();
+		              sub_18007E190(v171, 0LL);
+		            }
+		            sub_180005370(v70.m128i_i64[0], (int)v75, anonObj);
+		            v79 = (char *)(v72 + 3);
+		            v80 = *(Value_1 **)&evaluationStackBase.x;
+		            p_klass = &v179.fields.hasDelegate->klass;
+		          }
+		          else
+		          {
+		            v79 = (char *)v191.m128i_i64[1];
+		            v76 = (Object__Array *)v191.m128i_i64[0];
+		            v80 = (Value_1 *)_mm_srli_si128(v69, 8).m128i_u64[0];
+		          }
+		          v81 = v79 - (char *)v80;
+		          v82 = (unsigned __int128)((v79 - (char *)v80) * (__int128)0x2AAAAAAAAAAAAAABLL) >> 64;
+		          v83 = (v79 - (char *)v80) / 12;
+		          if ( !v79 )
+		            sub_1800D8250(v81, v82);
+		          *(_DWORD *)v79 = 8;
+		          *((_DWORD *)v79 + 1) = v83;
+		          if ( !v76 )
+		            sub_1800D8250(v81, v82);
+		          element_class = v76->klass->_0.element_class;
+		          v85 = *p_klass;
+		          if ( !(unsigned __int8)il2cpp_class_is_assignable_from_1(element_class, *p_klass)
+		            && ((*(_BYTE *)(v85 + 313) & 0x10) == 0
+		             || ((element_class->flags & 0x20) == 0
+		              && *((_BYTE *)&element_class->byval_arg + 10) != 19
+		              && *((_BYTE *)&element_class->byval_arg + 10) != 30
+		              || !element_class->interopData
+		              || !element_class->interopData->guid
+		              || !sub_1802ED414(p_klass))
+		             && element_class != (Il2CppClass *)qword_18F35FF70) )
+		          {
+		            v172 = sub_18031E23C();
+		            sub_18007E190(v172, 0LL);
+		          }
+		          sub_180005370(v76, (int)v83, p_klass);
+		          virtualMachine = v67->fields.virtualMachine;
+		          if ( !virtualMachine )
+		            sub_1800D8250(0LL, v86);
+		          IFix::Core::VirtualMachine::Execute(
+		            virtualMachine,
+		            virtualMachine->fields.unmanagedCodes[v67->fields.methodId],
+		            (Value_1 *)v69.m128i_i64[0],
+		            v76,
+		            v80,
+		            (v67->fields.anonObj != 0LL) + 1,
+		            v67->fields.methodId,
+		            0,
+		            topWriteBack,
+		            0LL);
+		          if ( !v69.m128i_i64[0] )
+		            sub_1800D8250(v89, v88);
+		          v90 = *(_DWORD *)(v69.m128i_i64[0] + 4);
+		          v5 = (Object *)hgCamera;
+		          v41 = interpolateTrigger;
+		        }
+		        else
+		        {
+		LABEL_143:
+		          v90 = *((_DWORD *)p_klass + 10);
+		        }
+		        if ( v90 == 2 )
+		        {
+		          v91 = (unsigned __int8 (__fastcall *)(_QWORD *))qword_18F36FBB8;
+		          if ( !qword_18F36FBB8 )
+		          {
+		            v91 = (unsigned __int8 (__fastcall *)(_QWORD *))il2cpp_resolve_icall_1("UnityEngine.Behaviour::get_isActiveAndEnabled()");
+		            if ( !v91 )
+		            {
+		              v173 = sub_1802EE1B8("UnityEngine.Behaviour::get_isActiveAndEnabled()");
+		              sub_18007E1B0(v173, 0LL);
+		            }
+		            qword_18F36FBB8 = (__int64)v91;
+		          }
+		          if ( v91(p_klass) )
+		          {
+		            sub_1800049A0(*p_klass);
+		            if ( (*(unsigned __int8 (__fastcall **)(_QWORD *, _QWORD))(*p_klass + 464LL))(
+		                   p_klass,
+		                   *(_QWORD *)(*p_klass + 472LL)) )
+		            {
+		              v179.fields._.descriptor = 0LL;
+		              LODWORD(v179.fields.setValueDelegate) = 0;
+		              v92 = (void (__fastcall *)(Transform *, FieldDescriptor **))qword_18F3700F0;
+		              if ( !qword_18F3700F0 )
+		              {
+		                v92 = (void (__fastcall *)(Transform *, FieldDescriptor **))il2cpp_resolve_icall_1(
+		                                                                              "UnityEngine.Transform::get_position_Inject"
+		                                                                              "ed(UnityEngine.Vector3&)");
+		                if ( !v92 )
+		                {
+		                  v174 = sub_1802EE1B8("UnityEngine.Transform::get_position_Injected(UnityEngine.Vector3&)");
+		                  sub_18007E1B0(v174, 0LL);
+		                }
+		                qword_18F3700F0 = (__int64)v92;
+		              }
+		              v92(v41, &v179.fields._.descriptor);
+		              v94 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		              if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper->_1.cctor_finished_or_no_cctor )
+		              {
+		                il2cpp_runtime_class_init_1(TypeInfo::IFix::ILFixDynamicMethodWrapper);
+		                v94 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		              }
+		              v95 = v94->static_fields->wrapperArray;
+		              if ( !v95 )
+		                sub_1800D8250(v94, 0LL);
+		              if ( v95->max_length.size <= 624 )
+		                goto LABEL_168;
+		              if ( !v94->_1.cctor_finished_or_no_cctor )
+		              {
+		                il2cpp_runtime_class_init_1(v94);
+		                v94 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		              }
+		              v96 = v94->static_fields->wrapperArray;
+		              if ( !v96 )
+		                sub_1800D8250(v94, 0LL);
+		              if ( v96->max_length.size <= 0x270u )
+		                sub_1800D2AA0(v94, v96, v93);
+		              if ( v96[17].vector[12] )
+		              {
+		                if ( !v94->_1.cctor_finished_or_no_cctor )
+		                {
+		                  il2cpp_runtime_class_init_1(v94);
+		                  v94 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		                }
+		                v97 = v94->static_fields->wrapperArray;
+		                if ( !v97 )
+		                  sub_1800D8250(0LL, v96);
+		                if ( v97->max_length.size <= 0x270u )
+		                  sub_1800D2AA0(v97, v96, v93);
+		                v98 = v97[17].vector[12];
+		                if ( !v98 )
+		                  sub_1800D8250(0LL, v96);
+		                v188 = *(Vector3 *)&v179.fields._.descriptor;
+		                v100 = IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_255(v98, (Object *)p_klass, &v188, 0LL);
+		              }
+		              else
+		              {
+		LABEL_168:
+		                v187 = *(Vector3 *)&v179.fields._.descriptor;
+		                if ( HG::Rendering::Runtime::HGEnvironmentVolumeBase::_DistanceToEdge(
+		                       (HGEnvironmentVolumeBase *)p_klass,
+		                       &v187,
+		                       0LL) > 0.0 )
+		                {
+		                  v100 = 1;
+		                  goto LABEL_170;
+		                }
+		                v100 = 0;
+		              }
+		              if ( v100 )
+		              {
+		LABEL_170:
+		                v101 = (Dictionary_2_System_Object_HG_Rendering_Runtime_HGEnvironmentVolumeBase_InterpolateDataPerCamera_ *)p_klass[10];
+		                if ( !v101 )
+		                  sub_1800D8250(0LL, v99);
+		                if ( !System::Collections::Generic::Dictionary<System::Object,HG::Rendering::Runtime::HGEnvironmentVolumeBase::InterpolateDataPerCamera>::ContainsKey(
+		                        v101,
+		                        v5,
+		                        MethodInfo::System::Collections::Generic::Dictionary<HG::Rendering::Runtime::HGCamera,HG::Rendering::Runtime::HGEnvironmentVolumeBase::InterpolateDataPerCamera>::ContainsKey) )
+		                {
+		                  v104 = (Dictionary_2_System_Object_HG_Rendering_Runtime_HGEnvironmentVolumeBase_InterpolateDataPerCamera_ *)p_klass[10];
+		                  if ( !v104 )
+		                    sub_1800D8250(0LL, v102);
+		                  System::Collections::Generic::Dictionary<System::Object,HG::Rendering::Runtime::HGEnvironmentVolumeBase::InterpolateDataPerCamera>::Add(
+		                    v104,
+		                    v5,
+		                    (HGEnvironmentVolumeBase_InterpolateDataPerCamera)_mm_cvtsi128_si32((__m128i)0LL),
+		                    MethodInfo::System::Collections::Generic::Dictionary<HG::Rendering::Runtime::HGCamera,HG::Rendering::Runtime::HGEnvironmentVolumeBase::InterpolateDataPerCamera>::Add);
+		                }
+		                v105 = (Dictionary_2_System_Object_HG_Rendering_Runtime_HGEnvironmentVolumeBase_InterpolateDataPerCamera_ *)p_klass[10];
+		                if ( !v105 )
+		                  sub_1800D8250(v103, v102);
+		                v106 = MethodInfo::System::Collections::Generic::Dictionary<HG::Rendering::Runtime::HGCamera,HG::Rendering::Runtime::HGEnvironmentVolumeBase::InterpolateDataPerCamera>::get_Item;
+		                if ( !*((_QWORD *)MethodInfo::System::Collections::Generic::Dictionary<HG::Rendering::Runtime::HGCamera,HG::Rendering::Runtime::HGEnvironmentVolumeBase::InterpolateDataPerCamera>::get_Item->klass->rgctx_data[22].rgctxDataDummy
+		                      + 4) )
+		                  (*(void (**)(void))MethodInfo::System::Collections::Generic::Dictionary<HG::Rendering::Runtime::HGCamera,HG::Rendering::Runtime::HGEnvironmentVolumeBase::InterpolateDataPerCamera>::get_Item->klass->rgctx_data[22].rgctxDataDummy)();
+		                Entry = System::Collections::Generic::Dictionary<System::Object,HG::Rendering::Runtime::HGEnvironmentVolumeBase::InterpolateDataPerCamera>::FindEntry(
+		                          v105,
+		                          v5,
+		                          (MethodInfo *)v106->klass->rgctx_data[22].rgctxDataDummy);
+		                if ( Entry < 0 )
+		                  System::ThrowHelper::ThrowKeyNotFoundException(v5, 0LL);
+		                entries = v105->fields._entries;
+		                if ( !entries )
+		                  sub_1800D8250(0LL, v108);
+		                if ( (unsigned int)Entry >= entries->max_length.size )
+		                  sub_1800D2AA0(entries, Entry, v109);
+		                evaluationStackBase.x = entries->vector[Entry].value.timeFadingFactor;
+		                if ( !v100 || *((_BYTE *)p_klass + 72) )
+		                {
+		                  v133 = (double (*)(void))qword_18F36FFB8;
+		                  if ( !qword_18F36FFB8 )
+		                  {
+		                    v133 = (double (*)(void))il2cpp_resolve_icall_1("UnityEngine.Time::get_deltaTime()");
+		                    if ( !v133 )
+		                    {
+		                      v176 = sub_1802EE1B8("UnityEngine.Time::get_deltaTime()");
+		                      sub_18007E1B0(v176, 0LL);
+		                    }
+		                    qword_18F36FFB8 = (__int64)v133;
+		                  }
+		                  v135 = v133();
+		                  v136 = *(float *)&v135;
+		                  v137 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		                  if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper->_1.cctor_finished_or_no_cctor )
+		                  {
+		                    il2cpp_runtime_class_init_1(TypeInfo::IFix::ILFixDynamicMethodWrapper);
+		                    v137 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		                  }
+		                  v127 = v137->static_fields->wrapperArray;
+		                  if ( !v127 )
+		                    sub_1800D8250(v137, 0LL);
+		                  if ( v127->max_length.size <= 639 )
+		                    goto LABEL_234;
+		                  if ( !v137->_1.cctor_finished_or_no_cctor )
+		                  {
+		                    il2cpp_runtime_class_init_1(v137);
+		                    v137 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		                  }
+		                  v127 = v137->static_fields->wrapperArray;
+		                  if ( !v127 )
+		                    sub_1800D8250(v137, 0LL);
+		                  if ( v127->max_length.size <= 0x27Fu )
+		                    sub_1800D2AA0(v137, v127, v134);
+		                  if ( v127[17].vector[27] )
+		                  {
+		                    if ( !v137->_1.cctor_finished_or_no_cctor )
+		                    {
+		                      il2cpp_runtime_class_init_1(v137);
+		                      v137 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		                    }
+		                    v138 = v137->static_fields->wrapperArray;
+		                    if ( !v138 )
+		                      sub_1800D8250(0LL, v127);
+		                    if ( v138->max_length.size <= 0x27Fu )
+		                      sub_1800D2AA0(v138, v127, v134);
+		                    v139 = (ILFixDynamicMethodWrapper_15 *)v138[17].vector[27];
+		                    if ( !v139 )
+		                      sub_1800D8250(0LL, v127);
+		                    v140 = IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_46(v139, (Object *)p_klass, 0LL);
+		                  }
+		                  else
+		                  {
+		LABEL_234:
+		                    v140 = *((float *)p_klass + 14);
+		                  }
+		                  v141 = (float)(v136 * m_interpolateTimeFactor) / v140;
+		                  x_low = (__m128i)LODWORD(evaluationStackBase.x);
+		                  *(float *)x_low.m128i_i32 = evaluationStackBase.x - v141;
+		                }
+		                else
+		                {
+		                  v122 = (double (*)(void))qword_18F36FFB8;
+		                  if ( !qword_18F36FFB8 )
+		                  {
+		                    v122 = (double (*)(void))il2cpp_resolve_icall_1("UnityEngine.Time::get_deltaTime()");
+		                    if ( !v122 )
+		                    {
+		                      v175 = sub_1802EE1B8("UnityEngine.Time::get_deltaTime()");
+		                      sub_18007E1B0(v175, 0LL);
+		                    }
+		                    qword_18F36FFB8 = (__int64)v122;
+		                  }
+		                  v124 = v122();
+		                  v125 = *(float *)&v124;
+		                  v126 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		                  if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper->_1.cctor_finished_or_no_cctor )
+		                  {
+		                    il2cpp_runtime_class_init_1(TypeInfo::IFix::ILFixDynamicMethodWrapper);
+		                    v126 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		                  }
+		                  v127 = v126->static_fields->wrapperArray;
+		                  if ( !v127 )
+		                    sub_1800D8250(v126, 0LL);
+		                  if ( v127->max_length.size <= 638 )
+		                    goto LABEL_214;
+		                  if ( !v126->_1.cctor_finished_or_no_cctor )
+		                  {
+		                    il2cpp_runtime_class_init_1(v126);
+		                    v126 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		                  }
+		                  v127 = v126->static_fields->wrapperArray;
+		                  if ( !v127 )
+		                    sub_1800D8250(v126, 0LL);
+		                  if ( v127->max_length.size <= 0x27Eu )
+		                    sub_1800D2AA0(v126, v127, v123);
+		                  if ( v127[17].vector[26] )
+		                  {
+		                    if ( !v126->_1.cctor_finished_or_no_cctor )
+		                    {
+		                      il2cpp_runtime_class_init_1(v126);
+		                      v126 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		                    }
+		                    v128 = v126->static_fields->wrapperArray;
+		                    if ( !v128 )
+		                      sub_1800D8250(0LL, v127);
+		                    if ( v128->max_length.size <= 0x27Eu )
+		                      sub_1800D2AA0(v128, v127, v123);
+		                    v129 = (ILFixDynamicMethodWrapper_15 *)v128[17].vector[26];
+		                    if ( !v129 )
+		                      sub_1800D8250(0LL, v127);
+		                    v130 = IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_46(v129, (Object *)p_klass, 0LL);
+		                  }
+		                  else
+		                  {
+		LABEL_214:
+		                    v130 = *((float *)p_klass + 13);
+		                  }
+		                  v131 = (float)(v125 * m_interpolateTimeFactor) / v130;
+		                  x_low = (__m128i)LODWORD(evaluationStackBase.x);
+		                  *(float *)x_low.m128i_i32 = evaluationStackBase.x + v131;
+		                }
+		                if ( *(float *)x_low.m128i_i32 < 0.0 )
+		                {
+		                  x_low = 0LL;
+		                }
+		                else if ( *(float *)x_low.m128i_i32 > 1.0 )
+		                {
+		                  x_low = (__m128i)0x3F800000u;
+		                }
+		                v142 = (Dictionary_2_System_Object_HG_Rendering_Runtime_HGEnvironmentVolumeBase_InterpolateDataPerCamera_ *)p_klass[10];
+		                if ( !v142 )
+		                  sub_1800D8250(0LL, v127);
+		                System::Collections::Generic::Dictionary<System::Object,HG::Rendering::Runtime::HGEnvironmentVolumeBase::InterpolateDataPerCamera>::set_Item(
+		                  v142,
+		                  v5,
+		                  (HGEnvironmentVolumeBase_InterpolateDataPerCamera)_mm_cvtsi128_si32(x_low),
+		                  MethodInfo::System::Collections::Generic::Dictionary<HG::Rendering::Runtime::HGCamera,HG::Rendering::Runtime::HGEnvironmentVolumeBase::InterpolateDataPerCamera>::set_Item);
+		                v41 = interpolateTrigger;
+		              }
+		              else
+		              {
+		                v110 = (Dictionary_2_System_Object_HG_Rendering_Runtime_HGEnvironmentVolumeBase_InterpolateDataPerCamera_ *)p_klass[10];
+		                if ( !v110 )
+		                  sub_1800D8250(0LL, v99);
+		                if ( System::Collections::Generic::Dictionary<System::Object,HG::Rendering::Runtime::HGEnvironmentVolumeBase::InterpolateDataPerCamera>::ContainsKey(
+		                       v110,
+		                       v5,
+		                       MethodInfo::System::Collections::Generic::Dictionary<HG::Rendering::Runtime::HGCamera,HG::Rendering::Runtime::HGEnvironmentVolumeBase::InterpolateDataPerCamera>::ContainsKey) )
+		                {
+		                  v113 = (Dictionary_2_System_Object_HG_Rendering_Runtime_HGEnvironmentVolumeBase_InterpolateDataPerCamera_ *)p_klass[10];
+		                  if ( !v113 )
+		                    sub_1800D8250(v112, v111);
+		                  v114 = MethodInfo::System::Collections::Generic::Dictionary<HG::Rendering::Runtime::HGCamera,HG::Rendering::Runtime::HGEnvironmentVolumeBase::InterpolateDataPerCamera>::get_Item;
+		                  if ( !*((_QWORD *)MethodInfo::System::Collections::Generic::Dictionary<HG::Rendering::Runtime::HGCamera,HG::Rendering::Runtime::HGEnvironmentVolumeBase::InterpolateDataPerCamera>::get_Item->klass->rgctx_data[22].rgctxDataDummy
+		                        + 4) )
+		                    (*(void (**)(void))MethodInfo::System::Collections::Generic::Dictionary<HG::Rendering::Runtime::HGCamera,HG::Rendering::Runtime::HGEnvironmentVolumeBase::InterpolateDataPerCamera>::get_Item->klass->rgctx_data[22].rgctxDataDummy)();
+		                  v115 = System::Collections::Generic::Dictionary<System::Object,HG::Rendering::Runtime::HGEnvironmentVolumeBase::InterpolateDataPerCamera>::FindEntry(
+		                           v113,
+		                           v5,
+		                           (MethodInfo *)v114->klass->rgctx_data[22].rgctxDataDummy);
+		                  if ( v115 < 0 )
+		                    System::ThrowHelper::ThrowKeyNotFoundException(v5, 0LL);
+		                  v118 = v113->fields._entries;
+		                  if ( !v118 )
+		                    sub_1800D8250(0LL, v116);
+		                  v99 = v115;
+		                  if ( (unsigned int)v115 >= v118->max_length.size )
+		                    sub_1800D2AA0(v118, v115, v117);
+		                  Epsilon = TypeInfo::UnityEngine::Mathf->static_fields->Epsilon;
+		                  evaluationStackBase.x = v118->vector[v115].value.timeFadingFactor;
+		                  if ( Epsilon <= evaluationStackBase.x )
+		                    goto LABEL_170;
+		                  v120 = (Dictionary_2_System_Object_Beyond_Gameplay_ShopSystem_UnlockInfo_ *)p_klass[10];
+		                  if ( !v120 )
+		                    sub_1800D8250(0LL, v115);
+		                  System::Collections::Generic::Dictionary<System::Object,Beyond::Gameplay::ShopSystem::UnlockInfo>::Remove(
+		                    v120,
+		                    v5,
+		                    MethodInfo::System::Collections::Generic::Dictionary<HG::Rendering::Runtime::HGCamera,HG::Rendering::Runtime::HGEnvironmentVolumeBase::InterpolateDataPerCamera>::Remove);
+		                  v41 = interpolateTrigger;
+		                }
+		              }
+		            }
+		          }
+		        }
+		      }
+		    }
+		  }
+		  v143 = v186;
+		  if ( !v186 )
+		    goto LABEL_364;
+		  v144 = HG::Rendering::Runtime::HGEnvironmentVolumeCameraComponent::get_interpolatedPhase(v186, 0LL);
+		  if ( !v144 )
+		    goto LABEL_364;
+		  v145 = this;
+		  HG::Rendering::Runtime::HGEnvironmentPhase::AssignFrom(v144, this->fields.m_interpolatedPhase, 0LL);
+		  v146 = HG::Rendering::Runtime::HGEnvironmentVolumeCameraComponent::get_lastInterpolateTriggerPosition(v143, 0LL);
+		  items = LODWORD(this->fields.m_lastInterpolateTriggerPosition.z);
+		  *(_QWORD *)&v146->x = *(_QWORD *)&this->fields.m_lastInterpolateTriggerPosition.x;
+		  LODWORD(v146->z) = items;
+		  size = (unsigned __int64)this->fields.m_interpolatedVolumes;
+		  if ( !size )
+		    goto LABEL_364;
+		  Beyond::IndexedHashSet<System::Object>::GetEnumerator(
+		    (List_1_T_Enumerator_System_Object_ *)&v179,
+		    (IndexedHashSet_1_System_Object_ *)size,
+		    MethodInfo::Beyond::IndexedHashSet<HG::Rendering::Runtime::HGEnvironmentVolumeBase>::GetEnumerator);
+		  *(_OWORD *)&v185._list = *(_OWORD *)&v179.klass;
+		  v185._current = (Object *)v179.fields._.getValueDelegate;
+		  v179.klass = 0LL;
+		  v179.monitor = (MonitorData *)&v185;
+		  try
+		  {
+		    while ( System::Collections::Generic::List_1_T_::Enumerator<System::Object>::MoveNext(
+		              &v185,
+		              MethodInfo::System::Collections::Generic::List_1_T_::Enumerator<HG::Rendering::Runtime::HGEnvironmentVolumeBase>::MoveNext) )
+		    {
+		      current = v185._current;
+		      v148 = HG::Rendering::Runtime::HGEnvironmentVolumeCameraComponent::get_interpolatedVolumes(v143, 0LL);
+		      if ( !v148 )
+		        sub_1800D8250(v150, v149);
+		      Beyond::IndexedHashSet<System::Object>::Add(
+		        (IndexedHashSet_1_System_Object_ *)v148,
+		        current,
+		        MethodInfo::Beyond::IndexedHashSet<HG::Rendering::Runtime::HGEnvironmentVolumeBase>::Add);
+		    }
+		  }
+		  catch ( Il2CppExceptionWrapper *v189 )
+		  {
+		    size = (unsigned __int64)&v177;
+		    v179.klass = (SingleFieldAccessor__Class *)v189->ex;
+		    items = (signed __int64)v179.klass;
+		    if ( v179.klass )
+		      sub_18007E1E0(v179.klass);
+		    v143 = v184;
+		    v145 = this;
+		  }
+		  v151 = v145->fields.m_interpolatedVolumesFactor;
+		  if ( !v151 )
+		LABEL_364:
+		    sub_1800D8250(items, size);
+		  *(_OWORD *)&v179.monitor = 0LL;
+		  v179.klass = (SingleFieldAccessor__Class *)v151;
+		  if ( dword_18F35FD08 )
+		  {
+		    size = (((unsigned __int64)&v179 >> 12) & 0x1FFFFF) >> 6;
+		    _m_prefetchw(&qword_18F103690[size]);
+		    do
+		    {
+		      items = qword_18F103690[size] | (1LL << (((unsigned __int64)&v179 >> 12) & 0x3F));
+		      v152 = qword_18F103690[size];
+		    }
+		    while ( v152 != _InterlockedCompareExchange64(&qword_18F103690[size], items, v152) );
+		  }
+		  LODWORD(v179.monitor) = 0;
+		  HIDWORD(v179.monitor) = v151->fields._version;
+		  LODWORD(v179.fields._.getValueDelegate) = 0;
+		  v182 = *(_OWORD *)&v179.klass;
+		  getValueDelegate = v179.fields._.getValueDelegate;
+		  v179.klass = 0LL;
+		  v179.monitor = (MonitorData *)&v182;
+		  try
+		  {
+		    while ( 1 )
+		    {
+		      v153 = v182;
+		      if ( !(_QWORD)v182 )
+		        sub_1800D8250(items, size);
+		      v154 = HIDWORD(v182);
+		      if ( HIDWORD(v182) != *(_DWORD *)(v182 + 28) || DWORD2(v182) >= *(_DWORD *)(v182 + 24) )
+		        break;
+		      v155 = *(_QWORD *)(v182 + 16);
+		      if ( !v155 )
+		        sub_1800D8250(SDWORD2(v182), 0LL);
+		      if ( DWORD2(v182) >= *(_DWORD *)(v155 + 24) )
+		        sub_1800D2AA0(
+		          SDWORD2(v182),
+		          v155,
+		          MethodInfo::System::Collections::Generic::List_1_T_::Enumerator<float>::MoveNext);
+		      v156 = *(float *)(v155 + 4LL * SDWORD2(v182) + 32);
+		      *(float *)&getValueDelegate = v156;
+		      ++DWORD2(v182);
+		      v157 = HG::Rendering::Runtime::HGEnvironmentVolumeCameraComponent::get_interpolatedVolumesFactor(v143, 0LL);
+		      v161 = v157;
+		      if ( !v157 )
+		        sub_1800D8250(v159, v158);
+		      v162 = MethodInfo::System::Collections::Generic::List<float>::Add;
+		      ++v157->fields._version;
+		      items = (signed __int64)v157->fields._items;
+		      size = v157->fields._size;
+		      if ( !items )
+		        sub_1800D8250(0LL, size);
+		      if ( (unsigned int)size < *(_DWORD *)(items + 24) )
+		      {
+		        v157->fields._size = size + 1;
+		        if ( (unsigned int)size >= *(_DWORD *)(items + 24) )
+		          sub_1800D2AA0(items, size, v160);
+		        *(float *)(items + 4 * size + 32) = v156;
+		      }
+		      else
+		      {
+		        if ( !*((_QWORD *)v162->klass->rgctx_data[11].rgctxDataDummy + 4) )
+		          (*(void (**)(void))v162->klass->rgctx_data[11].rgctxDataDummy)();
+		        System::Collections::Generic::List<float>::AddWithResize(
+		          v161,
+		          v156,
+		          (MethodInfo *)v162->klass->rgctx_data[11].rgctxDataDummy);
+		      }
+		    }
+		    v163 = MethodInfo::System::Collections::Generic::List_1_T_::Enumerator<float>::MoveNext->klass;
+		    if ( ((__int64)v163->vtable[0].methodPtr & 1) == 0 )
+		    {
+		      sub_1800360B0(v163, HIDWORD(v182));
+		      v154 = HIDWORD(v182);
+		      v153 = v182;
+		    }
+		    if ( !v153 )
+		      sub_1800D8250(v163, v154);
+		    if ( (_DWORD)v154 != *(_DWORD *)(v153 + 28) )
+		      System::ThrowHelper::ThrowInvalidOperationException_InvalidOperation_EnumFailedVersion(0LL);
+		    DWORD2(v182) = *(_DWORD *)(v153 + 24) + 1;
+		    LODWORD(getValueDelegate) = 0;
+		  }
+		  catch ( Il2CppExceptionWrapper *v190 )
+		  {
+		    v179.klass = (SingleFieldAccessor__Class *)v190->ex;
+		    if ( v179.klass )
+		      sub_18007E1E0(v179.klass);
+		    klass = v184;
+		    v5 = (Object *)hgCamera;
+		    v6 = this;
+		    goto LABEL_276;
+		  }
+		}
+		
+		private void _PerCameraUpdate(HGCamera hgCamera, ref ScriptableRenderContext renderContext) {} // 0x0000000182EDFA90-0x0000000182EDFC60
+		// Void _PerCameraUpdate(HGCamera, ScriptableRenderContext ByRef)
+		void HG::Rendering::Runtime::HGEnvironmentManager::_PerCameraUpdate(
+		        HGEnvironmentManager *this,
+		        HGCamera *hgCamera,
+		        ScriptableRenderContext *renderContext,
+		        MethodInfo *method)
+		{
+		  struct ILFixDynamicMethodWrapper_2__Class *v4; // rax
+		  Object *v7; // rsi
+		  HGEnvironmentManager__Class *wrapperArray; // rdx
+		  int32_t m_talosStarRenderer_high; // ecx
+		  HGAdditionalCameraData *m_AdditionalCameraData; // rax
+		  int32_t hgRenderPath; // eax
+		  HGRainRenderer *s_rainRenderer; // rax
+		  HGSnowRenderer *s_snowRenderer; // rax
+		  const Il2CppImage *image; // r8
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  const Il2CppImage *v16; // r8
+		  ILFixDynamicMethodWrapper_2 *v17; // rax
+		  ILFixDynamicMethodWrapper_2 *v18; // rax
+		  HGEnvironmentManager__Class *klass; // rax
+		  ILFixDynamicMethodWrapper_2 *v20; // rax
+		
+		  v4 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  v7 = (Object *)this;
+		  if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(TypeInfo::IFix::ILFixDynamicMethodWrapper);
+		    v4 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  wrapperArray = (HGEnvironmentManager__Class *)v4->static_fields->wrapperArray;
+		  if ( !wrapperArray )
+		    goto LABEL_30;
+		  if ( SLODWORD(wrapperArray->_0.namespaze) > 793 )
+		  {
+		    if ( !v4->_1.cctor_finished_or_no_cctor )
+		    {
+		      il2cpp_runtime_class_init_1(v4);
+		      v4 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		    }
+		    wrapperArray = (HGEnvironmentManager__Class *)v4->static_fields;
+		    image = wrapperArray->_0.image;
+		    if ( !wrapperArray->_0.image )
+		      goto LABEL_30;
+		    if ( image->typeCount <= 0x319 )
+		      goto LABEL_60;
+		    if ( image[88].metadataHandle )
+		    {
+		      Patch = IFix::WrappersManagerImpl::GetPatch(793, 0LL);
+		      if ( Patch )
+		      {
+		        IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_325(Patch, v7, (Object *)hgCamera, renderContext, 0LL);
+		        return;
+		      }
+		      goto LABEL_30;
+		    }
+		  }
+		  if ( !hgCamera )
+		    goto LABEL_30;
+		  if ( !v4->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(v4);
+		    v4 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  this = (HGEnvironmentManager *)v4->static_fields;
+		  wrapperArray = this->klass;
+		  if ( !this->klass )
+		    goto LABEL_30;
+		  if ( SLODWORD(wrapperArray->_0.namespaze) <= 794 )
+		    goto LABEL_63;
+		  if ( !v4->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(v4);
+		    v4 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  wrapperArray = (HGEnvironmentManager__Class *)v4->static_fields;
+		  v16 = wrapperArray->_0.image;
+		  if ( !wrapperArray->_0.image )
+		    goto LABEL_30;
+		  if ( v16->typeCount <= 0x31A )
+		    goto LABEL_60;
+		  if ( !v16[88].nameToClassHashTable )
+		  {
+		LABEL_63:
+		    if ( !v4->_1.cctor_finished_or_no_cctor )
+		    {
+		      il2cpp_runtime_class_init_1(v4);
+		      v4 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		    }
+		    this = (HGEnvironmentManager *)v4->static_fields;
+		    wrapperArray = this->klass;
+		    if ( !this->klass )
+		      goto LABEL_30;
+		    if ( SLODWORD(wrapperArray->_0.namespaze) <= 703 )
+		      goto LABEL_14;
+		    if ( !v4->_1.cctor_finished_or_no_cctor )
+		    {
+		      il2cpp_runtime_class_init_1(v4);
+		      v4 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		    }
+		    this = (HGEnvironmentManager *)v4->static_fields;
+		    wrapperArray = this->klass;
+		    if ( !this->klass )
+		      goto LABEL_30;
+		    if ( LODWORD(wrapperArray->_0.namespaze) <= 0x2BF )
+		      goto LABEL_60;
+		    if ( wrapperArray[15]._0.name )
+		    {
+		      v18 = IFix::WrappersManagerImpl::GetPatch(703, 0LL);
+		      if ( !v18 )
+		        goto LABEL_30;
+		      m_talosStarRenderer_high = IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_1(
+		                                   (ILFixDynamicMethodWrapper_31 *)v18,
+		                                   (Object *)hgCamera,
+		                                   0LL);
+		      v4 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		    }
+		    else
+		    {
+		LABEL_14:
+		      this = (HGEnvironmentManager *)hgCamera->fields.m_AdditionalCameraData;
+		      if ( !this )
+		        goto LABEL_30;
+		      m_talosStarRenderer_high = HIDWORD(this->fields.m_talosStarRenderer);
+		    }
+		    if ( m_talosStarRenderer_high == 1 )
+		      return;
+		    if ( !v4->_1.cctor_finished_or_no_cctor )
+		    {
+		      il2cpp_runtime_class_init_1(v4);
+		      v4 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		    }
+		    this = (HGEnvironmentManager *)v4->static_fields;
+		    wrapperArray = this->klass;
+		    if ( !this->klass )
+		      goto LABEL_30;
+		    if ( SLODWORD(wrapperArray->_0.namespaze) <= 703 )
+		      goto LABEL_21;
+		    if ( !v4->_1.cctor_finished_or_no_cctor )
+		    {
+		      il2cpp_runtime_class_init_1(v4);
+		      v4 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		    }
+		    this = (HGEnvironmentManager *)v4->static_fields;
+		    klass = this->klass;
+		    if ( !this->klass )
+		      goto LABEL_30;
+		    if ( LODWORD(klass->_0.namespaze) > 0x2BF )
+		    {
+		      if ( klass[15]._0.name )
+		      {
+		        v20 = IFix::WrappersManagerImpl::GetPatch(703, 0LL);
+		        if ( !v20 )
+		          goto LABEL_30;
+		        hgRenderPath = IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_1(
+		                         (ILFixDynamicMethodWrapper_31 *)v20,
+		                         (Object *)hgCamera,
+		                         0LL);
+		        goto LABEL_23;
+		      }
+		LABEL_21:
+		      m_AdditionalCameraData = hgCamera->fields.m_AdditionalCameraData;
+		      if ( !m_AdditionalCameraData )
+		        goto LABEL_30;
+		      hgRenderPath = m_AdditionalCameraData->fields.hgRenderPath;
+		LABEL_23:
+		      if ( hgRenderPath == 2 )
+		        return;
+		LABEL_24:
+		      if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager->_1.cctor_finished_or_no_cctor )
+		        il2cpp_runtime_class_init_1(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
+		      s_rainRenderer = HG::Rendering::Runtime::HGEnvironmentManager::get_s_rainRenderer(0LL);
+		      if ( s_rainRenderer )
+		      {
+		        HG::Rendering::Runtime::HGRainRenderer::UpdateRainAndWetnessData(s_rainRenderer, hgCamera, renderContext, 0LL);
+		        s_snowRenderer = HG::Rendering::Runtime::HGEnvironmentManager::get_s_snowRenderer(0LL);
+		        if ( s_snowRenderer )
+		        {
+		          HG::Rendering::Runtime::HGSnowRenderer::UpdateSnowData(s_snowRenderer, hgCamera, renderContext, 0LL);
+		          return;
+		        }
+		      }
+		LABEL_30:
+		      sub_1800D8260(this, wrapperArray);
+		    }
+		LABEL_60:
+		    sub_1800D2AB0(this, wrapperArray);
+		  }
+		  v17 = IFix::WrappersManagerImpl::GetPatch(794, 0LL);
+		  if ( !v17 )
+		    goto LABEL_30;
+		  if ( !IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_14((ILFixDynamicMethodWrapper_20 *)v17, (Object *)hgCamera, 0LL) )
+		    goto LABEL_24;
+		}
+		
+		private Transform _GetInterpolateTrigger() => default; // 0x00000001831C8E90-0x00000001831C90E0
+		// Transform _GetInterpolateTrigger()
+		Transform *HG::Rendering::Runtime::HGEnvironmentManager::_GetInterpolateTrigger(
+		        HGEnvironmentManager *this,
+		        MethodInfo *method)
+		{
+		  struct ILFixDynamicMethodWrapper_2__Class *v3; // rcx
+		  ILFixDynamicMethodWrapper_2__Array *wrapperArray; // rdx
+		  struct Object_1__Class *v5; // rcx
+		  Transform *m_interpolateTriggerOverride; // rbx
+		  HGRenderPipeline *currentPipeline; // rax
+		  struct Object_1__Class *v8; // rcx
+		  Transform *currentPlayerCenter; // rbx
+		  HGRenderPipeline *v10; // rax
+		  Camera *main; // rax
+		  struct Object_1__Class *v13; // rcx
+		  Camera *v14; // rbx
+		  __int64 (__fastcall *v15)(Camera *); // rax
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		
+		  v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(TypeInfo::IFix::ILFixDynamicMethodWrapper);
+		    v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  wrapperArray = v3->static_fields->wrapperArray;
+		  if ( !wrapperArray )
+		    goto LABEL_31;
+		  if ( wrapperArray->max_length.size <= 620 )
+		    goto LABEL_5;
+		  if ( !v3->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(v3);
+		    v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  v3 = (struct ILFixDynamicMethodWrapper_2__Class *)v3->static_fields->wrapperArray;
+		  if ( !v3 )
+		    goto LABEL_31;
+		  if ( LODWORD(v3->_0.namespaze) <= 0x26C )
+		    sub_1800D2AB0(v3, wrapperArray);
+		  if ( !v3[13]._0.typeMetadataHandle )
+		  {
+		LABEL_5:
+		    v5 = TypeInfo::UnityEngine::Object;
+		    m_interpolateTriggerOverride = this->fields.m_interpolateTriggerOverride;
+		    if ( !TypeInfo::UnityEngine::Object->_1.cctor_finished_or_no_cctor )
+		    {
+		      il2cpp_runtime_class_init_1(TypeInfo::UnityEngine::Object);
+		      v5 = TypeInfo::UnityEngine::Object;
+		      if ( !TypeInfo::UnityEngine::Object->_1.cctor_finished_or_no_cctor )
+		      {
+		        il2cpp_runtime_class_init_1(TypeInfo::UnityEngine::Object);
+		        v5 = TypeInfo::UnityEngine::Object;
+		      }
+		    }
+		    if ( m_interpolateTriggerOverride )
+		    {
+		      if ( !v5->_1.cctor_finished_or_no_cctor )
+		        il2cpp_runtime_class_init_1(v5);
+		      if ( m_interpolateTriggerOverride->fields._._.m_CachedPtr )
+		        return this->fields.m_interpolateTriggerOverride;
+		    }
+		    if ( !TypeInfo::HG::Rendering::Runtime::HGRenderPipeline->_1.cctor_finished_or_no_cctor )
+		      il2cpp_runtime_class_init_1(TypeInfo::HG::Rendering::Runtime::HGRenderPipeline);
+		    currentPipeline = HG::Rendering::Runtime::HGRenderPipeline::get_currentPipeline(0LL);
+		    if ( !currentPipeline )
+		      goto LABEL_31;
+		    v8 = TypeInfo::UnityEngine::Object;
+		    currentPlayerCenter = currentPipeline->fields.currentPlayerCenter;
+		    if ( !TypeInfo::UnityEngine::Object->_1.cctor_finished_or_no_cctor )
+		    {
+		      il2cpp_runtime_class_init_1(TypeInfo::UnityEngine::Object);
+		      v8 = TypeInfo::UnityEngine::Object;
+		      if ( !TypeInfo::UnityEngine::Object->_1.cctor_finished_or_no_cctor )
+		      {
+		        il2cpp_runtime_class_init_1(TypeInfo::UnityEngine::Object);
+		        v8 = TypeInfo::UnityEngine::Object;
+		      }
+		    }
+		    if ( !currentPlayerCenter )
+		      goto LABEL_22;
+		    if ( !v8->_1.cctor_finished_or_no_cctor )
+		      il2cpp_runtime_class_init_1(v8);
+		    if ( !currentPlayerCenter->fields._._.m_CachedPtr )
+		    {
+		LABEL_22:
+		      main = UnityEngine::Camera::get_main(0LL);
+		      v13 = TypeInfo::UnityEngine::Object;
+		      v14 = main;
+		      if ( !TypeInfo::UnityEngine::Object->_1.cctor_finished_or_no_cctor )
+		      {
+		        il2cpp_runtime_class_init_1(TypeInfo::UnityEngine::Object);
+		        v13 = TypeInfo::UnityEngine::Object;
+		        if ( !TypeInfo::UnityEngine::Object->_1.cctor_finished_or_no_cctor )
+		        {
+		          il2cpp_runtime_class_init_1(TypeInfo::UnityEngine::Object);
+		          v13 = TypeInfo::UnityEngine::Object;
+		        }
+		      }
+		      if ( !v14 )
+		        return 0LL;
+		      if ( !v13->_1.cctor_finished_or_no_cctor )
+		        il2cpp_runtime_class_init_1(v13);
+		      if ( !v14->fields._._._.m_CachedPtr )
+		        return 0LL;
+		      v15 = (__int64 (__fastcall *)(Camera *))qword_18F36FBC0;
+		      if ( !qword_18F36FBC0 )
+		      {
+		        v15 = (__int64 (__fastcall *)(Camera *))sub_180059EA0("UnityEngine.Component::get_transform()");
+		        qword_18F36FBC0 = (__int64)v15;
+		      }
+		      return (Transform *)v15(v14);
+		    }
+		    if ( !TypeInfo::HG::Rendering::Runtime::HGRenderPipeline->_1.cctor_finished_or_no_cctor )
+		      il2cpp_runtime_class_init_1(TypeInfo::HG::Rendering::Runtime::HGRenderPipeline);
+		    v10 = HG::Rendering::Runtime::HGRenderPipeline::get_currentPipeline(0LL);
+		    if ( v10 )
+		      return v10->fields.currentPlayerCenter;
+		LABEL_31:
+		    sub_1800D8260(v3, wrapperArray);
+		  }
+		  Patch = IFix::WrappersManagerImpl::GetPatch(620, 0LL);
+		  if ( !Patch )
+		    goto LABEL_31;
+		  return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_248(Patch, (Object *)this, 0LL);
+		}
+		
+		private void _InterpolateVolumes(Transform interpolateTrigger) {} // 0x0000000182EE2770-0x0000000182EE28E0
+		// Void _InterpolateVolumes(Transform)
+		void HG::Rendering::Runtime::HGEnvironmentManager::_InterpolateVolumes(
+		        HGEnvironmentManager *this,
+		        Transform *interpolateTrigger,
+		        MethodInfo *method)
+		{
+		  IndexedHashSet_1_System_Object_ *m_interpolatedVolumes; // rcx
+		  Dictionary_2_System_Object_System_Int32___Class *klass; // rdx
+		  struct Object_1__Class *v7; // rcx
+		  Vector3 *p_m_lastInterpolateTriggerPosition; // rdx
+		  Vector3__StaticFields *static_fields; // rcx
+		  float z; // eax
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		
+		  m_interpolatedVolumes = (IndexedHashSet_1_System_Object_ *)TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(TypeInfo::IFix::ILFixDynamicMethodWrapper);
+		    m_interpolatedVolumes = (IndexedHashSet_1_System_Object_ *)TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  klass = m_interpolatedVolumes[5].fields.m_indexDict->klass;
+		  if ( !klass )
+		    goto LABEL_15;
+		  if ( SLODWORD(klass->_0.namespaze) <= 621 )
+		    goto LABEL_5;
+		  if ( !LODWORD(m_interpolatedVolumes[7].klass) )
+		  {
+		    il2cpp_runtime_class_init_1(m_interpolatedVolumes);
+		    m_interpolatedVolumes = (IndexedHashSet_1_System_Object_ *)TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  m_interpolatedVolumes = (IndexedHashSet_1_System_Object_ *)m_interpolatedVolumes[5].fields.m_indexDict->klass;
+		  if ( !m_interpolatedVolumes )
+		LABEL_15:
+		    sub_1800D8260(m_interpolatedVolumes, klass);
+		  if ( LODWORD(m_interpolatedVolumes->fields.m_indexDict) <= 0x26D )
+		    sub_1800D2AB0(m_interpolatedVolumes, klass);
+		  if ( m_interpolatedVolumes[156].monitor )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(621, 0LL);
+		    if ( Patch )
+		    {
+		      IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_1(
+		        (ILFixDynamicMethodWrapper_39 *)Patch,
+		        (Object *)this,
+		        (Object *)interpolateTrigger,
+		        0LL);
+		      return;
+		    }
+		    goto LABEL_15;
+		  }
+		LABEL_5:
+		  m_interpolatedVolumes = (IndexedHashSet_1_System_Object_ *)this->fields.m_interpolatedVolumes;
+		  if ( !m_interpolatedVolumes )
+		    goto LABEL_15;
+		  Beyond::IndexedHashSet<System::Object>::Clear(
+		    m_interpolatedVolumes,
+		    MethodInfo::Beyond::IndexedHashSet<HG::Rendering::Runtime::HGEnvironmentVolumeBase>::Clear);
+		  m_interpolatedVolumes = (IndexedHashSet_1_System_Object_ *)this->fields.m_interpolatedVolumesFactor;
+		  if ( !m_interpolatedVolumes )
+		    goto LABEL_15;
+		  ++HIDWORD(m_interpolatedVolumes->fields.m_indexDict);
+		  LODWORD(m_interpolatedVolumes->fields.m_indexDict) = 0;
+		  v7 = TypeInfo::UnityEngine::Object;
+		  if ( !TypeInfo::UnityEngine::Object->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(TypeInfo::UnityEngine::Object);
+		    v7 = TypeInfo::UnityEngine::Object;
+		    if ( !TypeInfo::UnityEngine::Object->_1.cctor_finished_or_no_cctor )
+		    {
+		      il2cpp_runtime_class_init_1(TypeInfo::UnityEngine::Object);
+		      v7 = TypeInfo::UnityEngine::Object;
+		    }
+		  }
+		  if ( interpolateTrigger )
+		  {
+		    if ( !v7->_1.cctor_finished_or_no_cctor )
+		      il2cpp_runtime_class_init_1(v7);
+		    p_m_lastInterpolateTriggerPosition = &this->fields.m_lastInterpolateTriggerPosition;
+		    if ( interpolateTrigger->fields._._.m_CachedPtr )
+		    {
+		      HG::Rendering::Runtime::HGEnvironmentManager::_InterpolateVolumesImpl(
+		        this,
+		        0LL,
+		        interpolateTrigger,
+		        this->fields.m_interpolatedPhase,
+		        &this->fields.m_lastInterpolateTriggerPosition,
+		        this->fields.m_interpolatedVolumes,
+		        this->fields.m_interpolatedVolumesFactor,
+		        0LL);
+		      return;
+		    }
+		  }
+		  else
+		  {
+		    p_m_lastInterpolateTriggerPosition = &this->fields.m_lastInterpolateTriggerPosition;
+		  }
+		  static_fields = TypeInfo::UnityEngine::Vector3->static_fields;
+		  z = static_fields->negativeInfinityVector.z;
+		  *(_QWORD *)&p_m_lastInterpolateTriggerPosition->x = *(_QWORD *)&static_fields->negativeInfinityVector.x;
+		  p_m_lastInterpolateTriggerPosition->z = z;
+		}
+		
+		private void _InterpolateVolumesImpl(HGCamera hgCamera, Transform interpolateTrigger, HGEnvironmentPhase interpolatedPhaseTarget, ref Vector3 lastInterpolateTriggerPosition, IndexedHashSet<HGEnvironmentVolumeBase> interpolatedVolumes, List<float> interpolatedVolumesFactor) {} // 0x00000001832764A0-0x0000000183277EC0
+		// Void _InterpolateVolumesImpl(HGCamera, Transform, HGEnvironmentPhase, Vector3 ByRef, IndexedHashSet`1[HG.Rendering.Runtime.HGEnvironmentVolumeBase], List`1[System.Single])
+		// Hidden C++ exception states: #wind=1
+		void HG::Rendering::Runtime::HGEnvironmentManager::_InterpolateVolumesImpl(
+		        HGEnvironmentManager *this,
+		        HGCamera *hgCamera,
+		        Transform *interpolateTrigger,
+		        HGEnvironmentPhase *interpolatedPhaseTarget,
+		        Vector3 *lastInterpolateTriggerPosition,
+		        IndexedHashSet_1_HG_Rendering_Runtime_HGEnvironmentVolumeBase_ *interpolatedVolumes,
+		        List_1_System_Single_ *interpolatedVolumesFactor,
+		        MethodInfo *method)
+		{
+		  Object *v8; // r14
+		  Object *v9; // r15
+		  struct ILFixDynamicMethodWrapper_2__Class *v12; // rcx
+		  ILFixDynamicMethodWrapper_2__Array *wrapperArray; // rbx
+		  ILFixDynamicMethodWrapper_2__Array *v14; // rbx
+		  __int64 v15; // rdx
+		  __int64 v16; // rcx
+		  ILFixDynamicMethodWrapper_2 *Patch; // rbx
+		  void (__fastcall *v18)(Object *, Vector3 *); // rax
+		  MethodInfo *v19; // r9
+		  Vector3 *v20; // rax
+		  __int64 v21; // rdx
+		  __int64 v22; // r8
+		  unsigned int z_low; // esi
+		  struct Math__Class *v24; // rcx
+		  __m128 v25; // xmm2
+		  __m128d v26; // xmm3
+		  __m128d v27; // xmm0
+		  float v28; // xmm0_4
+		  float m_interpolateTimeFactor; // xmm11_4
+		  __m128d v30; // xmm10
+		  void (__fastcall *v31)(Object *, Vector3 *); // rax
+		  Type *v32; // rdx
+		  __int64 v33; // rcx
+		  PropertyInfo_1 *v34; // r8
+		  Int32__Array **v35; // r9
+		  List_1_HG_Rendering_Runtime_HGEnvironmentVolumeBase_ *m_sortedVolumes; // rbx
+		  _QWORD *p_klass; // r12
+		  struct Object_1__Class *v38; // rcx
+		  unsigned __int8 (__fastcall *v39)(_QWORD *); // rax
+		  __int64 v40; // r8
+		  struct ILFixDynamicMethodWrapper_2__Class *v41; // rcx
+		  ILFixDynamicMethodWrapper_2__Array *v42; // rdx
+		  ILFixDynamicMethodWrapper_2__Array *v43; // rcx
+		  ILFixDynamicMethodWrapper_2 *v44; // r13
+		  Call *v45; // rax
+		  __m128i v46; // xmm6
+		  __m128i v47; // xmm2
+		  Object *anonObj; // r12
+		  _DWORD *v49; // xmm0_8
+		  signed __int64 v50; // rcx
+		  __int64 v51; // rdx
+		  __int64 v52; // r15
+		  Object__Array *clearDelegate; // r14
+		  __int64 v54; // rdi
+		  Object__Class *klass; // rsi
+		  Func_2_Google_Protobuf_IMessage_Boolean_ *hasDelegate; // rbx
+		  Value_1 *v57; // r15
+		  signed __int64 v58; // rcx
+		  __int64 v59; // rdx
+		  __int64 v60; // rdi
+		  Il2CppClass *element_class; // rbx
+		  __int64 v62; // rsi
+		  __int64 v63; // rdx
+		  VirtualMachine *virtualMachine; // rcx
+		  __int64 v65; // rcx
+		  int v66; // eax
+		  IndexedHashSet_1_HG_Rendering_Runtime_HGEnvironmentVolumeBase_ *v67; // rsi
+		  ILFixDynamicMethodWrapper_2__Array *v68; // rdx
+		  ILFixDynamicMethodWrapper_2__Array *v69; // rcx
+		  ILFixDynamicMethodWrapper_2 *v70; // r13
+		  Call *v71; // rax
+		  __m128i v72; // xmm6
+		  __m128i v73; // xmm2
+		  Object *v74; // r12
+		  _DWORD *v75; // xmm0_8
+		  signed __int64 v76; // rcx
+		  __int64 v77; // rdx
+		  __int64 v78; // r15
+		  Object__Array *v79; // r14
+		  __int64 v80; // rdi
+		  Object__Class *v81; // rsi
+		  Func_2_Google_Protobuf_IMessage_Boolean_ *v82; // rbx
+		  Value_1 *v83; // r15
+		  signed __int64 v84; // rcx
+		  __int64 v85; // rdx
+		  __int64 v86; // rdi
+		  Il2CppClass *v87; // rbx
+		  __int64 v88; // rsi
+		  __int64 v89; // rdx
+		  VirtualMachine *v90; // rcx
+		  __int64 v91; // rcx
+		  int v92; // eax
+		  ILFixDynamicMethodWrapper_2__Array *v93; // rdx
+		  ILFixDynamicMethodWrapper_2__Array *v94; // rcx
+		  ILFixDynamicMethodWrapper_2 *v95; // r13
+		  Call *v96; // rax
+		  __m128i v97; // xmm6
+		  __m128i v98; // xmm2
+		  Object *v99; // r12
+		  _DWORD *v100; // xmm0_8
+		  signed __int64 v101; // rcx
+		  __int64 v102; // rdx
+		  __int64 v103; // r15
+		  Object__Array *v104; // r14
+		  __int64 v105; // rdi
+		  Object__Class *v106; // rsi
+		  Func_2_Google_Protobuf_IMessage_Boolean_ *v107; // rbx
+		  Value_1 *v108; // r15
+		  signed __int64 v109; // rcx
+		  __int64 v110; // rdx
+		  __int64 v111; // rdi
+		  Il2CppClass *v112; // rbx
+		  __int64 v113; // rsi
+		  __int64 v114; // rdx
+		  VirtualMachine *v115; // rcx
+		  int v116; // eax
+		  __int64 v117; // rdx
+		  float manualBlendFactor; // xmm0_4
+		  Mathf__StaticFields *v119; // rcx
+		  __int64 v120; // rcx
+		  __int64 v121; // rdx
+		  __int64 v122; // rcx
+		  HGEnvironmentPhase *v123; // rbx
+		  float v124; // xmm6_4
+		  __int64 v125; // rdx
+		  __int64 v126; // rcx
+		  float v127; // xmm0_4
+		  __int64 v128; // rdx
+		  __int64 v129; // rcx
+		  __int64 v130; // rdx
+		  __int64 v131; // rcx
+		  List_1_System_Single_ *v132; // rdi
+		  void (__fastcall *v133)(Transform *, Vector3 *); // rax
+		  __int64 v134; // rdx
+		  bool v135; // di
+		  Dictionary_2_System_Object_HG_Rendering_Runtime_HGEnvironmentVolumeBase_InterpolateDataPerCamera_ *v136; // rcx
+		  __int64 v137; // rdx
+		  Dictionary_2_System_Object_HG_Rendering_Runtime_HGEnvironmentVolumeBase_InterpolateDataPerCamera_ *v138; // rcx
+		  Dictionary_2_System_Object_Beyond_Gameplay_ShopSystem_UnlockInfo_ *v139; // rcx
+		  char v140; // bl
+		  Dictionary_2_System_Object_HG_Rendering_Runtime_HGEnvironmentVolumeBase_InterpolateDataPerCamera_ *v141; // rcx
+		  __int64 v142; // rdx
+		  Dictionary_2_System_Object_HG_Rendering_Runtime_HGEnvironmentVolumeBase_InterpolateDataPerCamera_ *v143; // rcx
+		  Dictionary_2_System_Object_HG_Rendering_Runtime_HGEnvironmentVolumeBase_InterpolateDataPerCamera_ *v144; // rcx
+		  __m128i v145; // xmm6
+		  __m128i v146; // xmm1
+		  Dictionary_2_System_Object_HG_Rendering_Runtime_HGEnvironmentVolumeBase_InterpolateDataPerCamera_ *v147; // rcx
+		  Mathf__StaticFields *v148; // rcx
+		  __int64 v149; // rdx
+		  __int64 v150; // rcx
+		  HGEnvironmentPhase *v151; // rbx
+		  float v152; // xmm7_4
+		  __int64 v153; // rdx
+		  __int64 v154; // rcx
+		  __int64 v155; // rdx
+		  __int64 v156; // rcx
+		  __int64 v157; // rdx
+		  __int64 v158; // rcx
+		  __int64 v159; // r8
+		  struct MethodInfo *v160; // rbx
+		  Single__Array *items; // rcx
+		  __int64 size; // rdx
+		  void (__fastcall *v163)(Transform *, Vector3 *); // rax
+		  float DistanceBlendFactor; // xmm6_4
+		  Mathf__StaticFields *static_fields; // rcx
+		  __int64 v166; // rdx
+		  __int64 v167; // rcx
+		  HGEnvironmentPhase *v168; // rbx
+		  float s_timeOfDay; // xmm7_4
+		  __int64 v170; // rdx
+		  __int64 v171; // rcx
+		  __int64 v172; // rdx
+		  __int64 v173; // rcx
+		  __int64 v174; // rcx
+		  void (__fastcall *v175)(Object *, Vector3 *); // rax
+		  __int64 v176; // r8
+		  struct ILFixDynamicMethodWrapper_2__Class *v177; // rcx
+		  ILFixDynamicMethodWrapper_2__Array *v178; // rdx
+		  ILFixDynamicMethodWrapper_2__Array *v179; // rdx
+		  ILFixDynamicMethodWrapper_2__Array *v180; // rcx
+		  ILFixDynamicMethodWrapper_2 *v181; // rcx
+		  __int64 v182; // rdx
+		  __int64 v183; // rcx
+		  HGEnvironmentPhase *v184; // rbx
+		  float v185; // xmm6_4
+		  __int64 v186; // rdx
+		  __int64 v187; // rcx
+		  __int64 v188; // rdx
+		  __int64 v189; // rcx
+		  __int64 v190; // rdx
+		  __int64 v191; // rcx
+		  __int64 v192; // r8
+		  struct MethodInfo *v193; // rbx
+		  Single__Array *v194; // rcx
+		  __int64 v195; // rdx
+		  __int64 v196; // rax
+		  __int64 v197; // rax
+		  __int64 v198; // rax
+		  __int64 v199; // rax
+		  __int64 v200; // rax
+		  __int64 v201; // rax
+		  __int64 v202; // rax
+		  __int64 v203; // rax
+		  __int64 v204; // rax
+		  __int64 v205; // rax
+		  __int64 v206; // rax
+		  __int64 v207; // rax
+		  MethodInfo *P3; // [rsp+20h] [rbp-208h]
+		  Vector3 v209; // [rsp+50h] [rbp-1D8h] BYREF
+		  Value_1 *evaluationStackBase; // [rsp+60h] [rbp-1C8h]
+		  Vector3 v211; // [rsp+70h] [rbp-1B8h] BYREF
+		  Vector3 v212; // [rsp+80h] [rbp-1A8h] BYREF
+		  HGEnvironmentVolumeBase *current; // [rsp+90h] [rbp-198h]
+		  SingleFieldAccessor v214; // [rsp+98h] [rbp-190h] BYREF
+		  Value_1 **topWriteBack; // [rsp+D0h] [rbp-158h]
+		  Vector3 v216; // [rsp+E0h] [rbp-148h] BYREF
+		  Vector3 v217; // [rsp+F0h] [rbp-138h] BYREF
+		  Vector3 v218; // [rsp+100h] [rbp-128h] BYREF
+		  Vector3 v219; // [rsp+110h] [rbp-118h] BYREF
+		  Vector3 v220; // [rsp+120h] [rbp-108h] BYREF
+		  List_1_T_Enumerator_System_Object_ v221; // [rsp+130h] [rbp-F8h] BYREF
+		  Il2CppExceptionWrapper *v222; // [rsp+148h] [rbp-E0h] BYREF
+		  Vector3 v223; // [rsp+150h] [rbp-D8h] BYREF
+		  Call v224[3]; // [rsp+160h] [rbp-C8h] BYREF
+		
+		  v8 = (Object *)interpolatedPhaseTarget;
+		  v9 = (Object *)interpolateTrigger;
+		  v12 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(TypeInfo::IFix::ILFixDynamicMethodWrapper);
+		    v12 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  wrapperArray = v12->static_fields->wrapperArray;
+		  if ( !wrapperArray )
+		    sub_1800D8260(v12, hgCamera);
+		  if ( wrapperArray->max_length.size > 622 )
+		  {
+		    if ( !v12->_1.cctor_finished_or_no_cctor )
+		    {
+		      il2cpp_runtime_class_init_1(v12);
+		      v12 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		    }
+		    v14 = v12->static_fields->wrapperArray;
+		    if ( !v14 )
+		      sub_1800D8260(v12, hgCamera);
+		    if ( v14->max_length.size <= 0x26Eu )
+		      sub_1800D2AB0(v12, hgCamera);
+		    if ( v14[17].vector[10] )
+		    {
+		      Patch = IFix::WrappersManagerImpl::GetPatch(622, 0LL);
+		      if ( !Patch )
+		        sub_1800D8260(v16, v15);
+		      IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_259(
+		        Patch,
+		        (Object *)this,
+		        (Object *)hgCamera,
+		        v9,
+		        v8,
+		        lastInterpolateTriggerPosition,
+		        (Object *)interpolatedVolumes,
+		        (Object *)interpolatedVolumesFactor,
+		        0LL);
+		      return;
+		    }
+		  }
+		  if ( !v9 )
+		    sub_1800D8260(v12, hgCamera);
+		  *(_QWORD *)&v209.x = 0LL;
+		  v209.z = 0.0;
+		  v18 = (void (__fastcall *)(Object *, Vector3 *))qword_18F3700F0;
+		  if ( !qword_18F3700F0 )
+		  {
+		    v18 = (void (__fastcall *)(Object *, Vector3 *))il2cpp_resolve_icall_1(
+		                                                      "UnityEngine.Transform::get_position_Injected(UnityEngine.Vector3&)");
+		    if ( !v18 )
+		    {
+		      v196 = sub_1802EE1B8("UnityEngine.Transform::get_position_Injected(UnityEngine.Vector3&)");
+		      sub_18007E1B0(v196, 0LL);
+		    }
+		    qword_18F3700F0 = (__int64)v18;
+		  }
+		  v18(v9, &v209);
+		  v211 = *lastInterpolateTriggerPosition;
+		  v212 = v209;
+		  v20 = UnityEngine::Vector3::op_Subtraction(&v216, &v212, &v211, v19);
+		  *(_QWORD *)&v211.x = *(_QWORD *)&v20->x;
+		  z_low = LODWORD(v20->z);
+		  v24 = TypeInfo::System::Math;
+		  if ( !TypeInfo::System::Math->_1.cctor_finished_or_no_cctor )
+		    il2cpp_runtime_class_init_1(TypeInfo::System::Math);
+		  v25 = (__m128)_mm_cvtsi32_si128(z_low);
+		  v25.m128_f32[0] = (float)(v25.m128_f32[0] * v25.m128_f32[0])
+		                  + (float)((float)(v211.y * v211.y) + (float)(v211.x * v211.x));
+		  v26 = _mm_cvtps_pd(v25);
+		  if ( v26.m128d_f64[0] < 0.0 )
+		  {
+		    v27.m128d_f64[1] = v26.m128d_f64[1];
+		    v27.m128d_f64[0] = sub_1801D32D0(v24, v21, v22);
+		  }
+		  else
+		  {
+		    v27 = _mm_sqrt_pd(v26);
+		  }
+		  v28 = v27.m128d_f64[0];
+		  if ( v28 <= 5.0 )
+		    m_interpolateTimeFactor = this->fields.m_interpolateTimeFactor;
+		  else
+		    m_interpolateTimeFactor = 10000.0;
+		  *(float *)v27.m128d_f64 = UnityEngine::Time::get_deltaTime(0LL);
+		  v30 = v27;
+		  memset(&v209, 0, sizeof(v209));
+		  v31 = (void (__fastcall *)(Object *, Vector3 *))qword_18F3700F0;
+		  if ( !qword_18F3700F0 )
+		  {
+		    v31 = (void (__fastcall *)(Object *, Vector3 *))il2cpp_resolve_icall_1(
+		                                                      "UnityEngine.Transform::get_position_Injected(UnityEngine.Vector3&)");
+		    if ( !v31 )
+		    {
+		      v197 = sub_1802EE1B8("UnityEngine.Transform::get_position_Injected(UnityEngine.Vector3&)");
+		      sub_18007E1B0(v197, 0LL);
+		    }
+		    qword_18F3700F0 = (__int64)v31;
+		  }
+		  v31(v9, &v209);
+		  *lastInterpolateTriggerPosition = v209;
+		  m_sortedVolumes = this->fields.m_sortedVolumes;
+		  if ( !m_sortedVolumes )
+		    sub_1800D8260(v33, v32);
+		  *(_OWORD *)&v214.monitor = 0LL;
+		  v214.klass = (SingleFieldAccessor__Class *)m_sortedVolumes;
+		  sub_18002D1B0(&v214, v32, v34, v35, P3);
+		  LODWORD(v214.monitor) = 0;
+		  HIDWORD(v214.monitor) = m_sortedVolumes->fields._version;
+		  v214.fields._.getValueDelegate = 0LL;
+		  *(_OWORD *)&v221._list = *(_OWORD *)&v214.klass;
+		  v221._current = 0LL;
+		  v214.klass = 0LL;
+		  v214.monitor = (MonitorData *)&v221;
+		  try
+		  {
+		    v67 = interpolatedVolumes;
+		    while ( 1 )
+		    {
+		      while ( 1 )
+		      {
+		        while ( 1 )
+		        {
+		          while ( 1 )
+		          {
+		            if ( !System::Collections::Generic::List_1_T_::Enumerator<System::Object>::MoveNext(
+		                    &v221,
+		                    MethodInfo::System::Collections::Generic::List_1_T_::Enumerator<HG::Rendering::Runtime::HGEnvironmentVolumeBase>::MoveNext) )
+		              return;
+		            p_klass = &v221._current->klass;
+		            current = (HGEnvironmentVolumeBase *)v221._current;
+		            v38 = TypeInfo::UnityEngine::Object;
+		            if ( !TypeInfo::UnityEngine::Object->_1.cctor_finished_or_no_cctor )
+		            {
+		              il2cpp_runtime_class_init_1(TypeInfo::UnityEngine::Object);
+		              v38 = TypeInfo::UnityEngine::Object;
+		              if ( !TypeInfo::UnityEngine::Object->_1.cctor_finished_or_no_cctor )
+		              {
+		                il2cpp_runtime_class_init_1(TypeInfo::UnityEngine::Object);
+		                v38 = TypeInfo::UnityEngine::Object;
+		              }
+		            }
+		            if ( p_klass )
+		            {
+		              if ( !v38->_1.cctor_finished_or_no_cctor )
+		                il2cpp_runtime_class_init_1(v38);
+		              if ( p_klass[2] )
+		              {
+		                v39 = (unsigned __int8 (__fastcall *)(_QWORD *))qword_18F36FBB8;
+		                if ( !qword_18F36FBB8 )
+		                {
+		                  v39 = (unsigned __int8 (__fastcall *)(_QWORD *))il2cpp_resolve_icall_1("UnityEngine.Behaviour::get_isActiveAndEnabled()");
+		                  if ( !v39 )
+		                  {
+		                    v198 = sub_1802EE1B8("UnityEngine.Behaviour::get_isActiveAndEnabled()");
+		                    sub_18007E1B0(v198, 0LL);
+		                  }
+		                  qword_18F36FBB8 = (__int64)v39;
+		                }
+		                if ( v39(p_klass) )
+		                {
+		                  sub_1800049A0(*p_klass);
+		                  if ( (*(unsigned __int8 (__fastcall **)(_QWORD *, _QWORD))(*p_klass + 464LL))(
+		                         p_klass,
+		                         *(_QWORD *)(*p_klass + 472LL)) )
+		                  {
+		                    break;
+		                  }
+		                }
+		              }
+		            }
+		          }
+		          v41 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		          if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper->_1.cctor_finished_or_no_cctor )
+		          {
+		            il2cpp_runtime_class_init_1(TypeInfo::IFix::ILFixDynamicMethodWrapper);
+		            v41 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		          }
+		          v42 = v41->static_fields->wrapperArray;
+		          if ( !v42 )
+		            sub_1800D8250(v41, 0LL);
+		          if ( v42->max_length.size <= 623 )
+		            goto LABEL_85;
+		          if ( !v41->_1.cctor_finished_or_no_cctor )
+		          {
+		            il2cpp_runtime_class_init_1(v41);
+		            v41 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		          }
+		          v42 = v41->static_fields->wrapperArray;
+		          if ( !v42 )
+		            sub_1800D8250(v41, 0LL);
+		          if ( v42->max_length.size <= 0x26Fu )
+		            sub_1800D2AA0(v41, v42, v40);
+		          if ( v42[17].vector[11] )
+		          {
+		            if ( !v41->_1.cctor_finished_or_no_cctor )
+		            {
+		              il2cpp_runtime_class_init_1(v41);
+		              v41 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		            }
+		            v43 = v41->static_fields->wrapperArray;
+		            if ( !v43 )
+		              sub_1800D8250(0LL, v42);
+		            if ( v43->max_length.size <= 0x26Fu )
+		              sub_1800D2AA0(v43, v42, v40);
+		            v44 = v43[17].vector[11];
+		            if ( !v44 )
+		              sub_1800D8250(v43, v42);
+		            v45 = IFix::Core::Call::Begin(v224, 0LL);
+		            v46 = *(__m128i *)&v45->argumentBase;
+		            v47 = *(__m128i *)&v45->managedStack;
+		            *(__m128i *)&v214.fields.clearDelegate = v47;
+		            topWriteBack = v45->topWriteBack;
+		            if ( v44->fields.anonObj )
+		            {
+		              anonObj = v44->fields.anonObj;
+		              v49 = (_DWORD *)_mm_srli_si128(v47, 8).m128i_u64[0];
+		              evaluationStackBase = (Value_1 *)_mm_srli_si128(v46, 8).m128i_u64[0];
+		              v50 = (char *)v49 - (char *)evaluationStackBase;
+		              v51 = (unsigned __int128)(((char *)v49 - (char *)evaluationStackBase) * (__int128)0x2AAAAAAAAAAAAAABLL) >> 64;
+		              v52 = ((char *)v49 - (char *)evaluationStackBase) / 12;
+		              if ( !v49 )
+		                sub_1800D8250(v50, v51);
+		              *v49 = 8;
+		              v49[1] = v52;
+		              clearDelegate = (Object__Array *)v47.m128i_i64[0];
+		              if ( !v47.m128i_i64[0] )
+		                sub_1800D8250(v50, v51);
+		              v54 = *(_QWORD *)(*(_QWORD *)v47.m128i_i64[0] + 64LL);
+		              klass = anonObj->klass;
+		              if ( !(unsigned __int8)il2cpp_class_is_assignable_from_1(v54, anonObj->klass)
+		                && ((BYTE1(klass->vtable.Equals.methodPtr) & 0x10) == 0
+		                 || ((*(_BYTE *)(v54 + 276) & 0x20) == 0 && *(_BYTE *)(v54 + 42) != 19 && *(_BYTE *)(v54 + 42) != 30
+		                  || !*(_QWORD *)(v54 + 112)
+		                  || !*(_QWORD *)(*(_QWORD *)(v54 + 112) + 40LL)
+		                  || !sub_1802ED414(anonObj))
+		                 && v54 != qword_18F35FF70) )
+		              {
+		                v199 = sub_18031E23C();
+		                sub_18007E190(v199, 0LL);
+		              }
+		              sub_180005370(v47.m128i_i64[0], (int)v52, anonObj);
+		              hasDelegate = (Func_2_Google_Protobuf_IMessage_Boolean_ *)(v49 + 3);
+		              v57 = evaluationStackBase;
+		              p_klass = &current->klass;
+		            }
+		            else
+		            {
+		              hasDelegate = v214.fields.hasDelegate;
+		              clearDelegate = (Object__Array *)v214.fields.clearDelegate;
+		              v57 = (Value_1 *)_mm_srli_si128(v46, 8).m128i_u64[0];
+		            }
+		            v58 = (char *)hasDelegate - (char *)v57;
+		            v59 = (unsigned __int128)(((char *)hasDelegate - (char *)v57) * (__int128)0x2AAAAAAAAAAAAAABLL) >> 64;
+		            v60 = ((char *)hasDelegate - (char *)v57) / 12;
+		            if ( !hasDelegate )
+		              sub_1800D8250(v58, v59);
+		            LODWORD(hasDelegate->klass) = 8;
+		            HIDWORD(hasDelegate->klass) = v60;
+		            if ( !clearDelegate )
+		              sub_1800D8250(v58, v59);
+		            element_class = clearDelegate->klass->_0.element_class;
+		            v62 = *p_klass;
+		            if ( !(unsigned __int8)il2cpp_class_is_assignable_from_1(element_class, *p_klass)
+		              && ((*(_BYTE *)(v62 + 313) & 0x10) == 0
+		               || ((element_class->flags & 0x20) == 0
+		                && *((_BYTE *)&element_class->byval_arg + 10) != 19
+		                && *((_BYTE *)&element_class->byval_arg + 10) != 30
+		                || !element_class->interopData
+		                || !element_class->interopData->guid
+		                || !sub_1802ED414(p_klass))
+		               && element_class != (Il2CppClass *)qword_18F35FF70) )
+		            {
+		              v200 = sub_18031E23C();
+		              sub_18007E190(v200, 0LL);
+		            }
+		            sub_180005370(clearDelegate, (int)v60, p_klass);
+		            virtualMachine = v44->fields.virtualMachine;
+		            if ( !virtualMachine )
+		              sub_1800D8250(0LL, v63);
+		            IFix::Core::VirtualMachine::Execute(
+		              virtualMachine,
+		              virtualMachine->fields.unmanagedCodes[v44->fields.methodId],
+		              (Value_1 *)v46.m128i_i64[0],
+		              clearDelegate,
+		              v57,
+		              (v44->fields.anonObj != 0LL) + 1,
+		              v44->fields.methodId,
+		              0,
+		              topWriteBack,
+		              0LL);
+		            if ( !v46.m128i_i64[0] )
+		              sub_1800D8250(v65, v42);
+		            v66 = *(_DWORD *)(v46.m128i_i64[0] + 4);
+		            v41 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		            v8 = (Object *)interpolatedPhaseTarget;
+		            v9 = (Object *)interpolateTrigger;
+		            v67 = interpolatedVolumes;
+		          }
+		          else
+		          {
+		LABEL_85:
+		            v66 = *((_DWORD *)p_klass + 10);
+		          }
+		          if ( !v66 )
+		            break;
+		          if ( !v41->_1.cctor_finished_or_no_cctor )
+		          {
+		            il2cpp_runtime_class_init_1(v41);
+		            v41 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		          }
+		          v68 = v41->static_fields->wrapperArray;
+		          if ( !v68 )
+		            sub_1800D8250(v41, 0LL);
+		          if ( v68->max_length.size <= 623 )
+		            goto LABEL_129;
+		          if ( !v41->_1.cctor_finished_or_no_cctor )
+		          {
+		            il2cpp_runtime_class_init_1(v41);
+		            v41 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		          }
+		          v68 = v41->static_fields->wrapperArray;
+		          if ( !v68 )
+		            sub_1800D8250(v41, 0LL);
+		          if ( v68->max_length.size <= 0x26Fu )
+		            sub_1800D2AA0(v41, v68, v40);
+		          if ( v68[17].vector[11] )
+		          {
+		            if ( !v41->_1.cctor_finished_or_no_cctor )
+		            {
+		              il2cpp_runtime_class_init_1(v41);
+		              v41 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		            }
+		            v69 = v41->static_fields->wrapperArray;
+		            if ( !v69 )
+		              sub_1800D8250(0LL, v68);
+		            if ( v69->max_length.size <= 0x26Fu )
+		              sub_1800D2AA0(v69, v68, v40);
+		            v70 = v69[17].vector[11];
+		            if ( !v70 )
+		              sub_1800D8250(v69, v68);
+		            v71 = IFix::Core::Call::Begin(v224, 0LL);
+		            v72 = *(__m128i *)&v71->argumentBase;
+		            v73 = *(__m128i *)&v71->managedStack;
+		            *(__m128i *)&v214.fields.clearDelegate = v73;
+		            topWriteBack = v71->topWriteBack;
+		            if ( v70->fields.anonObj )
+		            {
+		              v74 = v70->fields.anonObj;
+		              v75 = (_DWORD *)_mm_srli_si128(v73, 8).m128i_u64[0];
+		              evaluationStackBase = (Value_1 *)_mm_srli_si128(v72, 8).m128i_u64[0];
+		              v76 = (char *)v75 - (char *)evaluationStackBase;
+		              v77 = (unsigned __int128)(((char *)v75 - (char *)evaluationStackBase) * (__int128)0x2AAAAAAAAAAAAAABLL) >> 64;
+		              v78 = ((char *)v75 - (char *)evaluationStackBase) / 12;
+		              if ( !v75 )
+		                sub_1800D8250(v76, v77);
+		              *v75 = 8;
+		              v75[1] = v78;
+		              v79 = (Object__Array *)v73.m128i_i64[0];
+		              if ( !v73.m128i_i64[0] )
+		                sub_1800D8250(v76, v77);
+		              v80 = *(_QWORD *)(*(_QWORD *)v73.m128i_i64[0] + 64LL);
+		              v81 = v74->klass;
+		              if ( !(unsigned __int8)il2cpp_class_is_assignable_from_1(v80, v74->klass)
+		                && ((BYTE1(v81->vtable.Equals.methodPtr) & 0x10) == 0
+		                 || ((*(_BYTE *)(v80 + 276) & 0x20) == 0 && *(_BYTE *)(v80 + 42) != 19 && *(_BYTE *)(v80 + 42) != 30
+		                  || !*(_QWORD *)(v80 + 112)
+		                  || !*(_QWORD *)(*(_QWORD *)(v80 + 112) + 40LL)
+		                  || !sub_1802ED414(v74))
+		                 && v80 != qword_18F35FF70) )
+		              {
+		                v201 = sub_18031E23C();
+		                sub_18007E190(v201, 0LL);
+		              }
+		              sub_180005370(v73.m128i_i64[0], (int)v78, v74);
+		              v82 = (Func_2_Google_Protobuf_IMessage_Boolean_ *)(v75 + 3);
+		              v83 = evaluationStackBase;
+		              p_klass = &current->klass;
+		            }
+		            else
+		            {
+		              v82 = v214.fields.hasDelegate;
+		              v79 = (Object__Array *)v214.fields.clearDelegate;
+		              v83 = (Value_1 *)_mm_srli_si128(v72, 8).m128i_u64[0];
+		            }
+		            v84 = (char *)v82 - (char *)v83;
+		            v85 = (unsigned __int128)(((char *)v82 - (char *)v83) * (__int128)0x2AAAAAAAAAAAAAABLL) >> 64;
+		            v86 = ((char *)v82 - (char *)v83) / 12;
+		            if ( !v82 )
+		              sub_1800D8250(v84, v85);
+		            LODWORD(v82->klass) = 8;
+		            HIDWORD(v82->klass) = v86;
+		            if ( !v79 )
+		              sub_1800D8250(v84, v85);
+		            v87 = v79->klass->_0.element_class;
+		            v88 = *p_klass;
+		            if ( !(unsigned __int8)il2cpp_class_is_assignable_from_1(v87, *p_klass)
+		              && ((*(_BYTE *)(v88 + 313) & 0x10) == 0
+		               || ((v87->flags & 0x20) == 0
+		                && *((_BYTE *)&v87->byval_arg + 10) != 19
+		                && *((_BYTE *)&v87->byval_arg + 10) != 30
+		                || !v87->interopData
+		                || !v87->interopData->guid
+		                || !sub_1802ED414(p_klass))
+		               && v87 != (Il2CppClass *)qword_18F35FF70) )
+		            {
+		              v202 = sub_18031E23C();
+		              sub_18007E190(v202, 0LL);
+		            }
+		            sub_180005370(v79, (int)v86, p_klass);
+		            v90 = v70->fields.virtualMachine;
+		            if ( !v90 )
+		              sub_1800D8250(0LL, v89);
+		            IFix::Core::VirtualMachine::Execute(
+		              v90,
+		              v90->fields.unmanagedCodes[v70->fields.methodId],
+		              (Value_1 *)v72.m128i_i64[0],
+		              v79,
+		              v83,
+		              (v70->fields.anonObj != 0LL) + 1,
+		              v70->fields.methodId,
+		              0,
+		              topWriteBack,
+		              0LL);
+		            if ( !v72.m128i_i64[0] )
+		              sub_1800D8250(v91, v68);
+		            v92 = *(_DWORD *)(v72.m128i_i64[0] + 4);
+		            v41 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		          }
+		          else
+		          {
+		LABEL_129:
+		            v92 = *((_DWORD *)p_klass + 10);
+		          }
+		          if ( v92 == 1 )
+		          {
+		            v9 = (Object *)interpolateTrigger;
+		            if ( !interpolateTrigger )
+		              sub_1800D8250(v41, v68);
+		            *(_QWORD *)&v211.x = 0LL;
+		            v211.z = 0.0;
+		            v163 = (void (__fastcall *)(Transform *, Vector3 *))qword_18F3700F0;
+		            if ( !qword_18F3700F0 )
+		            {
+		              v163 = (void (__fastcall *)(Transform *, Vector3 *))il2cpp_resolve_icall_1(
+		                                                                    "UnityEngine.Transform::get_position_Injected(UnityEngine.Vector3&)");
+		              if ( !v163 )
+		              {
+		                v206 = sub_1802EE1B8("UnityEngine.Transform::get_position_Injected(UnityEngine.Vector3&)");
+		                sub_18007E1B0(v206, 0LL);
+		              }
+		              qword_18F3700F0 = (__int64)v163;
+		            }
+		            v163(interpolateTrigger, &v211);
+		            v219 = v211;
+		            DistanceBlendFactor = HG::Rendering::Runtime::HGEnvironmentVolumeBase::GetDistanceBlendFactor(
+		                                    (HGEnvironmentVolumeBase *)p_klass,
+		                                    &v219,
+		                                    0LL);
+		            static_fields = TypeInfo::UnityEngine::Mathf->static_fields;
+		            v8 = (Object *)interpolatedPhaseTarget;
+		            v67 = interpolatedVolumes;
+		            if ( DistanceBlendFactor > static_fields->Epsilon )
+		            {
+		              v168 = (HGEnvironmentPhase *)sub_18008B570(static_fields, p_klass);
+		              if ( !v168 )
+		                sub_1800D8250(v167, v166);
+		              if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager->_1.cctor_finished_or_no_cctor )
+		                il2cpp_runtime_class_init_1(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
+		              s_timeOfDay = HG::Rendering::Runtime::HGEnvironmentManager::get_s_timeOfDay(0LL);
+		              if ( !TypeInfo::HG::Rendering::Runtime::HGLightConfig->_1.cctor_finished_or_no_cctor )
+		                il2cpp_runtime_class_init_1(TypeInfo::HG::Rendering::Runtime::HGLightConfig);
+		              HG::Rendering::Runtime::HGLightConfig::UpdateDirectFinalDirection(
+		                &v168->fields.lightConfig,
+		                s_timeOfDay,
+		                0LL);
+		              v8 = (Object *)interpolatedPhaseTarget;
+		              if ( !interpolatedPhaseTarget )
+		                sub_1800D8250(v171, v170);
+		              HG::Rendering::Runtime::HGEnvironmentPhase::Lerp(
+		                interpolatedPhaseTarget,
+		                interpolatedPhaseTarget,
+		                v168,
+		                DistanceBlendFactor,
+		                0LL);
+		              if ( !interpolatedVolumes )
+		                sub_1800D8250(v173, v172);
+		              Beyond::IndexedHashSet<System::Object>::Add(
+		                (IndexedHashSet_1_System_Object_ *)interpolatedVolumes,
+		                (Object *)p_klass,
+		                MethodInfo::Beyond::IndexedHashSet<HG::Rendering::Runtime::HGEnvironmentVolumeBase>::Add);
+		              v132 = interpolatedVolumesFactor;
+		              if ( !interpolatedVolumesFactor )
+		                sub_1800D8250(v174, v130);
+		LABEL_250:
+		              sub_1830BADF0(v132, v130, MethodInfo::System::Collections::Generic::List<float>::Add);
+		            }
+		          }
+		          else
+		          {
+		            if ( !v41->_1.cctor_finished_or_no_cctor )
+		            {
+		              il2cpp_runtime_class_init_1(v41);
+		              v41 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		            }
+		            v93 = v41->static_fields->wrapperArray;
+		            if ( !v93 )
+		              sub_1800D8250(v41, 0LL);
+		            if ( v93->max_length.size <= 623 )
+		              goto LABEL_173;
+		            if ( !v41->_1.cctor_finished_or_no_cctor )
+		            {
+		              il2cpp_runtime_class_init_1(v41);
+		              v41 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		            }
+		            v93 = v41->static_fields->wrapperArray;
+		            if ( !v93 )
+		              sub_1800D8250(v41, 0LL);
+		            if ( v93->max_length.size <= 0x26Fu )
+		              sub_1800D2AA0(v41, v93, v40);
+		            if ( v93[17].vector[11] )
+		            {
+		              if ( !v41->_1.cctor_finished_or_no_cctor )
+		              {
+		                il2cpp_runtime_class_init_1(v41);
+		                v41 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		              }
+		              v94 = v41->static_fields->wrapperArray;
+		              if ( !v94 )
+		                sub_1800D8250(0LL, v93);
+		              if ( v94->max_length.size <= 0x26Fu )
+		                sub_1800D2AA0(v94, v93, v40);
+		              v95 = v94[17].vector[11];
+		              if ( !v95 )
+		                sub_1800D8250(v94, v93);
+		              v96 = IFix::Core::Call::Begin(v224, 0LL);
+		              v97 = *(__m128i *)&v96->argumentBase;
+		              v98 = *(__m128i *)&v96->managedStack;
+		              *(__m128i *)&v214.fields.clearDelegate = v98;
+		              topWriteBack = v96->topWriteBack;
+		              if ( v95->fields.anonObj )
+		              {
+		                v99 = v95->fields.anonObj;
+		                v100 = (_DWORD *)_mm_srli_si128(v98, 8).m128i_u64[0];
+		                evaluationStackBase = (Value_1 *)_mm_srli_si128(v97, 8).m128i_u64[0];
+		                v101 = (char *)v100 - (char *)evaluationStackBase;
+		                v102 = (unsigned __int128)(((char *)v100 - (char *)evaluationStackBase) * (__int128)0x2AAAAAAAAAAAAAABLL) >> 64;
+		                v103 = ((char *)v100 - (char *)evaluationStackBase) / 12;
+		                if ( !v100 )
+		                  sub_1800D8250(v101, v102);
+		                *v100 = 8;
+		                v100[1] = v103;
+		                v104 = (Object__Array *)v98.m128i_i64[0];
+		                if ( !v98.m128i_i64[0] )
+		                  sub_1800D8250(v101, v102);
+		                v105 = *(_QWORD *)(*(_QWORD *)v98.m128i_i64[0] + 64LL);
+		                v106 = v99->klass;
+		                if ( !(unsigned __int8)il2cpp_class_is_assignable_from_1(v105, v99->klass)
+		                  && ((BYTE1(v106->vtable.Equals.methodPtr) & 0x10) == 0
+		                   || ((*(_BYTE *)(v105 + 276) & 0x20) == 0
+		                    && *(_BYTE *)(v105 + 42) != 19
+		                    && *(_BYTE *)(v105 + 42) != 30
+		                    || !*(_QWORD *)(v105 + 112)
+		                    || !*(_QWORD *)(*(_QWORD *)(v105 + 112) + 40LL)
+		                    || !sub_1802ED414(v99))
+		                   && v105 != qword_18F35FF70) )
+		                {
+		                  v203 = sub_18031E23C();
+		                  sub_18007E190(v203, 0LL);
+		                }
+		                sub_180005370(v98.m128i_i64[0], (int)v103, v99);
+		                v107 = (Func_2_Google_Protobuf_IMessage_Boolean_ *)(v100 + 3);
+		                v108 = evaluationStackBase;
+		                p_klass = &current->klass;
+		              }
+		              else
+		              {
+		                v107 = v214.fields.hasDelegate;
+		                v104 = (Object__Array *)v214.fields.clearDelegate;
+		                v108 = (Value_1 *)_mm_srli_si128(v97, 8).m128i_u64[0];
+		              }
+		              v109 = (char *)v107 - (char *)v108;
+		              v110 = (unsigned __int128)(((char *)v107 - (char *)v108) * (__int128)0x2AAAAAAAAAAAAAABLL) >> 64;
+		              v111 = ((char *)v107 - (char *)v108) / 12;
+		              if ( !v107 )
+		                sub_1800D8250(v109, v110);
+		              LODWORD(v107->klass) = 8;
+		              HIDWORD(v107->klass) = v111;
+		              if ( !v104 )
+		                sub_1800D8250(v109, v110);
+		              v112 = v104->klass->_0.element_class;
+		              v113 = *p_klass;
+		              if ( !(unsigned __int8)il2cpp_class_is_assignable_from_1(v112, *p_klass)
+		                && ((*(_BYTE *)(v113 + 313) & 0x10) == 0
+		                 || ((v112->flags & 0x20) == 0
+		                  && *((_BYTE *)&v112->byval_arg + 10) != 19
+		                  && *((_BYTE *)&v112->byval_arg + 10) != 30
+		                  || !v112->interopData
+		                  || !v112->interopData->guid
+		                  || !sub_1802ED414(p_klass))
+		                 && v112 != (Il2CppClass *)qword_18F35FF70) )
+		              {
+		                v204 = sub_18031E23C();
+		                sub_18007E190(v204, 0LL);
+		              }
+		              sub_180005370(v104, (int)v111, p_klass);
+		              v115 = v95->fields.virtualMachine;
+		              if ( !v115 )
+		                sub_1800D8250(0LL, v114);
+		              IFix::Core::VirtualMachine::Execute(
+		                v115,
+		                v115->fields.unmanagedCodes[v95->fields.methodId],
+		                (Value_1 *)v97.m128i_i64[0],
+		                v104,
+		                v108,
+		                (v95->fields.anonObj != 0LL) + 1,
+		                v95->fields.methodId,
+		                0,
+		                topWriteBack,
+		                0LL);
+		              if ( !v97.m128i_i64[0] )
+		                sub_1800D8250(v41, v93);
+		              v116 = *(_DWORD *)(v97.m128i_i64[0] + 4);
+		            }
+		            else
+		            {
+		LABEL_173:
+		              v116 = *((_DWORD *)p_klass + 10);
+		            }
+		            if ( v116 == 2 )
+		            {
+		              v9 = (Object *)interpolateTrigger;
+		              if ( !interpolateTrigger )
+		                sub_1800D8250(v41, v93);
+		              *(_QWORD *)&v212.x = 0LL;
+		              v212.z = 0.0;
+		              v133 = (void (__fastcall *)(Transform *, Vector3 *))qword_18F3700F0;
+		              if ( !qword_18F3700F0 )
+		              {
+		                v133 = (void (__fastcall *)(Transform *, Vector3 *))il2cpp_resolve_icall_1(
+		                                                                      "UnityEngine.Transform::get_position_Injected(Unity"
+		                                                                      "Engine.Vector3&)");
+		                if ( !v133 )
+		                {
+		                  v205 = sub_1802EE1B8("UnityEngine.Transform::get_position_Injected(UnityEngine.Vector3&)");
+		                  sub_18007E1B0(v205, 0LL);
+		                }
+		                qword_18F3700F0 = (__int64)v133;
+		              }
+		              v133(interpolateTrigger, &v212);
+		              v218 = v212;
+		              v135 = HG::Rendering::Runtime::HGEnvironmentVolumeBase::Contains(
+		                       (HGEnvironmentVolumeBase *)p_klass,
+		                       &v218,
+		                       0LL);
+		              if ( v135 || !hgCamera )
+		              {
+		LABEL_200:
+		                v140 = 0;
+		                if ( hgCamera )
+		                {
+		                  v141 = (Dictionary_2_System_Object_HG_Rendering_Runtime_HGEnvironmentVolumeBase_InterpolateDataPerCamera_ *)p_klass[10];
+		                  if ( !v141 )
+		                    sub_1800D8250(0LL, v134);
+		                  if ( !System::Collections::Generic::Dictionary<System::Object,HG::Rendering::Runtime::HGEnvironmentVolumeBase::InterpolateDataPerCamera>::ContainsKey(
+		                          v141,
+		                          (Object *)hgCamera,
+		                          MethodInfo::System::Collections::Generic::Dictionary<HG::Rendering::Runtime::HGCamera,HG::Rendering::Runtime::HGEnvironmentVolumeBase::InterpolateDataPerCamera>::ContainsKey) )
+		                  {
+		                    v143 = (Dictionary_2_System_Object_HG_Rendering_Runtime_HGEnvironmentVolumeBase_InterpolateDataPerCamera_ *)p_klass[10];
+		                    if ( !v143 )
+		                      sub_1800D8250(0LL, v142);
+		                    System::Collections::Generic::Dictionary<System::Object,HG::Rendering::Runtime::HGEnvironmentVolumeBase::InterpolateDataPerCamera>::Add(
+		                      v143,
+		                      (Object *)hgCamera,
+		                      (HGEnvironmentVolumeBase_InterpolateDataPerCamera)_mm_cvtsi128_si32((__m128i)0LL),
+		                      MethodInfo::System::Collections::Generic::Dictionary<HG::Rendering::Runtime::HGCamera,HG::Rendering::Runtime::HGEnvironmentVolumeBase::InterpolateDataPerCamera>::Add);
+		                  }
+		                  v140 = 1;
+		                  v144 = (Dictionary_2_System_Object_HG_Rendering_Runtime_HGEnvironmentVolumeBase_InterpolateDataPerCamera_ *)p_klass[10];
+		                  if ( !v144 )
+		                    sub_1800D8250(0LL, v142);
+		                  v145 = _mm_cvtsi32_si128((unsigned int)System::Collections::Generic::Dictionary<System::Object,HG::Rendering::Runtime::HGEnvironmentVolumeBase::InterpolateDataPerCamera>::get_Item(
+		                                                           v144,
+		                                                           (Object *)hgCamera,
+		                                                           MethodInfo::System::Collections::Generic::Dictionary<HG::Rendering::Runtime::HGCamera,HG::Rendering::Runtime::HGEnvironmentVolumeBase::InterpolateDataPerCamera>::get_Item).timeFadingFactor);
+		                  LODWORD(current) = v145.m128i_i32[0];
+		                }
+		                else
+		                {
+		                  v145 = (__m128i)*((unsigned int *)p_klass + 19);
+		                }
+		                if ( *(float *)v30.m128d_f64 > TypeInfo::UnityEngine::Mathf->static_fields->Epsilon )
+		                {
+		                  if ( !v135 || *((_BYTE *)p_klass + 72) )
+		                  {
+		                    *(float *)v145.m128i_i32 = *(float *)v145.m128i_i32
+		                                             - (float)((float)(*(float *)v30.m128d_f64 * m_interpolateTimeFactor)
+		                                                     / HG::Rendering::Runtime::HGEnvironmentVolumeBase::get_fadeOutDuration(
+		                                                         (HGEnvironmentVolumeBase *)p_klass,
+		                                                         0LL));
+		                  }
+		                  else
+		                  {
+		                    v146 = (__m128i)v30;
+		                    *(float *)v146.m128i_i32 = (float)((float)(*(float *)v30.m128d_f64 * m_interpolateTimeFactor)
+		                                                     / HG::Rendering::Runtime::HGEnvironmentVolumeBase::get_fadeInDuration(
+		                                                         (HGEnvironmentVolumeBase *)p_klass,
+		                                                         0LL))
+		                                             + *(float *)v145.m128i_i32;
+		                    v145 = v146;
+		                  }
+		                }
+		                if ( *(float *)v145.m128i_i32 < 0.0 )
+		                {
+		                  v145 = 0LL;
+		                }
+		                else if ( *(float *)v145.m128i_i32 > 1.0 )
+		                {
+		                  v145 = (__m128i)0x3F800000u;
+		                }
+		                if ( v140 )
+		                {
+		                  v147 = (Dictionary_2_System_Object_HG_Rendering_Runtime_HGEnvironmentVolumeBase_InterpolateDataPerCamera_ *)p_klass[10];
+		                  if ( !v147 )
+		                    sub_1800D8250(0LL, v134);
+		                  System::Collections::Generic::Dictionary<System::Object,HG::Rendering::Runtime::HGEnvironmentVolumeBase::InterpolateDataPerCamera>::set_Item(
+		                    v147,
+		                    (Object *)hgCamera,
+		                    (HGEnvironmentVolumeBase_InterpolateDataPerCamera)_mm_cvtsi128_si32(v145),
+		                    MethodInfo::System::Collections::Generic::Dictionary<HG::Rendering::Runtime::HGCamera,HG::Rendering::Runtime::HGEnvironmentVolumeBase::InterpolateDataPerCamera>::set_Item);
+		                }
+		                else
+		                {
+		                  *((_DWORD *)p_klass + 19) = v145.m128i_i32[0];
+		                }
+		                v148 = TypeInfo::UnityEngine::Mathf->static_fields;
+		                v8 = (Object *)interpolatedPhaseTarget;
+		                v67 = interpolatedVolumes;
+		                if ( *(float *)v145.m128i_i32 > v148->Epsilon )
+		                {
+		                  v151 = (HGEnvironmentPhase *)sub_18008B570(v148, p_klass);
+		                  if ( !v151 )
+		                    sub_1800D8250(v150, v149);
+		                  if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager->_1.cctor_finished_or_no_cctor )
+		                    il2cpp_runtime_class_init_1(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
+		                  v152 = HG::Rendering::Runtime::HGEnvironmentManager::get_s_timeOfDay(0LL);
+		                  if ( !TypeInfo::HG::Rendering::Runtime::HGLightConfig->_1.cctor_finished_or_no_cctor )
+		                    il2cpp_runtime_class_init_1(TypeInfo::HG::Rendering::Runtime::HGLightConfig);
+		                  HG::Rendering::Runtime::HGLightConfig::UpdateDirectFinalDirection(
+		                    &v151->fields.lightConfig,
+		                    v152,
+		                    0LL);
+		                  v8 = (Object *)interpolatedPhaseTarget;
+		                  if ( !interpolatedPhaseTarget )
+		                    sub_1800D8250(v154, v153);
+		                  HG::Rendering::Runtime::HGEnvironmentPhase::Lerp(
+		                    interpolatedPhaseTarget,
+		                    interpolatedPhaseTarget,
+		                    v151,
+		                    *(float *)v145.m128i_i32,
+		                    0LL);
+		                  if ( !interpolatedVolumes )
+		                    sub_1800D8250(v156, v155);
+		                  Beyond::IndexedHashSet<System::Object>::Add(
+		                    (IndexedHashSet_1_System_Object_ *)interpolatedVolumes,
+		                    (Object *)p_klass,
+		                    MethodInfo::Beyond::IndexedHashSet<HG::Rendering::Runtime::HGEnvironmentVolumeBase>::Add);
+		                  if ( !interpolatedVolumesFactor )
+		                    sub_1800D8250(v158, v157);
+		                  v160 = MethodInfo::System::Collections::Generic::List<float>::Add;
+		                  ++interpolatedVolumesFactor->fields._version;
+		                  items = interpolatedVolumesFactor->fields._items;
+		                  size = interpolatedVolumesFactor->fields._size;
+		                  if ( !items )
+		                    sub_1800D8250(0LL, size);
+		                  if ( (unsigned int)size < items->max_length.size )
+		                  {
+		                    interpolatedVolumesFactor->fields._size = size + 1;
+		                    if ( (unsigned int)size >= items->max_length.size )
+		                      sub_1800D2AA0(items, size, v159);
+		                    LODWORD(items->vector[size]) = v145.m128i_i32[0];
+		                  }
+		                  else
+		                  {
+		                    if ( !*((_QWORD *)v160->klass->rgctx_data[11].rgctxDataDummy + 4) )
+		                      (*(void (**)(void))v160->klass->rgctx_data[11].rgctxDataDummy)();
+		                    System::Collections::Generic::List<float>::AddWithResize(
+		                      interpolatedVolumesFactor,
+		                      *(float *)v145.m128i_i32,
+		                      (MethodInfo *)v160->klass->rgctx_data[11].rgctxDataDummy);
+		                  }
+		                }
+		              }
+		              else
+		              {
+		                v136 = (Dictionary_2_System_Object_HG_Rendering_Runtime_HGEnvironmentVolumeBase_InterpolateDataPerCamera_ *)p_klass[10];
+		                if ( !v136 )
+		                  sub_1800D8250(0LL, v134);
+		                v8 = (Object *)interpolatedPhaseTarget;
+		                v67 = interpolatedVolumes;
+		                if ( System::Collections::Generic::Dictionary<System::Object,HG::Rendering::Runtime::HGEnvironmentVolumeBase::InterpolateDataPerCamera>::ContainsKey(
+		                       v136,
+		                       (Object *)hgCamera,
+		                       MethodInfo::System::Collections::Generic::Dictionary<HG::Rendering::Runtime::HGCamera,HG::Rendering::Runtime::HGEnvironmentVolumeBase::InterpolateDataPerCamera>::ContainsKey) )
+		                {
+		                  v138 = (Dictionary_2_System_Object_HG_Rendering_Runtime_HGEnvironmentVolumeBase_InterpolateDataPerCamera_ *)p_klass[10];
+		                  if ( !v138 )
+		                    sub_1800D8250(0LL, v137);
+		                  if ( TypeInfo::UnityEngine::Mathf->static_fields->Epsilon <= System::Collections::Generic::Dictionary<System::Object,HG::Rendering::Runtime::HGEnvironmentVolumeBase::InterpolateDataPerCamera>::get_Item(
+		                                                                                 v138,
+		                                                                                 (Object *)hgCamera,
+		                                                                                 MethodInfo::System::Collections::Generic::Dictionary<HG::Rendering::Runtime::HGCamera,HG::Rendering::Runtime::HGEnvironmentVolumeBase::InterpolateDataPerCamera>::get_Item).timeFadingFactor )
+		                    goto LABEL_200;
+		                  v139 = (Dictionary_2_System_Object_Beyond_Gameplay_ShopSystem_UnlockInfo_ *)p_klass[10];
+		                  if ( !v139 )
+		                    sub_1800D8250(0LL, v134);
+		                  System::Collections::Generic::Dictionary<System::Object,Beyond::Gameplay::ShopSystem::UnlockInfo>::Remove(
+		                    v139,
+		                    (Object *)hgCamera,
+		                    MethodInfo::System::Collections::Generic::Dictionary<HG::Rendering::Runtime::HGCamera,HG::Rendering::Runtime::HGEnvironmentVolumeBase::InterpolateDataPerCamera>::Remove);
+		                }
+		              }
+		            }
+		            else
+		            {
+		              v8 = (Object *)interpolatedPhaseTarget;
+		              v9 = (Object *)interpolateTrigger;
+		              v67 = interpolatedVolumes;
+		              if ( HG::Rendering::Runtime::HGEnvironmentVolumeBase::get_blendMode(
+		                     (HGEnvironmentVolumeBase *)p_klass,
+		                     0LL) == EnvBlendMode__Enum_Manual )
+		              {
+		                manualBlendFactor = HG::Rendering::Runtime::HGEnvironmentVolumeBase::get_manualBlendFactor(
+		                                      (HGEnvironmentVolumeBase *)p_klass,
+		                                      0LL);
+		                v119 = TypeInfo::UnityEngine::Mathf->static_fields;
+		                if ( manualBlendFactor > v119->Epsilon )
+		                {
+		                  if ( !interpolateTrigger )
+		                    sub_1800D8250(v119, v117);
+		                  v217 = *UnityEngine::Transform::get_position(&v223, interpolateTrigger, 0LL);
+		                  if ( HG::Rendering::Runtime::HGEnvironmentVolumeBase::Contains(
+		                         (HGEnvironmentVolumeBase *)p_klass,
+		                         &v217,
+		                         0LL) )
+		                  {
+		                    v123 = (HGEnvironmentPhase *)sub_18008B570(v120, p_klass);
+		                    if ( !v123 )
+		                      sub_1800D8250(v122, v121);
+		                    if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager->_1.cctor_finished_or_no_cctor )
+		                      il2cpp_runtime_class_init_1(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
+		                    v124 = HG::Rendering::Runtime::HGEnvironmentManager::get_s_timeOfDay(0LL);
+		                    if ( !TypeInfo::HG::Rendering::Runtime::HGLightConfig->_1.cctor_finished_or_no_cctor )
+		                      il2cpp_runtime_class_init_1(TypeInfo::HG::Rendering::Runtime::HGLightConfig);
+		                    HG::Rendering::Runtime::HGLightConfig::UpdateDirectFinalDirection(
+		                      &v123->fields.lightConfig,
+		                      v124,
+		                      0LL);
+		                    v127 = HG::Rendering::Runtime::HGEnvironmentVolumeBase::get_manualBlendFactor(
+		                             (HGEnvironmentVolumeBase *)p_klass,
+		                             0LL);
+		                    v8 = (Object *)interpolatedPhaseTarget;
+		                    if ( !interpolatedPhaseTarget )
+		                      sub_1800D8250(v126, v125);
+		                    HG::Rendering::Runtime::HGEnvironmentPhase::Lerp(
+		                      interpolatedPhaseTarget,
+		                      interpolatedPhaseTarget,
+		                      v123,
+		                      v127,
+		                      0LL);
+		                    if ( !interpolatedVolumes )
+		                      sub_1800D8250(v129, v128);
+		                    Beyond::IndexedHashSet<System::Object>::Add(
+		                      (IndexedHashSet_1_System_Object_ *)interpolatedVolumes,
+		                      (Object *)p_klass,
+		                      MethodInfo::Beyond::IndexedHashSet<HG::Rendering::Runtime::HGEnvironmentVolumeBase>::Add);
+		                    HG::Rendering::Runtime::HGEnvironmentVolumeBase::get_manualBlendFactor(
+		                      (HGEnvironmentVolumeBase *)p_klass,
+		                      0LL);
+		                    v132 = interpolatedVolumesFactor;
+		                    if ( !interpolatedVolumesFactor )
+		                      sub_1800D8250(v131, v130);
+		                    goto LABEL_250;
+		                  }
+		                }
+		              }
+		            }
+		          }
+		        }
+		        if ( !v9 )
+		          sub_1800D8250(v41, v42);
+		        memset(&v209, 0, sizeof(v209));
+		        v175 = (void (__fastcall *)(Object *, Vector3 *))qword_18F3700F0;
+		        if ( !qword_18F3700F0 )
+		        {
+		          v175 = (void (__fastcall *)(Object *, Vector3 *))il2cpp_resolve_icall_1(
+		                                                             "UnityEngine.Transform::get_position_Injected(UnityEngine.Vector3&)");
+		          if ( !v175 )
+		          {
+		            v207 = sub_1802EE1B8("UnityEngine.Transform::get_position_Injected(UnityEngine.Vector3&)");
+		            sub_18007E1B0(v207, 0LL);
+		          }
+		          qword_18F3700F0 = (__int64)v175;
+		        }
+		        v175(v9, &v209);
+		        v177 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		        if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper->_1.cctor_finished_or_no_cctor )
+		        {
+		          il2cpp_runtime_class_init_1(TypeInfo::IFix::ILFixDynamicMethodWrapper);
+		          v177 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		        }
+		        v178 = v177->static_fields->wrapperArray;
+		        if ( !v178 )
+		          sub_1800D8250(v177, 0LL);
+		        if ( v178->max_length.size > 624 )
+		        {
+		          if ( !v177->_1.cctor_finished_or_no_cctor )
+		          {
+		            il2cpp_runtime_class_init_1(v177);
+		            v177 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		          }
+		          v179 = v177->static_fields->wrapperArray;
+		          if ( !v179 )
+		            sub_1800D8250(v177, 0LL);
+		          if ( v179->max_length.size <= 0x270u )
+		            sub_1800D2AA0(v177, v179, v176);
+		          if ( v179[17].vector[12] )
+		            break;
+		        }
+		        v216 = v209;
+		        if ( HG::Rendering::Runtime::HGEnvironmentVolumeBase::_DistanceToEdge(
+		               (HGEnvironmentVolumeBase *)p_klass,
+		               &v216,
+		               0LL) > 0.0 )
+		          goto LABEL_272;
+		      }
+		      if ( !v177->_1.cctor_finished_or_no_cctor )
+		      {
+		        il2cpp_runtime_class_init_1(v177);
+		        v177 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		      }
+		      v180 = v177->static_fields->wrapperArray;
+		      if ( !v180 )
+		        sub_1800D8250(0LL, v179);
+		      if ( v180->max_length.size <= 0x270u )
+		        sub_1800D2AA0(v180, v179, v176);
+		      v181 = v180[17].vector[12];
+		      if ( !v181 )
+		        sub_1800D8250(0LL, v179);
+		      v220 = v209;
+		      if ( IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_255(v181, (Object *)p_klass, &v220, 0LL) )
+		      {
+		LABEL_272:
+		        sub_1800049A0(*p_klass);
+		        v184 = (HGEnvironmentPhase *)(*(__int64 (__fastcall **)(_QWORD *, _QWORD))(*p_klass + 480LL))(
+		                                       p_klass,
+		                                       *(_QWORD *)(*p_klass + 488LL));
+		        if ( !v184 )
+		          sub_1800D8250(v183, v182);
+		        if ( !TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager->_1.cctor_finished_or_no_cctor )
+		          il2cpp_runtime_class_init_1(TypeInfo::HG::Rendering::Runtime::HGEnvironmentManager);
+		        v185 = HG::Rendering::Runtime::HGEnvironmentManager::get_s_timeOfDay(0LL);
+		        if ( !TypeInfo::HG::Rendering::Runtime::HGLightConfig->_1.cctor_finished_or_no_cctor )
+		          il2cpp_runtime_class_init_1(TypeInfo::HG::Rendering::Runtime::HGLightConfig);
+		        HG::Rendering::Runtime::HGLightConfig::UpdateDirectFinalDirection(&v184->fields.lightConfig, v185, 0LL);
+		        if ( !v8 )
+		          sub_1800D8250(v187, v186);
+		        HG::Rendering::Runtime::HGEnvironmentPhase::CopyFrom((HGEnvironmentPhase *)v8, v184, 0LL);
+		        if ( !v67 )
+		          sub_1800D8250(v189, v188);
+		        Beyond::IndexedHashSet<System::Object>::Add(
+		          (IndexedHashSet_1_System_Object_ *)v67,
+		          (Object *)p_klass,
+		          MethodInfo::Beyond::IndexedHashSet<HG::Rendering::Runtime::HGEnvironmentVolumeBase>::Add);
+		        if ( !interpolatedVolumesFactor )
+		          sub_1800D8250(v191, v190);
+		        v193 = MethodInfo::System::Collections::Generic::List<float>::Add;
+		        ++interpolatedVolumesFactor->fields._version;
+		        v194 = interpolatedVolumesFactor->fields._items;
+		        v195 = interpolatedVolumesFactor->fields._size;
+		        if ( !v194 )
+		          sub_1800D8250(0LL, v195);
+		        if ( (unsigned int)v195 < v194->max_length.size )
+		        {
+		          interpolatedVolumesFactor->fields._size = v195 + 1;
+		          if ( (unsigned int)v195 >= v194->max_length.size )
+		            sub_1800D2AA0(v194, v195, v192);
+		          v194->vector[v195] = 1.0;
+		        }
+		        else
+		        {
+		          if ( !*((_QWORD *)v193->klass->rgctx_data[11].rgctxDataDummy + 4) )
+		            (*(void (**)(void))v193->klass->rgctx_data[11].rgctxDataDummy)();
+		          System::Collections::Generic::List<float>::AddWithResize(
+		            interpolatedVolumesFactor,
+		            1.0,
+		            (MethodInfo *)v193->klass->rgctx_data[11].rgctxDataDummy);
+		        }
+		      }
+		    }
+		  }
+		  catch ( Il2CppExceptionWrapper *v222 )
+		  {
+		    v214.klass = (SingleFieldAccessor__Class *)v222->ex;
+		    if ( v214.klass )
+		      sub_18007E1E0(v214.klass);
+		  }
+		}
+		
 	}
 }

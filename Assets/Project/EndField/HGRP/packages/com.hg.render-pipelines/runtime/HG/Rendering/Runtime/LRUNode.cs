@@ -1,15 +1,16 @@
-﻿using System;
-using System.Runtime.InteropServices;
+using System;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
+
+// Image 4: HG.RenderPipelines.Runtime.dll - Assembly: HG.RenderPipelines.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null - Types 37354-38879
 
 namespace HG.Rendering.Runtime
 {
-	[StructLayout(LayoutKind.Sequential, Pack = 1, Size = 12)]
-	public struct LRUNode
+	public struct LRUNode // TypeDefIndex: 38641
 	{
-		public int key;
-
-		public int prev;
-
-		public int next;
+		// Fields
+		public int key; // 0x00
+		public int prev; // 0x04
+		public int next; // 0x08
 	}
 }

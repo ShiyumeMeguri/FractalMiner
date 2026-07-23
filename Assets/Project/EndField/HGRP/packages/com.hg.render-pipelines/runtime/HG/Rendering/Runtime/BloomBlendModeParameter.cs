@@ -1,35 +1,29 @@
-﻿using System;
+using System;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using UnityEngine.HyperGryphEngineCode;
 using UnityEngine.Rendering;
+
+// Image 4: HG.RenderPipelines.Runtime.dll - Assembly: HG.RenderPipelines.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null - Types 37354-38879
 
 namespace HG.Rendering.Runtime
 {
 	[Serializable]
-	public sealed class BloomBlendModeParameter : VolumeParameter<BloomBlendMode>
+	public sealed class BloomBlendModeParameter : VolumeParameter<BloomBlendMode> // TypeDefIndex: 38005
 	{
-		public BloomBlendModeParameter(BloomBlendMode value, [MetadataOffset(Offset = "0x01F9140E")] bool overrideState = false)
+		// Constructors
+		public BloomBlendModeParameter() {} // Dummy constructor
+		public BloomBlendModeParameter(BloomBlendMode value, bool overrideState = false /* Metadata: 0x02303826 */) {} // 0x0000000184DA09B0-0x0000000184DA09C0
+		// VolumeParameter`1[UnityEngine.LayerMask](LayerMask, Boolean)
+		void UnityEngine::Rendering::VolumeParameter<UnityEngine::LayerMask>::VolumeParameter(
+		        VolumeParameter_1_UnityEngine_LayerMask_ *this,
+		        LayerMask value,
+		        bool overrideState,
+		        MethodInfo *method)
 		{
-			// // BloomBlendModeParameter(BloomBlendMode, Boolean)
-			// void HG::Rendering::Runtime::BloomBlendModeParameter::BloomBlendModeParameter(
-			//         BloomBlendModeParameter *this,
-			//         BloomBlendMode__Enum value,
-			//         bool overrideState,
-			//         MethodInfo *method)
-			// {
-			//   if ( byte_18D8ED9C1 )
-			//   {
-			//     this.fields._.m_Value = value;
-			//     this.fields._._.overrideState = overrideState;
-			//   }
-			//   else
-			//   {
-			//     sub_18003C530(&MethodInfo::UnityEngine::Rendering::VolumeParameter<UnityEngine::HyperGryphEngineCode::BloomBlendMode>::VolumeParameter);
-			//     this.fields._.m_Value = value;
-			//     this.fields._._.overrideState = overrideState;
-			//     byte_18D8ED9C1 = 1;
-			//   }
-			// }
-			// 
+		  this->fields.m_Value = value;
+		  this->fields._.overrideState = overrideState;
 		}
+		
 	}
 }

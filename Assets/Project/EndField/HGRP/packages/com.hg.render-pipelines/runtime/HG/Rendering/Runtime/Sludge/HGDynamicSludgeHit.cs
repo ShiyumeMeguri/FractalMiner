@@ -1,16 +1,17 @@
-﻿using System;
-using System.Runtime.InteropServices;
+using System;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using UnityEngine;
+
+// Image 4: HG.RenderPipelines.Runtime.dll - Assembly: HG.RenderPipelines.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null - Types 37354-38879
 
 namespace HG.Rendering.Runtime.Sludge
 {
-	[StructLayout(LayoutKind.Sequential, Pack = 1, Size = 16)]
-	public struct HGDynamicSludgeHit
+	public struct HGDynamicSludgeHit // TypeDefIndex: 38841
 	{
-		public float time;
-
-		public Vector2 point;
-
-		public float range;
+		// Fields
+		public float time; // 0x00
+		public Vector2 point; // 0x04
+		public float range; // 0x0C
 	}
 }

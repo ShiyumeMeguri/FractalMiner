@@ -1,185 +1,149 @@
-﻿using System;
+using System;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using UnityEngine.Rendering;
+
+// Image 4: HG.RenderPipelines.Runtime.dll - Assembly: HG.RenderPipelines.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null - Types 37354-38879
 
 namespace HG.Rendering.Runtime
 {
-	[VolumeComponentMenuForRenderPipeline("HG/ChromaticAbberation", new Type[] { typeof(HGRenderPipeline) })]
 	[Serializable]
-	public sealed class HGChromaticAbberation : VolumeComponent
+	[VolumeComponentMenuForRenderPipeline("HG/ChromaticAbberation", new System.Type[1] {typeof(HGRenderPipeline) })]
+	public sealed class HGChromaticAbberation : VolumeComponent // TypeDefIndex: 38035
 	{
-		public HGChromaticAbberation()
+		// Fields
+		public BoolParameter enabled; // 0x30
+		public Vector2Parameter center; // 0x38
+		public ClampedFloatParameter intensity; // 0x40
+		public BoolParameter averageStep; // 0x48
+		public BoolParameter enableGlobalCenter; // 0x50
+		public Vector3Parameter globalCenter; // 0x58
+	
+		// Constructors
+		public HGChromaticAbberation() {} // 0x0000000184415F50-0x00000001844160C0
+		// HGChromaticAbberation()
+		void HG::Rendering::Runtime::HGChromaticAbberation::HGChromaticAbberation(
+		        HGChromaticAbberation *this,
+		        MethodInfo *method)
 		{
-			// // HGChromaticAbberation()
-			// void HG::Rendering::Runtime::HGChromaticAbberation::HGChromaticAbberation(
-			//         HGChromaticAbberation *this,
-			//         MethodInfo *method)
-			// {
-			//   MethodInfo *v2; // xmm6_8
-			//   BoolParameter *v4; // rax
-			//   OneofDescriptorProto *v5; // rdx
-			//   __int64 v6; // rcx
-			//   BoolParameter *v7; // rdi
-			//   OneofDescriptorProto *v8; // rdx
-			//   FileDescriptor *v9; // r8
-			//   MessageDescriptor *v10; // r9
-			//   Vector2Parameter *v11; // rax
-			//   Vector2Parameter *v12; // rdi
-			//   OneofDescriptorProto *v13; // rdx
-			//   FileDescriptor *v14; // r8
-			//   MessageDescriptor *v15; // r9
-			//   ClampedFloatParameter *v16; // rax
-			//   ClampedFloatParameter *v17; // rdi
-			//   OneofDescriptorProto *v18; // rdx
-			//   FileDescriptor *v19; // r8
-			//   MessageDescriptor *v20; // r9
-			//   BoolParameter *v21; // rax
-			//   BoolParameter *v22; // rdi
-			//   OneofDescriptorProto *v23; // rdx
-			//   FileDescriptor *v24; // r8
-			//   MessageDescriptor *v25; // r9
-			//   BoolParameter *v26; // rax
-			//   BoolParameter *v27; // rdi
-			//   OneofDescriptorProto *v28; // rdx
-			//   FileDescriptor *v29; // r8
-			//   MessageDescriptor *v30; // r9
-			//   __int64 v31; // rdi
-			//   FileDescriptor *v32; // r8
-			//   MessageDescriptor *v33; // r9
-			//   String__Array *overrideState; // [rsp+20h] [rbp-28h]
-			//   String__Array *overrideStatea; // [rsp+20h] [rbp-28h]
-			//   String__Array *overrideStatee; // [rsp+20h] [rbp-28h]
-			//   String__Array *overrideStateb; // [rsp+20h] [rbp-28h]
-			//   String__Array *overrideStatec; // [rsp+20h] [rbp-28h]
-			//   String__Array *overrideStated; // [rsp+20h] [rbp-28h]
-			//   MethodInfo *methoda; // [rsp+28h] [rbp-20h]
-			//   MethodInfo *methodb; // [rsp+28h] [rbp-20h]
-			//   MethodInfo *methodf; // [rsp+28h] [rbp-20h]
-			//   MethodInfo *methodc; // [rsp+28h] [rbp-20h]
-			//   MethodInfo *methodd; // [rsp+28h] [rbp-20h]
-			//   MethodInfo *methode; // [rsp+28h] [rbp-20h]
-			//   MethodInfo *v46; // [rsp+30h] [rbp-18h]
-			//   MethodInfo *v47; // [rsp+30h] [rbp-18h]
-			//   MethodInfo *v48; // [rsp+30h] [rbp-18h]
-			//   MethodInfo *v49; // [rsp+30h] [rbp-18h]
-			//   MethodInfo *v50; // [rsp+30h] [rbp-18h]
-			// 
-			//   if ( !byte_18D8ED9D8 )
-			//   {
-			//     sub_18003C530(&TypeInfo::UnityEngine::Rendering::BoolParameter);
-			//     sub_18003C530(&TypeInfo::UnityEngine::Rendering::ClampedFloatParameter);
-			//     sub_18003C530(&TypeInfo::UnityEngine::Rendering::Vector2Parameter);
-			//     sub_18003C530(&TypeInfo::UnityEngine::Rendering::Vector3Parameter);
-			//     byte_18D8ED9D8 = 1;
-			//   }
-			//   v4 = (BoolParameter *)sub_180004920(TypeInfo::UnityEngine::Rendering::BoolParameter);
-			//   v7 = v4;
-			//   if ( !v4 )
-			//     goto LABEL_12;
-			//   UnityEngine::Rendering::BoolParameter::BoolParameter(v4, 0, 0, 0LL);
-			//   this.fields.enabled = v7;
-			//   sub_1800054D0((OneofDescriptor *)&this.fields.enabled, v8, v9, v10, overrideState, (String *)methoda, v2);
-			//   v11 = (Vector2Parameter *)sub_180004920(TypeInfo::UnityEngine::Rendering::Vector2Parameter);
-			//   v12 = v11;
-			//   if ( !v11 )
-			//     goto LABEL_12;
-			//   UnityEngine::Rendering::Vector2Parameter::Vector2Parameter(
-			//     v11,
-			//     (Vector2)*(_OWORD *)&_mm_unpacklo_ps((__m128)0x3F000000u, (__m128)0x3F000000u),
-			//     0,
-			//     0LL);
-			//   this.fields.center = v12;
-			//   sub_1800054D0((OneofDescriptor *)&this.fields.center, v13, v14, v15, overrideStatea, (String *)methodb, v46);
-			//   v16 = (ClampedFloatParameter *)sub_180004920(TypeInfo::UnityEngine::Rendering::ClampedFloatParameter);
-			//   v17 = v16;
-			//   if ( !v16 )
-			//     goto LABEL_12;
-			//   UnityEngine::Rendering::ClampedFloatParameter::ClampedFloatParameter(v16, 0.1, 0.0, 0.30000001, 0, 0LL);
-			//   this.fields.intensity = v17;
-			//   sub_1800054D0((OneofDescriptor *)&this.fields.intensity, v18, v19, v20, overrideStatee, (String *)methodf, v47);
-			//   v21 = (BoolParameter *)sub_180004920(TypeInfo::UnityEngine::Rendering::BoolParameter);
-			//   v22 = v21;
-			//   if ( !v21 )
-			//     goto LABEL_12;
-			//   UnityEngine::Rendering::BoolParameter::BoolParameter(v21, 0, 0, 0LL);
-			//   this.fields.averageStep = v22;
-			//   sub_1800054D0((OneofDescriptor *)&this.fields.averageStep, v23, v24, v25, overrideStateb, (String *)methodc, v48);
-			//   v26 = (BoolParameter *)sub_180004920(TypeInfo::UnityEngine::Rendering::BoolParameter);
-			//   v27 = v26;
-			//   if ( !v26
-			//     || (UnityEngine::Rendering::BoolParameter::BoolParameter(v26, 0, 0, 0LL),
-			//         this.fields.enableGlobalCenter = v27,
-			//         sub_1800054D0(
-			//           (OneofDescriptor *)&this.fields.enableGlobalCenter,
-			//           v28,
-			//           v29,
-			//           v30,
-			//           overrideStatec,
-			//           (String *)methodd,
-			//           v49),
-			//         (v31 = sub_180004920(TypeInfo::UnityEngine::Rendering::Vector3Parameter)) == 0) )
-			//   {
-			// LABEL_12:
-			//     sub_180B536AC(v6, v5);
-			//   }
-			//   if ( !byte_18D8F3663 )
-			//   {
-			//     sub_18003C530(&MethodInfo::UnityEngine::Rendering::VolumeParameter<UnityEngine::Vector3>::VolumeParameter);
-			//     byte_18D8F3663 = 1;
-			//   }
-			//   *(_BYTE *)(v31 + 16) = 0;
-			//   *(_QWORD *)(v31 + 24) = _mm_unpacklo_ps((__m128)0LL, (__m128)0LL).m128_u64[0];
-			//   *(_DWORD *)(v31 + 32) = 0;
-			//   this.fields.globalCenter = (Vector3Parameter *)v31;
-			//   sub_1800054D0((OneofDescriptor *)&this.fields.globalCenter, v5, v32, v33, overrideStated, (String *)methode, v50);
-			//   UnityEngine::Rendering::VolumeComponent::VolumeComponent((VolumeComponent *)this, 0LL);
-			// }
-			// 
+		  BoolParameter *v3; // rax
+		  Type *v4; // rdx
+		  __int64 v5; // rcx
+		  PropertyInfo_1 *v6; // r8
+		  Int32__Array **v7; // r9
+		  __int64 v8; // rax
+		  PropertyInfo_1 *v9; // r8
+		  Int32__Array **v10; // r9
+		  __int64 v11; // rax
+		  PropertyInfo_1 *v12; // r8
+		  Int32__Array **v13; // r9
+		  BoolParameter *v14; // rax
+		  PropertyInfo_1 *v15; // r8
+		  Int32__Array **v16; // r9
+		  BoolParameter *v17; // rax
+		  PropertyInfo_1 *v18; // r8
+		  Int32__Array **v19; // r9
+		  __int64 v20; // rdi
+		  PropertyInfo_1 *v21; // r8
+		  Int32__Array **v22; // r9
+		  MethodInfo *v23; // [rsp+20h] [rbp-8h]
+		  MethodInfo *v24; // [rsp+20h] [rbp-8h]
+		  MethodInfo *v25; // [rsp+20h] [rbp-8h]
+		  MethodInfo *v26; // [rsp+20h] [rbp-8h]
+		  MethodInfo *v27; // [rsp+20h] [rbp-8h]
+		  MethodInfo *v28; // [rsp+20h] [rbp-8h]
+		
+		  v3 = (BoolParameter *)sub_1800368D0(TypeInfo::UnityEngine::Rendering::BoolParameter);
+		  if ( !v3 )
+		    goto LABEL_10;
+		  v3->fields._.m_Value = 0;
+		  v3->fields._._.overrideState = 0;
+		  this->fields.enabled = v3;
+		  sub_18002D1B0((SingleFieldAccessor *)&this->fields.enabled, v4, v6, v7, v23);
+		  v8 = sub_1800368D0(TypeInfo::UnityEngine::Rendering::Vector2Parameter);
+		  if ( !v8 )
+		    goto LABEL_10;
+		  *(_DWORD *)(v8 + 24) = 1056964608;
+		  *(_DWORD *)(v8 + 28) = 1056964608;
+		  *(_BYTE *)(v8 + 16) = 0;
+		  this->fields.center = (Vector2Parameter *)v8;
+		  sub_18002D1B0((SingleFieldAccessor *)&this->fields.center, v4, v9, v10, v24);
+		  v11 = sub_1800368D0(TypeInfo::UnityEngine::Rendering::ClampedFloatParameter);
+		  if ( !v11 )
+		    goto LABEL_10;
+		  *(_DWORD *)(v11 + 24) = 1036831949;
+		  *(_BYTE *)(v11 + 16) = 0;
+		  *(_DWORD *)(v11 + 32) = 0;
+		  *(_DWORD *)(v11 + 36) = 1050253722;
+		  *(_DWORD *)(v11 + 40) = 1065353216;
+		  this->fields.intensity = (ClampedFloatParameter *)v11;
+		  sub_18002D1B0((SingleFieldAccessor *)&this->fields.intensity, v4, v12, v13, v25);
+		  v14 = (BoolParameter *)sub_1800368D0(TypeInfo::UnityEngine::Rendering::BoolParameter);
+		  if ( !v14 )
+		    goto LABEL_10;
+		  v14->fields._.m_Value = 0;
+		  v14->fields._._.overrideState = 0;
+		  this->fields.averageStep = v14;
+		  sub_18002D1B0((SingleFieldAccessor *)&this->fields.averageStep, v4, v15, v16, v26);
+		  v17 = (BoolParameter *)sub_1800368D0(TypeInfo::UnityEngine::Rendering::BoolParameter);
+		  if ( !v17
+		    || (v17->fields._.m_Value = 0,
+		        v17->fields._._.overrideState = 0,
+		        this->fields.enableGlobalCenter = v17,
+		        sub_18002D1B0((SingleFieldAccessor *)&this->fields.enableGlobalCenter, v4, v18, v19, v27),
+		        (v20 = sub_1800368D0(TypeInfo::UnityEngine::Rendering::Vector3Parameter)) == 0) )
+		  {
+		LABEL_10:
+		    sub_1800D8260(v5, v4);
+		  }
+		  if ( !byte_18F36E4F5 )
+		  {
+		    sub_180035ED0(&MethodInfo::UnityEngine::Rendering::VolumeParameter<UnityEngine::Vector3>::VolumeParameter);
+		    byte_18F36E4F5 = 1;
+		  }
+		  *(_BYTE *)(v20 + 16) = 0;
+		  *(_QWORD *)(v20 + 24) = _mm_unpacklo_ps((__m128)0LL, (__m128)0LL).m128_u64[0];
+		  *(_DWORD *)(v20 + 32) = 0;
+		  this->fields.globalCenter = (Vector3Parameter *)v20;
+		  sub_18002D1B0((SingleFieldAccessor *)&this->fields.globalCenter, v4, v21, v22, v28);
+		  UnityEngine::Rendering::VolumeComponent::VolumeComponent((VolumeComponent *)this, 0LL);
 		}
-
-		public bool IsActive()
+		
+	
+		// Methods
+		public bool IsActive() => default; // 0x0000000189B69A78-0x0000000189B69AFC
+		// Boolean IsActive()
+		bool HG::Rendering::Runtime::HGChromaticAbberation::IsActive(HGChromaticAbberation *this, MethodInfo *method)
 		{
-			// // Boolean IsActive()
-			// bool HG::Rendering::Runtime::HGChromaticAbberation::IsActive(HGChromaticAbberation *this, MethodInfo *method)
-			// {
-			//   __int64 v3; // rcx
-			//   void *enabled; // rdx
-			//   bool result; // al
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			// 
-			//   if ( !IFix::WrappersManagerImpl::IsPatched(2224, 0LL) )
-			//   {
-			//     enabled = this.fields.enabled;
-			//     if ( enabled )
-			//     {
-			//       result = sub_1800023D0(10LL, enabled);
-			//       if ( !result )
-			//         return result;
-			//       enabled = this.fields.intensity;
-			//       if ( enabled )
-			//         return sub_18003F9B0(10LL, enabled) > 0.0;
-			//     }
-			// LABEL_7:
-			//     sub_180B536AC(v3, enabled);
-			//   }
-			//   Patch = IFix::WrappersManagerImpl::GetPatch(2224, 0LL);
-			//   if ( !Patch )
-			//     goto LABEL_7;
-			//   return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_8((ILFixDynamicMethodWrapper_27 *)Patch, (Object *)this, 0LL);
-			// }
-			// 
-			return default(bool);
+		  __int64 v3; // rcx
+		  void *enabled; // rdx
+		  bool result; // al
+		  double v6; // xmm0_8
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		
+		  if ( !IFix::WrappersManagerImpl::IsPatched(2681, 0LL) )
+		  {
+		    enabled = this->fields.enabled;
+		    if ( enabled )
+		    {
+		      result = sub_180006280(10LL, enabled);
+		      if ( !result )
+		        return result;
+		      enabled = this->fields.intensity;
+		      if ( enabled )
+		      {
+		        v6 = sub_1800057D0(10LL, enabled);
+		        return *(float *)&v6 > 0.0;
+		      }
+		    }
+		LABEL_7:
+		    sub_1800D8260(v3, enabled);
+		  }
+		  Patch = IFix::WrappersManagerImpl::GetPatch(2681, 0LL);
+		  if ( !Patch )
+		    goto LABEL_7;
+		  return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_14((ILFixDynamicMethodWrapper_20 *)Patch, (Object *)this, 0LL);
 		}
-
-		public BoolParameter enabled;
-
-		public Vector2Parameter center;
-
-		public ClampedFloatParameter intensity;
-
-		public BoolParameter averageStep;
-
-		public BoolParameter enableGlobalCenter;
-
-		public Vector3Parameter globalCenter;
+		
 	}
 }

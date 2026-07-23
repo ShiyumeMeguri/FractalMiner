@@ -1,24 +1,26 @@
-﻿using System;
+using System;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
+
+// Image 4: HG.RenderPipelines.Runtime.dll - Assembly: HG.RenderPipelines.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null - Types 37354-38879
 
 namespace HG.Rendering.Runtime
 {
 	[Serializable]
-	public class FloatScalableSettingValue : ScalableSettingValue<float>
+	public class FloatScalableSettingValue : ScalableSettingValue<float> // TypeDefIndex: 38564
 	{
-		public FloatScalableSettingValue()
+		// Constructors
+		public FloatScalableSettingValue() {} // 0x00000001841E1670-0x00000001841E1680
+		// Void Lerp[HGWindConfig](HGWindConfig ByRef, HGWindConfig ByRef, Single)
+		void HG::Rendering::Runtime::HGCelestialConfig::HGCelestialAdvancedObjectConfig::Lerp<HG::Rendering::Runtime::HGWindConfig>(
+		        HGCelestialConfig_HGCelestialAdvancedObjectConfig *this,
+		        HGWindConfig *cSrc,
+		        HGWindConfig *cDst,
+		        float t,
+		        MethodInfo *method)
 		{
-			// // FloatScalableSettingValue()
-			// void HG::Rendering::Runtime::FloatScalableSettingValue::FloatScalableSettingValue(
-			//         FloatScalableSettingValue *this,
-			//         MethodInfo *method)
-			// {
-			//   if ( !byte_18D91969B )
-			//   {
-			//     sub_18003C530(&MethodInfo::HG::Rendering::Runtime::ScalableSettingValue<float>::ScalableSettingValue);
-			//     byte_18D91969B = 1;
-			//   }
-			// }
-			// 
+		  ;
 		}
+		
 	}
 }

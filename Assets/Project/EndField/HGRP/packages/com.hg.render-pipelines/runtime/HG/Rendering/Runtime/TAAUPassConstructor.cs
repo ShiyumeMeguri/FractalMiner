@@ -1,2692 +1,2917 @@
-﻿using System;
+using System;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using HG.Rendering.RenderGraphModule;
 using UnityEngine;
 using UnityEngine.HyperGryphEngineCode;
 
+// Image 4: HG.RenderPipelines.Runtime.dll - Assembly: HG.RenderPipelines.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null - Types 37354-38879
+
 namespace HG.Rendering.Runtime
 {
-	internal class TAAUPassConstructor : IPassConstructor
+	internal class TAAUPassConstructor : IPassConstructor // TypeDefIndex: 38439
 	{
-		// (get) Token: 0x06001145 RID: 4421 RVA: 0x000025F0 File Offset: 0x000007F0
-		// (set) Token: 0x06001146 RID: 4422 RVA: 0x000025D0 File Offset: 0x000007D0
-		private float historyWeight
+		// Fields
+		private float[] m_gaussianKernel; // 0x10
+		private float m_gaussianKernelStdDev; // 0x18
+		private Material[] m_taauPassMaterials; // 0x20
+		private TAAUConstants m_constants; // 0x2C
+		private TextureHandle m_historyDilatedSceneDepth; // 0xEC
+		private TextureHandle m_historyDilatedSceneMV; // 0xFC
+		private RTNames[] m_rtNames; // 0x110
+		private static readonly RenderFunc<DilationPassData> s_dilationRenderFunc; // 0x00
+		private static readonly RenderFunc<MaskDilationPassData> s_maskDilationRenderFunc; // 0x08
+		private static readonly RenderFunc<ResolvePassData> s_resolveRenderFunc; // 0x10
+	
+		// Properties
+		private float historyWeight { get => default; set {} } // 0x0000000189BD3AA0-0x0000000189BD3AF0 0x0000000189BD4240-0x0000000189BD429C
+		// Single get_historyWeight()
+		float HG::Rendering::Runtime::TAAUPassConstructor::get_historyWeight(TAAUPassConstructor *this, MethodInfo *method)
 		{
-			get
-			{
-				// // Single GetLength()
-				// float UnityEngine::Splines::NativeSpline::GetLength(NativeSpline *this, MethodInfo *method)
-				// {
-				//   return this.m_Length;
-				// }
-				// 
-				return 0f;
-			}
-			set
-			{
-				// // Void set_baseline(Single)
-				// void UnityEngine::TextCore::FaceInfo::set_baseline(FaceInfo *this, float value, MethodInfo *method)
-				// {
-				//   this.m_Baseline = value;
-				// }
-				// 
-			}
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v5; // rdx
+		  __int64 v6; // rcx
+		
+		  if ( !IFix::WrappersManagerImpl::IsPatched(3351, 0LL) )
+		    return this->fields.m_constants.taauParameters0.z;
+		  Patch = IFix::WrappersManagerImpl::GetPatch(3351, 0LL);
+		  if ( !Patch )
+		    sub_1800D8260(v6, v5);
+		  return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_46((ILFixDynamicMethodWrapper_15 *)Patch, (Object *)this, 0LL);
 		}
+		
 
-		// (get) Token: 0x06001147 RID: 4423 RVA: 0x000025F0 File Offset: 0x000007F0
-		// (set) Token: 0x06001148 RID: 4424 RVA: 0x000025D0 File Offset: 0x000007D0
-		private float historyWeightInMotion
+		// Void set_historyWeight(Single)
+		void HG::Rendering::Runtime::TAAUPassConstructor::set_historyWeight(
+		        TAAUPassConstructor *this,
+		        float value,
+		        MethodInfo *method)
 		{
-			get
-			{
-				// // Single get_Width()
-				// float HG::Rendering::HgMath::CellGrid2D<System::Object>::get_Width(
-				//         CellGrid2D_1_System_Object_ *this,
-				//         MethodInfo *method)
-				// {
-				//   return this.fields._Width_k__BackingField;
-				// }
-				// 
-				return 0f;
-			}
-			set
-			{
-				// // Void set_Width(Single)
-				// void HG::Rendering::HgMath::CellGrid2D<System::Object>::set_Width(
-				//         CellGrid2D_1_System_Object_ *this,
-				//         float value,
-				//         MethodInfo *method)
-				// {
-				//   this.fields._Width_k__BackingField = value;
-				// }
-				// 
-			}
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v5; // rdx
+		  __int64 v6; // rcx
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(3352, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(3352, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(v6, v5);
+		    IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_15((ILFixDynamicMethodWrapper_18 *)Patch, (Object *)this, value, 0LL);
+		  }
+		  else
+		  {
+		    this->fields.m_constants.taauParameters0.z = value;
+		  }
 		}
-
-		// (get) Token: 0x06001149 RID: 4425 RVA: 0x000025F0 File Offset: 0x000007F0
-		// (set) Token: 0x0600114A RID: 4426 RVA: 0x000025D0 File Offset: 0x000007D0
-		private float forceClampHistoryWeight
+		
+		private float historyWeightInMotion { get => default; set {} } // 0x0000000189BD3A50-0x0000000189BD3AA0 0x0000000189BD41E4-0x0000000189BD4240
+		// Single get_historyWeightInMotion()
+		float HG::Rendering::Runtime::TAAUPassConstructor::get_historyWeightInMotion(
+		        TAAUPassConstructor *this,
+		        MethodInfo *method)
 		{
-			get
-			{
-				// // Single get_minRegionArea()
-				// float UnityEngine::AI::NavMeshSurface::get_minRegionArea(NavMeshSurface *this, MethodInfo *method)
-				// {
-				//   return this.fields.m_MinRegionArea;
-				// }
-				// 
-				return 0f;
-			}
-			set
-			{
-				// // Void SetEmptyElement(Single)
-				// void MagicaCloth::FixedChunkNativeArray<float>::SetEmptyElement(
-				//         FixedChunkNativeArray_1_System_Single_ *this,
-				//         float empty,
-				//         MethodInfo *method)
-				// {
-				//   this.fields.emptyElement = empty;
-				// }
-				// 
-			}
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v5; // rdx
+		  __int64 v6; // rcx
+		
+		  if ( !IFix::WrappersManagerImpl::IsPatched(3353, 0LL) )
+		    return this->fields.m_constants.taauParameters0.w;
+		  Patch = IFix::WrappersManagerImpl::GetPatch(3353, 0LL);
+		  if ( !Patch )
+		    sub_1800D8260(v6, v5);
+		  return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_46((ILFixDynamicMethodWrapper_15 *)Patch, (Object *)this, 0LL);
 		}
+		
 
-		// (get) Token: 0x0600114B RID: 4427 RVA: 0x000025F0 File Offset: 0x000007F0
-		// (set) Token: 0x0600114C RID: 4428 RVA: 0x000025D0 File Offset: 0x000007D0
-		private float forceClampHistoryWeightInMotion
+		// Void set_historyWeightInMotion(Single)
+		void HG::Rendering::Runtime::TAAUPassConstructor::set_historyWeightInMotion(
+		        TAAUPassConstructor *this,
+		        float value,
+		        MethodInfo *method)
 		{
-			get
-			{
-				// // Single get_currentTime()
-				// float Slate::Cutscene::get_currentTime(Cutscene *this, MethodInfo *method)
-				// {
-				//   return this.fields._currentTime;
-				// }
-				// 
-				return 0f;
-			}
-			set
-			{
-				// // Void set_tabWidth(Single)
-				// void UnityEngine::TextCore::FaceInfo::set_tabWidth(FaceInfo *this, float value, MethodInfo *method)
-				// {
-				//   this.m_TabWidth = value;
-				// }
-				// 
-			}
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v5; // rdx
+		  __int64 v6; // rcx
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(3354, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(3354, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(v6, v5);
+		    IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_15((ILFixDynamicMethodWrapper_18 *)Patch, (Object *)this, value, 0LL);
+		  }
+		  else
+		  {
+		    this->fields.m_constants.taauParameters0.w = value;
+		  }
 		}
-
-		// (get) Token: 0x0600114D RID: 4429 RVA: 0x000025F0 File Offset: 0x000007F0
-		// (set) Token: 0x0600114E RID: 4430 RVA: 0x000025D0 File Offset: 0x000007D0
-		private float sharpenStrength
+		
+		private float forceClampHistoryWeight { get => default; set {} } // 0x0000000189BD3A00-0x0000000189BD3A50 0x0000000189BD4110-0x0000000189BD416C
+		// Single get_forceClampHistoryWeight()
+		float HG::Rendering::Runtime::TAAUPassConstructor::get_forceClampHistoryWeight(
+		        TAAUPassConstructor *this,
+		        MethodInfo *method)
 		{
-			get
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v5; // rdx
+		  __int64 v6; // rcx
+		
+		  if ( !IFix::WrappersManagerImpl::IsPatched(3355, 0LL) )
+		    return this->fields.m_constants.taauParameters2.y;
+		  Patch = IFix::WrappersManagerImpl::GetPatch(3355, 0LL);
+		  if ( !Patch )
+		    sub_1800D8260(v6, v5);
+		  return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_46((ILFixDynamicMethodWrapper_15 *)Patch, (Object *)this, 0LL);
+		}
+		
+
+		// Void set_forceClampHistoryWeight(Single)
+		void HG::Rendering::Runtime::TAAUPassConstructor::set_forceClampHistoryWeight(
+		        TAAUPassConstructor *this,
+		        float value,
+		        MethodInfo *method)
+		{
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v5; // rdx
+		  __int64 v6; // rcx
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(3356, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(3356, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(v6, v5);
+		    IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_15((ILFixDynamicMethodWrapper_18 *)Patch, (Object *)this, value, 0LL);
+		  }
+		  else
+		  {
+		    this->fields.m_constants.taauParameters2.y = value;
+		  }
+		}
+		
+		private float forceClampHistoryWeightInMotion { get => default; set {} } // 0x0000000189BD39B0-0x0000000189BD3A00 0x0000000189BD40B4-0x0000000189BD4110
+		// Single get_forceClampHistoryWeightInMotion()
+		float HG::Rendering::Runtime::TAAUPassConstructor::get_forceClampHistoryWeightInMotion(
+		        TAAUPassConstructor *this,
+		        MethodInfo *method)
+		{
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v5; // rdx
+		  __int64 v6; // rcx
+		
+		  if ( !IFix::WrappersManagerImpl::IsPatched(3357, 0LL) )
+		    return this->fields.m_constants.taauParameters3.x;
+		  Patch = IFix::WrappersManagerImpl::GetPatch(3357, 0LL);
+		  if ( !Patch )
+		    sub_1800D8260(v6, v5);
+		  return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_46((ILFixDynamicMethodWrapper_15 *)Patch, (Object *)this, 0LL);
+		}
+		
+
+		// Void set_forceClampHistoryWeightInMotion(Single)
+		void HG::Rendering::Runtime::TAAUPassConstructor::set_forceClampHistoryWeightInMotion(
+		        TAAUPassConstructor *this,
+		        float value,
+		        MethodInfo *method)
+		{
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v5; // rdx
+		  __int64 v6; // rcx
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(3358, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(3358, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(v6, v5);
+		    IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_15((ILFixDynamicMethodWrapper_18 *)Patch, (Object *)this, value, 0LL);
+		  }
+		  else
+		  {
+		    this->fields.m_constants.taauParameters3.x = value;
+		  }
+		}
+		
+		private float sharpenStrength { get => default; set {} } // 0x0000000189BD3D70-0x0000000189BD3DC0 0x0000000189BD4520-0x0000000189BD457C
+		// Single get_sharpenStrength()
+		float HG::Rendering::Runtime::TAAUPassConstructor::get_sharpenStrength(TAAUPassConstructor *this, MethodInfo *method)
+		{
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v5; // rdx
+		  __int64 v6; // rcx
+		
+		  if ( !IFix::WrappersManagerImpl::IsPatched(3359, 0LL) )
+		    return this->fields.m_constants.taauParameters1.z;
+		  Patch = IFix::WrappersManagerImpl::GetPatch(3359, 0LL);
+		  if ( !Patch )
+		    sub_1800D8260(v6, v5);
+		  return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_46((ILFixDynamicMethodWrapper_15 *)Patch, (Object *)this, 0LL);
+		}
+		
+
+		// Void set_sharpenStrength(Single)
+		void HG::Rendering::Runtime::TAAUPassConstructor::set_sharpenStrength(
+		        TAAUPassConstructor *this,
+		        float value,
+		        MethodInfo *method)
+		{
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v5; // rdx
+		  __int64 v6; // rcx
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(3360, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(3360, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(v6, v5);
+		    IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_15((ILFixDynamicMethodWrapper_18 *)Patch, (Object *)this, value, 0LL);
+		  }
+		  else
+		  {
+		    this->fields.m_constants.taauParameters1.z = value;
+		  }
+		}
+		
+		private float firstFrame { get => default; set {} } // 0x0000000189BD3960-0x0000000189BD39B0 0x0000000189BD4058-0x0000000189BD40B4
+		// Single get_firstFrame()
+		float HG::Rendering::Runtime::TAAUPassConstructor::get_firstFrame(TAAUPassConstructor *this, MethodInfo *method)
+		{
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v5; // rdx
+		  __int64 v6; // rcx
+		
+		  if ( !IFix::WrappersManagerImpl::IsPatched(3361, 0LL) )
+		    return this->fields.m_constants.taauParameters1.w;
+		  Patch = IFix::WrappersManagerImpl::GetPatch(3361, 0LL);
+		  if ( !Patch )
+		    sub_1800D8260(v6, v5);
+		  return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_46((ILFixDynamicMethodWrapper_15 *)Patch, (Object *)this, 0LL);
+		}
+		
+
+		// Void set_firstFrame(Single)
+		void HG::Rendering::Runtime::TAAUPassConstructor::set_firstFrame(
+		        TAAUPassConstructor *this,
+		        float value,
+		        MethodInfo *method)
+		{
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v5; // rdx
+		  __int64 v6; // rcx
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(3362, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(3362, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(v6, v5);
+		    IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_15((ILFixDynamicMethodWrapper_18 *)Patch, (Object *)this, value, 0LL);
+		  }
+		  else
+		  {
+		    this->fields.m_constants.taauParameters1.w = value;
+		  }
+		}
+		
+		private float occlusionDepthDiff { get => default; set {} } // 0x0000000189BD3CD0-0x0000000189BD3D20 0x0000000189BD4468-0x0000000189BD44C4
+		// Single get_occlusionDepthDiff()
+		float HG::Rendering::Runtime::TAAUPassConstructor::get_occlusionDepthDiff(
+		        TAAUPassConstructor *this,
+		        MethodInfo *method)
+		{
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v5; // rdx
+		  __int64 v6; // rcx
+		
+		  if ( !IFix::WrappersManagerImpl::IsPatched(3363, 0LL) )
+		    return this->fields.m_constants.taauParameters1.y;
+		  Patch = IFix::WrappersManagerImpl::GetPatch(3363, 0LL);
+		  if ( !Patch )
+		    sub_1800D8260(v6, v5);
+		  return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_46((ILFixDynamicMethodWrapper_15 *)Patch, (Object *)this, 0LL);
+		}
+		
+
+		// Void set_occlusionDepthDiff(Single)
+		void HG::Rendering::Runtime::TAAUPassConstructor::set_occlusionDepthDiff(
+		        TAAUPassConstructor *this,
+		        float value,
+		        MethodInfo *method)
+		{
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v5; // rdx
+		  __int64 v6; // rcx
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(3364, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(3364, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(v6, v5);
+		    IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_15((ILFixDynamicMethodWrapper_18 *)Patch, (Object *)this, value, 0LL);
+		  }
+		  else
+		  {
+		    this->fields.m_constants.taauParameters1.y = value;
+		  }
+		}
+		
+		private float minMVConsideredDynamic { get => default; set {} } // 0x0000000189BD3C80-0x0000000189BD3CD0 0x0000000189BD440C-0x0000000189BD4468
+		// Single get_minMVConsideredDynamic()
+		float HG::Rendering::Runtime::TAAUPassConstructor::get_minMVConsideredDynamic(
+		        TAAUPassConstructor *this,
+		        MethodInfo *method)
+		{
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v5; // rdx
+		  __int64 v6; // rcx
+		
+		  if ( !IFix::WrappersManagerImpl::IsPatched(3365, 0LL) )
+		    return this->fields.m_constants.taauParameters3.y;
+		  Patch = IFix::WrappersManagerImpl::GetPatch(3365, 0LL);
+		  if ( !Patch )
+		    sub_1800D8260(v6, v5);
+		  return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_46((ILFixDynamicMethodWrapper_15 *)Patch, (Object *)this, 0LL);
+		}
+		
+
+		// Void set_minMVConsideredDynamic(Single)
+		void HG::Rendering::Runtime::TAAUPassConstructor::set_minMVConsideredDynamic(
+		        TAAUPassConstructor *this,
+		        float value,
+		        MethodInfo *method)
+		{
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v5; // rdx
+		  __int64 v6; // rcx
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(3366, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(3366, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(v6, v5);
+		    IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_15((ILFixDynamicMethodWrapper_18 *)Patch, (Object *)this, value, 0LL);
+		  }
+		  else
+		  {
+		    this->fields.m_constants.taauParameters3.y = value;
+		  }
+		}
+		
+		private float maxMVConsideredDynamic { get => default; set {} } // 0x0000000189BD3BE0-0x0000000189BD3C30 0x0000000189BD4354-0x0000000189BD43B0
+		// Single get_maxMVConsideredDynamic()
+		float HG::Rendering::Runtime::TAAUPassConstructor::get_maxMVConsideredDynamic(
+		        TAAUPassConstructor *this,
+		        MethodInfo *method)
+		{
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v5; // rdx
+		  __int64 v6; // rcx
+		
+		  if ( !IFix::WrappersManagerImpl::IsPatched(3367, 0LL) )
+		    return this->fields.m_constants.taauParameters3.z;
+		  Patch = IFix::WrappersManagerImpl::GetPatch(3367, 0LL);
+		  if ( !Patch )
+		    sub_1800D8260(v6, v5);
+		  return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_46((ILFixDynamicMethodWrapper_15 *)Patch, (Object *)this, 0LL);
+		}
+		
+
+		// Void set_maxMVConsideredDynamic(Single)
+		void HG::Rendering::Runtime::TAAUPassConstructor::set_maxMVConsideredDynamic(
+		        TAAUPassConstructor *this,
+		        float value,
+		        MethodInfo *method)
+		{
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v5; // rdx
+		  __int64 v6; // rcx
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(3368, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(3368, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(v6, v5);
+		    IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_15((ILFixDynamicMethodWrapper_18 *)Patch, (Object *)this, value, 0LL);
+		  }
+		  else
+		  {
+		    this->fields.m_constants.taauParameters3.z = value;
+		  }
+		}
+		
+		private float characterMotionSensitivity { get => default; set {} } // 0x0000000189BD3820-0x0000000189BD3870 0x0000000189BD3EE8-0x0000000189BD3F44
+		// Single get_characterMotionSensitivity()
+		float HG::Rendering::Runtime::TAAUPassConstructor::get_characterMotionSensitivity(
+		        TAAUPassConstructor *this,
+		        MethodInfo *method)
+		{
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v5; // rdx
+		  __int64 v6; // rcx
+		
+		  if ( !IFix::WrappersManagerImpl::IsPatched(3369, 0LL) )
+		    return this->fields.m_constants.taauParameters3.w;
+		  Patch = IFix::WrappersManagerImpl::GetPatch(3369, 0LL);
+		  if ( !Patch )
+		    sub_1800D8260(v6, v5);
+		  return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_46((ILFixDynamicMethodWrapper_15 *)Patch, (Object *)this, 0LL);
+		}
+		
+
+		// Void set_characterMotionSensitivity(Single)
+		void HG::Rendering::Runtime::TAAUPassConstructor::set_characterMotionSensitivity(
+		        TAAUPassConstructor *this,
+		        float value,
+		        MethodInfo *method)
+		{
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v5; // rdx
+		  __int64 v6; // rcx
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(3370, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(3370, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(v6, v5);
+		    IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_15((ILFixDynamicMethodWrapper_18 *)Patch, (Object *)this, value, 0LL);
+		  }
+		  else
+		  {
+		    this->fields.m_constants.taauParameters3.w = value;
+		  }
+		}
+		
+		public float fastConvergeState { get => default; set {} } // 0x0000000189BD3910-0x0000000189BD3960 0x0000000189BD3FFC-0x0000000189BD4058
+		// Single get_fastConvergeState()
+		float HG::Rendering::Runtime::TAAUPassConstructor::get_fastConvergeState(TAAUPassConstructor *this, MethodInfo *method)
+		{
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v5; // rdx
+		  __int64 v6; // rcx
+		
+		  if ( !IFix::WrappersManagerImpl::IsPatched(3371, 0LL) )
+		    return this->fields.m_constants.taauParameters2.w;
+		  Patch = IFix::WrappersManagerImpl::GetPatch(3371, 0LL);
+		  if ( !Patch )
+		    sub_1800D8260(v6, v5);
+		  return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_46((ILFixDynamicMethodWrapper_15 *)Patch, (Object *)this, 0LL);
+		}
+		
+
+		// Void set_fastConvergeState(Single)
+		void HG::Rendering::Runtime::TAAUPassConstructor::set_fastConvergeState(
+		        TAAUPassConstructor *this,
+		        float value,
+		        MethodInfo *method)
+		{
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v5; // rdx
+		  __int64 v6; // rcx
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(3372, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(3372, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(v6, v5);
+		    IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_15((ILFixDynamicMethodWrapper_18 *)Patch, (Object *)this, value, 0LL);
+		  }
+		  else
+		  {
+		    this->fields.m_constants.taauParameters2.w = value;
+		  }
+		}
+		
+		private float minMVConsideredDynamicChar { get => default; set {} } // 0x0000000189BD3C30-0x0000000189BD3C80 0x0000000189BD43B0-0x0000000189BD440C
+		// Single get_minMVConsideredDynamicChar()
+		float HG::Rendering::Runtime::TAAUPassConstructor::get_minMVConsideredDynamicChar(
+		        TAAUPassConstructor *this,
+		        MethodInfo *method)
+		{
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v5; // rdx
+		  __int64 v6; // rcx
+		
+		  if ( !IFix::WrappersManagerImpl::IsPatched(3373, 0LL) )
+		    return this->fields.m_constants.taauParameters4.y;
+		  Patch = IFix::WrappersManagerImpl::GetPatch(3373, 0LL);
+		  if ( !Patch )
+		    sub_1800D8260(v6, v5);
+		  return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_46((ILFixDynamicMethodWrapper_15 *)Patch, (Object *)this, 0LL);
+		}
+		
+
+		// Void set_minMVConsideredDynamicChar(Single)
+		void HG::Rendering::Runtime::TAAUPassConstructor::set_minMVConsideredDynamicChar(
+		        TAAUPassConstructor *this,
+		        float value,
+		        MethodInfo *method)
+		{
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v5; // rdx
+		  __int64 v6; // rcx
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(3374, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(3374, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(v6, v5);
+		    IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_15((ILFixDynamicMethodWrapper_18 *)Patch, (Object *)this, value, 0LL);
+		  }
+		  else
+		  {
+		    this->fields.m_constants.taauParameters4.y = value;
+		  }
+		}
+		
+		private float maxMVConsideredDynamicChar { get => default; set {} } // 0x0000000189BD3B90-0x0000000189BD3BE0 0x0000000189BD42F8-0x0000000189BD4354
+		// Single get_maxMVConsideredDynamicChar()
+		float HG::Rendering::Runtime::TAAUPassConstructor::get_maxMVConsideredDynamicChar(
+		        TAAUPassConstructor *this,
+		        MethodInfo *method)
+		{
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v5; // rdx
+		  __int64 v6; // rcx
+		
+		  if ( !IFix::WrappersManagerImpl::IsPatched(3375, 0LL) )
+		    return this->fields.m_constants.taauParameters4.z;
+		  Patch = IFix::WrappersManagerImpl::GetPatch(3375, 0LL);
+		  if ( !Patch )
+		    sub_1800D8260(v6, v5);
+		  return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_46((ILFixDynamicMethodWrapper_15 *)Patch, (Object *)this, 0LL);
+		}
+		
+
+		// Void set_maxMVConsideredDynamicChar(Single)
+		void HG::Rendering::Runtime::TAAUPassConstructor::set_maxMVConsideredDynamicChar(
+		        TAAUPassConstructor *this,
+		        float value,
+		        MethodInfo *method)
+		{
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v5; // rdx
+		  __int64 v6; // rcx
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(3376, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(3376, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(v6, v5);
+		    IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_15((ILFixDynamicMethodWrapper_18 *)Patch, (Object *)this, value, 0LL);
+		  }
+		  else
+		  {
+		    this->fields.m_constants.taauParameters4.z = value;
+		  }
+		}
+		
+		private float fastConvergeHistoryWeight { get => default; set {} } // 0x0000000189BD38C0-0x0000000189BD3910 0x0000000189BD3FA0-0x0000000189BD3FFC
+		// Single get_fastConvergeHistoryWeight()
+		float HG::Rendering::Runtime::TAAUPassConstructor::get_fastConvergeHistoryWeight(
+		        TAAUPassConstructor *this,
+		        MethodInfo *method)
+		{
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v5; // rdx
+		  __int64 v6; // rcx
+		
+		  if ( !IFix::WrappersManagerImpl::IsPatched(3377, 0LL) )
+		    return this->fields.m_constants.taauParameters4.x;
+		  Patch = IFix::WrappersManagerImpl::GetPatch(3377, 0LL);
+		  if ( !Patch )
+		    sub_1800D8260(v6, v5);
+		  return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_46((ILFixDynamicMethodWrapper_15 *)Patch, (Object *)this, 0LL);
+		}
+		
+
+		// Void set_fastConvergeHistoryWeight(Single)
+		void HG::Rendering::Runtime::TAAUPassConstructor::set_fastConvergeHistoryWeight(
+		        TAAUPassConstructor *this,
+		        float value,
+		        MethodInfo *method)
+		{
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v5; // rdx
+		  __int64 v6; // rcx
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(3378, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(3378, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(v6, v5);
+		    IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_15((ILFixDynamicMethodWrapper_18 *)Patch, (Object *)this, value, 0LL);
+		  }
+		  else
+		  {
+		    this->fields.m_constants.taauParameters4.x = value;
+		  }
+		}
+		
+		private float responsiveAAHistoryWeight { get => default; set {} } // 0x0000000189BD3D20-0x0000000189BD3D70 0x0000000189BD44C4-0x0000000189BD4520
+		// Single get_responsiveAAHistoryWeight()
+		float HG::Rendering::Runtime::TAAUPassConstructor::get_responsiveAAHistoryWeight(
+		        TAAUPassConstructor *this,
+		        MethodInfo *method)
+		{
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v5; // rdx
+		  __int64 v6; // rcx
+		
+		  if ( !IFix::WrappersManagerImpl::IsPatched(3379, 0LL) )
+		    return this->fields.m_constants.taauParameters2.z;
+		  Patch = IFix::WrappersManagerImpl::GetPatch(3379, 0LL);
+		  if ( !Patch )
+		    sub_1800D8260(v6, v5);
+		  return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_46((ILFixDynamicMethodWrapper_15 *)Patch, (Object *)this, 0LL);
+		}
+		
+
+		// Void set_responsiveAAHistoryWeight(Single)
+		void HG::Rendering::Runtime::TAAUPassConstructor::set_responsiveAAHistoryWeight(
+		        TAAUPassConstructor *this,
+		        float value,
+		        MethodInfo *method)
+		{
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v5; // rdx
+		  __int64 v6; // rcx
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(3380, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(3380, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(v6, v5);
+		    IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_15((ILFixDynamicMethodWrapper_18 *)Patch, (Object *)this, value, 0LL);
+		  }
+		  else
+		  {
+		    this->fields.m_constants.taauParameters2.z = value;
+		  }
+		}
+		
+		private float inputSampleLumaWeight { get => default; set {} } // 0x0000000189BD3AF0-0x0000000189BD3B40 0x0000000189BD429C-0x0000000189BD42F8
+		// Single get_inputSampleLumaWeight()
+		float HG::Rendering::Runtime::TAAUPassConstructor::get_inputSampleLumaWeight(
+		        TAAUPassConstructor *this,
+		        MethodInfo *method)
+		{
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v5; // rdx
+		  __int64 v6; // rcx
+		
+		  if ( !IFix::WrappersManagerImpl::IsPatched(3381, 0LL) )
+		    return this->fields.m_constants.taauParameters4.w;
+		  Patch = IFix::WrappersManagerImpl::GetPatch(3381, 0LL);
+		  if ( !Patch )
+		    sub_1800D8260(v6, v5);
+		  return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_46((ILFixDynamicMethodWrapper_15 *)Patch, (Object *)this, 0LL);
+		}
+		
+
+		// Void set_inputSampleLumaWeight(Single)
+		void HG::Rendering::Runtime::TAAUPassConstructor::set_inputSampleLumaWeight(
+		        TAAUPassConstructor *this,
+		        float value,
+		        MethodInfo *method)
+		{
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v5; // rdx
+		  __int64 v6; // rcx
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(3382, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(3382, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(v6, v5);
+		    IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_15((ILFixDynamicMethodWrapper_18 *)Patch, (Object *)this, value, 0LL);
+		  }
+		  else
+		  {
+		    this->fields.m_constants.taauParameters4.w = value;
+		  }
+		}
+		
+		private float taauScaleFactor { get => default; set {} } // 0x0000000189BD3DC0-0x0000000189BD3E10 0x0000000189BD457C-0x0000000189BD4618
+		// Single get_taauScaleFactor()
+		float HG::Rendering::Runtime::TAAUPassConstructor::get_taauScaleFactor(TAAUPassConstructor *this, MethodInfo *method)
+		{
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v5; // rdx
+		  __int64 v6; // rcx
+		
+		  if ( !IFix::WrappersManagerImpl::IsPatched(3383, 0LL) )
+		    return this->fields.m_constants.taauParameters0.x;
+		  Patch = IFix::WrappersManagerImpl::GetPatch(3383, 0LL);
+		  if ( !Patch )
+		    sub_1800D8260(v6, v5);
+		  return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_46((ILFixDynamicMethodWrapper_15 *)Patch, (Object *)this, 0LL);
+		}
+		
+
+		// Void set_taauScaleFactor(Single)
+		void HG::Rendering::Runtime::TAAUPassConstructor::set_taauScaleFactor(
+		        TAAUPassConstructor *this,
+		        float value,
+		        MethodInfo *method)
+		{
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v5; // rdx
+		  __int64 v6; // rcx
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(3384, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(3384, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(v6, v5);
+		    IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_15((ILFixDynamicMethodWrapper_18 *)Patch, (Object *)this, value, 0LL);
+		  }
+		  else
+		  {
+		    this->fields.m_constants.taauParameters0.x = value;
+		    this->fields.m_constants.taauParameters8.x = value;
+		    this->fields.m_constants.taauParameters0.y = 1.0 / value;
+		    this->fields.m_constants.taauParameters8.z = 1.0 / value;
+		    this->fields.m_constants.taauParameters8.y = value;
+		    this->fields.m_constants.taauParameters8.w = 1.0 / value;
+		  }
+		}
+		
+		private float invScaleFactor { get => default; } // 0x0000000189BD3B40-0x0000000189BD3B90 
+		// Single get_invScaleFactor()
+		float HG::Rendering::Runtime::TAAUPassConstructor::get_invScaleFactor(TAAUPassConstructor *this, MethodInfo *method)
+		{
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v5; // rdx
+		  __int64 v6; // rcx
+		
+		  if ( !IFix::WrappersManagerImpl::IsPatched(3385, 0LL) )
+		    return this->fields.m_constants.taauParameters0.y;
+		  Patch = IFix::WrappersManagerImpl::GetPatch(3385, 0LL);
+		  if ( !Patch )
+		    sub_1800D8260(v6, v5);
+		  return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_46((ILFixDynamicMethodWrapper_15 *)Patch, (Object *)this, 0LL);
+		}
+		
+		private float enableResponsiveTransparency { get => default; set {} } // 0x0000000189BD3870-0x0000000189BD38C0 0x0000000189BD3F44-0x0000000189BD3FA0
+		// Single get_enableResponsiveTransparency()
+		float HG::Rendering::Runtime::TAAUPassConstructor::get_enableResponsiveTransparency(
+		        TAAUPassConstructor *this,
+		        MethodInfo *method)
+		{
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v5; // rdx
+		  __int64 v6; // rcx
+		
+		  if ( !IFix::WrappersManagerImpl::IsPatched(3386, 0LL) )
+		    return this->fields.m_constants.taauParameters5.x;
+		  Patch = IFix::WrappersManagerImpl::GetPatch(3386, 0LL);
+		  if ( !Patch )
+		    sub_1800D8260(v6, v5);
+		  return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_46((ILFixDynamicMethodWrapper_15 *)Patch, (Object *)this, 0LL);
+		}
+		
+
+		// Void set_enableResponsiveTransparency(Single)
+		void HG::Rendering::Runtime::TAAUPassConstructor::set_enableResponsiveTransparency(
+		        TAAUPassConstructor *this,
+		        float value,
+		        MethodInfo *method)
+		{
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v5; // rdx
+		  __int64 v6; // rcx
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(3387, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(3387, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(v6, v5);
+		    IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_15((ILFixDynamicMethodWrapper_18 *)Patch, (Object *)this, value, 0LL);
+		  }
+		  else
+		  {
+		    this->fields.m_constants.taauParameters5.x = value;
+		  }
+		}
+		
+		private Vector4 LRSize { get => default; set {} } // 0x0000000189BD37B8-0x0000000189BD3820 0x0000000189BD3E7C-0x0000000189BD3EE8
+		// Vector4 get_LRSize()
+		Vector4 *HG::Rendering::Runtime::TAAUPassConstructor::get_LRSize(
+		        Vector4 *__return_ptr retstr,
+		        TAAUPassConstructor *this,
+		        MethodInfo *method)
+		{
+		  Vector4 taauParameters6; // xmm0
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v7; // rdx
+		  __int64 v8; // rcx
+		  Vector4 *result; // rax
+		  Vector4 v10; // [rsp+20h] [rbp-18h] BYREF
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(3388, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(3388, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(v8, v7);
+		    taauParameters6 = *IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_350(&v10, Patch, (Object *)this, 0LL);
+		  }
+		  else
+		  {
+		    taauParameters6 = this->fields.m_constants.taauParameters6;
+		  }
+		  result = retstr;
+		  *retstr = taauParameters6;
+		  return result;
+		}
+		
+
+		// Void set_LRSize(Vector4)
+		void HG::Rendering::Runtime::TAAUPassConstructor::set_LRSize(
+		        TAAUPassConstructor *this,
+		        Vector4 *value,
+		        MethodInfo *method)
+		{
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v6; // rdx
+		  __int64 v7; // rcx
+		  Vector4 v8; // [rsp+20h] [rbp-18h] BYREF
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(3389, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(3389, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(v7, v6);
+		    v8 = *value;
+		    IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_958(Patch, (Object *)this, &v8, 0LL);
+		  }
+		  else
+		  {
+		    this->fields.m_constants.taauParameters6 = *value;
+		  }
+		}
+		
+		private Vector4 HRSize { get => default; set {} } // 0x0000000189BD3750-0x0000000189BD37B8 0x0000000189BD3E10-0x0000000189BD3E7C
+		// Vector4 get_HRSize()
+		Vector4 *HG::Rendering::Runtime::TAAUPassConstructor::get_HRSize(
+		        Vector4 *__return_ptr retstr,
+		        TAAUPassConstructor *this,
+		        MethodInfo *method)
+		{
+		  Vector4 taauParameters7; // xmm0
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v7; // rdx
+		  __int64 v8; // rcx
+		  Vector4 *result; // rax
+		  Vector4 v10; // [rsp+20h] [rbp-18h] BYREF
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(3390, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(3390, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(v8, v7);
+		    taauParameters7 = *IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_350(&v10, Patch, (Object *)this, 0LL);
+		  }
+		  else
+		  {
+		    taauParameters7 = this->fields.m_constants.taauParameters7;
+		  }
+		  result = retstr;
+		  *retstr = taauParameters7;
+		  return result;
+		}
+		
+
+		// Void set_HRSize(Vector4)
+		void HG::Rendering::Runtime::TAAUPassConstructor::set_HRSize(
+		        TAAUPassConstructor *this,
+		        Vector4 *value,
+		        MethodInfo *method)
+		{
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v6; // rdx
+		  __int64 v7; // rcx
+		  Vector4 v8; // [rsp+20h] [rbp-18h] BYREF
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(3391, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(3391, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(v7, v6);
+		    v8 = *value;
+		    IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_958(Patch, (Object *)this, &v8, 0LL);
+		  }
+		  else
+		  {
+		    this->fields.m_constants.taauParameters7 = *value;
+		  }
+		}
+		
+		private bool prevTAAUState { get; set; } // 0x00000001811F33C0-0x00000001811F33D0 0x00000001811F33D0-0x00000001811F33E0
+		// Boolean get_isRunning()
+		bool UnityEngine::UIElements::Experimental::ValueAnimation<UnityEngine::UIElements::Experimental::StyleValues>::get_isRunning(
+		        ValueAnimation_1_StyleValues_ *this,
+		        MethodInfo *method)
+		{
+		  return this->fields._isRunning_k__BackingField;
+		}
+		
+
+		// Void set_isRunning(Boolean)
+		void UnityEngine::UIElements::Experimental::ValueAnimation<UnityEngine::UIElements::Experimental::StyleValues>::set_isRunning(
+		        ValueAnimation_1_StyleValues_ *this,
+		        bool value,
+		        MethodInfo *method)
+		{
+		  this->fields._isRunning_k__BackingField = value;
+		}
+		
+		private float gaussianKernelStdDev { get => default; set {} } // 0x00000001845A8DE0-0x00000001845A8E10 0x0000000189BD416C-0x0000000189BD41E4
+		// Single get_gaussianKernelStdDev()
+		float HG::Rendering::Runtime::TAAUPassConstructor::get_gaussianKernelStdDev(
+		        TAAUPassConstructor *this,
+		        MethodInfo *method)
+		{
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v5; // rdx
+		  __int64 v6; // rcx
+		
+		  if ( !IFix::WrappersManagerImpl::IsPatched(3392, 0LL) )
+		    return this->fields.m_gaussianKernelStdDev;
+		  Patch = IFix::WrappersManagerImpl::GetPatch(3392, 0LL);
+		  if ( !Patch )
+		    sub_1800D8260(v6, v5);
+		  return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_46((ILFixDynamicMethodWrapper_15 *)Patch, (Object *)this, 0LL);
+		}
+		
+
+		// Void set_gaussianKernelStdDev(Single)
+		void HG::Rendering::Runtime::TAAUPassConstructor::set_gaussianKernelStdDev(
+		        TAAUPassConstructor *this,
+		        float value,
+		        MethodInfo *method)
+		{
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v5; // rdx
+		  __int64 v6; // rcx
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(3393, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(3393, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(v6, v5);
+		    IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_15((ILFixDynamicMethodWrapper_18 *)Patch, (Object *)this, value, 0LL);
+		  }
+		  else
+		  {
+		    this->fields.m_gaussianKernelStdDev = value;
+		    sub_1800036A0(TypeInfo::HG::Rendering::Runtime::TAAUPassConstructor);
+		    HG::Rendering::Runtime::TAAUPassConstructor::ComputeGaussianKernel(value, &this->fields.m_gaussianKernel, 0LL);
+		  }
+		}
+		
+	
+		// Nested types
+		internal struct PassInput // TypeDefIndex: 38429
+		{
+			// Fields
+			internal TextureHandle sceneColor; // 0x00
+			internal TextureHandle sceneDepth; // 0x10
+			internal TextureHandle utilityDepth; // 0x20
+			internal TextureHandle sceneMV; // 0x30
+			internal TextureHandle historySceneColor; // 0x40
+			internal Vector2Int renderSize; // 0x50
+			internal Vector2Int screenSize; // 0x58
+			internal float renderingScale; // 0x60
+			internal float historyWeight; // 0x64
+			internal float historyWeightInMotion; // 0x68
+			internal float fastConvergeHistoryWeight; // 0x6C
+			internal float responsiveAAHistoryWeight; // 0x70
+			internal float minMVConsideredDynamic; // 0x74
+			internal float maxMVConsideredDynamic; // 0x78
+			internal float characterMotionSensitivity; // 0x7C
+			internal float occlusionDepthDiff; // 0x80
+			internal float inputSampleLumaWeight; // 0x84
+			internal float sharpenStrength1K; // 0x88
+			internal float sharpenStrength2K; // 0x8C
+			internal float sharpenStrength4K; // 0x90
+			internal float enableResponsiveTransparency; // 0x94
+			internal TAAUQuality quality; // 0x98
+			internal int renderPathFrameIndex; // 0x9C
+			internal bool enableTAAU; // 0xA0
+			internal bool fastConvergeState; // 0xA1
+		}
+	
+		internal struct PassOutput // TypeDefIndex: 38430
+		{
+			// Fields
+			internal TextureHandle currentSceneColor; // 0x00
+		}
+	
+		private struct TAAUConstants // TypeDefIndex: 38431
+		{
+			// Fields
+			public Vector4 taauParameters0; // 0x00
+			public Vector4 taauParameters1; // 0x10
+			public Vector4 taauParameters2; // 0x20
+			public Vector4 taauParameters3; // 0x30
+			public Vector4 taauParameters4; // 0x40
+			public Vector4 taauParameters5; // 0x50
+			public Vector4 taauParameters6; // 0x60
+			public Vector4 taauParameters7; // 0x70
+			public Vector4 taauParameters8; // 0x80
+			public Vector4 kernelWeights0; // 0x90
+			public Vector4 kernelWeights1; // 0xA0
+			public Vector4 kernelWeights2; // 0xB0
+		}
+	
+		private class DilationPassData // TypeDefIndex: 38432
+		{
+			// Fields
+			internal TextureHandle sceneDepth; // 0x10
+			internal TextureHandle sceneMV; // 0x20
+			internal TextureHandle currDilatedSceneDepth; // 0x30
+			internal TextureHandle currDilatedSceneMV; // 0x40
+			internal TextureHandle historyDilatedSceneDepth; // 0x50
+			internal TextureHandle historyDilatedSceneMV; // 0x60
+			internal Material material; // 0x70
+	
+			// Constructors
+			public DilationPassData() {} // 0x00000001841E1670-0x00000001841E1680
+			// Void Lerp[HGWindConfig](HGWindConfig ByRef, HGWindConfig ByRef, Single)
+			void HG::Rendering::Runtime::HGCelestialConfig::HGCelestialAdvancedObjectConfig::Lerp<HG::Rendering::Runtime::HGWindConfig>(
+			        HGCelestialConfig_HGCelestialAdvancedObjectConfig *this,
+			        HGWindConfig *cSrc,
+			        HGWindConfig *cDst,
+			        float t,
+			        MethodInfo *method)
 			{
-				// // Single get_Width()
-				// float HG::Rendering::HgMath::CellGrid3D<System::Object>::get_Width(
-				//         CellGrid3D_1_System_Object_ *this,
-				//         MethodInfo *method)
-				// {
-				//   return this.fields._Width_k__BackingField;
-				// }
-				// 
-				return 0f;
+			  ;
 			}
-			set
+			
+		}
+	
+		private class MaskDilationPassData // TypeDefIndex: 38433
+		{
+			// Fields
+			internal TextureHandle currDilatedMask; // 0x10
+			internal Material material; // 0x20
+	
+			// Constructors
+			public MaskDilationPassData() {} // 0x00000001841E1670-0x00000001841E1680
+			// Void Lerp[HGWindConfig](HGWindConfig ByRef, HGWindConfig ByRef, Single)
+			void HG::Rendering::Runtime::HGCelestialConfig::HGCelestialAdvancedObjectConfig::Lerp<HG::Rendering::Runtime::HGWindConfig>(
+			        HGCelestialConfig_HGCelestialAdvancedObjectConfig *this,
+			        HGWindConfig *cSrc,
+			        HGWindConfig *cDst,
+			        float t,
+			        MethodInfo *method)
 			{
-				// // Void set_Width(Single)
-				// void HG::Rendering::HgMath::CellGrid3D<System::Object>::set_Width(
-				//         CellGrid3D_1_System_Object_ *this,
-				//         float value,
-				//         MethodInfo *method)
-				// {
-				//   this.fields._Width_k__BackingField = value;
-				// }
-				// 
+			  ;
 			}
+			
 		}
-
-		// (get) Token: 0x0600114F RID: 4431 RVA: 0x000025F0 File Offset: 0x000007F0
-		// (set) Token: 0x06001150 RID: 4432 RVA: 0x000025D0 File Offset: 0x000007D0
-		private float firstFrame
+	
+		private class ResolvePassData // TypeDefIndex: 38434
 		{
-			get
+			// Fields
+			internal TextureHandle sceneColor; // 0x10
+			internal TextureHandle sceneDepth; // 0x20
+			internal TextureHandle sceneMV; // 0x30
+			internal TextureHandle historySceneColor; // 0x40
+			internal TAAUQuality quality; // 0x50
+			internal Material material; // 0x58
+	
+			// Constructors
+			public ResolvePassData() {} // 0x00000001841E1670-0x00000001841E1680
+			// Void Lerp[HGWindConfig](HGWindConfig ByRef, HGWindConfig ByRef, Single)
+			void HG::Rendering::Runtime::HGCelestialConfig::HGCelestialAdvancedObjectConfig::Lerp<HG::Rendering::Runtime::HGWindConfig>(
+			        HGCelestialConfig_HGCelestialAdvancedObjectConfig *this,
+			        HGWindConfig *cSrc,
+			        HGWindConfig *cDst,
+			        float t,
+			        MethodInfo *method)
 			{
-				// // Single get_Height()
-				// float HG::Rendering::HgMath::CellGrid3D<System::Object>::get_Height(
-				//         CellGrid3D_1_System_Object_ *this,
-				//         MethodInfo *method)
-				// {
-				//   return this.fields._Height_k__BackingField;
-				// }
-				// 
-				return 0f;
+			  ;
 			}
-			set
-			{
-				// // Void set_Height(Single)
-				// void HG::Rendering::HgMath::CellGrid3D<System::Object>::set_Height(
-				//         CellGrid3D_1_System_Object_ *this,
-				//         float value,
-				//         MethodInfo *method)
-				// {
-				//   this.fields._Height_k__BackingField = value;
-				// }
-				// 
-			}
+			
 		}
-
-		// (get) Token: 0x06001151 RID: 4433 RVA: 0x000025F0 File Offset: 0x000007F0
-		// (set) Token: 0x06001152 RID: 4434 RVA: 0x000025D0 File Offset: 0x000007D0
-		private float occlusionDepthDiff
+	
+		private struct RTNames // TypeDefIndex: 38435
 		{
-			get
-			{
-				// // Single get_defaultValue()
-				// float UnityEngine::UIElements::TypedUxmlAttributeDescription<float>::get_defaultValue(
-				//         TypedUxmlAttributeDescription_1_System_Single_ *this,
-				//         MethodInfo *method)
-				// {
-				//   return this.fields._defaultValue_k__BackingField;
-				// }
-				// 
-				return 0f;
-			}
-			set
-			{
-				// // Void set_defaultValue(Single)
-				// void UnityEngine::UIElements::TypedUxmlAttributeDescription<float>::set_defaultValue(
-				//         TypedUxmlAttributeDescription_1_System_Single_ *this,
-				//         float value,
-				//         MethodInfo *method)
-				// {
-				//   this.fields._defaultValue_k__BackingField = value;
-				// }
-				// 
-			}
+			// Fields
+			internal string dilatedDepthRTName; // 0x00
+			internal string dilatedMVRTName; // 0x08
+			internal string taauResultRTName; // 0x10
 		}
-
-		// (get) Token: 0x06001153 RID: 4435 RVA: 0x000025F0 File Offset: 0x000007F0
-		// (set) Token: 0x06001154 RID: 4436 RVA: 0x000025D0 File Offset: 0x000007D0
-		private float minMVConsideredDynamic
+	
+		private enum TAAUPass // TypeDefIndex: 38436
 		{
-			get
-			{
-				// // Single get_Pressure()
-				// float PaintIn3D::P3dHitBetween::get_Pressure(P3dHitBetween *this, MethodInfo *method)
-				// {
-				//   return this.fields.pressure;
-				// }
-				// 
-				return 0f;
-			}
-			set
-			{
-				// // Void set_Pressure(Single)
-				// void PaintIn3D::P3dHitBetween::set_Pressure(P3dHitBetween *this, float value, MethodInfo *method)
-				// {
-				//   this.fields.pressure = value;
-				// }
-				// 
-			}
+			DilationDepthReprojection = 0,
+			MaskDilation = 1,
+			FlickerDetection = 2,
+			Resolve = 3,
+			Count = 4
 		}
-
-		// (get) Token: 0x06001155 RID: 4437 RVA: 0x000025F0 File Offset: 0x000007F0
-		// (set) Token: 0x06001156 RID: 4438 RVA: 0x000025D0 File Offset: 0x000007D0
-		private float maxMVConsideredDynamic
+	
+		private struct SharpenStrengthParam // TypeDefIndex: 38437
 		{
-			get
-			{
-				// // Single Slate.ISubClipContainable.get_subClipOffset()
-				// float Slate::ActionClips::PlayAudio::Slate_ISubClipContainable_get_subClipOffset(PlayAudio_1 *this, MethodInfo *method)
-				// {
-				//   return this.fields.clipOffset;
-				// }
-				// 
-				return 0f;
-			}
-			set
-			{
-				// // Void Slate.ISubClipContainable.set_subClipOffset(Single)
-				// void Slate::ActionClips::PlayAudio::Slate_ISubClipContainable_set_subClipOffset(
-				//         PlayAudio_1 *this,
-				//         float value,
-				//         MethodInfo *method)
-				// {
-				//   this.fields.clipOffset = value;
-				// }
-				// 
-			}
+			// Fields
+			public float sharpen1K; // 0x00
+			public float sharpen2K; // 0x04
+			public float sharpen4K; // 0x08
 		}
-
-		// (get) Token: 0x06001157 RID: 4439 RVA: 0x000025F0 File Offset: 0x000007F0
-		// (set) Token: 0x06001158 RID: 4440 RVA: 0x000025D0 File Offset: 0x000007D0
-		private float characterMotionSensitivity
+	
+		// Constructors
+		public TAAUPassConstructor() {} // Dummy constructor
+		internal TAAUPassConstructor(HGRenderPipelineMaterialCollector materialCollector, HGRenderPathBase.HGRenderPathResources resources) {} // 0x00000001845A8A20-0x00000001845A8DE0
+		// TAAUPassConstructor(HGRenderPipelineMaterialCollector, HGRenderPathBase+HGRenderPathResources)
+		void HG::Rendering::Runtime::TAAUPassConstructor::TAAUPassConstructor(
+		        TAAUPassConstructor *this,
+		        HGRenderPipelineMaterialCollector *materialCollector,
+		        HGRenderPathBase_HGRenderPathResources *resources,
+		        MethodInfo *method)
 		{
-			get
-			{
-				// // Single get_voxelSize()
-				// float UnityEngine::AI::NavMeshSurface::get_voxelSize(NavMeshSurface *this, MethodInfo *method)
-				// {
-				//   return this.fields.m_VoxelSize;
-				// }
-				// 
-				return 0f;
-			}
-			set
-			{
-				// // Void set_voxelSize(Single)
-				// void UnityEngine::AI::NavMeshSurface::set_voxelSize(NavMeshSurface *this, float value, MethodInfo *method)
-				// {
-				//   this.fields.m_VoxelSize = value;
-				// }
-				// 
-			}
+		  HGRuntimeGrassQuery_Node *v7; // rdx
+		  HGRuntimeGrassQuery_Node *v8; // r8
+		  Int32__Array **v9; // r9
+		  HGRuntimeGrassQuery_Node *v10; // rdx
+		  HGRuntimeGrassQuery_Node *v11; // r8
+		  Int32__Array **v12; // r9
+		  HGRuntimeGrassQuery_Node *v13; // rdx
+		  HGRuntimeGrassQuery_Node *v14; // r8
+		  Int32__Array **v15; // r9
+		  HGRuntimeGrassQuery_Node *v16; // rdx
+		  HGRuntimeGrassQuery_Node *v17; // r8
+		  HGRuntimeGrassQuery_Node *v18; // rdx
+		  HGRuntimeGrassQuery_Node *v19; // r8
+		  HGRuntimeGrassQuery_Node *v20; // rdx
+		  Single__Array *m_gaussianKernel; // rcx
+		  HGRuntimeGrassQuery_Node *v22; // r8
+		  Int32__Array **v23; // r9
+		  __int64 v24; // r10
+		  HGRuntimeGrassQuery_Node *v25; // rdx
+		  HGRuntimeGrassQuery_Node *v26; // r8
+		  Int32__Array **v27; // r9
+		  HGRuntimeGrassQuery_Node *v28; // rdx
+		  HGRuntimeGrassQuery_Node *v29; // r8
+		  HGRuntimeGrassQuery_Node *v30; // rdx
+		  HGRuntimeGrassQuery_Node *v31; // r8
+		  HGRuntimeGrassQuery_Node *v32; // r8
+		  Int32__Array **v33; // r9
+		  __int64 v34; // r10
+		  TAAUPassConstructor_RTNames__Array *v35; // r10
+		  HGRuntimeGrassQuery_Node *v36; // rdx
+		  HGRuntimeGrassQuery_Node *v37; // r8
+		  Int32__Array **v38; // r9
+		  float gaussianKernelStdDev; // xmm6_4
+		  float v40; // xmm2_4
+		  float v41; // xmm3_4
+		  float v42; // xmm1_4
+		  float v43; // xmm2_4
+		  float v44; // xmm3_4
+		  float v45; // xmm1_4
+		  Vector4 v46; // xmm1
+		  Vector4 v47; // xmm0
+		  Vector4 v48; // xmm1
+		  Vector4 v49; // xmm0
+		  Vector4 v50; // xmm1
+		  Vector4 v51; // xmm0
+		  Vector4 v52; // xmm1
+		  Vector4 v53; // xmm0
+		  Vector4 v54; // xmm1
+		  Vector4 v55; // xmm0
+		  _BYTE v56[24]; // [rsp+20h] [rbp-E0h] BYREF
+		  Vector4 si128; // [rsp+40h] [rbp-C0h]
+		  __m128i v58; // [rsp+50h] [rbp-B0h]
+		  __m128i v59; // [rsp+60h] [rbp-A0h]
+		  __m128i v60; // [rsp+70h] [rbp-90h]
+		  __m128i v61; // [rsp+80h] [rbp-80h]
+		  __m128i v62; // [rsp+90h] [rbp-70h]
+		  Vector4 v63; // [rsp+A0h] [rbp-60h]
+		  Vector4 v64; // [rsp+B0h] [rbp-50h]
+		  __m128i v65; // [rsp+C0h] [rbp-40h]
+		  Vector4 v66; // [rsp+D0h] [rbp-30h]
+		  Vector4 v67; // [rsp+E0h] [rbp-20h]
+		  Vector4 v68; // [rsp+F0h] [rbp-10h]
+		
+		  this->fields.m_gaussianKernel = (Single__Array *)il2cpp_array_new_specific_1(TypeInfo::System::Single, 9LL);
+		  sub_18002D1B0((HGRuntimeGrassQuery_Node *)&this->fields, v7, v8, v9, *(MethodInfo **)v56);
+		  this->fields.m_gaussianKernelStdDev = 1.0;
+		  this->fields.m_taauPassMaterials = (Material__Array *)il2cpp_array_new_specific_1(
+		                                                          TypeInfo::UnityEngine::Material,
+		                                                          4LL);
+		  sub_18002D1B0((HGRuntimeGrassQuery_Node *)&this->fields.m_taauPassMaterials, v10, v11, v12, *(MethodInfo **)v56);
+		  il2cpp_array_new_specific_1(TypeInfo::HG::Rendering::Runtime::TAAUPassConstructor::RTNames, 2LL);
+		  *(_QWORD *)v56 = "DilatedDepth0";
+		  *(_OWORD *)&v56[8] = 0LL;
+		  ((void (__stdcall *)(HGRuntimeGrassQuery_Node *, HGRuntimeGrassQuery_Node *, HGRuntimeGrassQuery_Node *, Int32__Array **))sub_18002D1B0)(
+		    (HGRuntimeGrassQuery_Node *)v56,
+		    v13,
+		    v14,
+		    v15);
+		  *(_QWORD *)&v56[8] = "DilatedMV0";
+		  sub_18002D1B0((HGRuntimeGrassQuery_Node *)&v56[8], v16, v17, (Int32__Array **)"DilatedMV0", *(MethodInfo **)v56);
+		  *(_QWORD *)&v56[16] = "TAAUResult0";
+		  sub_18002D1B0((HGRuntimeGrassQuery_Node *)&v56[16], v18, v19, (Int32__Array **)"TAAUResult0", *(MethodInfo **)v56);
+		  if ( !v24 )
+		    goto LABEL_2;
+		  if ( !*(_DWORD *)(v24 + 24) )
+		    goto LABEL_20;
+		  *(_OWORD *)(v24 + 32) = *(_OWORD *)v56;
+		  *(_QWORD *)(v24 + 48) = *(_QWORD *)&v56[16];
+		  sub_18002D1B0((HGRuntimeGrassQuery_Node *)(v24 + 32), v20, v22, v23, *(MethodInfo **)v56);
+		  *(_QWORD *)v56 = "DilatedDepth1";
+		  *(_OWORD *)&v56[8] = 0LL;
+		  ((void (__stdcall *)(HGRuntimeGrassQuery_Node *, HGRuntimeGrassQuery_Node *, HGRuntimeGrassQuery_Node *, Int32__Array **))sub_18002D1B0)(
+		    (HGRuntimeGrassQuery_Node *)v56,
+		    v25,
+		    v26,
+		    v27);
+		  *(_QWORD *)&v56[8] = "DilatedMV1";
+		  sub_18002D1B0((HGRuntimeGrassQuery_Node *)&v56[8], v28, v29, (Int32__Array **)"DilatedMV1", *(MethodInfo **)v56);
+		  *(_QWORD *)&v56[16] = "TAAUResult1";
+		  sub_18002D1B0((HGRuntimeGrassQuery_Node *)&v56[16], v30, v31, (Int32__Array **)"TAAUResult1", *(MethodInfo **)v56);
+		  if ( *(_DWORD *)(v34 + 24) <= 1u )
+		    goto LABEL_20;
+		  *(_OWORD *)(v34 + 56) = *(_OWORD *)v56;
+		  *(_QWORD *)(v34 + 72) = *(_QWORD *)&v56[16];
+		  sub_18002D1B0((HGRuntimeGrassQuery_Node *)(v34 + 56), v20, v32, v33, *(MethodInfo **)v56);
+		  this->fields.m_rtNames = v35;
+		  sub_18002D1B0((HGRuntimeGrassQuery_Node *)&this->fields.m_rtNames, v36, v37, v38, *(MethodInfo **)v56);
+		  HG::Rendering::Runtime::TAAUPassConstructor::InitializeMaterials(
+		    this,
+		    materialCollector,
+		    resources->defaultResources,
+		    0LL);
+		  gaussianKernelStdDev = HG::Rendering::Runtime::TAAUPassConstructor::get_gaussianKernelStdDev(this, 0LL);
+		  if ( !TypeInfo::HG::Rendering::Runtime::TAAUPassConstructor->_1.cctor_finished_or_no_cctor )
+		    il2cpp_runtime_class_init_1(TypeInfo::HG::Rendering::Runtime::TAAUPassConstructor);
+		  HG::Rendering::Runtime::TAAUPassConstructor::ComputeGaussianKernel(
+		    gaussianKernelStdDev,
+		    &this->fields.m_gaussianKernel,
+		    0LL);
+		  m_gaussianKernel = this->fields.m_gaussianKernel;
+		  si128 = (Vector4)_mm_load_si128((const __m128i *)&xmmword_18B959740);
+		  v59 = _mm_load_si128((const __m128i *)&xmmword_18B959B60);
+		  v58 = _mm_load_si128((const __m128i *)&xmmword_18B959B50);
+		  v61 = _mm_load_si128((const __m128i *)&xmmword_18B959B30);
+		  v60 = _mm_load_si128((const __m128i *)&xmmword_18B959B40);
+		  v65 = _mm_load_si128((const __m128i *)&xmmword_18B959780);
+		  v62 = _mm_load_si128((const __m128i *)&xmmword_18B9593A0);
+		  v63 = (Vector4)v62;
+		  v64 = (Vector4)v62;
+		  if ( !m_gaussianKernel )
+		LABEL_2:
+		    sub_1800D8260(m_gaussianKernel, v20);
+		  if ( !m_gaussianKernel->max_length.size )
+		    goto LABEL_20;
+		  v40 = m_gaussianKernel->vector[0];
+		  if ( m_gaussianKernel->max_length.size <= 1u )
+		    goto LABEL_20;
+		  v41 = m_gaussianKernel->vector[1];
+		  if ( m_gaussianKernel->max_length.size <= 2u )
+		    goto LABEL_20;
+		  v42 = m_gaussianKernel->vector[2];
+		  if ( m_gaussianKernel->max_length.size <= 3u )
+		    goto LABEL_20;
+		  v66.w = m_gaussianKernel->vector[3];
+		  *(_QWORD *)&v66.x = __PAIR64__(LODWORD(v41), LODWORD(v40));
+		  v66.z = v42;
+		  if ( m_gaussianKernel->max_length.size <= 4u
+		    || (v43 = m_gaussianKernel->vector[4], m_gaussianKernel->max_length.size <= 5u)
+		    || (v44 = m_gaussianKernel->vector[5], m_gaussianKernel->max_length.size <= 6u)
+		    || (v45 = m_gaussianKernel->vector[6], m_gaussianKernel->max_length.size <= 7u)
+		    || (v67.w = m_gaussianKernel->vector[7],
+		        *(_QWORD *)&v67.x = __PAIR64__(LODWORD(v44), LODWORD(v43)),
+		        v67.z = v45,
+		        m_gaussianKernel->max_length.size <= 8u) )
+		  {
+		LABEL_20:
+		    sub_1800D2AB0(m_gaussianKernel, v20);
+		  }
+		  v68.x = m_gaussianKernel->vector[8];
+		  *(_QWORD *)&v68.y = 0LL;
+		  v68.w = 0.0;
+		  v46 = (Vector4)v58;
+		  this->fields.m_constants.taauParameters0 = si128;
+		  v47 = (Vector4)v59;
+		  this->fields.m_constants.taauParameters1 = v46;
+		  v48 = (Vector4)v60;
+		  this->fields.m_constants.taauParameters2 = v47;
+		  v49 = (Vector4)v61;
+		  this->fields.m_constants.taauParameters3 = v48;
+		  v50 = (Vector4)v62;
+		  this->fields.m_constants.taauParameters4 = v49;
+		  v51 = v63;
+		  this->fields.m_constants.taauParameters5 = v50;
+		  v52 = (Vector4)v65;
+		  this->fields.m_constants.taauParameters6 = v51;
+		  this->fields.m_constants.taauParameters7 = v64;
+		  v53 = v66;
+		  this->fields.m_constants.taauParameters8 = v52;
+		  v54 = v67;
+		  this->fields.m_constants.kernelWeights0 = v53;
+		  v55 = v68;
+		  this->fields.m_constants.kernelWeights1 = v54;
+		  this->fields.m_constants.kernelWeights2 = v55;
 		}
-
-		// (get) Token: 0x06001159 RID: 4441 RVA: 0x000025F0 File Offset: 0x000007F0
-		// (set) Token: 0x0600115A RID: 4442 RVA: 0x000025D0 File Offset: 0x000007D0
-		public float fastConvergeState
+		
+		static TAAUPassConstructor() {} // 0x0000000184B353D0-0x0000000184B35530
+		// TAAUPassConstructor()
+		void HG::Rendering::Runtime::TAAUPassConstructor::cctor(MethodInfo *method)
 		{
-			get
-			{
-				// // Single get_MainClipMixWeight()
-				// float UnityEngine::Timeline::AnimationPlayableAsset::get_MainClipMixWeight(
-				//         AnimationPlayableAsset *this,
-				//         MethodInfo *method)
-				// {
-				//   return this.fields.m_MainClipMixWeight;
-				// }
-				// 
-				return 0f;
-			}
-			set
-			{
-				// // Void set_strikethroughThickness(Single)
-				// void UnityEngine::TextCore::FaceInfo::set_strikethroughThickness(FaceInfo *this, float value, MethodInfo *method)
-				// {
-				//   this.m_StrikethroughThickness = value;
-				// }
-				// 
-			}
+		  struct TAAUPassConstructor_c__Class *v1; // rax
+		  Object *v2; // rdi
+		  RenderFunc_1_System_Object_ *v3; // rax
+		  __int64 v4; // rdx
+		  __int64 v5; // rcx
+		  HGRuntimeGrassQuery_Node__Class *v6; // rbx
+		  HGRuntimeGrassQuery_Node *static_fields; // rdx
+		  HGRuntimeGrassQuery_Node *v8; // r8
+		  Int32__Array **v9; // r9
+		  Object *v10; // rdi
+		  RenderFunc_1_System_Object_ *v11; // rax
+		  MonitorData *v12; // rbx
+		  HGRuntimeGrassQuery_Node *v13; // rdx
+		  HGRuntimeGrassQuery_Node *v14; // r8
+		  Int32__Array **v15; // r9
+		  Object *v16; // rdi
+		  RenderFunc_1_System_Object_ *v17; // rax
+		  RenderFunc_1_HG_Rendering_Runtime_TAAUPassConstructor_ResolvePassData_ *v18; // rbx
+		  TAAUPassConstructor__StaticFields *v19; // rdx
+		  HGRuntimeGrassQuery_Node *v20; // r8
+		  Int32__Array **v21; // r9
+		  MethodInfo *v22; // [rsp+20h] [rbp-8h]
+		  MethodInfo *v23; // [rsp+20h] [rbp-8h]
+		  MethodInfo *v24; // [rsp+50h] [rbp+28h]
+		
+		  v1 = TypeInfo::HG::Rendering::Runtime::TAAUPassConstructor::__c;
+		  if ( !TypeInfo::HG::Rendering::Runtime::TAAUPassConstructor::__c->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(TypeInfo::HG::Rendering::Runtime::TAAUPassConstructor::__c);
+		    v1 = TypeInfo::HG::Rendering::Runtime::TAAUPassConstructor::__c;
+		  }
+		  v2 = (Object *)v1->static_fields->__9;
+		  v3 = (RenderFunc_1_System_Object_ *)sub_1800368D0(TypeInfo::HG::Rendering::RenderGraphModule::RenderFunc<HG::Rendering::Runtime::TAAUPassConstructor::DilationPassData>);
+		  v6 = (HGRuntimeGrassQuery_Node__Class *)v3;
+		  if ( !v3 )
+		    goto LABEL_4;
+		  HG::Rendering::RenderGraphModule::RenderFunc<System::Object>::RenderFunc(
+		    v3,
+		    v2,
+		    MethodInfo::HG::Rendering::Runtime::TAAUPassConstructor::__c::__cctor_b__102_0,
+		    0LL);
+		  static_fields = (HGRuntimeGrassQuery_Node *)TypeInfo::HG::Rendering::Runtime::TAAUPassConstructor->static_fields;
+		  static_fields->klass = v6;
+		  sub_18002D1B0(
+		    (HGRuntimeGrassQuery_Node *)TypeInfo::HG::Rendering::Runtime::TAAUPassConstructor->static_fields,
+		    static_fields,
+		    v8,
+		    v9,
+		    v22);
+		  v10 = (Object *)TypeInfo::HG::Rendering::Runtime::TAAUPassConstructor::__c->static_fields->__9;
+		  v11 = (RenderFunc_1_System_Object_ *)sub_1800368D0(TypeInfo::HG::Rendering::RenderGraphModule::RenderFunc<HG::Rendering::Runtime::TAAUPassConstructor::MaskDilationPassData>);
+		  v12 = (MonitorData *)v11;
+		  if ( !v11
+		    || (HG::Rendering::RenderGraphModule::RenderFunc<System::Object>::RenderFunc(
+		          v11,
+		          v10,
+		          MethodInfo::HG::Rendering::Runtime::TAAUPassConstructor::__c::__cctor_b__102_1,
+		          0LL),
+		        v13 = (HGRuntimeGrassQuery_Node *)TypeInfo::HG::Rendering::Runtime::TAAUPassConstructor->static_fields,
+		        v13->monitor = v12,
+		        sub_18002D1B0(
+		          (HGRuntimeGrassQuery_Node *)&TypeInfo::HG::Rendering::Runtime::TAAUPassConstructor->static_fields->s_maskDilationRenderFunc,
+		          v13,
+		          v14,
+		          v15,
+		          v23),
+		        v16 = (Object *)TypeInfo::HG::Rendering::Runtime::TAAUPassConstructor::__c->static_fields->__9,
+		        v17 = (RenderFunc_1_System_Object_ *)sub_1800368D0(TypeInfo::HG::Rendering::RenderGraphModule::RenderFunc<HG::Rendering::Runtime::TAAUPassConstructor::ResolvePassData>),
+		        (v18 = (RenderFunc_1_HG_Rendering_Runtime_TAAUPassConstructor_ResolvePassData_ *)v17) == 0LL) )
+		  {
+		LABEL_4:
+		    sub_1800D8260(v5, v4);
+		  }
+		  HG::Rendering::RenderGraphModule::RenderFunc<System::Object>::RenderFunc(
+		    v17,
+		    v16,
+		    MethodInfo::HG::Rendering::Runtime::TAAUPassConstructor::__c::__cctor_b__102_2,
+		    0LL);
+		  v19 = TypeInfo::HG::Rendering::Runtime::TAAUPassConstructor->static_fields;
+		  v19->s_resolveRenderFunc = v18;
+		  sub_18002D1B0(
+		    (HGRuntimeGrassQuery_Node *)&TypeInfo::HG::Rendering::Runtime::TAAUPassConstructor->static_fields->s_resolveRenderFunc,
+		    (HGRuntimeGrassQuery_Node *)v19,
+		    v20,
+		    v21,
+		    v24);
 		}
-
-		// (get) Token: 0x0600115B RID: 4443 RVA: 0x000025F0 File Offset: 0x000007F0
-		// (set) Token: 0x0600115C RID: 4444 RVA: 0x000025D0 File Offset: 0x000007D0
-		private float minMVConsideredDynamicChar
+		
+	
+		// Methods
+		void IPassConstructor.PrepareShaderVariablesGlobal(ref ShaderVariablesGlobal shaderVariablesGlobal) {} // 0x0000000189BD32EC-0x0000000189BD3340
+		// Void HG.Rendering.Runtime.IPassConstructor.PrepareShaderVariablesGlobal(ShaderVariablesGlobal ByRef)
+		void HG::Rendering::Runtime::TAAUPassConstructor::HG_Rendering_Runtime_IPassConstructor_PrepareShaderVariablesGlobal(
+		        TAAUPassConstructor *this,
+		        ShaderVariablesGlobal *shaderVariablesGlobal,
+		        MethodInfo *method)
 		{
-			get
-			{
-				// // Single get_Opacity()
-				// float PaintIn3D::P3dPaintFill::get_Opacity(P3dPaintFill *this, MethodInfo *method)
-				// {
-				//   return this.fields.opacity;
-				// }
-				// 
-				return 0f;
-			}
-			set
-			{
-				// // Void set_startLifetime(Single)
-				// void UnityEngine::ParticleSystem::Particle::set_startLifetime(
-				//         ParticleSystem_Particle *this,
-				//         float value,
-				//         MethodInfo *method)
-				// {
-				//   this.m_Lifetime = value;
-				// }
-				// 
-			}
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v6; // rdx
+		  __int64 v7; // rcx
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(3395, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(3395, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(v7, v6);
+		    IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_378(Patch, (Object *)this, shaderVariablesGlobal, 0LL);
+		  }
 		}
-
-		// (get) Token: 0x0600115D RID: 4445 RVA: 0x000025F0 File Offset: 0x000007F0
-		// (set) Token: 0x0600115E RID: 4446 RVA: 0x000025D0 File Offset: 0x000007D0
-		private float maxMVConsideredDynamicChar
+		
+		void IPassConstructor.OnPreRendering(ref PassEventInput input) {} // 0x0000000189BD3298-0x0000000189BD32EC
+		// Void HG.Rendering.Runtime.IPassConstructor.OnPreRendering(PassEventInput ByRef)
+		void HG::Rendering::Runtime::TAAUPassConstructor::HG_Rendering_Runtime_IPassConstructor_OnPreRendering(
+		        TAAUPassConstructor *this,
+		        PassEventInput *input,
+		        MethodInfo *method)
 		{
-			get
-			{
-				// // Single get_Minimum()
-				// float PaintIn3D::P3dPaintFill::get_Minimum(P3dPaintFill *this, MethodInfo *method)
-				// {
-				//   return this.fields.minimum;
-				// }
-				// 
-				return 0f;
-			}
-			set
-			{
-				// // Void set_Minimum(Single)
-				// void PaintIn3D::P3dPaintFill::set_Minimum(P3dPaintFill *this, float value, MethodInfo *method)
-				// {
-				//   this.fields.minimum = value;
-				// }
-				// 
-			}
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v6; // rdx
+		  __int64 v7; // rcx
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(3396, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(3396, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(v7, v6);
+		    IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_788(Patch, (Object *)this, input, 0LL);
+		  }
 		}
-
-		// (get) Token: 0x0600115F RID: 4447 RVA: 0x000025F0 File Offset: 0x000007F0
-		// (set) Token: 0x06001160 RID: 4448 RVA: 0x000025D0 File Offset: 0x000007D0
-		private float fastConvergeHistoryWeight
+		
+		void IPassConstructor.OnPostRendering(ref PassEventInput input) {} // 0x0000000189BD3180-0x0000000189BD3298
+		// Void HG.Rendering.Runtime.IPassConstructor.OnPostRendering(PassEventInput ByRef)
+		void HG::Rendering::Runtime::TAAUPassConstructor::HG_Rendering_Runtime_IPassConstructor_OnPostRendering(
+		        TAAUPassConstructor *this,
+		        PassEventInput *input,
+		        MethodInfo *method)
 		{
-			get
-			{
-				// // Single get_verticalScrollbarSpacing()
-				// float UnityEngine::UI::ScrollRect::get_verticalScrollbarSpacing(ScrollRect *this, MethodInfo *method)
-				// {
-				//   return this.fields.m_VerticalScrollbarSpacing;
-				// }
-				// 
-				return 0f;
-			}
-			set
-			{
-				// // Void set_remainingLifetime(Single)
-				// void UnityEngine::ParticleSystem::Particle::set_remainingLifetime(
-				//         ParticleSystem_Particle *this,
-				//         float value,
-				//         MethodInfo *method)
-				// {
-				//   *(float *)&this.m_ParentRandomSeed = value;
-				// }
-				// 
-			}
+		  HGRenderGraph *renderGraph; // rdi
+		  __int64 v6; // rdx
+		  __int64 v7; // rcx
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  TextureHandle v9; // [rsp+30h] [rbp-18h] BYREF
+		
+		  if ( !IFix::WrappersManagerImpl::IsPatched(3397, 0LL) )
+		  {
+		    renderGraph = input->renderGraph;
+		    sub_1800036A0(TypeInfo::HG::Rendering::RenderGraphModule::TextureHandle);
+		    if ( HG::Rendering::RenderGraphModule::TextureHandle::IsValid(&this->fields.m_historyDilatedSceneDepth, 0LL) )
+		    {
+		      if ( !renderGraph )
+		        goto LABEL_9;
+		      this->fields.m_historyDilatedSceneDepth = *HG::Rendering::RenderGraphModule::HGRenderGraph::PreserveTexture(
+		                                                   &v9,
+		                                                   renderGraph,
+		                                                   &this->fields.m_historyDilatedSceneDepth,
+		                                                   1,
+		                                                   (String *)"TAAUPass",
+		                                                   0LL);
+		    }
+		    sub_1800036A0(TypeInfo::HG::Rendering::RenderGraphModule::TextureHandle);
+		    if ( !HG::Rendering::RenderGraphModule::TextureHandle::IsValid(&this->fields.m_historyDilatedSceneMV, 0LL) )
+		      return;
+		    if ( renderGraph )
+		    {
+		      this->fields.m_historyDilatedSceneMV = *HG::Rendering::RenderGraphModule::HGRenderGraph::PreserveTexture(
+		                                                &v9,
+		                                                renderGraph,
+		                                                &this->fields.m_historyDilatedSceneMV,
+		                                                1,
+		                                                (String *)"TAAUPass",
+		                                                0LL);
+		      return;
+		    }
+		LABEL_9:
+		    sub_1800D8260(v7, v6);
+		  }
+		  Patch = IFix::WrappersManagerImpl::GetPatch(3397, 0LL);
+		  if ( !Patch )
+		    goto LABEL_9;
+		  IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_788(Patch, (Object *)this, input, 0LL);
 		}
-
-		// (get) Token: 0x06001161 RID: 4449 RVA: 0x000025F0 File Offset: 0x000007F0
-		// (set) Token: 0x06001162 RID: 4450 RVA: 0x000025D0 File Offset: 0x000007D0
-		private float responsiveAAHistoryWeight
+		
+		internal void ConstructPass(ref PassInput input, ref PassOutput output, HGRenderGraph renderGraph, HGCamera camera) {} // 0x0000000189BD29EC-0x0000000189BD2AF0
+		// Void ConstructPass(TAAUPassConstructor+PassInput ByRef, TAAUPassConstructor+PassOutput ByRef, HGRenderGraph, HGCamera)
+		void HG::Rendering::Runtime::TAAUPassConstructor::ConstructPass(
+		        TAAUPassConstructor *this,
+		        TAAUPassConstructor_PassInput *input,
+		        TAAUPassConstructor_PassOutput *output,
+		        HGRenderGraph *renderGraph,
+		        HGCamera *camera,
+		        MethodInfo *method)
 		{
-			get
-			{
-				// // Single get_PeekAmount()
-				// float SRDebugger::UI::MobileMenuController::get_PeekAmount(MobileMenuController *this, MethodInfo *method)
-				// {
-				//   return this.fields._peekAmount;
-				// }
-				// 
-				return 0f;
-			}
-			set
-			{
-				// // Void set_strikethroughOffset(Single)
-				// void UnityEngine::TextCore::FaceInfo::set_strikethroughOffset(FaceInfo *this, float value, MethodInfo *method)
-				// {
-				//   this.m_StrikethroughOffset = value;
-				// }
-				// 
-			}
+		  __int64 v10; // rdx
+		  ILFixDynamicMethodWrapper_2 *Patch; // rcx
+		  TextureHandle v12; // [rsp+40h] [rbp-18h] BYREF
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(3398, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(3398, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(0LL, v10);
+		    IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_1231(
+		      Patch,
+		      (Object *)this,
+		      input,
+		      output,
+		      (Object *)renderGraph,
+		      (Object *)camera,
+		      0LL);
+		  }
+		  else
+		  {
+		    if ( input->enableTAAU )
+		    {
+		      HG::Rendering::Runtime::TAAUPassConstructor::PrepareParameters(this, input, renderGraph, 0LL);
+		      HG::Rendering::Runtime::TAAUPassConstructor::ConstructTAAUPasses(this, input, output, renderGraph, 0LL);
+		    }
+		    else
+		    {
+		      *output = (TAAUPassConstructor_PassOutput)input->sceneColor;
+		      sub_1800036A0(TypeInfo::HG::Rendering::RenderGraphModule::TextureHandle);
+		      this->fields.m_historyDilatedSceneDepth = *HG::Rendering::RenderGraphModule::TextureHandle::get_nullHandle(
+		                                                   &v12,
+		                                                   0LL);
+		      this->fields.m_historyDilatedSceneMV = *HG::Rendering::RenderGraphModule::TextureHandle::get_nullHandle(&v12, 0LL);
+		    }
+		    this->fields._prevTAAUState_k__BackingField = input->enableTAAU;
+		  }
 		}
-
-		// (get) Token: 0x06001163 RID: 4451 RVA: 0x000025F0 File Offset: 0x000007F0
-		// (set) Token: 0x06001164 RID: 4452 RVA: 0x000025D0 File Offset: 0x000007D0
-		private float inputSampleLumaWeight
+		
+		private void InitializeMaterials(HGRenderPipelineMaterialCollector materialCollector, HGRenderPipelineRuntimeResources resource) {} // 0x00000001845A8E10-0x00000001845A90C0
+		// Void InitializeMaterials(HGRenderPipelineMaterialCollector, HGRenderPipelineRuntimeResources)
+		void HG::Rendering::Runtime::TAAUPassConstructor::InitializeMaterials(
+		        TAAUPassConstructor *this,
+		        HGRenderPipelineMaterialCollector *materialCollector,
+		        HGRenderPipelineRuntimeResources *resource,
+		        MethodInfo *method)
 		{
-			get
-			{
-				// // Single get_Opacity()
-				// float PaintIn3D::P3dPaintSphere::get_Opacity(P3dPaintSphere *this, MethodInfo *method)
-				// {
-				//   return this.fields.opacity;
-				// }
-				// 
-				return 0f;
-			}
-			set
-			{
-				// // Void set_Opacity(Single)
-				// void PaintIn3D::P3dPaintSphere::set_Opacity(P3dPaintSphere *this, float value, MethodInfo *method)
-				// {
-				//   this.fields.opacity = value;
-				// }
-				// 
-			}
+		  __int64 v7; // rdx
+		  struct Object_1__Class *v8; // rcx
+		  Material__Array *m_taauPassMaterials; // rax
+		  Material *v10; // rsi
+		  Material__Array *v11; // rsi
+		  HGRenderPipelineRuntimeResources_ShaderResources *shaders; // rax
+		  Material *Material; // rax
+		  Material *v14; // r14
+		  Material__Array *v15; // rax
+		  Material *v16; // rsi
+		  Material__Array *v17; // rsi
+		  HGRenderPipelineRuntimeResources_ShaderResources *v18; // rax
+		  Material *v19; // rax
+		  Material *v20; // r14
+		  Material__Array *v21; // rax
+		  Material *v22; // rsi
+		  Material__Array *v23; // rbx
+		  HGRenderPipelineRuntimeResources_ShaderResources *v24; // rax
+		  Material *v25; // rax
+		  Material *v26; // rdi
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(3407, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(3407, 0LL);
+		    if ( Patch )
+		    {
+		      IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_11(
+		        (ILFixDynamicMethodWrapper_30 *)Patch,
+		        (Object *)this,
+		        (Object *)materialCollector,
+		        (Object *)resource,
+		        0LL);
+		      return;
+		    }
+		    goto LABEL_3;
+		  }
+		  m_taauPassMaterials = this->fields.m_taauPassMaterials;
+		  if ( !m_taauPassMaterials )
+		    goto LABEL_3;
+		  if ( m_taauPassMaterials->max_length.size <= 1u )
+		    goto LABEL_49;
+		  v10 = m_taauPassMaterials->vector[1];
+		  if ( !TypeInfo::UnityEngine::Object->_1.cctor_finished_or_no_cctor )
+		    il2cpp_runtime_class_init_1(TypeInfo::UnityEngine::Object);
+		  v8 = TypeInfo::UnityEngine::Object;
+		  if ( !TypeInfo::UnityEngine::Object->_1.cctor_finished_or_no_cctor )
+		    il2cpp_runtime_class_init_1(TypeInfo::UnityEngine::Object);
+		  if ( !v10 )
+		    goto LABEL_13;
+		  v8 = TypeInfo::UnityEngine::Object;
+		  if ( !TypeInfo::UnityEngine::Object->_1.cctor_finished_or_no_cctor )
+		    il2cpp_runtime_class_init_1(TypeInfo::UnityEngine::Object);
+		  if ( !v10->fields._.m_CachedPtr )
+		  {
+		LABEL_13:
+		    v11 = this->fields.m_taauPassMaterials;
+		    if ( !resource )
+		      goto LABEL_3;
+		    shaders = resource->fields.shaders;
+		    if ( !shaders )
+		      goto LABEL_3;
+		    if ( !materialCollector )
+		      goto LABEL_3;
+		    Material = HG::Rendering::Runtime::HGRenderPipelineMaterialCollector::CreateMaterial(
+		                 materialCollector,
+		                 shaders->fields.taauMaskDilationPS,
+		                 0,
+		                 0LL);
+		    v14 = Material;
+		    if ( !v11 )
+		      goto LABEL_3;
+		    sub_180031B10(v11, Material);
+		    sub_1800020D0(v11, 1LL, v14);
+		  }
+		  v15 = this->fields.m_taauPassMaterials;
+		  if ( !v15 )
+		    goto LABEL_3;
+		  if ( !v15->max_length.size )
+		    goto LABEL_49;
+		  v16 = v15->vector[0];
+		  if ( !TypeInfo::UnityEngine::Object->_1.cctor_finished_or_no_cctor )
+		    il2cpp_runtime_class_init_1(TypeInfo::UnityEngine::Object);
+		  v8 = TypeInfo::UnityEngine::Object;
+		  if ( !TypeInfo::UnityEngine::Object->_1.cctor_finished_or_no_cctor )
+		    il2cpp_runtime_class_init_1(TypeInfo::UnityEngine::Object);
+		  if ( !v16 )
+		    goto LABEL_28;
+		  v8 = TypeInfo::UnityEngine::Object;
+		  if ( !TypeInfo::UnityEngine::Object->_1.cctor_finished_or_no_cctor )
+		    il2cpp_runtime_class_init_1(TypeInfo::UnityEngine::Object);
+		  if ( !v16->fields._.m_CachedPtr )
+		  {
+		LABEL_28:
+		    v17 = this->fields.m_taauPassMaterials;
+		    if ( !resource )
+		      goto LABEL_3;
+		    v18 = resource->fields.shaders;
+		    if ( !v18 )
+		      goto LABEL_3;
+		    if ( !materialCollector )
+		      goto LABEL_3;
+		    v19 = HG::Rendering::Runtime::HGRenderPipelineMaterialCollector::CreateMaterial(
+		            materialCollector,
+		            v18->fields.taauDilationPS,
+		            0,
+		            0LL);
+		    v20 = v19;
+		    if ( !v17 )
+		      goto LABEL_3;
+		    sub_180031B10(v17, v19);
+		    sub_1800020D0(v17, 0LL, v20);
+		  }
+		  v21 = this->fields.m_taauPassMaterials;
+		  if ( !v21 )
+		    goto LABEL_3;
+		  if ( v21->max_length.size <= 3u )
+		LABEL_49:
+		    sub_1800D2AB0(v8, v7);
+		  v22 = v21->vector[3];
+		  if ( !TypeInfo::UnityEngine::Object->_1.cctor_finished_or_no_cctor )
+		    il2cpp_runtime_class_init_1(TypeInfo::UnityEngine::Object);
+		  v8 = TypeInfo::UnityEngine::Object;
+		  if ( !TypeInfo::UnityEngine::Object->_1.cctor_finished_or_no_cctor )
+		    il2cpp_runtime_class_init_1(TypeInfo::UnityEngine::Object);
+		  if ( !v22 )
+		    goto LABEL_43;
+		  v8 = TypeInfo::UnityEngine::Object;
+		  if ( !TypeInfo::UnityEngine::Object->_1.cctor_finished_or_no_cctor )
+		    il2cpp_runtime_class_init_1(TypeInfo::UnityEngine::Object);
+		  if ( !v22->fields._.m_CachedPtr )
+		  {
+		LABEL_43:
+		    v23 = this->fields.m_taauPassMaterials;
+		    if ( resource )
+		    {
+		      v24 = resource->fields.shaders;
+		      if ( v24 )
+		      {
+		        if ( materialCollector )
+		        {
+		          v25 = HG::Rendering::Runtime::HGRenderPipelineMaterialCollector::CreateMaterial(
+		                  materialCollector,
+		                  v24->fields.taauResolvePS,
+		                  0,
+		                  0LL);
+		          v26 = v25;
+		          if ( v23 )
+		          {
+		            sub_180031B10(v23, v25);
+		            sub_1800020D0(v23, 3LL, v26);
+		            return;
+		          }
+		        }
+		      }
+		    }
+		LABEL_3:
+		    sub_1800D8260(v8, v7);
+		  }
 		}
-
-		// (get) Token: 0x06001165 RID: 4453 RVA: 0x000025F0 File Offset: 0x000007F0
-		// (set) Token: 0x06001166 RID: 4454 RVA: 0x000025D0 File Offset: 0x000007D0
-		private float taauScaleFactor
+		
+		private void PrepareParameters(ref PassInput input, HGRenderGraph renderGraph) {} // 0x0000000189BD3340-0x0000000189BD3750
+		// Void PrepareParameters(TAAUPassConstructor+PassInput ByRef, HGRenderGraph)
+		void HG::Rendering::Runtime::TAAUPassConstructor::PrepareParameters(
+		        TAAUPassConstructor *this,
+		        TAAUPassConstructor_PassInput *input,
+		        HGRenderGraph *renderGraph,
+		        MethodInfo *method)
 		{
-			get
-			{
-				// // Single get_defaultValue()
-				// float HG::Rendering::Runtime::SettingParameter<float>::get_defaultValue(
-				//         SettingParameter_1_System_Single_ *this,
-				//         MethodInfo *method)
-				// {
-				//   return this.fields._defaultValue_k__BackingField;
-				// }
-				// 
-				return 0f;
-			}
-			set
-			{
-				// // Void set_taauScaleFactor(Single)
-				// void HG::Rendering::Runtime::TAAUPassConstructor::set_taauScaleFactor(
-				//         TAAUPassConstructor *this,
-				//         float value,
-				//         MethodInfo *method)
-				// {
-				//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-				//   __int64 v5; // rdx
-				//   __int64 v6; // rcx
-				// 
-				//   if ( IFix::WrappersManagerImpl::IsPatched(2813, 0LL) )
-				//   {
-				//     Patch = IFix::WrappersManagerImpl::GetPatch(2813, 0LL);
-				//     if ( !Patch )
-				//       sub_180B536AC(v6, v5);
-				//     IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_27((ILFixDynamicMethodWrapper_20 *)Patch, (Object *)this, value, 0LL);
-				//   }
-				//   else
-				//   {
-				//     this.fields.m_constants.taauParameters0.x = value;
-				//     this.fields.m_constants.taauParameters8.x = value;
-				//     this.fields.m_constants.taauParameters0.y = 1.0 / value;
-				//     this.fields.m_constants.taauParameters8.z = 1.0 / value;
-				//     this.fields.m_constants.taauParameters8.y = value;
-				//     this.fields.m_constants.taauParameters8.w = 1.0 / value;
-				//   }
-				// }
-				// 
-			}
+		  bool v7; // si
+		  void *static_fields; // rdx
+		  __int64 v9; // rcx
+		  float historyWeight; // xmm1_4
+		  float sharpenStrength4K; // xmm2_4
+		  float v12; // xmm0_4
+		  HGRenderGraphContext *HGContext; // rax
+		  CommandBuffer *cmd; // rsi
+		  HGRenderGraphContext *v15; // r14
+		  CBHandle *v16; // rax
+		  __m128i v17; // xmm6
+		  Material__Array *m_taauPassMaterials; // rax
+		  Material *v19; // rbx
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int128 v21; // [rsp+30h] [rbp-40h] BYREF
+		  CBHandle v22; // [rsp+40h] [rbp-30h] BYREF
+		
+		  if ( !IFix::WrappersManagerImpl::IsPatched(3400, 0LL) )
+		  {
+		    sub_1800036A0(TypeInfo::HG::Rendering::RenderGraphModule::TextureHandle);
+		    v7 = !HG::Rendering::RenderGraphModule::TextureHandle::IsValid(&input->historySceneColor, 0LL)
+		      || !this->fields._prevTAAUState_k__BackingField;
+		    if ( !input->quality )
+		    {
+		      if ( v7
+		        || (sub_1800036A0(TypeInfo::HG::Rendering::RenderGraphModule::TextureHandle),
+		            !HG::Rendering::RenderGraphModule::TextureHandle::IsValid(&this->fields.m_historyDilatedSceneDepth, 0LL))
+		        || (sub_1800036A0(TypeInfo::HG::Rendering::RenderGraphModule::TextureHandle),
+		            !HG::Rendering::RenderGraphModule::TextureHandle::IsValid(&this->fields.m_historyDilatedSceneMV, 0LL)) )
+		      {
+		        v7 = 1;
+		      }
+		    }
+		    HG::Rendering::Runtime::TAAUPassConstructor::set_taauScaleFactor(this, input->renderingScale, 0LL);
+		    if ( v7 )
+		      historyWeight = 0.0;
+		    else
+		      historyWeight = input->historyWeight;
+		    if ( this )
+		    {
+		      HG::Rendering::Runtime::TAAUPassConstructor::set_historyWeight(this, historyWeight, 0LL);
+		      HG::Rendering::Runtime::TAAUPassConstructor::set_historyWeightInMotion(this, input->historyWeightInMotion, 0LL);
+		      HG::Rendering::Runtime::TAAUPassConstructor::set_fastConvergeHistoryWeight(
+		        this,
+		        input->fastConvergeHistoryWeight,
+		        0LL);
+		      HG::Rendering::Runtime::TAAUPassConstructor::set_responsiveAAHistoryWeight(
+		        this,
+		        input->responsiveAAHistoryWeight,
+		        0LL);
+		      HG::Rendering::Runtime::TAAUPassConstructor::set_minMVConsideredDynamic(this, input->minMVConsideredDynamic, 0LL);
+		      HG::Rendering::Runtime::TAAUPassConstructor::set_maxMVConsideredDynamic(this, input->maxMVConsideredDynamic, 0LL);
+		      HG::Rendering::Runtime::TAAUPassConstructor::set_characterMotionSensitivity(
+		        this,
+		        input->characterMotionSensitivity,
+		        0LL);
+		      HG::Rendering::Runtime::TAAUPassConstructor::set_occlusionDepthDiff(this, input->occlusionDepthDiff, 0LL);
+		      HG::Rendering::Runtime::TAAUPassConstructor::set_inputSampleLumaWeight(this, input->inputSampleLumaWeight, 0LL);
+		      HG::Rendering::Runtime::TAAUPassConstructor::set_fastConvergeState(this, (float)input->fastConvergeState, 0LL);
+		      HG::Rendering::Runtime::TAAUPassConstructor::set_enableResponsiveTransparency(
+		        this,
+		        input->enableResponsiveTransparency,
+		        0LL);
+		      HG::Rendering::Runtime::TAAUPassConstructor::set_firstFrame(this, (float)v7, 0LL);
+		      sharpenStrength4K = input->sharpenStrength4K;
+		      *(_QWORD *)&v21 = _mm_unpacklo_ps(
+		                          (__m128)LODWORD(input->sharpenStrength1K),
+		                          (__m128)LODWORD(input->sharpenStrength2K)).m128_u64[0];
+		      *((float *)&v21 + 2) = sharpenStrength4K;
+		      v12 = HG::Rendering::Runtime::TAAUPassConstructor::ComputeSharpenStrength(
+		              this,
+		              &input->screenSize,
+		              (TAAUPassConstructor_SharpenStrengthParam *)&v21,
+		              0LL);
+		      HG::Rendering::Runtime::TAAUPassConstructor::set_sharpenStrength(this, v12, 0LL);
+		      if ( renderGraph )
+		      {
+		        HGContext = HG::Rendering::RenderGraphModule::HGRenderGraph::get_HGContext(renderGraph, 0LL);
+		        if ( HGContext )
+		        {
+		          cmd = HGContext->fields.cmd;
+		          *(float *)&v21 = (float)input->screenSize.m_X;
+		          *((float *)&v21 + 1) = (float)input->screenSize.m_Y;
+		          *((float *)&v21 + 2) = 1.0 / (float)input->screenSize.m_X;
+		          *((float *)&v21 + 3) = 1.0 / (float)input->screenSize.m_Y;
+		          *(_OWORD *)&v22.bufferId = v21;
+		          HG::Rendering::Runtime::TAAUPassConstructor::set_HRSize(this, (Vector4 *)&v22, 0LL);
+		          *(float *)&v21 = (float)input->renderSize.m_X;
+		          *((float *)&v21 + 1) = (float)input->renderSize.m_Y;
+		          *((float *)&v21 + 2) = 1.0 / *(float *)&v21;
+		          *((float *)&v21 + 3) = 1.0 / *((float *)&v21 + 1);
+		          *(_OWORD *)&v22.bufferId = v21;
+		          HG::Rendering::Runtime::TAAUPassConstructor::set_LRSize(this, (Vector4 *)&v22, 0LL);
+		          v15 = HG::Rendering::RenderGraphModule::HGRenderGraph::get_HGContext(renderGraph, 0LL);
+		          if ( v15 )
+		          {
+		            sub_1800036A0(TypeInfo::UnityEngine::Rendering::ScriptableRenderContext);
+		            v16 = UnityEngine::Rendering::ScriptableRenderContext::AllocateConstantBuffer(
+		                    &v22,
+		                    &v15->fields.renderContext,
+		                    192,
+		                    0LL);
+		            v17 = *(__m128i *)&v16->bufferId;
+		            v22.ptr = v16->ptr;
+		            System::Buffer::MemoryCopy((Void *)&this->fields.m_constants, (Void *)v22.ptr, 192LL, 192LL, 0LL);
+		            sub_1800036A0(TypeInfo::HG::Rendering::Runtime::HGShaderIDs);
+		            static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs->static_fields;
+		            if ( cmd )
+		            {
+		              UnityEngine::Rendering::CommandBuffer::SetGlobalConstantBufferInternal0(
+		                cmd,
+		                _mm_cvtsi128_si32(v17),
+		                *((_DWORD *)static_fields + 617),
+		                _mm_cvtsi128_si32(_mm_srli_si128(v17, 4)),
+		                192,
+		                0LL);
+		              if ( input->quality != 1 )
+		                return;
+		              m_taauPassMaterials = this->fields.m_taauPassMaterials;
+		              if ( m_taauPassMaterials )
+		              {
+		                if ( m_taauPassMaterials->max_length.size <= 3u )
+		                  sub_1800D2AB0(v9, static_fields);
+		                v19 = m_taauPassMaterials->vector[3];
+		                sub_1800036A0(TypeInfo::HG::Rendering::Runtime::HGShaderKeyWords);
+		                static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderKeyWords->static_fields;
+		                if ( v19 )
+		                {
+		                  UnityEngine::Material::EnableKeyword(v19, *((String **)static_fields + 47), 0LL);
+		                  return;
+		                }
+		              }
+		            }
+		          }
+		        }
+		      }
+		    }
+		LABEL_25:
+		    sub_1800D8260(v9, static_fields);
+		  }
+		  Patch = IFix::WrappersManagerImpl::GetPatch(3400, 0LL);
+		  if ( !Patch )
+		    goto LABEL_25;
+		  IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_1229(Patch, (Object *)this, input, (Object *)renderGraph, 0LL);
 		}
-
-		// (get) Token: 0x06001167 RID: 4455 RVA: 0x000025F0 File Offset: 0x000007F0
-		private float invScaleFactor
+		
+		private void ConstructTAAUPasses(ref PassInput input, ref PassOutput output, HGRenderGraph renderGraph) {} // 0x0000000189BD30C4-0x0000000189BD3180
+		// Void ConstructTAAUPasses(TAAUPassConstructor+PassInput ByRef, TAAUPassConstructor+PassOutput ByRef, HGRenderGraph)
+		void HG::Rendering::Runtime::TAAUPassConstructor::ConstructTAAUPasses(
+		        TAAUPassConstructor *this,
+		        TAAUPassConstructor_PassInput *input,
+		        TAAUPassConstructor_PassOutput *output,
+		        HGRenderGraph *renderGraph,
+		        MethodInfo *method)
 		{
-			get
-			{
-				// // Single get_hintWeight()
-				// float UnityEngine::Animations::Rigging::TwoBoneIKConstraintData::get_hintWeight(
-				//         TwoBoneIKConstraintData *this,
-				//         MethodInfo *method)
-				// {
-				//   return this.m_HintWeight;
-				// }
-				// 
-				return 0f;
-			}
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v10; // rdx
+		  __int64 v11; // rcx
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(3403, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(3403, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(v11, v10);
+		    IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_1230(Patch, (Object *)this, input, output, (Object *)renderGraph, 0LL);
+		  }
+		  else
+		  {
+		    if ( !input->quality )
+		    {
+		      HG::Rendering::Runtime::TAAUPassConstructor::ConstructDilationPass(this, input, renderGraph, 0LL);
+		      HG::Rendering::Runtime::TAAUPassConstructor::ConstructMaskDilationPass(this, input, renderGraph, 0LL);
+		    }
+		    HG::Rendering::Runtime::TAAUPassConstructor::ConstructResolvePass(this, input, output, renderGraph, 0LL);
+		  }
 		}
-
-		// (get) Token: 0x06001168 RID: 4456 RVA: 0x000025F0 File Offset: 0x000007F0
-		// (set) Token: 0x06001169 RID: 4457 RVA: 0x000025D0 File Offset: 0x000007D0
-		private float enableResponsiveTransparency
+		
+		private void ConstructDilationPass(ref PassInput input, HGRenderGraph renderGraph) {} // 0x0000000189BD1948-0x0000000189BD25A0
+		// Void ConstructDilationPass(TAAUPassConstructor+PassInput ByRef, HGRenderGraph)
+		// Hidden C++ exception states: #wind=1
+		void HG::Rendering::Runtime::TAAUPassConstructor::ConstructDilationPass(
+		        TAAUPassConstructor *this,
+		        TAAUPassConstructor_PassInput *input,
+		        HGRenderGraph *renderGraph,
+		        MethodInfo *method)
 		{
-			get
-			{
-				// // Single get_Angle()
-				// float PaintIn3D::P3dPaintSphere::get_Angle(P3dPaintSphere *this, MethodInfo *method)
-				// {
-				//   return this.fields.angle;
-				// }
-				// 
-				return 0f;
-			}
-			set
-			{
-				// // Void set_Angle(Single)
-				// void PaintIn3D::P3dPaintSphere::set_Angle(P3dPaintSphere *this, float value, MethodInfo *method)
-				// {
-				//   this.fields.angle = value;
-				// }
-				// 
-			}
+		  ProfilingSampler *v7; // rax
+		  __int64 v8; // rdx
+		  __int64 v9; // rcx
+		  int v10; // edi
+		  __int64 v11; // rdx
+		  TAAUPassConstructor_RTNames__Array *m_rtNames; // rcx
+		  unsigned __int64 v13; // r8
+		  signed __int64 v14; // rtt
+		  __int64 v15; // rdx
+		  __int64 v16; // rcx
+		  __int64 v17; // r8
+		  __int64 v18; // rdx
+		  TAAUPassConstructor_RTNames__Array *v19; // rcx
+		  unsigned __int64 v20; // r8
+		  signed __int64 v21; // rtt
+		  Object *v22; // rdx
+		  Material__Array *m_taauPassMaterials; // rax
+		  Object__Class *v24; // rcx
+		  unsigned __int64 v25; // rdx
+		  unsigned __int64 v26; // r8
+		  char v27; // dl
+		  signed __int64 v28; // rtt
+		  __int64 v29; // rdx
+		  TAAUPassConstructor_RTNames__Array *v30; // rcx
+		  unsigned __int64 v31; // r8
+		  signed __int64 v32; // rtt
+		  Object *v33; // r15
+		  __int64 v34; // rdx
+		  __int64 v35; // rcx
+		  TextureHandle v36; // xmm0
+		  __int64 v37; // rdx
+		  TAAUPassConstructor_RTNames__Array *v38; // rcx
+		  unsigned __int64 v39; // r8
+		  signed __int64 v40; // rtt
+		  Object *v41; // rbx
+		  __int64 v42; // rdx
+		  __int64 v43; // rcx
+		  TextureHandle v44; // xmm0
+		  __int64 v45; // rdx
+		  __int64 v46; // rcx
+		  __int64 v47; // rdx
+		  __int64 v48; // rcx
+		  __int64 v49; // rdx
+		  __int64 v50; // rcx
+		  __int64 v51; // rdx
+		  __int64 v52; // rcx
+		  __int64 v53; // rdx
+		  __int64 v54; // rcx
+		  __int64 v55; // rdx
+		  __int64 v56; // rcx
+		  __int64 v57; // rdx
+		  __int64 v58; // rcx
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v60; // rdx
+		  __int64 v61; // rcx
+		  Object *v62; // [rsp+50h] [rbp-218h] BYREF
+		  __m128i si128; // [rsp+60h] [rbp-208h] BYREF
+		  TextureDesc v64; // [rsp+70h] [rbp-1F8h] BYREF
+		  HGRenderGraphBuilder v65; // [rsp+D0h] [rbp-198h] BYREF
+		  _QWORD v66[2]; // [rsp+F0h] [rbp-178h] BYREF
+		  TextureDesc v67; // [rsp+100h] [rbp-168h] BYREF
+		  HGRenderGraphBuilder v68; // [rsp+160h] [rbp-108h] BYREF
+		  TextureDesc v69; // [rsp+180h] [rbp-E8h] BYREF
+		  Il2CppExceptionWrapper *v70; // [rsp+1E0h] [rbp-88h] BYREF
+		  TextureDesc v71; // [rsp+1F0h] [rbp-78h] BYREF
+		
+		  v62 = 0LL;
+		  sub_18033B9D0(&v67, 0LL, 96LL);
+		  sub_18033B9D0(&v64, 0LL, 96LL);
+		  if ( IFix::WrappersManagerImpl::IsPatched(3404, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(3404, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(v61, v60);
+		    IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_1229(Patch, (Object *)this, input, (Object *)renderGraph, 0LL);
+		  }
+		  else
+		  {
+		    v7 = UnityEngine::Rendering::ProfilingSampler::Get<System::Int32Enum>(
+		           (Int32Enum__Enum)0x4Fu,
+		           MethodInfo::UnityEngine::Rendering::ProfilingSampler::Get<HG::Rendering::Runtime::HGProfileId>);
+		    if ( !renderGraph )
+		      sub_1800D8260(v9, v8);
+		    HG::Rendering::RenderGraphModule::HGRenderGraph::AddRenderPass<System::Object>(
+		      &v68,
+		      renderGraph,
+		      (String *)"TAAU Dilation Pass",
+		      &v62,
+		      v7,
+		      1,
+		      ProfilingHGPass__Enum_None,
+		      MethodInfo::HG::Rendering::RenderGraphModule::HGRenderGraph::AddRenderPass<HG::Rendering::Runtime::TAAUPassConstructor::DilationPassData>);
+		    v65 = v68;
+		    v66[0] = 0LL;
+		    v66[1] = &v65;
+		    try
+		    {
+		      v10 = input->renderPathFrameIndex % 2;
+		      sub_1800036A0(TypeInfo::HG::Rendering::RenderGraphModule::TextureHandle);
+		      if ( !HG::Rendering::RenderGraphModule::TextureHandle::IsValid(&this->fields.m_historyDilatedSceneDepth, 0LL) )
+		      {
+		        sub_18033B9D0(&v69, 0LL, 96LL);
+		        HG::Rendering::RenderGraphModule::TextureDesc::TextureDesc(&v69, input->renderSize, 0LL);
+		        v64 = v69;
+		        v64.colorFormat = 45;
+		        *(_WORD *)&v64.enableRandomWrite = 0;
+		        v64.autoGenerateMips = 0;
+		        m_rtNames = this->fields.m_rtNames;
+		        if ( !m_rtNames )
+		          sub_1800D8250(0LL, v11);
+		        v64.name = *(String **)sub_1803C0734(m_rtNames, v10);
+		        if ( dword_18F35FD08 )
+		        {
+		          v13 = (((unsigned __int64)&v64.name >> 12) & 0x1FFFFF) >> 6;
+		          _m_prefetchw(&qword_18F0BCBA0[v13 + 36190]);
+		          do
+		            v14 = qword_18F0BCBA0[v13 + 36190];
+		          while ( v14 != _InterlockedCompareExchange64(
+		                           &qword_18F0BCBA0[v13 + 36190],
+		                           v14 | (1LL << (((unsigned __int64)&v64.name >> 12) & 0x3F)),
+		                           v14) );
+		        }
+		        v67 = v64;
+		        this->fields.m_historyDilatedSceneDepth = *HG::Rendering::RenderGraphModule::HGRenderGraph::CreateTexture(
+		                                                     (TextureHandle *)&si128,
+		                                                     renderGraph,
+		                                                     &v67,
+		                                                     0LL);
+		      }
+		      sub_1800036A0(TypeInfo::HG::Rendering::RenderGraphModule::TextureHandle);
+		      if ( !HG::Rendering::RenderGraphModule::TextureHandle::IsValid(&this->fields.m_historyDilatedSceneMV, 0LL) )
+		      {
+		        sub_18033B9D0(&v69, 0LL, 96LL);
+		        HG::Rendering::RenderGraphModule::TextureDesc::TextureDesc(&v69, input->renderSize, 0LL);
+		        v64 = v69;
+		        v64.colorFormat = HG::Rendering::RenderGraphModule::HGRenderGraph::GetTextureDescRef(
+		                            renderGraph,
+		                            &input->sceneMV,
+		                            0LL)->colorFormat;
+		        *(_WORD *)&v64.enableRandomWrite = 0;
+		        v64.autoGenerateMips = 0;
+		        v19 = this->fields.m_rtNames;
+		        if ( !v19 )
+		          sub_1800D8250(0LL, v18);
+		        v64.name = *(String **)(sub_1803C0734(v19, v10) + 8);
+		        if ( dword_18F35FD08 )
+		        {
+		          v20 = (((unsigned __int64)&v64.name >> 12) & 0x1FFFFF) >> 6;
+		          _m_prefetchw(&qword_18F0BCBA0[v20 + 36190]);
+		          do
+		            v21 = qword_18F0BCBA0[v20 + 36190];
+		          while ( v21 != _InterlockedCompareExchange64(
+		                           &qword_18F0BCBA0[v20 + 36190],
+		                           v21 | (1LL << (((unsigned __int64)&v64.name >> 12) & 0x3F)),
+		                           v21) );
+		        }
+		        v67 = v64;
+		        this->fields.m_historyDilatedSceneMV = *HG::Rendering::RenderGraphModule::HGRenderGraph::CreateTexture(
+		                                                  (TextureHandle *)&si128,
+		                                                  renderGraph,
+		                                                  &v67,
+		                                                  0LL);
+		      }
+		      if ( !v62 )
+		        sub_1800D8250(v16, v15);
+		      v62[1] = (Object)input->sceneDepth;
+		      if ( !v62 )
+		        sub_1800D8250(v16, v15);
+		      v62[2] = (Object)input->sceneMV;
+		      if ( !v62 )
+		        sub_1800D8250(v16, v15);
+		      v62[5] = (Object)this->fields.m_historyDilatedSceneDepth;
+		      if ( !v62 )
+		        sub_1800D8250(v16, v15);
+		      v62[6] = (Object)this->fields.m_historyDilatedSceneMV;
+		      v22 = v62;
+		      m_taauPassMaterials = this->fields.m_taauPassMaterials;
+		      if ( !m_taauPassMaterials )
+		        sub_1800D8250(v16, v62);
+		      if ( !m_taauPassMaterials->max_length.size )
+		        sub_1800D2AA0(v16, v62, v17);
+		      v24 = (Object__Class *)m_taauPassMaterials->vector[0];
+		      if ( !v62 )
+		        sub_1800D8250(v24, 0LL);
+		      v62[7].klass = v24;
+		      if ( dword_18F35FD08 )
+		      {
+		        v25 = ((unsigned __int64)&v22[7] >> 12) & 0x1FFFFF;
+		        v26 = v25 >> 6;
+		        v27 = v25 & 0x3F;
+		        _m_prefetchw(&qword_18F0BCBA0[v26 + 36190]);
+		        do
+		          v28 = qword_18F0BCBA0[v26 + 36190];
+		        while ( v28 != _InterlockedCompareExchange64(&qword_18F0BCBA0[v26 + 36190], v28 | (1LL << v27), v28) );
+		      }
+		      sub_18033B9D0(&v69, 0LL, 96LL);
+		      HG::Rendering::RenderGraphModule::TextureDesc::TextureDesc(&v69, input->renderSize, 0LL);
+		      v64 = v69;
+		      v64.colorFormat = 45;
+		      *(_WORD *)&v64.enableRandomWrite = 0;
+		      v64.autoGenerateMips = 0;
+		      v30 = this->fields.m_rtNames;
+		      if ( !v30 )
+		        sub_1800D8250(0LL, v29);
+		      v64.name = *(String **)sub_1803C0734(v30, v10);
+		      if ( dword_18F35FD08 )
+		      {
+		        v31 = (((unsigned __int64)&v64.name >> 12) & 0x1FFFFF) >> 6;
+		        _m_prefetchw(&qword_18F0BCBA0[v31 + 36190]);
+		        do
+		          v32 = qword_18F0BCBA0[v31 + 36190];
+		        while ( v32 != _InterlockedCompareExchange64(
+		                         &qword_18F0BCBA0[v31 + 36190],
+		                         v32 | (1LL << (((unsigned __int64)&v64.name >> 12) & 0x3F)),
+		                         v32) );
+		      }
+		      v67 = v64;
+		      v33 = v62;
+		      v36 = *HG::Rendering::RenderGraphModule::HGRenderGraph::CreateTexture(
+		               (TextureHandle *)&si128,
+		               renderGraph,
+		               &v67,
+		               0LL);
+		      if ( !v33 )
+		        sub_1800D8250(v35, v34);
+		      v33[3] = (Object)v36;
+		      sub_18033B9D0(&v71, 0LL, 96LL);
+		      HG::Rendering::RenderGraphModule::TextureDesc::TextureDesc(&v71, input->renderSize, 0LL);
+		      v64 = v71;
+		      v64.colorFormat = HG::Rendering::RenderGraphModule::HGRenderGraph::GetTextureDescRef(
+		                          renderGraph,
+		                          &input->sceneMV,
+		                          0LL)->colorFormat;
+		      *(_WORD *)&v64.enableRandomWrite = 0;
+		      v64.autoGenerateMips = 0;
+		      v38 = this->fields.m_rtNames;
+		      if ( !v38 )
+		        sub_1800D8250(0LL, v37);
+		      v64.name = *(String **)(sub_1803C0734(v38, v10) + 8);
+		      if ( dword_18F35FD08 )
+		      {
+		        v39 = (((unsigned __int64)&v64.name >> 12) & 0x1FFFFF) >> 6;
+		        _m_prefetchw(&qword_18F0BCBA0[v39 + 36190]);
+		        do
+		          v40 = qword_18F0BCBA0[v39 + 36190];
+		        while ( v40 != _InterlockedCompareExchange64(
+		                         &qword_18F0BCBA0[v39 + 36190],
+		                         v40 | (1LL << (((unsigned __int64)&v64.name >> 12) & 0x3F)),
+		                         v40) );
+		      }
+		      v67 = v64;
+		      v41 = v62;
+		      v44 = *HG::Rendering::RenderGraphModule::HGRenderGraph::CreateTexture(
+		               (TextureHandle *)&si128,
+		               renderGraph,
+		               &v67,
+		               0LL);
+		      if ( !v41 )
+		        sub_1800D8250(v43, v42);
+		      v41[4] = (Object)v44;
+		      if ( !v62 )
+		        sub_1800D8250(v43, v42);
+		      HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::ReadTexture(
+		        (TextureHandle *)&si128,
+		        &v65,
+		        (TextureHandle *)&v62[1],
+		        0LL);
+		      if ( !v62 )
+		        sub_1800D8250(v46, v45);
+		      HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::ReadTexture(
+		        (TextureHandle *)&si128,
+		        &v65,
+		        (TextureHandle *)&v62[2],
+		        0LL);
+		      if ( !v62 )
+		        sub_1800D8250(v48, v47);
+		      HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::ReadWriteTexture(
+		        (TextureHandle *)&si128,
+		        &v65,
+		        (TextureHandle *)&v62[5],
+		        0LL);
+		      if ( !v62 )
+		        sub_1800D8250(v50, v49);
+		      HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::ReadWriteTexture(
+		        (TextureHandle *)&si128,
+		        &v65,
+		        (TextureHandle *)&v62[6],
+		        0LL);
+		      HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::AllowPassCulling(&v65, 0, 0LL);
+		      if ( !v62 )
+		        sub_1800D8250(v52, v51);
+		      si128 = _mm_load_si128((const __m128i *)&xmmword_18B959540);
+		      HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::SetColorAttachment(
+		        (TextureHandle *)&v68,
+		        &v65,
+		        (TextureHandle *)&v62[3],
+		        0,
+		        RenderBufferLoadAction__Enum_DontCare,
+		        RenderBufferStoreAction__Enum_Store,
+		        (Color *)&si128,
+		        0,
+		        0LL);
+		      if ( !v62 )
+		        sub_1800D8250(v54, v53);
+		      si128 = _mm_load_si128((const __m128i *)&xmmword_18B959540);
+		      HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::SetColorAttachment(
+		        (TextureHandle *)&v68,
+		        &v65,
+		        (TextureHandle *)&v62[4],
+		        1,
+		        RenderBufferLoadAction__Enum_DontCare,
+		        RenderBufferStoreAction__Enum_Store,
+		        (Color *)&si128,
+		        0,
+		        0LL);
+		      if ( HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::DepthRequiredIfMRT(&v65, 0LL) )
+		        HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::SetDepthAttachment(
+		          (TextureHandle *)&v68,
+		          &v65,
+		          &input->utilityDepth,
+		          DepthAccess__Enum_ReadWrite,
+		          RenderBufferLoadAction__Enum_Load,
+		          RenderBufferStoreAction__Enum_Store,
+		          1.0,
+		          0,
+		          0,
+		          0LL);
+		      sub_1800036A0(TypeInfo::HG::Rendering::Runtime::TAAUPassConstructor);
+		      HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::SetRenderFunc<System::Object>(
+		        &v65,
+		        (RenderFunc_1_System_Object_ *)TypeInfo::HG::Rendering::Runtime::TAAUPassConstructor->static_fields->s_dilationRenderFunc,
+		        0LL,
+		        0,
+		        MethodInfo::HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::SetRenderFunc<HG::Rendering::Runtime::TAAUPassConstructor::DilationPassData>);
+		      if ( !v62 )
+		        sub_1800D8250(v56, v55);
+		      this->fields.m_historyDilatedSceneDepth = *HG::Rendering::RenderGraphModule::HGRenderGraph::PreserveTexture(
+		                                                   (TextureHandle *)&v68,
+		                                                   renderGraph,
+		                                                   (TextureHandle *)&v62[3],
+		                                                   1,
+		                                                   (String *)"TAAUPass",
+		                                                   0LL);
+		      if ( !v62 )
+		        sub_1800D8250(v58, v57);
+		      this->fields.m_historyDilatedSceneMV = *HG::Rendering::RenderGraphModule::HGRenderGraph::PreserveTexture(
+		                                                (TextureHandle *)&v68,
+		                                                renderGraph,
+		                                                (TextureHandle *)&v62[4],
+		                                                1,
+		                                                (String *)"TAAUPass",
+		                                                0LL);
+		    }
+		    catch ( Il2CppExceptionWrapper *v70 )
+		    {
+		      v66[0] = v70->ex;
+		    }
+		    sub_180268AE0(v66);
+		  }
 		}
-
-		// (get) Token: 0x0600116A RID: 4458 RVA: 0x000025D2 File Offset: 0x000007D2
-		// (set) Token: 0x0600116B RID: 4459 RVA: 0x000025D0 File Offset: 0x000007D0
-		private Vector4 LRSize
+		
+		private void ConstructMaskDilationPass(ref PassInput input, HGRenderGraph renderGraph) {} // 0x0000000189BD25A0-0x0000000189BD29EC
+		// Void ConstructMaskDilationPass(TAAUPassConstructor+PassInput ByRef, HGRenderGraph)
+		// Hidden C++ exception states: #wind=1
+		void HG::Rendering::Runtime::TAAUPassConstructor::ConstructMaskDilationPass(
+		        TAAUPassConstructor *this,
+		        TAAUPassConstructor_PassInput *input,
+		        HGRenderGraph *renderGraph,
+		        MethodInfo *method)
 		{
-			get
-			{
-				// // Vector4 get_LRSize()
-				// Vector4 *HG::Rendering::Runtime::TAAUPassConstructor::get_LRSize(
-				//         Vector4 *__return_ptr retstr,
-				//         TAAUPassConstructor *this,
-				//         MethodInfo *method)
-				// {
-				//   Vector4 *result; // rax
-				// 
-				//   result = retstr;
-				//   *retstr = this.fields.m_constants.taauParameters6;
-				//   return result;
-				// }
-				// 
-				return null;
-			}
-			set
-			{
-				// // Void set_LRSize(Vector4)
-				// void HG::Rendering::Runtime::TAAUPassConstructor::set_LRSize(
-				//         TAAUPassConstructor *this,
-				//         Vector4 *value,
-				//         MethodInfo *method)
-				// {
-				//   this.fields.m_constants.taauParameters6 = *value;
-				// }
-				// 
-			}
+		  ProfilingSampler *v7; // rax
+		  __int64 v8; // rdx
+		  __int64 v9; // rcx
+		  __int64 v10; // rcx
+		  __int64 v11; // r8
+		  Object *v12; // rdx
+		  Material__Array *m_taauPassMaterials; // rax
+		  Object__Class *v14; // rcx
+		  unsigned int v15; // edx
+		  unsigned __int64 v16; // r8
+		  signed __int64 v17; // rtt
+		  int v18; // edi
+		  __int64 v19; // rdx
+		  __int64 v20; // rcx
+		  int v21; // eax
+		  int32_t v22; // ebx
+		  Object *v23; // rbx
+		  __int64 v24; // rdx
+		  __int64 v25; // rcx
+		  TextureHandle v26; // xmm0
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v28; // rdx
+		  __int64 v29; // rcx
+		  Object *v30; // [rsp+50h] [rbp-1A8h] BYREF
+		  _QWORD v31[3]; // [rsp+58h] [rbp-1A0h] BYREF
+		  __m128i si128; // [rsp+70h] [rbp-188h] BYREF
+		  HGRenderGraphBuilder v33; // [rsp+80h] [rbp-178h] BYREF
+		  Il2CppExceptionWrapper *v34; // [rsp+A0h] [rbp-158h] BYREF
+		  HGRenderGraphBuilder v35; // [rsp+A8h] [rbp-150h] BYREF
+		  __int128 v36; // [rsp+E0h] [rbp-118h]
+		  __int128 v37; // [rsp+F0h] [rbp-108h]
+		  TextureDesc v38; // [rsp+130h] [rbp-C8h] BYREF
+		  TextureDesc v39; // [rsp+190h] [rbp-68h] BYREF
+		
+		  v30 = 0LL;
+		  sub_18033B9D0(&v39, 0LL, 96LL);
+		  if ( IFix::WrappersManagerImpl::IsPatched(3405, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(3405, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(v29, v28);
+		    IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_1229(Patch, (Object *)this, input, (Object *)renderGraph, 0LL);
+		  }
+		  else
+		  {
+		    v7 = UnityEngine::Rendering::ProfilingSampler::Get<System::Int32Enum>(
+		           (Int32Enum__Enum)0x50u,
+		           MethodInfo::UnityEngine::Rendering::ProfilingSampler::Get<HG::Rendering::Runtime::HGProfileId>);
+		    if ( !renderGraph )
+		      sub_1800D8260(v9, v8);
+		    HG::Rendering::RenderGraphModule::HGRenderGraph::AddRenderPass<System::Object>(
+		      &v35,
+		      renderGraph,
+		      (String *)"TAAU Mask Dilation Pass",
+		      &v30,
+		      v7,
+		      1,
+		      ProfilingHGPass__Enum_None,
+		      MethodInfo::HG::Rendering::RenderGraphModule::HGRenderGraph::AddRenderPass<HG::Rendering::Runtime::TAAUPassConstructor::MaskDilationPassData>);
+		    v33 = v35;
+		    v31[0] = 0LL;
+		    v31[1] = &v33;
+		    try
+		    {
+		      v12 = v30;
+		      m_taauPassMaterials = this->fields.m_taauPassMaterials;
+		      if ( !m_taauPassMaterials )
+		        sub_1800D8250(v10, v30);
+		      if ( m_taauPassMaterials->max_length.size <= 1u )
+		        sub_1800D2AA0(v10, v30, v11);
+		      v14 = (Object__Class *)m_taauPassMaterials->vector[1];
+		      if ( !v30 )
+		        sub_1800D8250(v14, 0LL);
+		      v30[2].klass = v14;
+		      if ( dword_18F35FD08 )
+		      {
+		        v15 = ((unsigned __int64)&v12[2] >> 12) & 0x1FFFFF;
+		        v16 = (unsigned __int64)v15 >> 6;
+		        v12 = (Object *)(v15 & 0x3F);
+		        _m_prefetchw(&qword_18F103690[v16]);
+		        do
+		        {
+		          v14 = (Object__Class *)(qword_18F103690[v16] | (1LL << (char)v12));
+		          v17 = qword_18F103690[v16];
+		        }
+		        while ( v17 != _InterlockedCompareExchange64(&qword_18F103690[v16], (signed __int64)v14, v17) );
+		      }
+		      v18 = sub_182F3EA70(v14, v12);
+		      v21 = sub_182F3EA70(v20, v19);
+		      v22 = 4 * (v21 / 4 + (int)(float)((float)((float)(v21 % 4) * 0.25) + (float)((float)(v21 % 4) * 0.25)));
+		      sub_18033B9D0(&v38, 0LL, 96LL);
+		      HG::Rendering::RenderGraphModule::TextureDesc::TextureDesc(
+		        &v38,
+		        4 * (v18 / 4 + (int)(float)((float)((float)(v18 % 4) * 0.25) + (float)((float)(v18 % 4) * 0.25))),
+		        v22,
+		        0LL);
+		      HIDWORD(v36) = v38.dimension;
+		      v37 = *(_OWORD *)&v38.enableRandomWrite;
+		      LODWORD(v36) = 5;
+		      LOWORD(v37) = 0;
+		      *(_QWORD *)((char *)&v36 + 4) = 0x100000001LL;
+		      *(_OWORD *)&v39.width = *(_OWORD *)&v38.width;
+		      *(_OWORD *)&v39.colorFormat = v36;
+		      *(_OWORD *)&v39.enableRandomWrite = v37;
+		      *(_OWORD *)&v39.bindTextureMS = *(_OWORD *)&v38.bindTextureMS;
+		      *(_OWORD *)&v39.fastMemoryDesc.inFastMemory = *(_OWORD *)&v38.fastMemoryDesc.inFastMemory;
+		      v39.clearColor = v38.clearColor;
+		      v23 = v30;
+		      v26 = *HG::Rendering::RenderGraphModule::HGRenderGraph::CreateTexture(
+		               (TextureHandle *)&si128,
+		               renderGraph,
+		               &v39,
+		               0LL);
+		      if ( !v23 )
+		        sub_1800D8250(v25, v24);
+		      v23[1] = (Object)v26;
+		      if ( !v30 )
+		        sub_1800D8250(v25, v24);
+		      si128 = _mm_load_si128((const __m128i *)&xmmword_18B959540);
+		      HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::SetColorAttachment(
+		        (TextureHandle *)&v35,
+		        &v33,
+		        (TextureHandle *)&v30[1],
+		        0,
+		        RenderBufferLoadAction__Enum_DontCare,
+		        RenderBufferStoreAction__Enum_Store,
+		        (Color *)&si128,
+		        0,
+		        0LL);
+		      HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::AllowPassCulling(&v33, 0, 0LL);
+		      sub_1800036A0(TypeInfo::HG::Rendering::Runtime::TAAUPassConstructor);
+		      HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::SetRenderFunc<System::Object>(
+		        &v33,
+		        (RenderFunc_1_System_Object_ *)TypeInfo::HG::Rendering::Runtime::TAAUPassConstructor->static_fields->s_maskDilationRenderFunc,
+		        0LL,
+		        0,
+		        MethodInfo::HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::SetRenderFunc<HG::Rendering::Runtime::TAAUPassConstructor::MaskDilationPassData>);
+		    }
+		    catch ( Il2CppExceptionWrapper *v34 )
+		    {
+		      v31[0] = v34->ex;
+		    }
+		    sub_180268AE0(v31);
+		  }
 		}
-
-		// (get) Token: 0x0600116C RID: 4460 RVA: 0x000025D2 File Offset: 0x000007D2
-		// (set) Token: 0x0600116D RID: 4461 RVA: 0x000025D0 File Offset: 0x000007D0
-		private Vector4 HRSize
+		
+		private void ConstructResolvePass(ref PassInput input, ref PassOutput output, HGRenderGraph renderGraph) {} // 0x0000000189BD2AF0-0x0000000189BD30C4
+		// Void ConstructResolvePass(TAAUPassConstructor+PassInput ByRef, TAAUPassConstructor+PassOutput ByRef, HGRenderGraph)
+		// Hidden C++ exception states: #wind=1
+		void HG::Rendering::Runtime::TAAUPassConstructor::ConstructResolvePass(
+		        TAAUPassConstructor *this,
+		        TAAUPassConstructor_PassInput *input,
+		        TAAUPassConstructor_PassOutput *output,
+		        HGRenderGraph *renderGraph,
+		        MethodInfo *method)
 		{
-			get
-			{
-				// // Vector4 get_HRSize()
-				// Vector4 *HG::Rendering::Runtime::TAAUPassConstructor::get_HRSize(
-				//         Vector4 *__return_ptr retstr,
-				//         TAAUPassConstructor *this,
-				//         MethodInfo *method)
-				// {
-				//   Vector4 *result; // rax
-				// 
-				//   result = retstr;
-				//   *retstr = this.fields.m_constants.taauParameters7;
-				//   return result;
-				// }
-				// 
-				return null;
-			}
-			set
-			{
-				// // Void set_HRSize(Vector4)
-				// void HG::Rendering::Runtime::TAAUPassConstructor::set_HRSize(
-				//         TAAUPassConstructor *this,
-				//         Vector4 *value,
-				//         MethodInfo *method)
-				// {
-				//   this.fields.m_constants.taauParameters7 = *value;
-				// }
-				// 
-			}
+		  __int64 v9; // rdx
+		  __int64 v10; // rcx
+		  int v11; // ebx
+		  int32_t colorFormat; // r12d
+		  ProfilingSampler *v13; // rax
+		  __int64 v14; // rdx
+		  __int64 v15; // rcx
+		  __int64 v16; // rdx
+		  __int64 quality; // rcx
+		  __int64 v18; // rdx
+		  __int64 v19; // r8
+		  Object *v20; // rcx
+		  Material__Array *m_taauPassMaterials; // rax
+		  MonitorData *v22; // rdx
+		  unsigned __int64 v23; // r8
+		  signed __int64 v24; // rtt
+		  Object *v25; // r15
+		  __int64 v26; // rdx
+		  __int64 v27; // rcx
+		  TextureHandle v28; // xmm0
+		  Object *v29; // r15
+		  __int64 v30; // rdx
+		  __int64 v31; // rcx
+		  TextureHandle v32; // xmm0
+		  Object *v33; // r15
+		  __int64 v34; // rdx
+		  __int64 v35; // rcx
+		  TextureHandle v36; // xmm0
+		  __int64 v37; // rdx
+		  TAAUPassConstructor_RTNames__Array *m_rtNames; // rcx
+		  unsigned __int64 v39; // r8
+		  signed __int64 v40; // rtt
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v42; // rdx
+		  __int64 v43; // rcx
+		  Object *v44; // [rsp+50h] [rbp-1D8h] BYREF
+		  __m128i si128; // [rsp+60h] [rbp-1C8h] BYREF
+		  TextureHandle v46; // [rsp+70h] [rbp-1B8h] BYREF
+		  _QWORD v47[2]; // [rsp+80h] [rbp-1A8h] BYREF
+		  HGRenderGraphBuilder v48; // [rsp+90h] [rbp-198h] BYREF
+		  TextureDesc v49; // [rsp+B0h] [rbp-178h] BYREF
+		  Il2CppExceptionWrapper *v50; // [rsp+110h] [rbp-118h] BYREF
+		  HGRenderGraphBuilder v51; // [rsp+118h] [rbp-110h] BYREF
+		  TextureDesc v52; // [rsp+140h] [rbp-E8h] BYREF
+		  TextureDesc v53; // [rsp+1A0h] [rbp-88h] BYREF
+		
+		  v44 = 0LL;
+		  sub_18033B9D0(&v53, 0LL, 96LL);
+		  sub_18033B9D0(&v49, 0LL, 96LL);
+		  if ( IFix::WrappersManagerImpl::IsPatched(3406, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(3406, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(v43, v42);
+		    IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_1230(Patch, (Object *)this, input, output, (Object *)renderGraph, 0LL);
+		  }
+		  else
+		  {
+		    v11 = input->renderPathFrameIndex % 2;
+		    if ( input->quality )
+		    {
+		      if ( !renderGraph )
+		        sub_1800D8260(v10, v9);
+		      colorFormat = HG::Rendering::RenderGraphModule::HGRenderGraph::GetTextureDescRef(
+		                      renderGraph,
+		                      &input->sceneColor,
+		                      0LL)->colorFormat;
+		    }
+		    else
+		    {
+		      colorFormat = 48;
+		    }
+		    v13 = UnityEngine::Rendering::ProfilingSampler::Get<System::Int32Enum>(
+		            (Int32Enum__Enum)0x52u,
+		            MethodInfo::UnityEngine::Rendering::ProfilingSampler::Get<HG::Rendering::Runtime::HGProfileId>);
+		    if ( !renderGraph )
+		      sub_1800D8260(v15, v14);
+		    HG::Rendering::RenderGraphModule::HGRenderGraph::AddRenderPass<System::Object>(
+		      &v51,
+		      renderGraph,
+		      (String *)"TAAU Resolve Pass",
+		      &v44,
+		      v13,
+		      1,
+		      ProfilingHGPass__Enum_None,
+		      MethodInfo::HG::Rendering::RenderGraphModule::HGRenderGraph::AddRenderPass<HG::Rendering::Runtime::TAAUPassConstructor::ResolvePassData>);
+		    v48 = v51;
+		    v47[0] = 0LL;
+		    v47[1] = &v48;
+		    try
+		    {
+		      quality = (unsigned int)input->quality;
+		      if ( !v44 )
+		        sub_1800D8250(quality, v16);
+		      LODWORD(v44[5].klass) = quality;
+		      if ( !v44 )
+		        sub_1800D8250(quality, v16);
+		      v44[4] = (Object)input->historySceneColor;
+		      sub_1800036A0(TypeInfo::HG::Rendering::RenderGraphModule::TextureHandle);
+		      if ( HG::Rendering::RenderGraphModule::TextureHandle::IsValid(&input->historySceneColor, 0LL) )
+		        HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::ReadTexture(
+		          (TextureHandle *)&si128,
+		          &v48,
+		          &input->historySceneColor,
+		          0LL);
+		      v20 = v44;
+		      m_taauPassMaterials = this->fields.m_taauPassMaterials;
+		      if ( !m_taauPassMaterials )
+		        sub_1800D8250(v44, v18);
+		      if ( m_taauPassMaterials->max_length.size <= 3u )
+		        sub_1800D2AA0(v44, v18, v19);
+		      v22 = (MonitorData *)m_taauPassMaterials->vector[3];
+		      if ( !v44 )
+		        sub_1800D8250(0LL, v22);
+		      v44[5].monitor = v22;
+		      if ( dword_18F35FD08 )
+		      {
+		        v23 = (((unsigned __int64)&v20[5].monitor >> 12) & 0x1FFFFF) >> 6;
+		        _m_prefetchw(&qword_18F0BCBA0[v23 + 36190]);
+		        do
+		          v24 = qword_18F0BCBA0[v23 + 36190];
+		        while ( v24 != _InterlockedCompareExchange64(
+		                         &qword_18F0BCBA0[v23 + 36190],
+		                         v24 | (1LL << (((unsigned __int64)&v20[5].monitor >> 12) & 0x3F)),
+		                         v24) );
+		      }
+		      v25 = v44;
+		      v28 = *HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::ReadTexture(
+		               (TextureHandle *)&si128,
+		               &v48,
+		               &input->sceneColor,
+		               0LL);
+		      if ( !v25 )
+		        sub_1800D8250(v27, v26);
+		      v25[1] = (Object)v28;
+		      if ( input->quality == 1 )
+		      {
+		        v29 = v44;
+		        v32 = *HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::ReadTexture(
+		                 (TextureHandle *)&si128,
+		                 &v48,
+		                 &input->sceneDepth,
+		                 0LL);
+		        if ( !v29 )
+		          sub_1800D8250(v31, v30);
+		        v29[2] = (Object)v32;
+		        v33 = v44;
+		        v36 = *HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::ReadTexture(
+		                 (TextureHandle *)&si128,
+		                 &v48,
+		                 &input->sceneMV,
+		                 0LL);
+		        if ( !v33 )
+		          sub_1800D8250(v35, v34);
+		        v33[3] = (Object)v36;
+		      }
+		      HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::AllowPassCulling(&v48, 0, 0LL);
+		      sub_18033B9D0(&v52, 0LL, 96LL);
+		      HG::Rendering::RenderGraphModule::TextureDesc::TextureDesc(&v52, input->screenSize, 0LL);
+		      v49 = v52;
+		      v49.colorFormat = colorFormat;
+		      *(_WORD *)&v49.enableRandomWrite = 0;
+		      v49.autoGenerateMips = 0;
+		      m_rtNames = this->fields.m_rtNames;
+		      if ( !m_rtNames )
+		        sub_1800D8250(0LL, v37);
+		      v49.name = *(String **)(sub_1803C0734(m_rtNames, v11) + 16);
+		      if ( dword_18F35FD08 )
+		      {
+		        v39 = (((unsigned __int64)&v49.name >> 12) & 0x1FFFFF) >> 6;
+		        _m_prefetchw(&qword_18F0BCBA0[v39 + 36190]);
+		        do
+		          v40 = qword_18F0BCBA0[v39 + 36190];
+		        while ( v40 != _InterlockedCompareExchange64(
+		                         &qword_18F0BCBA0[v39 + 36190],
+		                         v40 | (1LL << (((unsigned __int64)&v49.name >> 12) & 0x3F)),
+		                         v40) );
+		      }
+		      v53 = v49;
+		      v46 = *HG::Rendering::RenderGraphModule::HGRenderGraph::CreateTexture(
+		               (TextureHandle *)&si128,
+		               renderGraph,
+		               &v53,
+		               0LL);
+		      si128 = _mm_load_si128((const __m128i *)&xmmword_18B959540);
+		      HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::SetColorAttachment(
+		        (TextureHandle *)&v51,
+		        &v48,
+		        &v46,
+		        0,
+		        RenderBufferLoadAction__Enum_DontCare,
+		        RenderBufferStoreAction__Enum_Store,
+		        (Color *)&si128,
+		        0,
+		        0LL);
+		      sub_1800036A0(TypeInfo::HG::Rendering::Runtime::TAAUPassConstructor);
+		      HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::SetRenderFunc<System::Object>(
+		        &v48,
+		        (RenderFunc_1_System_Object_ *)TypeInfo::HG::Rendering::Runtime::TAAUPassConstructor->static_fields->s_resolveRenderFunc,
+		        0LL,
+		        0,
+		        MethodInfo::HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::SetRenderFunc<HG::Rendering::Runtime::TAAUPassConstructor::ResolvePassData>);
+		      output->currentSceneColor = v46;
+		    }
+		    catch ( Il2CppExceptionWrapper *v50 )
+		    {
+		      v47[0] = v50->ex;
+		    }
+		    sub_180268AE0(v47);
+		  }
 		}
-
-		// (get) Token: 0x0600116E RID: 4462 RVA: 0x000025D8 File Offset: 0x000007D8
-		// (set) Token: 0x0600116F RID: 4463 RVA: 0x000025D0 File Offset: 0x000007D0
-		private bool prevTAAUState
+		
+		void IPassConstructor.Dispose(HGRenderGraph renderGraph) {} // 0x0000000184D7FE40-0x0000000184D7FE70
+		// Void HG.Rendering.Runtime.IPassConstructor.Dispose(HGRenderGraph)
+		void HG::Rendering::Runtime::TAAUPassConstructor::HG_Rendering_Runtime_IPassConstructor_Dispose(
+		        TAAUPassConstructor *this,
+		        HGRenderGraph *renderGraph,
+		        MethodInfo *method)
 		{
-			[CompilerGenerated]
-			get
-			{
-				// // Boolean get_isRunning()
-				// bool UnityEngine::UIElements::Experimental::ValueAnimation<UnityEngine::UIElements::Experimental::StyleValues>::get_isRunning(
-				//         ValueAnimation_1_StyleValues_ *this,
-				//         MethodInfo *method)
-				// {
-				//   return this.fields._isRunning_k__BackingField;
-				// }
-				// 
-				return default(bool);
-			}
-			[CompilerGenerated]
-			set
-			{
-				// // Void set_isRunning(Boolean)
-				// void UnityEngine::UIElements::Experimental::ValueAnimation<UnityEngine::UIElements::Experimental::StyleValues>::set_isRunning(
-				//         ValueAnimation_1_StyleValues_ *this,
-				//         bool value,
-				//         MethodInfo *method)
-				// {
-				//   this.fields._isRunning_k__BackingField = value;
-				// }
-				// 
-			}
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v6; // rdx
+		  __int64 v7; // rcx
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(3408, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(3408, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(v7, v6);
+		    IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_1(
+		      (ILFixDynamicMethodWrapper_39 *)Patch,
+		      (Object *)this,
+		      (Object *)renderGraph,
+		      0LL);
+		  }
 		}
-
-		// (get) Token: 0x06001170 RID: 4464 RVA: 0x000025F0 File Offset: 0x000007F0
-		// (set) Token: 0x06001171 RID: 4465 RVA: 0x000025D0 File Offset: 0x000007D0
-		private float gaussianKernelStdDev
+		
+		private float ComputeSharpenStrength([IsReadOnly] in Vector2Int screenSize, SharpenStrengthParam param) => default; // 0x0000000189BD1860-0x0000000189BD1948
+		// Single ComputeSharpenStrength(Vector2Int ByRef, TAAUPassConstructor+SharpenStrengthParam)
+		float HG::Rendering::Runtime::TAAUPassConstructor::ComputeSharpenStrength(
+		        TAAUPassConstructor *this,
+		        Vector2Int *screenSize,
+		        TAAUPassConstructor_SharpenStrengthParam *param,
+		        MethodInfo *method)
 		{
-			get
-			{
-				// // Single omZbIWJIrldcSvYlXrKUFlzMuTURA()
-				// float iLhuYWDbmVJbwzFrmgpHjHIbandoA<System::Object>::omZbIWJIrldcSvYlXrKUFlzMuTURA(
-				//         iLhuYWDbmVJbwzFrmgpHjHIbandoA_1_System_Object_ *this,
-				//         MethodInfo *method)
-				// {
-				//   return this.fields.NfxnViHTtvNRHOZQvFrczEXLFcPT;
-				// }
-				// 
-				return 0f;
-			}
-			set
-			{
-				// // Void set_gaussianKernelStdDev(Single)
-				// void HG::Rendering::Runtime::TAAUPassConstructor::set_gaussianKernelStdDev(
-				//         TAAUPassConstructor *this,
-				//         float value,
-				//         MethodInfo *method)
-				// {
-				//   if ( !byte_18D9195C7 )
-				//   {
-				//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::TAAUPassConstructor);
-				//     byte_18D9195C7 = 1;
-				//   }
-				//   this.fields.m_gaussianKernelStdDev = value;
-				//   sub_180002C70(TypeInfo::HG::Rendering::Runtime::TAAUPassConstructor);
-				//   HG::Rendering::Runtime::TAAUPassConstructor::ComputeGaussianKernel(value, &this.fields.m_gaussianKernel, 0LL);
-				// }
-				// 
-			}
+		  Beyond::JobMathf *v7; // rcx
+		  TAAUPassConstructor_SharpenStrengthParam *p_sharpen2K; // rax
+		  float v9; // xmm1_4
+		  float sharpen1K; // xmm4_4
+		  float v11; // xmm0_4
+		  float v12; // xmm1_4
+		  float v13; // xmm3_4
+		  float result; // xmm0_4
+		  float v15; // xmm3_4
+		  __int64 v16; // rdx
+		  ILFixDynamicMethodWrapper_2 *Patch; // rcx
+		  float sharpen4K; // eax
+		  TAAUPassConstructor_SharpenStrengthParam v19; // [rsp+30h] [rbp-18h] BYREF
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(3402, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(3402, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(0LL, v16);
+		    sharpen4K = param->sharpen4K;
+		    *(_QWORD *)&v19.sharpen1K = *(_QWORD *)&param->sharpen1K;
+		    v19.sharpen4K = sharpen4K;
+		    return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_1228(Patch, (Object *)this, screenSize, &v19, 0LL);
+		  }
+		  else
+		  {
+		    p_sharpen2K = (TAAUPassConstructor_SharpenStrengthParam *)&param->sharpen2K;
+		    v9 = 2560.0;
+		    if ( (float)screenSize->m_X < 2560.0 )
+		    {
+		      sharpen1K = p_sharpen2K->sharpen1K;
+		      p_sharpen2K = param;
+		      v11 = 1920.0;
+		    }
+		    else
+		    {
+		      sharpen1K = param->sharpen4K;
+		      v11 = 2560.0;
+		      v9 = 3840.0;
+		    }
+		    v12 = v9 - v11;
+		    v13 = (float)screenSize->m_X - v11;
+		    result = p_sharpen2K->sharpen1K;
+		    v15 = fmaxf(v13, 0.0) / v12;
+		    Beyond::JobMathf::ClampedLerp(v7, sharpen1K, fminf(1.0, v15), v15);
+		  }
+		  return result;
 		}
-
-		internal TAAUPassConstructor(HGRenderPipelineMaterialCollector materialCollector, HGRenderPathBase.HGRenderPathResources resources)
+		
+		private static void ComputeGaussianKernel(float stdDev, ref float[] kernel) {} // 0x0000000183C00BB0-0x0000000183C01010
+		// Void ComputeGaussianKernel(Single, Single[] ByRef)
+		void HG::Rendering::Runtime::TAAUPassConstructor::ComputeGaussianKernel(
+		        float stdDev,
+		        Single__Array **kernel,
+		        MethodInfo *method)
 		{
-			// // TAAUPassConstructor(HGRenderPipelineMaterialCollector, HGRenderPathBase+HGRenderPathResources)
-			// void HG::Rendering::Runtime::TAAUPassConstructor::TAAUPassConstructor(
-			//         TAAUPassConstructor *this,
-			//         HGRenderPipelineMaterialCollector *materialCollector,
-			//         HGRenderPathBase_HGRenderPathResources *resources,
-			//         MethodInfo *method)
-			// {
-			//   HGRenderPathBase_HGRenderPathResources *v7; // rdx
-			//   PassConstructorID__Enum__Array *v8; // r8
-			//   HGCamera *v9; // r9
-			//   __int64 v10; // r8
-			//   __int64 v11; // r9
-			//   HGRenderPathBase_HGRenderPathResources *v12; // rdx
-			//   PassConstructorID__Enum__Array *v13; // r8
-			//   HGCamera *v14; // r9
-			//   __int64 v15; // r8
-			//   __int64 v16; // r9
-			//   HGRenderPathBase_HGRenderPathResources *v17; // rdx
-			//   PassConstructorID__Enum__Array *v18; // r8
-			//   HGCamera *v19; // r9
-			//   HGRenderPathBase_HGRenderPathResources *v20; // rdx
-			//   PassConstructorID__Enum__Array *v21; // r8
-			//   HGRenderPathBase_HGRenderPathResources *v22; // rdx
-			//   PassConstructorID__Enum__Array *v23; // r8
-			//   HGRenderPathBase_HGRenderPathResources *v24; // rdx
-			//   Single__Array *m_gaussianKernel; // rcx
-			//   PassConstructorID__Enum__Array *v26; // r8
-			//   HGCamera *v27; // r9
-			//   __int64 v28; // r10
-			//   HGRenderPathBase_HGRenderPathResources *v29; // rdx
-			//   PassConstructorID__Enum__Array *v30; // r8
-			//   HGCamera *v31; // r9
-			//   HGRenderPathBase_HGRenderPathResources *v32; // rdx
-			//   PassConstructorID__Enum__Array *v33; // r8
-			//   HGRenderPathBase_HGRenderPathResources *v34; // rdx
-			//   PassConstructorID__Enum__Array *v35; // r8
-			//   PassConstructorID__Enum__Array *v36; // r8
-			//   HGCamera *v37; // r9
-			//   __int64 v38; // r10
-			//   TAAUPassConstructor_RTNames__Array *v39; // r10
-			//   HGRenderPathBase_HGRenderPathResources *v40; // rdx
-			//   PassConstructorID__Enum__Array *v41; // r8
-			//   HGCamera *v42; // r9
-			//   __int64 v43; // rdx
-			//   float m_gaussianKernelStdDev; // xmm6_4
-			//   float v45; // xmm2_4
-			//   float v46; // xmm3_4
-			//   float v47; // xmm1_4
-			//   float v48; // xmm2_4
-			//   float v49; // xmm3_4
-			//   float v50; // xmm1_4
-			//   Vector4 v51; // xmm1
-			//   Vector4 v52; // xmm0
-			//   Vector4 v53; // xmm1
-			//   Vector4 v54; // xmm0
-			//   Vector4 v55; // xmm1
-			//   Vector4 v56; // xmm0
-			//   Vector4 v57; // xmm1
-			//   Vector4 v58; // xmm0
-			//   Vector4 v59; // xmm1
-			//   Vector4 v60; // xmm0
-			//   _BYTE v61[24]; // [rsp+20h] [rbp-E0h] BYREF
-			//   Vector4 si128; // [rsp+40h] [rbp-C0h]
-			//   __m128i v63; // [rsp+50h] [rbp-B0h]
-			//   __m128i v64; // [rsp+60h] [rbp-A0h]
-			//   __m128i v65; // [rsp+70h] [rbp-90h]
-			//   __m128i v66; // [rsp+80h] [rbp-80h]
-			//   __m128i v67; // [rsp+90h] [rbp-70h]
-			//   Vector4 v68; // [rsp+A0h] [rbp-60h]
-			//   Vector4 v69; // [rsp+B0h] [rbp-50h]
-			//   __m128i v70; // [rsp+C0h] [rbp-40h]
-			//   Vector4 v71; // [rsp+D0h] [rbp-30h]
-			//   Vector4 v72; // [rsp+E0h] [rbp-20h]
-			//   Vector4 v73; // [rsp+F0h] [rbp-10h]
-			// 
-			//   if ( !byte_18D8EDAC2 )
-			//   {
-			//     sub_18003C530(&TypeInfo::UnityEngine::Material);
-			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::TAAUPassConstructor::RTNames);
-			//     sub_18003C530(&TypeInfo::System::Single);
-			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::TAAUPassConstructor);
-			//     sub_18003C530(&off_18C8FCD28);
-			//     sub_18003C530(&off_18C8FCD38);
-			//     sub_18003C530(&off_18C8FCD48);
-			//     sub_18003C530(&off_18C8FCD58);
-			//     sub_18003C530(&off_18C8FCCF0);
-			//     sub_18003C530(&off_18C8FCD08);
-			//     byte_18D8EDAC2 = 1;
-			//   }
-			//   this.fields.m_gaussianKernel = (Single__Array *)il2cpp_array_new_specific_0(
-			//                                                      TypeInfo::System::Single,
-			//                                                      9LL,
-			//                                                      resources,
-			//                                                      method);
-			//   sub_1800054D0((HGRenderPathScene *)&this.fields, v7, v8, v9, *(MethodInfo **)v61, *(MethodInfo **)&v61[8]);
-			//   this.fields.m_gaussianKernelStdDev = 1.0;
-			//   this.fields.m_taauPassMaterials = (Material__Array *)il2cpp_array_new_specific_0(
-			//                                                           TypeInfo::UnityEngine::Material,
-			//                                                           4LL,
-			//                                                           v10,
-			//                                                           v11);
-			//   sub_1800054D0(
-			//     (HGRenderPathScene *)&this.fields.m_taauPassMaterials,
-			//     v12,
-			//     v13,
-			//     v14,
-			//     *(MethodInfo **)v61,
-			//     *(MethodInfo **)&v61[8]);
-			//   il2cpp_array_new_specific_0(TypeInfo::HG::Rendering::Runtime::TAAUPassConstructor::RTNames, 2LL, v15, v16);
-			//   *(_QWORD *)v61 = "DilatedDepth0";
-			//   *(_OWORD *)&v61[8] = 0LL;
-			//   ((void (__stdcall *)(HGRenderPathScene *, HGRenderPathBase_HGRenderPathResources *, PassConstructorID__Enum__Array *, HGCamera *))sub_1800054D0)(
-			//     (HGRenderPathScene *)v61,
-			//     v17,
-			//     v18,
-			//     v19);
-			//   *(_QWORD *)&v61[8] = "DilatedMV0";
-			//   ((void (__stdcall *)(HGRenderPathScene *, HGRenderPathBase_HGRenderPathResources *, PassConstructorID__Enum__Array *, HGCamera *, MethodInfo *))sub_1800054D0)(
-			//     (HGRenderPathScene *)&v61[8],
-			//     v20,
-			//     v21,
-			//     (HGCamera *)"DilatedMV0",
-			//     *(MethodInfo **)v61);
-			//   *(_QWORD *)&v61[16] = "TAAUResult0";
-			//   sub_1800054D0(
-			//     (HGRenderPathScene *)&v61[16],
-			//     v22,
-			//     v23,
-			//     (HGCamera *)"TAAUResult0",
-			//     *(MethodInfo **)v61,
-			//     *(MethodInfo **)&v61[8]);
-			//   if ( !v28 )
-			//     goto LABEL_19;
-			//   if ( !*(_DWORD *)(v28 + 24) )
-			//     goto LABEL_20;
-			//   *(_OWORD *)(v28 + 32) = *(_OWORD *)v61;
-			//   *(_QWORD *)(v28 + 48) = *(_QWORD *)&v61[16];
-			//   sub_1800054D0((HGRenderPathScene *)(v28 + 32), v24, v26, v27, *(MethodInfo **)v61, *(MethodInfo **)&v61[8]);
-			//   *(_QWORD *)v61 = "DilatedDepth1";
-			//   *(_OWORD *)&v61[8] = 0LL;
-			//   ((void (__stdcall *)(HGRenderPathScene *, HGRenderPathBase_HGRenderPathResources *, PassConstructorID__Enum__Array *, HGCamera *))sub_1800054D0)(
-			//     (HGRenderPathScene *)v61,
-			//     v29,
-			//     v30,
-			//     v31);
-			//   *(_QWORD *)&v61[8] = "DilatedMV1";
-			//   ((void (__stdcall *)(HGRenderPathScene *, HGRenderPathBase_HGRenderPathResources *, PassConstructorID__Enum__Array *, HGCamera *, MethodInfo *))sub_1800054D0)(
-			//     (HGRenderPathScene *)&v61[8],
-			//     v32,
-			//     v33,
-			//     (HGCamera *)"DilatedMV1",
-			//     *(MethodInfo **)v61);
-			//   *(_QWORD *)&v61[16] = "TAAUResult1";
-			//   sub_1800054D0(
-			//     (HGRenderPathScene *)&v61[16],
-			//     v34,
-			//     v35,
-			//     (HGCamera *)"TAAUResult1",
-			//     *(MethodInfo **)v61,
-			//     *(MethodInfo **)&v61[8]);
-			//   if ( *(_DWORD *)(v38 + 24) <= 1u )
-			// LABEL_20:
-			//     sub_180070270(m_gaussianKernel, v24);
-			//   *(_OWORD *)(v38 + 56) = *(_OWORD *)v61;
-			//   *(_QWORD *)(v38 + 72) = *(_QWORD *)&v61[16];
-			//   sub_1800054D0((HGRenderPathScene *)(v38 + 56), v24, v36, v37, *(MethodInfo **)v61, *(MethodInfo **)&v61[8]);
-			//   this.fields.m_rtNames = v39;
-			//   sub_1800054D0(
-			//     (HGRenderPathScene *)&this.fields.m_rtNames,
-			//     v40,
-			//     v41,
-			//     v42,
-			//     *(MethodInfo **)v61,
-			//     *(MethodInfo **)&v61[8]);
-			//   HG::Rendering::Runtime::TAAUPassConstructor::InitializeMaterials(
-			//     this,
-			//     materialCollector,
-			//     resources.defaultResources,
-			//     0LL);
-			//   m_gaussianKernelStdDev = this.fields.m_gaussianKernelStdDev;
-			//   if ( !TypeInfo::HG::Rendering::Runtime::TAAUPassConstructor._1.cctor_finished_or_no_cctor )
-			//     il2cpp_runtime_class_init_0(TypeInfo::HG::Rendering::Runtime::TAAUPassConstructor, v43);
-			//   HG::Rendering::Runtime::TAAUPassConstructor::ComputeGaussianKernel(
-			//     m_gaussianKernelStdDev,
-			//     &this.fields.m_gaussianKernel,
-			//     0LL);
-			//   m_gaussianKernel = this.fields.m_gaussianKernel;
-			//   si128 = (Vector4)_mm_load_si128((const __m128i *)&xmmword_18A357570);
-			//   v64 = _mm_load_si128((const __m128i *)&xmmword_18A357AF0);
-			//   v63 = _mm_load_si128((const __m128i *)&xmmword_18A357AE0);
-			//   v66 = _mm_load_si128((const __m128i *)&xmmword_18A357AC0);
-			//   v65 = _mm_load_si128((const __m128i *)&xmmword_18A357AD0);
-			//   v70 = _mm_load_si128((const __m128i *)&xmmword_18A357460);
-			//   v67 = _mm_load_si128((const __m128i *)&xmmword_18A3576A0);
-			//   v68 = (Vector4)v67;
-			//   v69 = (Vector4)v67;
-			//   if ( !m_gaussianKernel )
-			// LABEL_19:
-			//     sub_180B536AC(m_gaussianKernel, v24);
-			//   if ( !m_gaussianKernel.max_length.size )
-			//     goto LABEL_20;
-			//   v45 = m_gaussianKernel.vector[0];
-			//   if ( m_gaussianKernel.max_length.size <= 1u )
-			//     goto LABEL_20;
-			//   v46 = m_gaussianKernel.vector[1];
-			//   if ( m_gaussianKernel.max_length.size <= 2u )
-			//     goto LABEL_20;
-			//   v47 = m_gaussianKernel.vector[2];
-			//   if ( m_gaussianKernel.max_length.size <= 3u )
-			//     goto LABEL_20;
-			//   v71.w = m_gaussianKernel.vector[3];
-			//   *(_QWORD *)&v71.x = __PAIR64__(LODWORD(v46), LODWORD(v45));
-			//   v71.z = v47;
-			//   if ( m_gaussianKernel.max_length.size <= 4u )
-			//     goto LABEL_20;
-			//   v48 = m_gaussianKernel.vector[4];
-			//   if ( m_gaussianKernel.max_length.size <= 5u )
-			//     goto LABEL_20;
-			//   v49 = m_gaussianKernel.vector[5];
-			//   if ( m_gaussianKernel.max_length.size <= 6u )
-			//     goto LABEL_20;
-			//   v50 = m_gaussianKernel.vector[6];
-			//   if ( m_gaussianKernel.max_length.size <= 7u )
-			//     goto LABEL_20;
-			//   v72.w = m_gaussianKernel.vector[7];
-			//   *(_QWORD *)&v72.x = __PAIR64__(LODWORD(v49), LODWORD(v48));
-			//   v72.z = v50;
-			//   if ( m_gaussianKernel.max_length.size <= 8u )
-			//     goto LABEL_20;
-			//   v73.x = m_gaussianKernel.vector[8];
-			//   *(_QWORD *)&v73.y = 0LL;
-			//   v73.w = 0.0;
-			//   v51 = (Vector4)v63;
-			//   this.fields.m_constants.taauParameters0 = si128;
-			//   v52 = (Vector4)v64;
-			//   this.fields.m_constants.taauParameters1 = v51;
-			//   v53 = (Vector4)v65;
-			//   this.fields.m_constants.taauParameters2 = v52;
-			//   v54 = (Vector4)v66;
-			//   this.fields.m_constants.taauParameters3 = v53;
-			//   v55 = (Vector4)v67;
-			//   this.fields.m_constants.taauParameters4 = v54;
-			//   v56 = v68;
-			//   this.fields.m_constants.taauParameters5 = v55;
-			//   v57 = (Vector4)v70;
-			//   this.fields.m_constants.taauParameters6 = v56;
-			//   this.fields.m_constants.taauParameters7 = v69;
-			//   v58 = v71;
-			//   this.fields.m_constants.taauParameters8 = v57;
-			//   v59 = v72;
-			//   this.fields.m_constants.kernelWeights0 = v58;
-			//   v60 = v73;
-			//   this.fields.m_constants.kernelWeights1 = v59;
-			//   this.fields.m_constants.kernelWeights2 = v60;
-			// }
-			// 
+		  __int64 v4; // rdx
+		  Single__Array *v5; // rcx
+		  Single__Array *v6; // rdi
+		  float v7; // xmm6_4
+		  Single__Array *v8; // rdi
+		  Single__Array *v9; // rdi
+		  Single__Array *v10; // rdi
+		  Single__Array *v11; // rdi
+		  Single__Array *v12; // rdi
+		  Single__Array *v13; // rdi
+		  Single__Array *v14; // rdi
+		  Single__Array *v15; // rdi
+		  __int64 v16; // r8
+		  __int64 v17; // r9
+		  Single__Array *v18; // rax
+		  float v19; // xmm6_4
+		  float *v20; // rax
+		  __int64 v21; // r8
+		  __int64 v22; // r9
+		  float *v23; // rax
+		  __int64 v24; // r8
+		  __int64 v25; // r9
+		  float *v26; // rax
+		  __int64 v27; // r8
+		  __int64 v28; // r9
+		  float *v29; // rax
+		  __int64 v30; // r8
+		  __int64 v31; // r9
+		  float *v32; // rax
+		  __int64 v33; // r8
+		  __int64 v34; // r9
+		  float *v35; // rax
+		  __int64 v36; // r8
+		  __int64 v37; // r9
+		  float *v38; // rax
+		  __int64 v39; // r8
+		  __int64 v40; // r9
+		  float *v41; // rax
+		  __int64 v42; // r8
+		  __int64 v43; // r9
+		  float *v44; // rax
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		
+		  if ( !IFix::WrappersManagerImpl::IsPatched(3394, 0LL) )
+		  {
+		    v6 = *kernel;
+		    v7 = stdDev * stdDev;
+		    if ( !*kernel )
+		      goto LABEL_3;
+		    if ( !v6->max_length.size )
+		      goto LABEL_34;
+		    v6->vector[0] = sub_180335960() / (float)(v7 * 6.2831855);
+		    v8 = *kernel;
+		    if ( !*kernel )
+		      goto LABEL_3;
+		    if ( v8->max_length.size <= 1u )
+		      goto LABEL_34;
+		    v8->vector[1] = sub_180335960() / (float)(v7 * 6.2831855);
+		    v9 = *kernel;
+		    if ( !*kernel )
+		      goto LABEL_3;
+		    if ( v9->max_length.size <= 2u )
+		      goto LABEL_34;
+		    v9->vector[2] = sub_180335960() / (float)(v7 * 6.2831855);
+		    v10 = *kernel;
+		    if ( !*kernel )
+		      goto LABEL_3;
+		    if ( v10->max_length.size <= 3u )
+		      goto LABEL_34;
+		    v10->vector[3] = sub_180335960() / (float)(v7 * 6.2831855);
+		    v11 = *kernel;
+		    if ( !*kernel )
+		      goto LABEL_3;
+		    if ( v11->max_length.size <= 4u )
+		      goto LABEL_34;
+		    v11->vector[4] = sub_180335960() / (float)(v7 * 6.2831855);
+		    v12 = *kernel;
+		    if ( !*kernel )
+		      goto LABEL_3;
+		    if ( v12->max_length.size <= 5u )
+		      goto LABEL_34;
+		    v12->vector[5] = sub_180335960() / (float)(v7 * 6.2831855);
+		    v13 = *kernel;
+		    if ( !*kernel )
+		      goto LABEL_3;
+		    if ( v13->max_length.size <= 6u )
+		      goto LABEL_34;
+		    v13->vector[6] = sub_180335960() / (float)(v7 * 6.2831855);
+		    v14 = *kernel;
+		    if ( !*kernel )
+		      goto LABEL_3;
+		    if ( v14->max_length.size <= 7u )
+		      goto LABEL_34;
+		    v14->vector[7] = sub_180335960() / (float)(v7 * 6.2831855);
+		    v15 = *kernel;
+		    if ( !*kernel )
+		      goto LABEL_3;
+		    if ( v15->max_length.size <= 8u )
+		      goto LABEL_34;
+		    v15->vector[8] = sub_180335960() / (float)(v7 * 6.2831855);
+		    v18 = *kernel;
+		    if ( !*kernel )
+		      goto LABEL_3;
+		    if ( !v18->max_length.size || (v5 = *kernel, v18->max_length.size <= 8u) )
+		LABEL_34:
+		      sub_1800D2AB0(v5, v4);
+		    v19 = (float)((float)((float)((float)((float)((float)((float)((float)(v18->vector[0] + 0.0) + v18->vector[1])
+		                                                        + v18->vector[2])
+		                                                + v18->vector[3])
+		                                        + v18->vector[4])
+		                                + v18->vector[5])
+		                        + v18->vector[6])
+		                + v18->vector[7])
+		        + v18->vector[8];
+		    if ( v18 )
+		    {
+		      v20 = (float *)sub_180002EB0(v5, 0LL, v16, v17);
+		      *v20 = *v20 / v19;
+		      v5 = *kernel;
+		      if ( *kernel )
+		      {
+		        v23 = (float *)sub_180002EB0(v5, 1LL, v21, v22);
+		        *v23 = *v23 / v19;
+		        v5 = *kernel;
+		        if ( *kernel )
+		        {
+		          v26 = (float *)sub_180002EB0(v5, 2LL, v24, v25);
+		          *v26 = *v26 / v19;
+		          v5 = *kernel;
+		          if ( *kernel )
+		          {
+		            v29 = (float *)sub_180002EB0(v5, 3LL, v27, v28);
+		            *v29 = *v29 / v19;
+		            v5 = *kernel;
+		            if ( *kernel )
+		            {
+		              v32 = (float *)sub_180002EB0(v5, 4LL, v30, v31);
+		              *v32 = *v32 / v19;
+		              v5 = *kernel;
+		              if ( *kernel )
+		              {
+		                v35 = (float *)sub_180002EB0(v5, 5LL, v33, v34);
+		                *v35 = *v35 / v19;
+		                v5 = *kernel;
+		                if ( *kernel )
+		                {
+		                  v38 = (float *)sub_180002EB0(v5, 6LL, v36, v37);
+		                  *v38 = *v38 / v19;
+		                  v5 = *kernel;
+		                  if ( *kernel )
+		                  {
+		                    v41 = (float *)sub_180002EB0(v5, 7LL, v39, v40);
+		                    *v41 = *v41 / v19;
+		                    v5 = *kernel;
+		                    if ( *kernel )
+		                    {
+		                      v44 = (float *)sub_180002EB0(v5, 8LL, v42, v43);
+		                      *v44 = *v44 / v19;
+		                      return;
+		                    }
+		                  }
+		                }
+		              }
+		            }
+		          }
+		        }
+		      }
+		    }
+		LABEL_3:
+		    sub_1800D8260(v5, v4);
+		  }
+		  Patch = IFix::WrappersManagerImpl::GetPatch(3394, 0LL);
+		  if ( !Patch )
+		    goto LABEL_3;
+		  IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_1227(Patch, stdDev, kernel, 0LL);
 		}
-
-		private void HG.Rendering.Runtime.IPassConstructor.PrepareShaderVariablesGlobal(ref ShaderVariablesGlobal shaderVariablesGlobal)
-		{
-			// // Void HG.Rendering.Runtime.IPassConstructor.PrepareShaderVariablesGlobal(ShaderVariablesGlobal ByRef)
-			// void HG::Rendering::Runtime::TAAUPassConstructor::HG_Rendering_Runtime_IPassConstructor_PrepareShaderVariablesGlobal(
-			//         TAAUPassConstructor *this,
-			//         ShaderVariablesGlobal *shaderVariablesGlobal,
-			//         MethodInfo *method)
-			// {
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			//   __int64 v6; // rdx
-			//   __int64 v7; // rcx
-			// 
-			//   if ( IFix::WrappersManagerImpl::IsPatched(2814, 0LL) )
-			//   {
-			//     Patch = IFix::WrappersManagerImpl::GetPatch(2814, 0LL);
-			//     if ( !Patch )
-			//       sub_180B536AC(v7, v6);
-			//     IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_340(Patch, (Object *)this, shaderVariablesGlobal, 0LL);
-			//   }
-			// }
-			// 
-		}
-
-		private void HG.Rendering.Runtime.IPassConstructor.OnPreRendering(ref PassEventInput input)
-		{
-			// // Void HG.Rendering.Runtime.IPassConstructor.OnPreRendering(PassEventInput ByRef)
-			// void HG::Rendering::Runtime::TAAUPassConstructor::HG_Rendering_Runtime_IPassConstructor_OnPreRendering(
-			//         TAAUPassConstructor *this,
-			//         PassEventInput *input,
-			//         MethodInfo *method)
-			// {
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			//   __int64 v6; // rdx
-			//   __int64 v7; // rcx
-			// 
-			//   if ( IFix::WrappersManagerImpl::IsPatched(2815, 0LL) )
-			//   {
-			//     Patch = IFix::WrappersManagerImpl::GetPatch(2815, 0LL);
-			//     if ( !Patch )
-			//       sub_180B536AC(v7, v6);
-			//     IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_634(Patch, (Object *)this, input, 0LL);
-			//   }
-			// }
-			// 
-		}
-
-		private void HG.Rendering.Runtime.IPassConstructor.OnPostRendering(ref PassEventInput input)
-		{
-			// // Void HG.Rendering.Runtime.IPassConstructor.OnPostRendering(PassEventInput ByRef)
-			// void HG::Rendering::Runtime::TAAUPassConstructor::HG_Rendering_Runtime_IPassConstructor_OnPostRendering(
-			//         TAAUPassConstructor *this,
-			//         PassEventInput *input,
-			//         MethodInfo *method)
-			// {
-			//   HGRenderGraph *renderGraph; // rdi
-			//   __int64 v6; // rdx
-			//   __int64 v7; // rcx
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			//   TextureHandle v9; // [rsp+30h] [rbp-18h] BYREF
-			// 
-			//   if ( !byte_18D9195C8 )
-			//   {
-			//     sub_18003C530(&TypeInfo::HG::Rendering::RenderGraphModule::TextureHandle);
-			//     sub_18003C530(&off_18D503520);
-			//     byte_18D9195C8 = 1;
-			//   }
-			//   if ( !IFix::WrappersManagerImpl::IsPatched(2816, 0LL) )
-			//   {
-			//     renderGraph = input.renderGraph;
-			//     sub_180002C70(TypeInfo::HG::Rendering::RenderGraphModule::TextureHandle);
-			//     if ( HG::Rendering::RenderGraphModule::TextureHandle::IsValid(&this.fields.m_historyDilatedSceneDepth, 0LL) )
-			//     {
-			//       if ( !renderGraph )
-			//         goto LABEL_11;
-			//       this.fields.m_historyDilatedSceneDepth = *HG::Rendering::RenderGraphModule::HGRenderGraph::PreserveTexture(
-			//                                                    &v9,
-			//                                                    renderGraph,
-			//                                                    &this.fields.m_historyDilatedSceneDepth,
-			//                                                    1,
-			//                                                    (String *)"TAAUPass",
-			//                                                    0LL);
-			//     }
-			//     sub_180002C70(TypeInfo::HG::Rendering::RenderGraphModule::TextureHandle);
-			//     if ( !HG::Rendering::RenderGraphModule::TextureHandle::IsValid(&this.fields.m_historyDilatedSceneMV, 0LL) )
-			//       return;
-			//     if ( renderGraph )
-			//     {
-			//       this.fields.m_historyDilatedSceneMV = *HG::Rendering::RenderGraphModule::HGRenderGraph::PreserveTexture(
-			//                                                 &v9,
-			//                                                 renderGraph,
-			//                                                 &this.fields.m_historyDilatedSceneMV,
-			//                                                 1,
-			//                                                 (String *)"TAAUPass",
-			//                                                 0LL);
-			//       return;
-			//     }
-			// LABEL_11:
-			//     sub_180B536AC(v7, v6);
-			//   }
-			//   Patch = IFix::WrappersManagerImpl::GetPatch(2816, 0LL);
-			//   if ( !Patch )
-			//     goto LABEL_11;
-			//   IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_634(Patch, (Object *)this, input, 0LL);
-			// }
-			// 
-		}
-
-		internal void ConstructPass(ref TAAUPassConstructor.PassInput input, ref TAAUPassConstructor.PassOutput output, HGRenderGraph renderGraph, HGCamera camera)
-		{
-			// // Void ConstructPass(TAAUPassConstructor+PassInput ByRef, TAAUPassConstructor+PassOutput ByRef, HGRenderGraph, HGCamera)
-			// void HG::Rendering::Runtime::TAAUPassConstructor::ConstructPass(
-			//         TAAUPassConstructor *this,
-			//         TAAUPassConstructor_PassInput *input,
-			//         TAAUPassConstructor_PassOutput *output,
-			//         HGRenderGraph *renderGraph,
-			//         HGCamera *camera,
-			//         MethodInfo *method)
-			// {
-			//   __int64 v10; // rdx
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rcx
-			//   _BYTE v12[24]; // [rsp+40h] [rbp-18h] BYREF
-			// 
-			//   if ( !byte_18D9195C9 )
-			//   {
-			//     sub_18003C530(&TypeInfo::HG::Rendering::RenderGraphModule::TextureHandle);
-			//     byte_18D9195C9 = 1;
-			//   }
-			//   if ( IFix::WrappersManagerImpl::IsPatched(2817, 0LL) )
-			//   {
-			//     Patch = IFix::WrappersManagerImpl::GetPatch(2817, 0LL);
-			//     if ( !Patch )
-			//       sub_180B536AC(0LL, v10);
-			//     IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_1028(
-			//       Patch,
-			//       (Object *)this,
-			//       input,
-			//       output,
-			//       (Object *)renderGraph,
-			//       (Object *)camera,
-			//       0LL);
-			//   }
-			//   else
-			//   {
-			//     if ( input.enableTAAU )
-			//     {
-			//       HG::Rendering::Runtime::TAAUPassConstructor::PrepareParameters(this, input, renderGraph, 0LL);
-			//       HG::Rendering::Runtime::TAAUPassConstructor::ConstructTAAUPasses(this, input, output, renderGraph, 0LL);
-			//     }
-			//     else
-			//     {
-			//       *output = (TAAUPassConstructor_PassOutput)input.sceneColor;
-			//       sub_180002C70(TypeInfo::HG::Rendering::RenderGraphModule::TextureHandle);
-			//       this.fields.m_historyDilatedSceneDepth = *(TextureHandle *)sub_182E7CCD0(v12);
-			//       this.fields.m_historyDilatedSceneMV = *(TextureHandle *)sub_182E7CCD0(v12);
-			//     }
-			//     this.fields._prevTAAUState_k__BackingField = input.enableTAAU;
-			//   }
-			// }
-			// 
-		}
-
-		private void InitializeMaterials(HGRenderPipelineMaterialCollector materialCollector, HGRenderPipelineRuntimeResources resource)
-		{
-			// // Void InitializeMaterials(HGRenderPipelineMaterialCollector, HGRenderPipelineRuntimeResources)
-			// void HG::Rendering::Runtime::TAAUPassConstructor::InitializeMaterials(
-			//         TAAUPassConstructor *this,
-			//         HGRenderPipelineMaterialCollector *materialCollector,
-			//         HGRenderPipelineRuntimeResources *resource,
-			//         MethodInfo *method)
-			// {
-			//   __int64 v7; // rdx
-			//   __int64 v8; // rcx
-			//   Material__Array *m_taauPassMaterials; // rax
-			//   Object_1 *v10; // rbp
-			//   Material__Array *v11; // rbp
-			//   HGRenderPipelineRuntimeResources_ShaderResources *shaders; // rax
-			//   Material *Material; // rax
-			//   Material *v14; // r14
-			//   Material__Array *v15; // rax
-			//   Object_1 *v16; // rbp
-			//   Material__Array *v17; // rbp
-			//   HGRenderPipelineRuntimeResources_ShaderResources *v18; // rax
-			//   Material *v19; // rax
-			//   Material *v20; // r14
-			//   Material__Array *v21; // rax
-			//   Object_1 *v22; // rbp
-			//   Material__Array *v23; // rbx
-			//   HGRenderPipelineRuntimeResources_ShaderResources *v24; // rax
-			//   Material *v25; // rax
-			//   Material *v26; // rdi
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			// 
-			//   if ( !byte_18D8EDAC3 )
-			//   {
-			//     sub_18003C530(&TypeInfo::UnityEngine::Object);
-			//     byte_18D8EDAC3 = 1;
-			//   }
-			//   if ( IFix::WrappersManagerImpl::IsPatched(2826, 0LL) )
-			//   {
-			//     Patch = IFix::WrappersManagerImpl::GetPatch(2826, 0LL);
-			//     if ( Patch )
-			//     {
-			//       IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_11(
-			//         (ILFixDynamicMethodWrapper_28 *)Patch,
-			//         (Object *)this,
-			//         (Object *)materialCollector,
-			//         (Object *)resource,
-			//         0LL);
-			//       return;
-			//     }
-			//     goto LABEL_35;
-			//   }
-			//   m_taauPassMaterials = this.fields.m_taauPassMaterials;
-			//   if ( !m_taauPassMaterials )
-			//     goto LABEL_35;
-			//   if ( m_taauPassMaterials.max_length.size <= 1u )
-			//     goto LABEL_36;
-			//   v10 = (Object_1 *)m_taauPassMaterials.vector[1];
-			//   if ( !TypeInfo::UnityEngine::Object._1.cctor_finished_or_no_cctor )
-			//     il2cpp_runtime_class_init_0(TypeInfo::UnityEngine::Object, v7);
-			//   if ( UnityEngine::Object::op_Equality(v10, 0LL, 0LL) )
-			//   {
-			//     v11 = this.fields.m_taauPassMaterials;
-			//     if ( !resource )
-			//       goto LABEL_35;
-			//     shaders = resource.fields.shaders;
-			//     if ( !shaders )
-			//       goto LABEL_35;
-			//     if ( !materialCollector )
-			//       goto LABEL_35;
-			//     Material = HG::Rendering::Runtime::HGRenderPipelineMaterialCollector::CreateMaterial(
-			//                  materialCollector,
-			//                  shaders.fields.taauMaskDilationPS,
-			//                  0,
-			//                  0LL);
-			//     v14 = Material;
-			//     if ( !v11 )
-			//       goto LABEL_35;
-			//     sub_180036D40(v11, Material);
-			//     sub_18000FDA0(v11, 1LL, v14);
-			//   }
-			//   v15 = this.fields.m_taauPassMaterials;
-			//   if ( !v15 )
-			//     goto LABEL_35;
-			//   if ( !v15.max_length.size )
-			//     goto LABEL_36;
-			//   v16 = (Object_1 *)v15.vector[0];
-			//   if ( !TypeInfo::UnityEngine::Object._1.cctor_finished_or_no_cctor )
-			//     il2cpp_runtime_class_init_0(TypeInfo::UnityEngine::Object, v7);
-			//   if ( UnityEngine::Object::op_Equality(v16, 0LL, 0LL) )
-			//   {
-			//     v17 = this.fields.m_taauPassMaterials;
-			//     if ( !resource )
-			//       goto LABEL_35;
-			//     v18 = resource.fields.shaders;
-			//     if ( !v18 )
-			//       goto LABEL_35;
-			//     if ( !materialCollector )
-			//       goto LABEL_35;
-			//     v19 = HG::Rendering::Runtime::HGRenderPipelineMaterialCollector::CreateMaterial(
-			//             materialCollector,
-			//             v18.fields.taauDilationPS,
-			//             0,
-			//             0LL);
-			//     v20 = v19;
-			//     if ( !v17 )
-			//       goto LABEL_35;
-			//     sub_180036D40(v17, v19);
-			//     sub_18000FDA0(v17, 0LL, v20);
-			//   }
-			//   v21 = this.fields.m_taauPassMaterials;
-			//   if ( !v21 )
-			//     goto LABEL_35;
-			//   if ( v21.max_length.size <= 3u )
-			// LABEL_36:
-			//     sub_180070270(v8, v7);
-			//   v22 = (Object_1 *)v21.vector[3];
-			//   if ( !TypeInfo::UnityEngine::Object._1.cctor_finished_or_no_cctor )
-			//     il2cpp_runtime_class_init_0(TypeInfo::UnityEngine::Object, v7);
-			//   if ( UnityEngine::Object::op_Equality(v22, 0LL, 0LL) )
-			//   {
-			//     v23 = this.fields.m_taauPassMaterials;
-			//     if ( resource )
-			//     {
-			//       v24 = resource.fields.shaders;
-			//       if ( v24 )
-			//       {
-			//         if ( materialCollector )
-			//         {
-			//           v25 = HG::Rendering::Runtime::HGRenderPipelineMaterialCollector::CreateMaterial(
-			//                   materialCollector,
-			//                   v24.fields.taauResolvePS,
-			//                   0,
-			//                   0LL);
-			//           v26 = v25;
-			//           if ( v23 )
-			//           {
-			//             sub_180036D40(v23, v25);
-			//             sub_18000FDA0(v23, 3LL, v26);
-			//             return;
-			//           }
-			//         }
-			//       }
-			//     }
-			// LABEL_35:
-			//     sub_180B536AC(v8, v7);
-			//   }
-			// }
-			// 
-		}
-
-		private void PrepareParameters(ref TAAUPassConstructor.PassInput input, HGRenderGraph renderGraph)
-		{
-			// // Void PrepareParameters(TAAUPassConstructor+PassInput ByRef, HGRenderGraph)
-			// void HG::Rendering::Runtime::TAAUPassConstructor::PrepareParameters(
-			//         TAAUPassConstructor *this,
-			//         TAAUPassConstructor_PassInput *input,
-			//         HGRenderGraph *renderGraph,
-			//         MethodInfo *method)
-			// {
-			//   bool v7; // si
-			//   void *static_fields; // rdx
-			//   __int64 v9; // rcx
-			//   float historyWeight; // xmm0_4
-			//   float sharpenStrength4K; // xmm2_4
-			//   HGRenderGraphContext *m_RenderGraphContext; // rax
-			//   CommandBuffer *cmd; // rsi
-			//   HGRenderGraphContext *v14; // r14
-			//   CBHandle *v15; // rax
-			//   __m128i v16; // xmm6
-			//   Material__Array *m_taauPassMaterials; // rax
-			//   Material *v18; // rbx
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			//   CBHandle v20; // [rsp+30h] [rbp-30h] BYREF
-			// 
-			//   if ( !byte_18D9195CA )
-			//   {
-			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGShaderIDs);
-			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGShaderKeyWords);
-			//     sub_18003C530(&TypeInfo::UnityEngine::Rendering::ScriptableRenderContext);
-			//     sub_18003C530(&TypeInfo::HG::Rendering::RenderGraphModule::TextureHandle);
-			//     byte_18D9195CA = 1;
-			//   }
-			//   if ( !IFix::WrappersManagerImpl::IsPatched(2819, 0LL) )
-			//   {
-			//     sub_180002C70(TypeInfo::HG::Rendering::RenderGraphModule::TextureHandle);
-			//     v7 = !HG::Rendering::RenderGraphModule::TextureHandle::IsValid(&input.historySceneColor, 0LL)
-			//       || !this.fields._prevTAAUState_k__BackingField;
-			//     if ( !input.quality )
-			//     {
-			//       if ( v7
-			//         || (sub_180002C70(TypeInfo::HG::Rendering::RenderGraphModule::TextureHandle),
-			//             !HG::Rendering::RenderGraphModule::TextureHandle::IsValid(&this.fields.m_historyDilatedSceneDepth, 0LL))
-			//         || (sub_180002C70(TypeInfo::HG::Rendering::RenderGraphModule::TextureHandle),
-			//             !HG::Rendering::RenderGraphModule::TextureHandle::IsValid(&this.fields.m_historyDilatedSceneMV, 0LL)) )
-			//       {
-			//         v7 = 1;
-			//       }
-			//     }
-			//     HG::Rendering::Runtime::TAAUPassConstructor::set_taauScaleFactor(this, input.renderingScale, 0LL);
-			//     if ( v7 )
-			//       historyWeight = 0.0;
-			//     else
-			//       historyWeight = input.historyWeight;
-			//     if ( this )
-			//     {
-			//       this.fields.m_constants.taauParameters0.z = historyWeight;
-			//       this.fields.m_constants.taauParameters0.w = input.historyWeightInMotion;
-			//       this.fields.m_constants.taauParameters4.x = input.fastConvergeHistoryWeight;
-			//       this.fields.m_constants.taauParameters2.z = input.responsiveAAHistoryWeight;
-			//       this.fields.m_constants.taauParameters3.y = input.minMVConsideredDynamic;
-			//       this.fields.m_constants.taauParameters3.z = input.maxMVConsideredDynamic;
-			//       this.fields.m_constants.taauParameters3.w = input.characterMotionSensitivity;
-			//       this.fields.m_constants.taauParameters1.y = input.occlusionDepthDiff;
-			//       this.fields.m_constants.taauParameters4.w = input.inputSampleLumaWeight;
-			//       this.fields.m_constants.taauParameters2.w = (float)input.fastConvergeState;
-			//       this.fields.m_constants.taauParameters5.x = input.enableResponsiveTransparency;
-			//       this.fields.m_constants.taauParameters1.w = (float)v7;
-			//       sharpenStrength4K = input.sharpenStrength4K;
-			//       *(_QWORD *)&v20.bufferId = _mm_unpacklo_ps(
-			//                                    (__m128)LODWORD(input.sharpenStrength1K),
-			//                                    (__m128)LODWORD(input.sharpenStrength2K)).m128_u64[0];
-			//       *(float *)&v20.size = sharpenStrength4K;
-			//       this.fields.m_constants.taauParameters1.z = HG::Rendering::Runtime::TAAUPassConstructor::ComputeSharpenStrength(
-			//                                                      this,
-			//                                                      &input.screenSize,
-			//                                                      (TAAUPassConstructor_SharpenStrengthParam *)&v20,
-			//                                                      0LL);
-			//       if ( renderGraph )
-			//       {
-			//         m_RenderGraphContext = renderGraph.fields.m_RenderGraphContext;
-			//         if ( m_RenderGraphContext )
-			//         {
-			//           cmd = m_RenderGraphContext.fields.cmd;
-			//           *(float *)&v20.bufferId = (float)input.screenSize.m_X;
-			//           *(float *)&v20.offset = (float)input.screenSize.m_Y;
-			//           *(float *)&v20.size = 1.0 / (float)input.screenSize.m_X;
-			//           *((float *)&v20.size + 1) = 1.0 / (float)input.screenSize.m_Y;
-			//           this.fields.m_constants.taauParameters7 = *(Vector4 *)&v20.bufferId;
-			//           *(float *)&v20.bufferId = (float)input.renderSize.m_X;
-			//           *(float *)&v20.offset = (float)input.renderSize.m_Y;
-			//           *(float *)&v20.size = 1.0 / *(float *)&v20.bufferId;
-			//           *((float *)&v20.size + 1) = 1.0 / *(float *)&v20.offset;
-			//           this.fields.m_constants.taauParameters6 = *(Vector4 *)&v20.bufferId;
-			//           v14 = renderGraph.fields.m_RenderGraphContext;
-			//           if ( v14 )
-			//           {
-			//             sub_180002C70(TypeInfo::UnityEngine::Rendering::ScriptableRenderContext);
-			//             v15 = UnityEngine::Rendering::ScriptableRenderContext::AllocateConstantBuffer(
-			//                     &v20,
-			//                     &v14.fields.renderContext,
-			//                     192,
-			//                     0LL);
-			//             v16 = *(__m128i *)&v15.bufferId;
-			//             v20.ptr = v15.ptr;
-			//             System::Buffer::MemoryCopy((Void *)&this.fields.m_constants, (Void *)v20.ptr, 192LL, 192LL, 0LL);
-			//             sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGShaderIDs);
-			//             static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderIDs.static_fields;
-			//             if ( cmd )
-			//             {
-			//               UnityEngine::Rendering::CommandBuffer::SetGlobalConstantBufferInternal0(
-			//                 cmd,
-			//                 _mm_cvtsi128_si32(v16),
-			//                 *((_DWORD *)static_fields + 609),
-			//                 _mm_cvtsi128_si32(_mm_srli_si128(v16, 4)),
-			//                 192,
-			//                 0LL);
-			//               if ( input.quality != 1 )
-			//                 return;
-			//               m_taauPassMaterials = this.fields.m_taauPassMaterials;
-			//               if ( m_taauPassMaterials )
-			//               {
-			//                 if ( m_taauPassMaterials.max_length.size <= 3u )
-			//                   sub_180070270(v9, static_fields);
-			//                 v18 = m_taauPassMaterials.vector[3];
-			//                 sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGShaderKeyWords);
-			//                 static_fields = TypeInfo::HG::Rendering::Runtime::HGShaderKeyWords.static_fields;
-			//                 if ( v18 )
-			//                 {
-			//                   UnityEngine::Material::EnableKeyword(v18, *((String **)static_fields + 47), 0LL);
-			//                   return;
-			//                 }
-			//               }
-			//             }
-			//           }
-			//         }
-			//       }
-			//     }
-			// LABEL_27:
-			//     sub_180B536AC(v9, static_fields);
-			//   }
-			//   Patch = IFix::WrappersManagerImpl::GetPatch(2819, 0LL);
-			//   if ( !Patch )
-			//     goto LABEL_27;
-			//   IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_1026(Patch, (Object *)this, input, (Object *)renderGraph, 0LL);
-			// }
-			// 
-		}
-
-		private void ConstructTAAUPasses(ref TAAUPassConstructor.PassInput input, ref TAAUPassConstructor.PassOutput output, HGRenderGraph renderGraph)
-		{
-			// // Void ConstructTAAUPasses(TAAUPassConstructor+PassInput ByRef, TAAUPassConstructor+PassOutput ByRef, HGRenderGraph)
-			// void HG::Rendering::Runtime::TAAUPassConstructor::ConstructTAAUPasses(
-			//         TAAUPassConstructor *this,
-			//         TAAUPassConstructor_PassInput *input,
-			//         TAAUPassConstructor_PassOutput *output,
-			//         HGRenderGraph *renderGraph,
-			//         MethodInfo *method)
-			// {
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			//   __int64 v10; // rdx
-			//   __int64 v11; // rcx
-			// 
-			//   if ( IFix::WrappersManagerImpl::IsPatched(2822, 0LL) )
-			//   {
-			//     Patch = IFix::WrappersManagerImpl::GetPatch(2822, 0LL);
-			//     if ( !Patch )
-			//       sub_180B536AC(v11, v10);
-			//     IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_1027(Patch, (Object *)this, input, output, (Object *)renderGraph, 0LL);
-			//   }
-			//   else
-			//   {
-			//     if ( !input.quality )
-			//     {
-			//       HG::Rendering::Runtime::TAAUPassConstructor::ConstructDilationPass(this, input, renderGraph, 0LL);
-			//       HG::Rendering::Runtime::TAAUPassConstructor::ConstructMaskDilationPass(this, input, renderGraph, 0LL);
-			//     }
-			//     HG::Rendering::Runtime::TAAUPassConstructor::ConstructResolvePass(this, input, output, renderGraph, 0LL);
-			//   }
-			// }
-			// 
-		}
-
-		private void ConstructDilationPass(ref TAAUPassConstructor.PassInput input, HGRenderGraph renderGraph)
-		{
-			// // Void ConstructDilationPass(TAAUPassConstructor+PassInput ByRef, HGRenderGraph)
-			// // Hidden C++ exception states: #wind=1
-			// void HG::Rendering::Runtime::TAAUPassConstructor::ConstructDilationPass(
-			//         TAAUPassConstructor *this,
-			//         TAAUPassConstructor_PassInput *input,
-			//         HGRenderGraph *renderGraph,
-			//         MethodInfo *method)
-			// {
-			//   ProfilingSampler *v7; // rax
-			//   __int64 v8; // rdx
-			//   __int64 v9; // rcx
-			//   int v10; // edi
-			//   __int64 v11; // rdx
-			//   TAAUPassConstructor_RTNames__Array *m_rtNames; // rcx
-			//   unsigned __int64 v13; // r8
-			//   signed __int64 v14; // rtt
-			//   __int64 v15; // rdx
-			//   __int64 v16; // rcx
-			//   __int64 v17; // r8
-			//   __int64 v18; // r9
-			//   __int64 v19; // rdx
-			//   TAAUPassConstructor_RTNames__Array *v20; // rcx
-			//   unsigned __int64 v21; // r8
-			//   signed __int64 v22; // rtt
-			//   Object *v23; // rdx
-			//   Material__Array *m_taauPassMaterials; // rax
-			//   Object__Class *v25; // rcx
-			//   unsigned int v26; // edx
-			//   unsigned __int64 v27; // r8
-			//   char v28; // dl
-			//   signed __int64 v29; // rtt
-			//   __int64 v30; // rdx
-			//   TAAUPassConstructor_RTNames__Array *v31; // rcx
-			//   unsigned __int64 v32; // r8
-			//   signed __int64 v33; // rtt
-			//   Object *v34; // r15
-			//   __int64 v35; // rdx
-			//   __int64 v36; // rcx
-			//   TextureHandle v37; // xmm0
-			//   __int64 v38; // rdx
-			//   TAAUPassConstructor_RTNames__Array *v39; // rcx
-			//   unsigned __int64 v40; // r8
-			//   signed __int64 v41; // rtt
-			//   Object *v42; // rbx
-			//   __int64 v43; // rdx
-			//   __int64 v44; // rcx
-			//   TextureHandle v45; // xmm0
-			//   __int64 v46; // rdx
-			//   __int64 v47; // rcx
-			//   __int64 v48; // rdx
-			//   __int64 v49; // rcx
-			//   __int64 v50; // rdx
-			//   __int64 v51; // rcx
-			//   __int64 v52; // rdx
-			//   __int64 v53; // rcx
-			//   __int64 v54; // rdx
-			//   __int64 v55; // rcx
-			//   __int64 v56; // rdx
-			//   __int64 v57; // rcx
-			//   __int64 v58; // rdx
-			//   __int64 v59; // rcx
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			//   __int64 v61; // rdx
-			//   __int64 v62; // rcx
-			//   Object *v63; // [rsp+50h] [rbp-218h] BYREF
-			//   __m128i si128; // [rsp+60h] [rbp-208h] BYREF
-			//   TextureDesc v65; // [rsp+70h] [rbp-1F8h] BYREF
-			//   HGRenderGraphBuilder v66; // [rsp+D0h] [rbp-198h] BYREF
-			//   _QWORD v67[2]; // [rsp+F0h] [rbp-178h] BYREF
-			//   TextureDesc v68; // [rsp+100h] [rbp-168h] BYREF
-			//   HGRenderGraphBuilder v69; // [rsp+160h] [rbp-108h] BYREF
-			//   TextureDesc v70; // [rsp+180h] [rbp-E8h] BYREF
-			//   Il2CppExceptionWrapper *v71; // [rsp+1E0h] [rbp-88h] BYREF
-			//   TextureDesc v72; // [rsp+1F0h] [rbp-78h] BYREF
-			// 
-			//   if ( !byte_18D9195CB )
-			//   {
-			//     sub_18003C530(&MethodInfo::HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::SetRenderFunc<HG::Rendering::Runtime::TAAUPassConstructor::DilationPassData>);
-			//     sub_18003C530(&MethodInfo::HG::Rendering::RenderGraphModule::HGRenderGraph::AddRenderPass<HG::Rendering::Runtime::TAAUPassConstructor::DilationPassData>);
-			//     sub_18003C530(&MethodInfo::UnityEngine::Rendering::ProfilingSampler::Get<HG::Rendering::Runtime::HGProfileId>);
-			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::TAAUPassConstructor);
-			//     sub_18003C530(&TypeInfo::HG::Rendering::RenderGraphModule::TextureHandle);
-			//     sub_18003C530(&off_18D503520);
-			//     sub_18003C530(&off_18D503550);
-			//     byte_18D9195CB = 1;
-			//   }
-			//   v63 = 0LL;
-			//   sub_1802F01E0(&v68, 0LL, 96LL);
-			//   sub_1802F01E0(&v65, 0LL, 96LL);
-			//   if ( IFix::WrappersManagerImpl::IsPatched(2823, 0LL) )
-			//   {
-			//     Patch = IFix::WrappersManagerImpl::GetPatch(2823, 0LL);
-			//     if ( !Patch )
-			//       sub_180B536AC(v62, v61);
-			//     IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_1026(Patch, (Object *)this, input, (Object *)renderGraph, 0LL);
-			//   }
-			//   else
-			//   {
-			//     v7 = UnityEngine::Rendering::ProfilingSampler::Get<System::Int32Enum>(
-			//            (Int32Enum__Enum)0x4Eu,
-			//            MethodInfo::UnityEngine::Rendering::ProfilingSampler::Get<HG::Rendering::Runtime::HGProfileId>);
-			//     if ( !renderGraph )
-			//       sub_180B536AC(v9, v8);
-			//     HG::Rendering::RenderGraphModule::HGRenderGraph::AddRenderPass<System::Object>(
-			//       &v69,
-			//       renderGraph,
-			//       (String *)"TAAU Dilation Pass",
-			//       &v63,
-			//       v7,
-			//       1,
-			//       ProfilingHGPass__Enum_None,
-			//       MethodInfo::HG::Rendering::RenderGraphModule::HGRenderGraph::AddRenderPass<HG::Rendering::Runtime::TAAUPassConstructor::DilationPassData>);
-			//     v66 = v69;
-			//     v67[0] = 0LL;
-			//     v67[1] = &v66;
-			//     try
-			//     {
-			//       v10 = input.renderPathFrameIndex % 2;
-			//       sub_180002C70(TypeInfo::HG::Rendering::RenderGraphModule::TextureHandle);
-			//       if ( !HG::Rendering::RenderGraphModule::TextureHandle::IsValid(&this.fields.m_historyDilatedSceneDepth, 0LL) )
-			//       {
-			//         sub_1802F01E0(&v70, 0LL, 96LL);
-			//         HG::Rendering::RenderGraphModule::TextureDesc::TextureDesc(&v70, input.renderSize, 0LL);
-			//         v65 = v70;
-			//         v65.colorFormat = 45;
-			//         *(_WORD *)&v65.enableRandomWrite = 0;
-			//         v65.autoGenerateMips = 0;
-			//         m_rtNames = this.fields.m_rtNames;
-			//         if ( !m_rtNames )
-			//           sub_1802DC2C8(0LL, v11);
-			//         v65.name = *(String **)sub_18037A2A0(m_rtNames, v10);
-			//         if ( dword_18D8E43F8 )
-			//         {
-			//           v13 = (((unsigned __int64)&v65.name >> 12) & 0x1FFFFF) >> 6;
-			//           _m_prefetchw(&qword_18D6405E0[v13 + 36190]);
-			//           do
-			//             v14 = qword_18D6405E0[v13 + 36190];
-			//           while ( v14 != _InterlockedCompareExchange64(
-			//                            &qword_18D6405E0[v13 + 36190],
-			//                            v14 | (1LL << (((unsigned __int64)&v65.name >> 12) & 0x3F)),
-			//                            v14) );
-			//         }
-			//         v68 = v65;
-			//         this.fields.m_historyDilatedSceneDepth = *HG::Rendering::RenderGraphModule::HGRenderGraph::CreateTexture(
-			//                                                      (TextureHandle *)&si128,
-			//                                                      renderGraph,
-			//                                                      &v68,
-			//                                                      0LL);
-			//       }
-			//       sub_180002C70(TypeInfo::HG::Rendering::RenderGraphModule::TextureHandle);
-			//       if ( !HG::Rendering::RenderGraphModule::TextureHandle::IsValid(&this.fields.m_historyDilatedSceneMV, 0LL) )
-			//       {
-			//         sub_1802F01E0(&v70, 0LL, 96LL);
-			//         HG::Rendering::RenderGraphModule::TextureDesc::TextureDesc(&v70, input.renderSize, 0LL);
-			//         v65 = v70;
-			//         v65.colorFormat = HG::Rendering::RenderGraphModule::HGRenderGraph::GetTextureDescRef(
-			//                             renderGraph,
-			//                             &input.sceneMV,
-			//                             0LL).colorFormat;
-			//         *(_WORD *)&v65.enableRandomWrite = 0;
-			//         v65.autoGenerateMips = 0;
-			//         v20 = this.fields.m_rtNames;
-			//         if ( !v20 )
-			//           sub_1802DC2C8(0LL, v19);
-			//         v65.name = *(String **)(sub_18037A2A0(v20, v10) + 8);
-			//         if ( dword_18D8E43F8 )
-			//         {
-			//           v21 = (((unsigned __int64)&v65.name >> 12) & 0x1FFFFF) >> 6;
-			//           _m_prefetchw(&qword_18D6405E0[v21 + 36190]);
-			//           do
-			//             v22 = qword_18D6405E0[v21 + 36190];
-			//           while ( v22 != _InterlockedCompareExchange64(
-			//                            &qword_18D6405E0[v21 + 36190],
-			//                            v22 | (1LL << (((unsigned __int64)&v65.name >> 12) & 0x3F)),
-			//                            v22) );
-			//         }
-			//         v68 = v65;
-			//         this.fields.m_historyDilatedSceneMV = *HG::Rendering::RenderGraphModule::HGRenderGraph::CreateTexture(
-			//                                                   (TextureHandle *)&si128,
-			//                                                   renderGraph,
-			//                                                   &v68,
-			//                                                   0LL);
-			//       }
-			//       if ( !v63 )
-			//         sub_1802DC2C8(v16, v15);
-			//       v63[1] = (Object)input.sceneDepth;
-			//       if ( !v63 )
-			//         sub_1802DC2C8(v16, v15);
-			//       v63[2] = (Object)input.sceneMV;
-			//       if ( !v63 )
-			//         sub_1802DC2C8(v16, v15);
-			//       v63[5] = (Object)this.fields.m_historyDilatedSceneDepth;
-			//       if ( !v63 )
-			//         sub_1802DC2C8(v16, v15);
-			//       v63[6] = (Object)this.fields.m_historyDilatedSceneMV;
-			//       v23 = v63;
-			//       m_taauPassMaterials = this.fields.m_taauPassMaterials;
-			//       if ( !m_taauPassMaterials )
-			//         sub_1802DC2C8(v16, v63);
-			//       if ( !m_taauPassMaterials.max_length.size )
-			//         sub_180070260(v16, v63, v17, v18);
-			//       v25 = (Object__Class *)m_taauPassMaterials.vector[0];
-			//       if ( !v63 )
-			//         sub_1802DC2C8(v25, 0LL);
-			//       v63[7].klass = v25;
-			//       if ( dword_18D8E43F8 )
-			//       {
-			//         v26 = ((unsigned __int64)&v23[7] >> 12) & 0x1FFFFF;
-			//         v27 = (unsigned __int64)v26 >> 6;
-			//         v28 = v26 & 0x3F;
-			//         _m_prefetchw(&qword_18D6405E0[v27 + 36190]);
-			//         do
-			//           v29 = qword_18D6405E0[v27 + 36190];
-			//         while ( v29 != _InterlockedCompareExchange64(&qword_18D6405E0[v27 + 36190], v29 | (1LL << v28), v29) );
-			//       }
-			//       sub_1802F01E0(&v70, 0LL, 96LL);
-			//       HG::Rendering::RenderGraphModule::TextureDesc::TextureDesc(&v70, input.renderSize, 0LL);
-			//       v65 = v70;
-			//       v65.colorFormat = 45;
-			//       *(_WORD *)&v65.enableRandomWrite = 0;
-			//       v65.autoGenerateMips = 0;
-			//       v31 = this.fields.m_rtNames;
-			//       if ( !v31 )
-			//         sub_1802DC2C8(0LL, v30);
-			//       v65.name = *(String **)sub_18037A2A0(v31, v10);
-			//       if ( dword_18D8E43F8 )
-			//       {
-			//         v32 = (((unsigned __int64)&v65.name >> 12) & 0x1FFFFF) >> 6;
-			//         _m_prefetchw(&qword_18D6405E0[v32 + 36190]);
-			//         do
-			//           v33 = qword_18D6405E0[v32 + 36190];
-			//         while ( v33 != _InterlockedCompareExchange64(
-			//                          &qword_18D6405E0[v32 + 36190],
-			//                          v33 | (1LL << (((unsigned __int64)&v65.name >> 12) & 0x3F)),
-			//                          v33) );
-			//       }
-			//       v68 = v65;
-			//       v34 = v63;
-			//       v37 = *HG::Rendering::RenderGraphModule::HGRenderGraph::CreateTexture(
-			//                (TextureHandle *)&si128,
-			//                renderGraph,
-			//                &v68,
-			//                0LL);
-			//       if ( !v34 )
-			//         sub_1802DC2C8(v36, v35);
-			//       v34[3] = (Object)v37;
-			//       sub_1802F01E0(&v72, 0LL, 96LL);
-			//       HG::Rendering::RenderGraphModule::TextureDesc::TextureDesc(&v72, input.renderSize, 0LL);
-			//       v65 = v72;
-			//       v65.colorFormat = HG::Rendering::RenderGraphModule::HGRenderGraph::GetTextureDescRef(
-			//                           renderGraph,
-			//                           &input.sceneMV,
-			//                           0LL).colorFormat;
-			//       *(_WORD *)&v65.enableRandomWrite = 0;
-			//       v65.autoGenerateMips = 0;
-			//       v39 = this.fields.m_rtNames;
-			//       if ( !v39 )
-			//         sub_1802DC2C8(0LL, v38);
-			//       v65.name = *(String **)(sub_18037A2A0(v39, v10) + 8);
-			//       if ( dword_18D8E43F8 )
-			//       {
-			//         v40 = (((unsigned __int64)&v65.name >> 12) & 0x1FFFFF) >> 6;
-			//         _m_prefetchw(&qword_18D6405E0[v40 + 36190]);
-			//         do
-			//           v41 = qword_18D6405E0[v40 + 36190];
-			//         while ( v41 != _InterlockedCompareExchange64(
-			//                          &qword_18D6405E0[v40 + 36190],
-			//                          v41 | (1LL << (((unsigned __int64)&v65.name >> 12) & 0x3F)),
-			//                          v41) );
-			//       }
-			//       v68 = v65;
-			//       v42 = v63;
-			//       v45 = *HG::Rendering::RenderGraphModule::HGRenderGraph::CreateTexture(
-			//                (TextureHandle *)&si128,
-			//                renderGraph,
-			//                &v68,
-			//                0LL);
-			//       if ( !v42 )
-			//         sub_1802DC2C8(v44, v43);
-			//       v42[4] = (Object)v45;
-			//       if ( !v63 )
-			//         sub_1802DC2C8(v44, v43);
-			//       HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::ReadTexture(
-			//         (TextureHandle *)&si128,
-			//         &v66,
-			//         (TextureHandle *)&v63[1],
-			//         0LL);
-			//       if ( !v63 )
-			//         sub_1802DC2C8(v47, v46);
-			//       HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::ReadTexture(
-			//         (TextureHandle *)&si128,
-			//         &v66,
-			//         (TextureHandle *)&v63[2],
-			//         0LL);
-			//       if ( !v63 )
-			//         sub_1802DC2C8(v49, v48);
-			//       HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::ReadWriteTexture(
-			//         (TextureHandle *)&si128,
-			//         &v66,
-			//         (TextureHandle *)&v63[5],
-			//         0LL);
-			//       if ( !v63 )
-			//         sub_1802DC2C8(v51, v50);
-			//       HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::ReadWriteTexture(
-			//         (TextureHandle *)&si128,
-			//         &v66,
-			//         (TextureHandle *)&v63[6],
-			//         0LL);
-			//       HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::AllowPassCulling(&v66, 0, 0LL);
-			//       if ( !v63 )
-			//         sub_1802DC2C8(v53, v52);
-			//       si128 = _mm_load_si128((const __m128i *)&xmmword_18A3576D0);
-			//       HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::SetColorAttachment(
-			//         (TextureHandle *)&v69,
-			//         &v66,
-			//         (TextureHandle *)&v63[3],
-			//         0,
-			//         RenderBufferLoadAction__Enum_DontCare,
-			//         RenderBufferStoreAction__Enum_Store,
-			//         (Color *)&si128,
-			//         0,
-			//         0LL);
-			//       if ( !v63 )
-			//         sub_1802DC2C8(v55, v54);
-			//       si128 = _mm_load_si128((const __m128i *)&xmmword_18A3576D0);
-			//       HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::SetColorAttachment(
-			//         (TextureHandle *)&v69,
-			//         &v66,
-			//         (TextureHandle *)&v63[4],
-			//         1,
-			//         RenderBufferLoadAction__Enum_DontCare,
-			//         RenderBufferStoreAction__Enum_Store,
-			//         (Color *)&si128,
-			//         0,
-			//         0LL);
-			//       if ( HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::DepthRequiredIfMRT(&v66, 0LL) )
-			//         HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::SetDepthAttachment(
-			//           (TextureHandle *)&v69,
-			//           &v66,
-			//           &input.utilityDepth,
-			//           DepthAccess__Enum_ReadWrite,
-			//           RenderBufferLoadAction__Enum_Load,
-			//           RenderBufferStoreAction__Enum_Store,
-			//           1.0,
-			//           0,
-			//           0,
-			//           0LL);
-			//       sub_180002C70(TypeInfo::HG::Rendering::Runtime::TAAUPassConstructor);
-			//       HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::SetRenderFunc<System::Object>(
-			//         &v66,
-			//         (RenderFunc_1_System_Object_ *)TypeInfo::HG::Rendering::Runtime::TAAUPassConstructor.static_fields.s_dilationRenderFunc,
-			//         0LL,
-			//         0,
-			//         MethodInfo::HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::SetRenderFunc<HG::Rendering::Runtime::TAAUPassConstructor::DilationPassData>);
-			//       if ( !v63 )
-			//         sub_1802DC2C8(v57, v56);
-			//       this.fields.m_historyDilatedSceneDepth = *HG::Rendering::RenderGraphModule::HGRenderGraph::PreserveTexture(
-			//                                                    (TextureHandle *)&v69,
-			//                                                    renderGraph,
-			//                                                    (TextureHandle *)&v63[3],
-			//                                                    1,
-			//                                                    (String *)"TAAUPass",
-			//                                                    0LL);
-			//       if ( !v63 )
-			//         sub_1802DC2C8(v59, v58);
-			//       this.fields.m_historyDilatedSceneMV = *HG::Rendering::RenderGraphModule::HGRenderGraph::PreserveTexture(
-			//                                                 (TextureHandle *)&v69,
-			//                                                 renderGraph,
-			//                                                 (TextureHandle *)&v63[4],
-			//                                                 1,
-			//                                                 (String *)"TAAUPass",
-			//                                                 0LL);
-			//     }
-			//     catch ( Il2CppExceptionWrapper *v71 )
-			//     {
-			//       v67[0] = v71.ex;
-			//     }
-			//     sub_180222690(v67);
-			//   }
-			// }
-			// 
-		}
-
-		private void ConstructMaskDilationPass(ref TAAUPassConstructor.PassInput input, HGRenderGraph renderGraph)
-		{
-			// // Void ConstructMaskDilationPass(TAAUPassConstructor+PassInput ByRef, HGRenderGraph)
-			// // Hidden C++ exception states: #wind=1
-			// void HG::Rendering::Runtime::TAAUPassConstructor::ConstructMaskDilationPass(
-			//         TAAUPassConstructor *this,
-			//         TAAUPassConstructor_PassInput *input,
-			//         HGRenderGraph *renderGraph,
-			//         MethodInfo *method)
-			// {
-			//   ProfilingSampler *v7; // rax
-			//   __int64 v8; // rdx
-			//   __int64 v9; // rcx
-			//   __int64 v10; // rcx
-			//   __int64 v11; // r8
-			//   __int64 v12; // r9
-			//   Object *v13; // rdx
-			//   Material__Array *m_taauPassMaterials; // rax
-			//   Object__Class *v15; // rcx
-			//   unsigned int v16; // edx
-			//   unsigned __int64 v17; // r8
-			//   signed __int64 v18; // rtt
-			//   int v19; // edi
-			//   __int64 v20; // rdx
-			//   __int64 v21; // rcx
-			//   int v22; // eax
-			//   int32_t v23; // ebx
-			//   Object *v24; // rbx
-			//   __int64 v25; // rdx
-			//   __int64 v26; // rcx
-			//   TextureHandle v27; // xmm0
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			//   __int64 v29; // rdx
-			//   __int64 v30; // rcx
-			//   Object *v31; // [rsp+50h] [rbp-1A8h] BYREF
-			//   _QWORD v32[3]; // [rsp+58h] [rbp-1A0h] BYREF
-			//   __m128i si128; // [rsp+70h] [rbp-188h] BYREF
-			//   HGRenderGraphBuilder v34; // [rsp+80h] [rbp-178h] BYREF
-			//   Il2CppExceptionWrapper *v35; // [rsp+A0h] [rbp-158h] BYREF
-			//   HGRenderGraphBuilder v36; // [rsp+A8h] [rbp-150h] BYREF
-			//   __int128 v37; // [rsp+E0h] [rbp-118h]
-			//   __int128 v38; // [rsp+F0h] [rbp-108h]
-			//   TextureDesc v39; // [rsp+130h] [rbp-C8h] BYREF
-			//   TextureDesc v40; // [rsp+190h] [rbp-68h] BYREF
-			// 
-			//   if ( !byte_18D9195CC )
-			//   {
-			//     sub_18003C530(&MethodInfo::HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::SetRenderFunc<HG::Rendering::Runtime::TAAUPassConstructor::MaskDilationPassData>);
-			//     sub_18003C530(&MethodInfo::HG::Rendering::RenderGraphModule::HGRenderGraph::AddRenderPass<HG::Rendering::Runtime::TAAUPassConstructor::MaskDilationPassData>);
-			//     sub_18003C530(&MethodInfo::UnityEngine::Rendering::ProfilingSampler::Get<HG::Rendering::Runtime::HGProfileId>);
-			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::TAAUPassConstructor);
-			//     sub_18003C530(&off_18D5033E8);
-			//     byte_18D9195CC = 1;
-			//   }
-			//   v31 = 0LL;
-			//   sub_1802F01E0(&v40, 0LL, 96LL);
-			//   if ( IFix::WrappersManagerImpl::IsPatched(2824, 0LL) )
-			//   {
-			//     Patch = IFix::WrappersManagerImpl::GetPatch(2824, 0LL);
-			//     if ( !Patch )
-			//       sub_180B536AC(v30, v29);
-			//     IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_1026(Patch, (Object *)this, input, (Object *)renderGraph, 0LL);
-			//   }
-			//   else
-			//   {
-			//     v7 = UnityEngine::Rendering::ProfilingSampler::Get<System::Int32Enum>(
-			//            (Int32Enum__Enum)0x4Fu,
-			//            MethodInfo::UnityEngine::Rendering::ProfilingSampler::Get<HG::Rendering::Runtime::HGProfileId>);
-			//     if ( !renderGraph )
-			//       sub_180B536AC(v9, v8);
-			//     HG::Rendering::RenderGraphModule::HGRenderGraph::AddRenderPass<System::Object>(
-			//       &v36,
-			//       renderGraph,
-			//       (String *)"TAAU Mask Dilation Pass",
-			//       &v31,
-			//       v7,
-			//       1,
-			//       ProfilingHGPass__Enum_None,
-			//       MethodInfo::HG::Rendering::RenderGraphModule::HGRenderGraph::AddRenderPass<HG::Rendering::Runtime::TAAUPassConstructor::MaskDilationPassData>);
-			//     v34 = v36;
-			//     v32[0] = 0LL;
-			//     v32[1] = &v34;
-			//     try
-			//     {
-			//       v13 = v31;
-			//       m_taauPassMaterials = this.fields.m_taauPassMaterials;
-			//       if ( !m_taauPassMaterials )
-			//         sub_1802DC2C8(v10, v31);
-			//       if ( m_taauPassMaterials.max_length.size <= 1u )
-			//         sub_180070260(v10, v31, v11, v12);
-			//       v15 = (Object__Class *)m_taauPassMaterials.vector[1];
-			//       if ( !v31 )
-			//         sub_1802DC2C8(v15, 0LL);
-			//       v31[2].klass = v15;
-			//       if ( dword_18D8E43F8 )
-			//       {
-			//         v16 = ((unsigned __int64)&v13[2] >> 12) & 0x1FFFFF;
-			//         v17 = (unsigned __int64)v16 >> 6;
-			//         v13 = (Object *)(v16 & 0x3F);
-			//         _m_prefetchw(&qword_18D6870D0[v17]);
-			//         do
-			//         {
-			//           v15 = (Object__Class *)(qword_18D6870D0[v17] | (1LL << (char)v13));
-			//           v18 = qword_18D6870D0[v17];
-			//         }
-			//         while ( v18 != _InterlockedCompareExchange64(&qword_18D6870D0[v17], (signed __int64)v15, v18) );
-			//       }
-			//       v19 = sub_1825C6750(v15, v13);
-			//       v22 = sub_1825C6750(v21, v20);
-			//       v23 = 4 * (v22 / 4 + (int)(float)((float)((float)(v22 % 4) * 0.25) + (float)((float)(v22 % 4) * 0.25)));
-			//       sub_1802F01E0(&v39, 0LL, 96LL);
-			//       HG::Rendering::RenderGraphModule::TextureDesc::TextureDesc(
-			//         &v39,
-			//         4 * (v19 / 4 + (int)(float)((float)((float)(v19 % 4) * 0.25) + (float)((float)(v19 % 4) * 0.25))),
-			//         v23,
-			//         0LL);
-			//       HIDWORD(v37) = v39.dimension;
-			//       v38 = *(_OWORD *)&v39.enableRandomWrite;
-			//       LODWORD(v37) = 5;
-			//       LOWORD(v38) = 0;
-			//       *(_QWORD *)((char *)&v37 + 4) = 0x100000001LL;
-			//       *(_OWORD *)&v40.width = *(_OWORD *)&v39.width;
-			//       *(_OWORD *)&v40.colorFormat = v37;
-			//       *(_OWORD *)&v40.enableRandomWrite = v38;
-			//       *(_OWORD *)&v40.bindTextureMS = *(_OWORD *)&v39.bindTextureMS;
-			//       *(_OWORD *)&v40.fastMemoryDesc.inFastMemory = *(_OWORD *)&v39.fastMemoryDesc.inFastMemory;
-			//       v40.clearColor = v39.clearColor;
-			//       v24 = v31;
-			//       v27 = *HG::Rendering::RenderGraphModule::HGRenderGraph::CreateTexture(
-			//                (TextureHandle *)&si128,
-			//                renderGraph,
-			//                &v40,
-			//                0LL);
-			//       if ( !v24 )
-			//         sub_1802DC2C8(v26, v25);
-			//       v24[1] = (Object)v27;
-			//       if ( !v31 )
-			//         sub_1802DC2C8(v26, v25);
-			//       si128 = _mm_load_si128((const __m128i *)&xmmword_18A3576D0);
-			//       HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::SetColorAttachment(
-			//         (TextureHandle *)&v36,
-			//         &v34,
-			//         (TextureHandle *)&v31[1],
-			//         0,
-			//         RenderBufferLoadAction__Enum_DontCare,
-			//         RenderBufferStoreAction__Enum_Store,
-			//         (Color *)&si128,
-			//         0,
-			//         0LL);
-			//       HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::AllowPassCulling(&v34, 0, 0LL);
-			//       sub_180002C70(TypeInfo::HG::Rendering::Runtime::TAAUPassConstructor);
-			//       HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::SetRenderFunc<System::Object>(
-			//         &v34,
-			//         (RenderFunc_1_System_Object_ *)TypeInfo::HG::Rendering::Runtime::TAAUPassConstructor.static_fields.s_maskDilationRenderFunc,
-			//         0LL,
-			//         0,
-			//         MethodInfo::HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::SetRenderFunc<HG::Rendering::Runtime::TAAUPassConstructor::MaskDilationPassData>);
-			//     }
-			//     catch ( Il2CppExceptionWrapper *v35 )
-			//     {
-			//       v32[0] = v35.ex;
-			//     }
-			//     sub_180222690(v32);
-			//   }
-			// }
-			// 
-		}
-
-		private void ConstructResolvePass(ref TAAUPassConstructor.PassInput input, ref TAAUPassConstructor.PassOutput output, HGRenderGraph renderGraph)
-		{
-			// // Void ConstructResolvePass(TAAUPassConstructor+PassInput ByRef, TAAUPassConstructor+PassOutput ByRef, HGRenderGraph)
-			// // Hidden C++ exception states: #wind=1
-			// void HG::Rendering::Runtime::TAAUPassConstructor::ConstructResolvePass(
-			//         TAAUPassConstructor *this,
-			//         TAAUPassConstructor_PassInput *input,
-			//         TAAUPassConstructor_PassOutput *output,
-			//         HGRenderGraph *renderGraph,
-			//         MethodInfo *method)
-			// {
-			//   __int64 v9; // rdx
-			//   __int64 v10; // rcx
-			//   int v11; // edi
-			//   int32_t colorFormat; // r12d
-			//   ProfilingSampler *v13; // rax
-			//   __int64 v14; // rdx
-			//   __int64 v15; // rcx
-			//   __int64 v16; // rdx
-			//   __int64 quality; // rcx
-			//   __int64 v18; // rdx
-			//   __int64 v19; // r8
-			//   __int64 v20; // r9
-			//   Object *v21; // rcx
-			//   Material__Array *m_taauPassMaterials; // rax
-			//   MonitorData *v23; // rdx
-			//   unsigned __int64 v24; // r8
-			//   signed __int64 v25; // rtt
-			//   Object *v26; // r15
-			//   __int64 v27; // rdx
-			//   __int64 v28; // rcx
-			//   TextureHandle v29; // xmm0
-			//   Object *v30; // r15
-			//   __int64 v31; // rdx
-			//   __int64 v32; // rcx
-			//   TextureHandle v33; // xmm0
-			//   Object *v34; // r15
-			//   __int64 v35; // rdx
-			//   __int64 v36; // rcx
-			//   TextureHandle v37; // xmm0
-			//   __int64 v38; // rdx
-			//   TAAUPassConstructor_RTNames__Array *m_rtNames; // rcx
-			//   unsigned __int64 v40; // r8
-			//   signed __int64 v41; // rtt
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			//   __int64 v43; // rdx
-			//   __int64 v44; // rcx
-			//   Object *v45; // [rsp+50h] [rbp-1D8h] BYREF
-			//   __m128i si128; // [rsp+60h] [rbp-1C8h] BYREF
-			//   TextureHandle v47; // [rsp+70h] [rbp-1B8h] BYREF
-			//   _QWORD v48[2]; // [rsp+80h] [rbp-1A8h] BYREF
-			//   HGRenderGraphBuilder v49; // [rsp+90h] [rbp-198h] BYREF
-			//   TextureDesc v50; // [rsp+B0h] [rbp-178h] BYREF
-			//   Il2CppExceptionWrapper *v51; // [rsp+110h] [rbp-118h] BYREF
-			//   HGRenderGraphBuilder v52; // [rsp+118h] [rbp-110h] BYREF
-			//   TextureDesc v53; // [rsp+140h] [rbp-E8h] BYREF
-			//   TextureDesc v54; // [rsp+1A0h] [rbp-88h] BYREF
-			// 
-			//   if ( !byte_18D9195CD )
-			//   {
-			//     sub_18003C530(&MethodInfo::HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::SetRenderFunc<HG::Rendering::Runtime::TAAUPassConstructor::ResolvePassData>);
-			//     sub_18003C530(&MethodInfo::HG::Rendering::RenderGraphModule::HGRenderGraph::AddRenderPass<HG::Rendering::Runtime::TAAUPassConstructor::ResolvePassData>);
-			//     sub_18003C530(&MethodInfo::UnityEngine::Rendering::ProfilingSampler::Get<HG::Rendering::Runtime::HGProfileId>);
-			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::TAAUPassConstructor);
-			//     sub_18003C530(&TypeInfo::HG::Rendering::RenderGraphModule::TextureHandle);
-			//     sub_18003C530(&off_18D5033F0);
-			//     byte_18D9195CD = 1;
-			//   }
-			//   v45 = 0LL;
-			//   sub_1802F01E0(&v54, 0LL, 96LL);
-			//   sub_1802F01E0(&v50, 0LL, 96LL);
-			//   if ( IFix::WrappersManagerImpl::IsPatched(2825, 0LL) )
-			//   {
-			//     Patch = IFix::WrappersManagerImpl::GetPatch(2825, 0LL);
-			//     if ( !Patch )
-			//       sub_180B536AC(v44, v43);
-			//     IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_1027(Patch, (Object *)this, input, output, (Object *)renderGraph, 0LL);
-			//   }
-			//   else
-			//   {
-			//     v11 = input.renderPathFrameIndex % 2;
-			//     if ( input.quality )
-			//     {
-			//       if ( !renderGraph )
-			//         sub_180B536AC(v10, v9);
-			//       colorFormat = HG::Rendering::RenderGraphModule::HGRenderGraph::GetTextureDescRef(
-			//                       renderGraph,
-			//                       &input.sceneColor,
-			//                       0LL).colorFormat;
-			//     }
-			//     else
-			//     {
-			//       colorFormat = 48;
-			//     }
-			//     v13 = UnityEngine::Rendering::ProfilingSampler::Get<System::Int32Enum>(
-			//             (Int32Enum__Enum)0x51u,
-			//             MethodInfo::UnityEngine::Rendering::ProfilingSampler::Get<HG::Rendering::Runtime::HGProfileId>);
-			//     if ( !renderGraph )
-			//       sub_180B536AC(v15, v14);
-			//     HG::Rendering::RenderGraphModule::HGRenderGraph::AddRenderPass<System::Object>(
-			//       &v52,
-			//       renderGraph,
-			//       (String *)"TAAU Resolve Pass",
-			//       &v45,
-			//       v13,
-			//       1,
-			//       ProfilingHGPass__Enum_None,
-			//       MethodInfo::HG::Rendering::RenderGraphModule::HGRenderGraph::AddRenderPass<HG::Rendering::Runtime::TAAUPassConstructor::ResolvePassData>);
-			//     v49 = v52;
-			//     v48[0] = 0LL;
-			//     v48[1] = &v49;
-			//     try
-			//     {
-			//       quality = (unsigned int)input.quality;
-			//       if ( !v45 )
-			//         sub_1802DC2C8(quality, v16);
-			//       LODWORD(v45[5].klass) = quality;
-			//       if ( !v45 )
-			//         sub_1802DC2C8(quality, v16);
-			//       v45[4] = (Object)input.historySceneColor;
-			//       sub_180002C70(TypeInfo::HG::Rendering::RenderGraphModule::TextureHandle);
-			//       if ( HG::Rendering::RenderGraphModule::TextureHandle::IsValid(&input.historySceneColor, 0LL) )
-			//         HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::ReadTexture(
-			//           (TextureHandle *)&si128,
-			//           &v49,
-			//           &input.historySceneColor,
-			//           0LL);
-			//       v21 = v45;
-			//       m_taauPassMaterials = this.fields.m_taauPassMaterials;
-			//       if ( !m_taauPassMaterials )
-			//         sub_1802DC2C8(v45, v18);
-			//       if ( m_taauPassMaterials.max_length.size <= 3u )
-			//         sub_180070260(v45, v18, v19, v20);
-			//       v23 = (MonitorData *)m_taauPassMaterials.vector[3];
-			//       if ( !v45 )
-			//         sub_1802DC2C8(0LL, v23);
-			//       v45[5].monitor = v23;
-			//       if ( dword_18D8E43F8 )
-			//       {
-			//         v24 = (((unsigned __int64)&v21[5].monitor >> 12) & 0x1FFFFF) >> 6;
-			//         _m_prefetchw(&qword_18D6405E0[v24 + 36190]);
-			//         do
-			//           v25 = qword_18D6405E0[v24 + 36190];
-			//         while ( v25 != _InterlockedCompareExchange64(
-			//                          &qword_18D6405E0[v24 + 36190],
-			//                          v25 | (1LL << (((unsigned __int64)&v21[5].monitor >> 12) & 0x3F)),
-			//                          v25) );
-			//       }
-			//       v26 = v45;
-			//       v29 = *HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::ReadTexture(
-			//                (TextureHandle *)&si128,
-			//                &v49,
-			//                &input.sceneColor,
-			//                0LL);
-			//       if ( !v26 )
-			//         sub_1802DC2C8(v28, v27);
-			//       v26[1] = (Object)v29;
-			//       if ( input.quality == 1 )
-			//       {
-			//         v30 = v45;
-			//         v33 = *HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::ReadTexture(
-			//                  (TextureHandle *)&si128,
-			//                  &v49,
-			//                  &input.sceneDepth,
-			//                  0LL);
-			//         if ( !v30 )
-			//           sub_1802DC2C8(v32, v31);
-			//         v30[2] = (Object)v33;
-			//         v34 = v45;
-			//         v37 = *HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::ReadTexture(
-			//                  (TextureHandle *)&si128,
-			//                  &v49,
-			//                  &input.sceneMV,
-			//                  0LL);
-			//         if ( !v34 )
-			//           sub_1802DC2C8(v36, v35);
-			//         v34[3] = (Object)v37;
-			//       }
-			//       HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::AllowPassCulling(&v49, 0, 0LL);
-			//       sub_1802F01E0(&v53, 0LL, 96LL);
-			//       HG::Rendering::RenderGraphModule::TextureDesc::TextureDesc(&v53, input.screenSize, 0LL);
-			//       v50 = v53;
-			//       v50.colorFormat = colorFormat;
-			//       *(_WORD *)&v50.enableRandomWrite = 0;
-			//       v50.autoGenerateMips = 0;
-			//       m_rtNames = this.fields.m_rtNames;
-			//       if ( !m_rtNames )
-			//         sub_1802DC2C8(0LL, v38);
-			//       v50.name = *(String **)(sub_18037A2A0(m_rtNames, v11) + 16);
-			//       if ( dword_18D8E43F8 )
-			//       {
-			//         v40 = (((unsigned __int64)&v50.name >> 12) & 0x1FFFFF) >> 6;
-			//         _m_prefetchw(&qword_18D6405E0[v40 + 36190]);
-			//         do
-			//           v41 = qword_18D6405E0[v40 + 36190];
-			//         while ( v41 != _InterlockedCompareExchange64(
-			//                          &qword_18D6405E0[v40 + 36190],
-			//                          v41 | (1LL << (((unsigned __int64)&v50.name >> 12) & 0x3F)),
-			//                          v41) );
-			//       }
-			//       v54 = v50;
-			//       v47 = *HG::Rendering::RenderGraphModule::HGRenderGraph::CreateTexture(
-			//                (TextureHandle *)&si128,
-			//                renderGraph,
-			//                &v54,
-			//                0LL);
-			//       si128 = _mm_load_si128((const __m128i *)&xmmword_18A3576D0);
-			//       HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::SetColorAttachment(
-			//         (TextureHandle *)&v52,
-			//         &v49,
-			//         &v47,
-			//         0,
-			//         RenderBufferLoadAction__Enum_DontCare,
-			//         RenderBufferStoreAction__Enum_Store,
-			//         (Color *)&si128,
-			//         0,
-			//         0LL);
-			//       sub_180002C70(TypeInfo::HG::Rendering::Runtime::TAAUPassConstructor);
-			//       HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::SetRenderFunc<System::Object>(
-			//         &v49,
-			//         (RenderFunc_1_System_Object_ *)TypeInfo::HG::Rendering::Runtime::TAAUPassConstructor.static_fields.s_resolveRenderFunc,
-			//         0LL,
-			//         0,
-			//         MethodInfo::HG::Rendering::RenderGraphModule::HGRenderGraphBuilder::SetRenderFunc<HG::Rendering::Runtime::TAAUPassConstructor::ResolvePassData>);
-			//       output.currentSceneColor = v47;
-			//     }
-			//     catch ( Il2CppExceptionWrapper *v51 )
-			//     {
-			//       v48[0] = v51.ex;
-			//     }
-			//     sub_180222690(v48);
-			//   }
-			// }
-			// 
-		}
-
-		private void HG.Rendering.Runtime.IPassConstructor.Dispose(HGRenderGraph renderGraph)
-		{
-			// // Void HG.Rendering.Runtime.IPassConstructor.Dispose(HGRenderGraph)
-			// void HG::Rendering::Runtime::TAAUPassConstructor::HG_Rendering_Runtime_IPassConstructor_Dispose(
-			//         TAAUPassConstructor *this,
-			//         HGRenderGraph *renderGraph,
-			//         MethodInfo *method)
-			// {
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			//   __int64 v6; // rdx
-			//   __int64 v7; // rcx
-			// 
-			//   if ( IFix::WrappersManagerImpl::IsPatched(2827, 0LL) )
-			//   {
-			//     Patch = IFix::WrappersManagerImpl::GetPatch(2827, 0LL);
-			//     if ( !Patch )
-			//       sub_180B536AC(v7, v6);
-			//     IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_1(
-			//       (ILFixDynamicMethodWrapper_37 *)Patch,
-			//       (Object *)this,
-			//       (Object *)renderGraph,
-			//       0LL);
-			//   }
-			// }
-			// 
-		}
-
-		private float ComputeSharpenStrength(in Vector2Int screenSize, TAAUPassConstructor.SharpenStrengthParam param)
-		{
-			// // Single ComputeSharpenStrength(Vector2Int ByRef, TAAUPassConstructor+SharpenStrengthParam)
-			// float HG::Rendering::Runtime::TAAUPassConstructor::ComputeSharpenStrength(
-			//         TAAUPassConstructor *this,
-			//         Vector2Int *screenSize,
-			//         TAAUPassConstructor_SharpenStrengthParam *param,
-			//         MethodInfo *method)
-			// {
-			//   Beyond::JobMathf *v7; // rcx
-			//   float v8; // xmm1_4
-			//   float sharpen2K; // xmm4_4
-			//   float v10; // xmm0_4
-			//   double v11; // xmm0_8
-			//   __int64 v12; // rdx
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rcx
-			//   float sharpen4K; // eax
-			//   TAAUPassConstructor_SharpenStrengthParam v16; // [rsp+30h] [rbp-18h] BYREF
-			// 
-			//   if ( IFix::WrappersManagerImpl::IsPatched(2821, 0LL) )
-			//   {
-			//     Patch = IFix::WrappersManagerImpl::GetPatch(2821, 0LL);
-			//     if ( !Patch )
-			//       sub_180B536AC(0LL, v12);
-			//     sharpen4K = param.sharpen4K;
-			//     *(_QWORD *)&v16.sharpen1K = *(_QWORD *)&param.sharpen1K;
-			//     v16.sharpen4K = sharpen4K;
-			//     *(float *)&v11 = IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_1025(Patch, (Object *)this, screenSize, &v16, 0LL);
-			//   }
-			//   else
-			//   {
-			//     v8 = 2560.0;
-			//     if ( (float)screenSize.m_X < 2560.0 )
-			//     {
-			//       sharpen2K = param.sharpen2K;
-			//       v10 = 1920.0;
-			//     }
-			//     else
-			//     {
-			//       sharpen2K = param.sharpen4K;
-			//       v10 = 2560.0;
-			//       v8 = 3840.0;
-			//     }
-			//     v11 = Beyond::JobMathf::ClampedLerp(
-			//             v7,
-			//             sharpen2K,
-			//             fminf(1.0, fmaxf((float)screenSize.m_X - v10, 0.0) / (float)(v8 - v10)));
-			//   }
-			//   return *(float *)&v11;
-			// }
-			// 
-			return 0f;
-		}
-
-		private static void ComputeGaussianKernel(float stdDev, ref float[] kernel)
-		{
-			// // Void ComputeGaussianKernel(Single, Single[] ByRef)
-			// void HG::Rendering::Runtime::TAAUPassConstructor::ComputeGaussianKernel(
-			//         float stdDev,
-			//         Single__Array **kernel,
-			//         MethodInfo *method)
-			// {
-			//   __int64 v4; // rdx
-			//   Single__Array *v5; // rcx
-			//   Single__Array *v6; // rdi
-			//   float v7; // xmm6_4
-			//   Single__Array *v8; // rdi
-			//   Single__Array *v9; // rdi
-			//   Single__Array *v10; // rdi
-			//   Single__Array *v11; // rdi
-			//   Single__Array *v12; // rdi
-			//   Single__Array *v13; // rdi
-			//   Single__Array *v14; // rdi
-			//   Single__Array *v15; // rdi
-			//   Single__Array *v16; // rax
-			//   float v17; // xmm6_4
-			//   float *v18; // rax
-			//   float *v19; // rax
-			//   float *v20; // rax
-			//   float *v21; // rax
-			//   float *v22; // rax
-			//   float *v23; // rax
-			//   float *v24; // rax
-			//   float *v25; // rax
-			//   float *v26; // rax
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			// 
-			//   if ( !IFix::WrappersManagerImpl::IsPatched(2828, 0LL) )
-			//   {
-			//     v6 = *kernel;
-			//     v7 = stdDev * stdDev;
-			//     if ( !*kernel )
-			//       goto LABEL_33;
-			//     if ( !v6.max_length.size )
-			//       goto LABEL_34;
-			//     v6.vector[0] = sub_1802EA170() / (float)(v7 * 6.2831855);
-			//     v8 = *kernel;
-			//     if ( !*kernel )
-			//       goto LABEL_33;
-			//     if ( v8.max_length.size <= 1u )
-			//       goto LABEL_34;
-			//     v8.vector[1] = sub_1802EA170() / (float)(v7 * 6.2831855);
-			//     v9 = *kernel;
-			//     if ( !*kernel )
-			//       goto LABEL_33;
-			//     if ( v9.max_length.size <= 2u )
-			//       goto LABEL_34;
-			//     v9.vector[2] = sub_1802EA170() / (float)(v7 * 6.2831855);
-			//     v10 = *kernel;
-			//     if ( !*kernel )
-			//       goto LABEL_33;
-			//     if ( v10.max_length.size <= 3u )
-			//       goto LABEL_34;
-			//     v10.vector[3] = sub_1802EA170() / (float)(v7 * 6.2831855);
-			//     v11 = *kernel;
-			//     if ( !*kernel )
-			//       goto LABEL_33;
-			//     if ( v11.max_length.size <= 4u )
-			//       goto LABEL_34;
-			//     v11.vector[4] = sub_1802EA170() / (float)(v7 * 6.2831855);
-			//     v12 = *kernel;
-			//     if ( !*kernel )
-			//       goto LABEL_33;
-			//     if ( v12.max_length.size <= 5u )
-			//       goto LABEL_34;
-			//     v12.vector[5] = sub_1802EA170() / (float)(v7 * 6.2831855);
-			//     v13 = *kernel;
-			//     if ( !*kernel )
-			//       goto LABEL_33;
-			//     if ( v13.max_length.size <= 6u )
-			//       goto LABEL_34;
-			//     v13.vector[6] = sub_1802EA170() / (float)(v7 * 6.2831855);
-			//     v14 = *kernel;
-			//     if ( !*kernel )
-			//       goto LABEL_33;
-			//     if ( v14.max_length.size <= 7u )
-			//       goto LABEL_34;
-			//     v14.vector[7] = sub_1802EA170() / (float)(v7 * 6.2831855);
-			//     v15 = *kernel;
-			//     if ( !*kernel )
-			//       goto LABEL_33;
-			//     if ( v15.max_length.size <= 8u )
-			//       goto LABEL_34;
-			//     v15.vector[8] = sub_1802EA170() / (float)(v7 * 6.2831855);
-			//     v16 = *kernel;
-			//     if ( !*kernel )
-			//       goto LABEL_33;
-			//     if ( !v16.max_length.size || (v5 = *kernel, v16.max_length.size <= 8u) )
-			// LABEL_34:
-			//       sub_180070270(v5, v4);
-			//     v17 = (float)((float)((float)((float)((float)((float)((float)((float)(v16.vector[0] + 0.0) + v16.vector[1])
-			//                                                         + v16.vector[2])
-			//                                                 + v16.vector[3])
-			//                                         + v16.vector[4])
-			//                                 + v16.vector[5])
-			//                         + v16.vector[6])
-			//                 + v16.vector[7])
-			//         + v16.vector[8];
-			//     if ( v16 )
-			//     {
-			//       v18 = (float *)sub_18003ECE0(v5, 0LL);
-			//       *v18 = *v18 / v17;
-			//       v5 = *kernel;
-			//       if ( *kernel )
-			//       {
-			//         v19 = (float *)sub_18003ECE0(v5, 1LL);
-			//         *v19 = *v19 / v17;
-			//         v5 = *kernel;
-			//         if ( *kernel )
-			//         {
-			//           v20 = (float *)sub_18003ECE0(v5, 2LL);
-			//           *v20 = *v20 / v17;
-			//           v5 = *kernel;
-			//           if ( *kernel )
-			//           {
-			//             v21 = (float *)sub_18003ECE0(v5, 3LL);
-			//             *v21 = *v21 / v17;
-			//             v5 = *kernel;
-			//             if ( *kernel )
-			//             {
-			//               v22 = (float *)sub_18003ECE0(v5, 4LL);
-			//               *v22 = *v22 / v17;
-			//               v5 = *kernel;
-			//               if ( *kernel )
-			//               {
-			//                 v23 = (float *)sub_18003ECE0(v5, 5LL);
-			//                 *v23 = *v23 / v17;
-			//                 v5 = *kernel;
-			//                 if ( *kernel )
-			//                 {
-			//                   v24 = (float *)sub_18003ECE0(v5, 6LL);
-			//                   *v24 = *v24 / v17;
-			//                   v5 = *kernel;
-			//                   if ( *kernel )
-			//                   {
-			//                     v25 = (float *)sub_18003ECE0(v5, 7LL);
-			//                     *v25 = *v25 / v17;
-			//                     v5 = *kernel;
-			//                     if ( *kernel )
-			//                     {
-			//                       v26 = (float *)sub_18003ECE0(v5, 8LL);
-			//                       *v26 = *v26 / v17;
-			//                       return;
-			//                     }
-			//                   }
-			//                 }
-			//               }
-			//             }
-			//           }
-			//         }
-			//       }
-			//     }
-			// LABEL_33:
-			//     sub_180B536AC(v5, v4);
-			//   }
-			//   Patch = IFix::WrappersManagerImpl::GetPatch(2828, 0LL);
-			//   if ( !Patch )
-			//     goto LABEL_33;
-			//   IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_1029(Patch, stdDev, kernel, 0LL);
-			// }
-			// 
-		}
-
-		private float[] m_gaussianKernel;
-
-		private float m_gaussianKernelStdDev;
-
-		private Material[] m_taauPassMaterials;
-
-		private TAAUPassConstructor.TAAUConstants m_constants;
-
-		private TextureHandle m_historyDilatedSceneDepth;
-
-		private TextureHandle m_historyDilatedSceneMV;
-
-		private TAAUPassConstructor.RTNames[] m_rtNames;
-
-		[StaticFieldOffset(ThreadStatic = false, Offset = "0x00")]
-		private static readonly RenderFunc<TAAUPassConstructor.DilationPassData> s_dilationRenderFunc;
-
-		[StaticFieldOffset(ThreadStatic = false, Offset = "0x08")]
-		private static readonly RenderFunc<TAAUPassConstructor.MaskDilationPassData> s_maskDilationRenderFunc;
-
-		[StaticFieldOffset(ThreadStatic = false, Offset = "0x10")]
-		private static readonly RenderFunc<TAAUPassConstructor.ResolvePassData> s_resolveRenderFunc;
-
-		[StructLayout(LayoutKind.Sequential, Pack = 1, Size = 168)]
-		internal struct PassInput
-		{
-			internal TextureHandle sceneColor;
-
-			internal TextureHandle sceneDepth;
-
-			internal TextureHandle utilityDepth;
-
-			internal TextureHandle sceneMV;
-
-			internal TextureHandle historySceneColor;
-
-			internal Vector2Int renderSize;
-
-			internal Vector2Int screenSize;
-
-			internal float renderingScale;
-
-			internal float historyWeight;
-
-			internal float historyWeightInMotion;
-
-			internal float fastConvergeHistoryWeight;
-
-			internal float responsiveAAHistoryWeight;
-
-			internal float minMVConsideredDynamic;
-
-			internal float maxMVConsideredDynamic;
-
-			internal float characterMotionSensitivity;
-
-			internal float occlusionDepthDiff;
-
-			internal float inputSampleLumaWeight;
-
-			internal float sharpenStrength1K;
-
-			internal float sharpenStrength2K;
-
-			internal float sharpenStrength4K;
-
-			internal float enableResponsiveTransparency;
-
-			internal TAAUQuality quality;
-
-			internal int renderPathFrameIndex;
-
-			internal bool enableTAAU;
-
-			internal bool fastConvergeState;
-		}
-
-		[StructLayout(LayoutKind.Sequential, Pack = 1, Size = 16)]
-		internal struct PassOutput
-		{
-			internal TextureHandle currentSceneColor;
-		}
-
-		[StructLayout(LayoutKind.Sequential, Pack = 1, Size = 192)]
-		private struct TAAUConstants
-		{
-			public Vector4 taauParameters0;
-
-			public Vector4 taauParameters1;
-
-			public Vector4 taauParameters2;
-
-			public Vector4 taauParameters3;
-
-			public Vector4 taauParameters4;
-
-			public Vector4 taauParameters5;
-
-			public Vector4 taauParameters6;
-
-			public Vector4 taauParameters7;
-
-			public Vector4 taauParameters8;
-
-			public Vector4 kernelWeights0;
-
-			public Vector4 kernelWeights1;
-
-			public Vector4 kernelWeights2;
-		}
-
-		private class DilationPassData
-		{
-			public DilationPassData()
-			{
-				// // Void Lerp[HGWindConfig](HGWindConfig ByRef, HGWindConfig ByRef, Single)
-				// void HG::Rendering::Runtime::HGCelestialConfig::HGCelestialAdvancedObjectConfig::Lerp<HG::Rendering::Runtime::HGWindConfig>(
-				//         HGCelestialConfig_HGCelestialAdvancedObjectConfig *this,
-				//         HGWindConfig *cSrc,
-				//         HGWindConfig *cDst,
-				//         float t,
-				//         MethodInfo *method)
-				// {
-				//   ;
-				// }
-				// 
-			}
-
-			internal TextureHandle sceneDepth;
-
-			internal TextureHandle sceneMV;
-
-			internal TextureHandle currDilatedSceneDepth;
-
-			internal TextureHandle currDilatedSceneMV;
-
-			internal TextureHandle historyDilatedSceneDepth;
-
-			internal TextureHandle historyDilatedSceneMV;
-
-			internal Material material;
-		}
-
-		private class MaskDilationPassData
-		{
-			public MaskDilationPassData()
-			{
-				// // Void Lerp[HGWindConfig](HGWindConfig ByRef, HGWindConfig ByRef, Single)
-				// void HG::Rendering::Runtime::HGCelestialConfig::HGCelestialAdvancedObjectConfig::Lerp<HG::Rendering::Runtime::HGWindConfig>(
-				//         HGCelestialConfig_HGCelestialAdvancedObjectConfig *this,
-				//         HGWindConfig *cSrc,
-				//         HGWindConfig *cDst,
-				//         float t,
-				//         MethodInfo *method)
-				// {
-				//   ;
-				// }
-				// 
-			}
-
-			internal TextureHandle currDilatedMask;
-
-			internal Material material;
-		}
-
-		private class ResolvePassData
-		{
-			public ResolvePassData()
-			{
-				// // Void Lerp[HGWindConfig](HGWindConfig ByRef, HGWindConfig ByRef, Single)
-				// void HG::Rendering::Runtime::HGCelestialConfig::HGCelestialAdvancedObjectConfig::Lerp<HG::Rendering::Runtime::HGWindConfig>(
-				//         HGCelestialConfig_HGCelestialAdvancedObjectConfig *this,
-				//         HGWindConfig *cSrc,
-				//         HGWindConfig *cDst,
-				//         float t,
-				//         MethodInfo *method)
-				// {
-				//   ;
-				// }
-				// 
-			}
-
-			internal TextureHandle sceneColor;
-
-			internal TextureHandle sceneDepth;
-
-			internal TextureHandle sceneMV;
-
-			internal TextureHandle historySceneColor;
-
-			internal TAAUQuality quality;
-
-			internal Material material;
-		}
-
-		[StructLayout(LayoutKind.Sequential, Pack = 1, Size = 24)]
-		private struct RTNames
-		{
-			internal string dilatedDepthRTName;
-
-			internal string dilatedMVRTName;
-
-			internal string taauResultRTName;
-		}
-
-		private enum TAAUPass
-		{
-			DilationDepthReprojection,
-			MaskDilation,
-			FlickerDetection,
-			Resolve,
-			Count
-		}
-
-		[StructLayout(LayoutKind.Sequential, Pack = 1, Size = 12)]
-		private struct SharpenStrengthParam
-		{
-			public float sharpen1K;
-
-			public float sharpen2K;
-
-			public float sharpen4K;
-		}
+		
 	}
 }

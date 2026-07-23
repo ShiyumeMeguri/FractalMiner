@@ -1,199 +1,175 @@
-﻿using System;
-using System.Runtime.InteropServices;
+using System;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using HG.Rendering.Runtime;
 using UnityEngine;
 
+// Image 4: HG.RenderPipelines.Runtime.dll - Assembly: HG.RenderPipelines.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null - Types 37354-38879
+
 namespace HG.Rendering.ScriptBridge
 {
-	public class HGCameraConfig
+	public class HGCameraConfig // TypeDefIndex: 37412
 	{
-		public HGCameraConfig()
+		// Nested types
+		public struct HGCameraComponentsAttached // TypeDefIndex: 37411
 		{
-			// // Void Lerp[HGWindConfig](HGWindConfig ByRef, HGWindConfig ByRef, Single)
-			// void HG::Rendering::Runtime::HGCelestialConfig::HGCelestialAdvancedObjectConfig::Lerp<HG::Rendering::Runtime::HGWindConfig>(
-			//         HGCelestialConfig_HGCelestialAdvancedObjectConfig *this,
-			//         HGWindConfig *cSrc,
-			//         HGWindConfig *cDst,
-			//         float t,
-			//         MethodInfo *method)
-			// {
-			//   ;
-			// }
-			// 
+			// Fields
+			public HGDepthOfField depthOfField; // 0x00
+			public HGAdditionalCameraData cameraAdditionalData; // 0x08
 		}
-
-		public static HGCameraConfig.HGCameraComponentsAttached ConfigMainCamera(Camera camera)
+	
+		// Constructors
+		public HGCameraConfig() {} // 0x00000001841E1670-0x00000001841E1680
+		// Void Lerp[HGWindConfig](HGWindConfig ByRef, HGWindConfig ByRef, Single)
+		void HG::Rendering::Runtime::HGCelestialConfig::HGCelestialAdvancedObjectConfig::Lerp<HG::Rendering::Runtime::HGWindConfig>(
+		        HGCelestialConfig_HGCelestialAdvancedObjectConfig *this,
+		        HGWindConfig *cSrc,
+		        HGWindConfig *cDst,
+		        float t,
+		        MethodInfo *method)
 		{
-			// // HGCameraConfig+HGCameraComponentsAttached ConfigMainCamera(Camera)
-			// HGCameraConfig_HGCameraComponentsAttached *HG::Rendering::ScriptBridge::HGCameraConfig::ConfigMainCamera(
-			//         HGCameraConfig_HGCameraComponentsAttached *__return_ptr retstr,
-			//         Camera *camera,
-			//         MethodInfo *method)
-			// {
-			//   __int64 v5; // rdx
-			//   IEnumerable_1_HG_Rendering_Runtime_CSG_CSGPolygon_ *v6; // rdx
-			//   __int64 v7; // rcx
-			//   HGCamera *v8; // rdi
-			//   GameObject *gameObject; // rax
-			//   Object *v10; // rax
-			//   Bounds *v11; // r8
-			//   Object__Array *m_AdditionalCameraData; // r9
-			//   Object__Array *v13; // r9
-			//   IEnumerable_1_HG_Rendering_Runtime_CSG_CSGPolygon_ *v14; // rdx
-			//   Bounds *v15; // r8
-			//   HGCameraConfig_HGCameraComponentsAttached v16; // xmm0
-			//   HGCameraConfig_HGCameraComponentsAttached *result; // rax
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			//   _BYTE v19[40]; // [rsp+20h] [rbp-28h] BYREF
-			// 
-			//   if ( !byte_18D8ED943 )
-			//   {
-			//     sub_18003C530(&MethodInfo::UnityEngine::GameObject::AddComponent<HG::Rendering::Runtime::HGDepthOfField>);
-			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGCamera);
-			//     byte_18D8ED943 = 1;
-			//   }
-			//   if ( IFix::WrappersManagerImpl::IsPatched(27, 0LL) )
-			//   {
-			//     Patch = IFix::WrappersManagerImpl::GetPatch(27, 0LL);
-			//     if ( Patch )
-			//     {
-			//       v16 = *IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_18(
-			//                (HGCameraConfig_HGCameraComponentsAttached *)&v19[16],
-			//                Patch,
-			//                (Object *)camera,
-			//                0LL);
-			//       goto LABEL_11;
-			//     }
-			// LABEL_7:
-			//     sub_180B536AC(v7, v6);
-			//   }
-			//   HG::Rendering::ScriptBridge::HGCameraConfig::ApplyTableCameraSettings(camera, 0LL);
-			//   if ( !TypeInfo::HG::Rendering::Runtime::HGCamera._1.cctor_finished_or_no_cctor )
-			//     il2cpp_runtime_class_init_0(TypeInfo::HG::Rendering::Runtime::HGCamera, v5);
-			//   v8 = HG::Rendering::Runtime::HGCamera::GetOrCreate(camera, 0, 0LL);
-			//   if ( !camera )
-			//     goto LABEL_7;
-			//   gameObject = UnityEngine::Component::get_gameObject((Component *)camera, 0LL);
-			//   if ( !gameObject )
-			//     goto LABEL_7;
-			//   v10 = UnityEngine::GameObject::AddComponent<System::Object>(
-			//           gameObject,
-			//           MethodInfo::UnityEngine::GameObject::AddComponent<HG::Rendering::Runtime::HGDepthOfField>);
-			//   if ( !v8 )
-			//     goto LABEL_7;
-			//   m_AdditionalCameraData = (Object__Array *)v8.fields.m_AdditionalCameraData;
-			//   *(_OWORD *)v19 = (unsigned __int64)v10;
-			//   ((void (__stdcall *)(BSP *, IEnumerable_1_HG_Rendering_Runtime_CSG_CSGPolygon_ *, Bounds *, Object__Array *))sub_1800054D0)(
-			//     (BSP *)v19,
-			//     v6,
-			//     v11,
-			//     m_AdditionalCameraData);
-			//   *(_QWORD *)&v19[8] = v13;
-			//   ((void (__stdcall *)(BSP *, IEnumerable_1_HG_Rendering_Runtime_CSG_CSGPolygon_ *, Bounds *, Object__Array *, MethodInfo *))sub_1800054D0)(
-			//     (BSP *)&v19[8],
-			//     v14,
-			//     v15,
-			//     v13,
-			//     *(MethodInfo **)v19);
-			//   v16 = *(HGCameraConfig_HGCameraComponentsAttached *)v19;
-			// LABEL_11:
-			//   result = retstr;
-			//   *retstr = v16;
-			//   return result;
-			// }
-			// 
-			return default(HGCameraConfig.HGCameraComponentsAttached);
+		  ;
 		}
-
-		public static void ConfigUICamera(Camera camera)
+		
+	
+		// Methods
+		public static HGCameraComponentsAttached ConfigMainCamera(Camera camera) => default; // 0x000000018394ECB0-0x000000018394ED90
+		// HGCameraConfig+HGCameraComponentsAttached ConfigMainCamera(Camera)
+		HGCameraConfig_HGCameraComponentsAttached *HG::Rendering::ScriptBridge::HGCameraConfig::ConfigMainCamera(
+		        HGCameraConfig_HGCameraComponentsAttached *__return_ptr retstr,
+		        Camera *camera,
+		        MethodInfo *method)
 		{
-			// // Void ConfigUICamera(Camera)
-			// void HG::Rendering::ScriptBridge::HGCameraConfig::ConfigUICamera(Camera *camera, MethodInfo *method)
-			// {
-			//   __int64 v3; // rdx
-			//   HGCamera *v4; // rax
-			//   __int64 v5; // rdx
-			//   Camera *m_AdditionalCameraData; // rcx
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			// 
-			//   if ( !byte_18D8ED944 )
-			//   {
-			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGCamera);
-			//     byte_18D8ED944 = 1;
-			//   }
-			//   if ( !IFix::WrappersManagerImpl::IsPatched(30, 0LL) )
-			//   {
-			//     if ( !TypeInfo::HG::Rendering::Runtime::HGCamera._1.cctor_finished_or_no_cctor )
-			//       il2cpp_runtime_class_init_0(TypeInfo::HG::Rendering::Runtime::HGCamera, v3);
-			//     v4 = HG::Rendering::Runtime::HGCamera::GetOrCreate(camera, 0, 0LL);
-			//     if ( v4 )
-			//     {
-			//       m_AdditionalCameraData = (Camera *)v4.fields.m_AdditionalCameraData;
-			//       if ( m_AdditionalCameraData )
-			//       {
-			//         HIDWORD(m_AdditionalCameraData[3].klass) = 1;
-			//         m_AdditionalCameraData = v4.fields.camera;
-			//         if ( m_AdditionalCameraData )
-			//         {
-			//           UnityEngine::Camera::SetLightWeight(m_AdditionalCameraData, 1, 0LL);
-			//           return;
-			//         }
-			//       }
-			//     }
-			// LABEL_10:
-			//     sub_180B536AC(m_AdditionalCameraData, v5);
-			//   }
-			//   Patch = IFix::WrappersManagerImpl::GetPatch(30, 0LL);
-			//   if ( !Patch )
-			//     goto LABEL_10;
-			//   IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_0((ILFixDynamicMethodWrapper_37 *)Patch, (Object *)camera, 0LL);
-			// }
-			// 
+		  __int64 v5; // rdx
+		  __int64 v6; // rcx
+		  HGCamera *v7; // rdi
+		  GameObject *gameObject; // rax
+		  Object *v9; // rbx
+		  Int32__Array **additionalCameraData; // rax
+		  Action_1_HG_Rendering_Runtime_VolumetricRenderer_VolumetricCallbackContext_ *v11; // rdx
+		  VolumetricRenderer_VolumetricBounds *v12; // r8
+		  Int32__Array **v13; // r9
+		  Action_1_HG_Rendering_Runtime_VolumetricRenderer_VolumetricCallbackContext_ *v14; // rdx
+		  VolumetricRenderer_VolumetricBounds *v15; // r8
+		  HGCameraConfig_HGCameraComponentsAttached v16; // xmm0
+		  HGCameraConfig_HGCameraComponentsAttached *result; // rax
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  HGCameraConfig_HGCameraComponentsAttached v19; // [rsp+20h] [rbp-28h] BYREF
+		  HGCameraConfig_HGCameraComponentsAttached v20; // [rsp+30h] [rbp-18h] BYREF
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(21, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(21, 0LL);
+		    if ( Patch )
+		    {
+		      v16 = *IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_14(&v20, Patch, (Object *)camera, 0LL);
+		      goto LABEL_9;
+		    }
+		LABEL_5:
+		    sub_1800D8260(v6, v5);
+		  }
+		  HG::Rendering::ScriptBridge::HGCameraConfig::ApplyTableCameraSettings(camera, 0LL);
+		  if ( !TypeInfo::HG::Rendering::Runtime::HGCamera->_1.cctor_finished_or_no_cctor )
+		    il2cpp_runtime_class_init_1(TypeInfo::HG::Rendering::Runtime::HGCamera);
+		  v7 = HG::Rendering::Runtime::HGCamera::GetOrCreate(camera, 0, 0LL);
+		  if ( !camera )
+		    goto LABEL_5;
+		  gameObject = UnityEngine::Component::get_gameObject((Component *)camera, 0LL);
+		  if ( !gameObject )
+		    goto LABEL_5;
+		  v9 = UnityEngine::GameObject::AddComponent<System::Object>(
+		         gameObject,
+		         MethodInfo::UnityEngine::GameObject::AddComponent<HG::Rendering::Runtime::HGDepthOfField>);
+		  if ( !v7 )
+		    goto LABEL_5;
+		  additionalCameraData = (Int32__Array **)HG::Rendering::Runtime::HGCamera::get_additionalCameraData(v7, 0LL);
+		  v19 = (HGCameraConfig_HGCameraComponentsAttached)(unsigned __int64)v9;
+		  ((void (__stdcall *)(VolumetricRenderer_VolumetricRenderItem *, Action_1_HG_Rendering_Runtime_VolumetricRenderer_VolumetricCallbackContext_ *, VolumetricRenderer_VolumetricBounds *, Int32__Array **))sub_18002D1B0)(
+		    (VolumetricRenderer_VolumetricRenderItem *)&v19,
+		    v11,
+		    v12,
+		    additionalCameraData);
+		  v19.cameraAdditionalData = (HGAdditionalCameraData *)v13;
+		  ((void (__stdcall *)(VolumetricRenderer_VolumetricRenderItem *, Action_1_HG_Rendering_Runtime_VolumetricRenderer_VolumetricCallbackContext_ *, VolumetricRenderer_VolumetricBounds *, Int32__Array **, MethodInfo *))sub_18002D1B0)(
+		    (VolumetricRenderer_VolumetricRenderItem *)&v19.cameraAdditionalData,
+		    v14,
+		    v15,
+		    v13,
+		    (MethodInfo *)v19.depthOfField);
+		  v16 = v19;
+		LABEL_9:
+		  result = retstr;
+		  *retstr = v16;
+		  return result;
 		}
-
-		private static void ApplyTableCameraSettings(Camera camera)
+		
+		public static void ConfigUICamera(Camera camera) {} // 0x000000018394ED90-0x000000018394EE20
+		// Void ConfigUICamera(Camera)
+		void HG::Rendering::ScriptBridge::HGCameraConfig::ConfigUICamera(Camera *camera, MethodInfo *method)
 		{
-			// // Void ApplyTableCameraSettings(Camera)
-			// void HG::Rendering::ScriptBridge::HGCameraConfig::ApplyTableCameraSettings(Camera *camera, MethodInfo *method)
-			// {
-			//   __int64 v3; // rdx
-			//   HGCamera *v4; // rax
-			//   __int64 v5; // rdx
-			//   __int64 v6; // rcx
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			// 
-			//   if ( !byte_18D8ED945 )
-			//   {
-			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGCamera);
-			//     byte_18D8ED945 = 1;
-			//   }
-			//   if ( !IFix::WrappersManagerImpl::IsPatched(28, 0LL) )
-			//   {
-			//     if ( !TypeInfo::HG::Rendering::Runtime::HGCamera._1.cctor_finished_or_no_cctor )
-			//       il2cpp_runtime_class_init_0(TypeInfo::HG::Rendering::Runtime::HGCamera, v3);
-			//     v4 = HG::Rendering::Runtime::HGCamera::GetOrCreate(camera, 0, 0LL);
-			//     if ( v4 )
-			//     {
-			//       v4.fields.applyTableSettings = 1;
-			//       return;
-			//     }
-			// LABEL_8:
-			//     sub_180B536AC(v6, v5);
-			//   }
-			//   Patch = IFix::WrappersManagerImpl::GetPatch(28, 0LL);
-			//   if ( !Patch )
-			//     goto LABEL_8;
-			//   IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_0((ILFixDynamicMethodWrapper_37 *)Patch, (Object *)camera, 0LL);
-			// }
-			// 
+		  HGCamera *v3; // rax
+		  __int64 v4; // rdx
+		  Camera *v5; // rcx
+		  HGCamera *v6; // rbx
+		  HGAdditionalCameraData *additionalCameraData; // rax
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		
+		  if ( !IFix::WrappersManagerImpl::IsPatched(25, 0LL) )
+		  {
+		    if ( !TypeInfo::HG::Rendering::Runtime::HGCamera->_1.cctor_finished_or_no_cctor )
+		      il2cpp_runtime_class_init_1(TypeInfo::HG::Rendering::Runtime::HGCamera);
+		    v3 = HG::Rendering::Runtime::HGCamera::GetOrCreate(camera, 0, 0LL);
+		    v6 = v3;
+		    if ( v3 )
+		    {
+		      additionalCameraData = HG::Rendering::Runtime::HGCamera::get_additionalCameraData(v3, 0LL);
+		      if ( additionalCameraData )
+		      {
+		        additionalCameraData->fields.hgRenderPath = 1;
+		        v5 = v6->fields.camera;
+		        if ( v5 )
+		        {
+		          UnityEngine::Camera::SetLightWeight(v5, 1, 0LL);
+		          return;
+		        }
+		      }
+		    }
+		LABEL_5:
+		    sub_1800D8260(v5, v4);
+		  }
+		  Patch = IFix::WrappersManagerImpl::GetPatch(25, 0LL);
+		  if ( !Patch )
+		    goto LABEL_5;
+		  IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_0((ILFixDynamicMethodWrapper_39 *)Patch, (Object *)camera, 0LL);
 		}
-
-		[StructLayout(LayoutKind.Sequential, Pack = 1)]
-		public struct HGCameraComponentsAttached
+		
+		private static void ApplyTableCameraSettings(Camera camera) {} // 0x000000018394E700-0x000000018394E760
+		// Void ApplyTableCameraSettings(Camera)
+		void HG::Rendering::ScriptBridge::HGCameraConfig::ApplyTableCameraSettings(Camera *camera, MethodInfo *method)
 		{
-			public HGDepthOfField depthOfField;
-
-			public HGAdditionalCameraData cameraAdditionalData;
+		  HGCamera *v3; // rax
+		  __int64 v4; // rdx
+		  __int64 v5; // rcx
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		
+		  if ( !IFix::WrappersManagerImpl::IsPatched(22, 0LL) )
+		  {
+		    if ( !TypeInfo::HG::Rendering::Runtime::HGCamera->_1.cctor_finished_or_no_cctor )
+		      il2cpp_runtime_class_init_1(TypeInfo::HG::Rendering::Runtime::HGCamera);
+		    v3 = HG::Rendering::Runtime::HGCamera::GetOrCreate(camera, 0, 0LL);
+		    if ( v3 )
+		    {
+		      v3->fields.applyTableSettings = 1;
+		      return;
+		    }
+		LABEL_6:
+		    sub_1800D8260(v5, v4);
+		  }
+		  Patch = IFix::WrappersManagerImpl::GetPatch(22, 0LL);
+		  if ( !Patch )
+		    goto LABEL_6;
+		  IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_0((ILFixDynamicMethodWrapper_39 *)Patch, (Object *)camera, 0LL);
 		}
+		
 	}
 }

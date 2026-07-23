@@ -1,14 +1,16 @@
-﻿using System;
-using System.Runtime.InteropServices;
+using System;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using UnityEngine;
+
+// Image 4: HG.RenderPipelines.Runtime.dll - Assembly: HG.RenderPipelines.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null - Types 37354-38879
 
 namespace HG.Rendering.Runtime
 {
-	[StructLayout(LayoutKind.Sequential, Pack = 1, Size = 60)]
-	internal struct TerrainDeformRenderData
+	internal struct TerrainDeformRenderData // TypeDefIndex: 38649
 	{
-		public TerrainDeformConstData constData;
-
-		public Vector3 curCenter;
+		// Fields
+		public TerrainDeformConstData constData; // 0x00
+		public Vector3 curCenter; // 0x30
 	}
 }

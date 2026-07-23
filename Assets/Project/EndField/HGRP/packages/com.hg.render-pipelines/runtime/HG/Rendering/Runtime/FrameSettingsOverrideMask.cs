@@ -1,17 +1,19 @@
-﻿using System;
+using System;
 using System.Diagnostics;
-using System.Runtime.InteropServices;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.Rendering;
 
+// Image 4: HG.RenderPipelines.Runtime.dll - Assembly: HG.RenderPipelines.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null - Types 37354-38879
+
 namespace HG.Rendering.Runtime
 {
-	[DebuggerDisplay("{mask.humanizedData}")]
 	[Serializable]
-	[StructLayout(LayoutKind.Sequential, Pack = 1, Size = 16)]
-	public struct FrameSettingsOverrideMask
+	[DebuggerDisplay("{mask.humanizedData}")]
+	public struct FrameSettingsOverrideMask // TypeDefIndex: 38532
 	{
+		// Fields
 		[SerializeField]
-		public BitArray128 mask;
+		public BitArray128 mask; // 0x00
 	}
 }

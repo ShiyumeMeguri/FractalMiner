@@ -1,110 +1,142 @@
-﻿using System;
+using System;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using UnityEngine;
+
+// Image 4: HG.RenderPipelines.Runtime.dll - Assembly: HG.RenderPipelines.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null - Types 37354-38879
 
 namespace HG.Rendering.Runtime
 {
-	[RequireComponent(typeof(Renderer))]
+	[AddComponentMenu("HG/Effect/VFXSortingOrder(\u4FEE\u6539\u6E32\u67D3\u987A\u5E8F)")]
 	[ExecuteAlways]
-	[AddComponentMenu("HG/Effect/VFXSortingOrder(修改渲染顺序)")]
-	public class VFXSortingOrder : MonoBehaviour
+	[RequireComponent(typeof(Renderer))]
+	public class VFXSortingOrder : MonoBehaviour // TypeDefIndex: 37979
 	{
-		public VFXSortingOrder()
+		// Fields
+		public int sortingOrder; // 0x18
+		private Renderer m_renderer; // 0x20
+	
+		// Constructors
+		public VFXSortingOrder() {} // 0x0000000183695570-0x0000000183695590
+		// LuaUIWidget()
+		void Beyond::Lua::LuaUIWidget::LuaUIWidget(LuaUIWidget *this, MethodInfo *method)
 		{
-			// // Singleton`1[System.Object]()
-			// void RootMotion::Singleton<System::Object>::Singleton(Singleton_1_System_Object__1 *this, MethodInfo *method)
-			// {
-			//   UnityEngine::Component::Component((Component *)this, 0LL);
-			// }
-			// 
+		  if ( !TypeInfo::UnityEngine::Object->_1.cctor_finished_or_no_cctor )
+		    il2cpp_runtime_class_init_1(TypeInfo::UnityEngine::Object);
 		}
-
-		private void Awake()
+		
+	
+		// Methods
+		private void Awake() {} // 0x0000000183484B60-0x0000000183484BB0
+		// Void Awake()
+		void HG::Rendering::Runtime::VFXSortingOrder::Awake(VFXSortingOrder *this, MethodInfo *method)
 		{
-			// // Void Awake()
-			// void HG::Rendering::Runtime::VFXSortingOrder::Awake(VFXSortingOrder *this, MethodInfo *method)
-			// {
-			//   HGRenderPathBase_HGRenderPathResources *v3; // rdx
-			//   PassConstructorID__Enum__Array *v4; // r8
-			//   HGCamera *v5; // r9
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			//   __int64 v7; // rdx
-			//   __int64 v8; // rcx
-			//   MethodInfo *v9; // [rsp+50h] [rbp+28h]
-			//   MethodInfo *v10; // [rsp+58h] [rbp+30h]
-			// 
-			//   if ( !byte_18D8ED9B0 )
-			//   {
-			//     sub_18003C530(&MethodInfo::UnityEngine::Component::GetComponent<UnityEngine::Renderer>);
-			//     byte_18D8ED9B0 = 1;
-			//   }
-			//   if ( IFix::WrappersManagerImpl::IsPatched(2161, 0LL) )
-			//   {
-			//     Patch = IFix::WrappersManagerImpl::GetPatch(2161, 0LL);
-			//     if ( !Patch )
-			//       sub_180B536AC(v8, v7);
-			//     IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_0((ILFixDynamicMethodWrapper_37 *)Patch, (Object *)this, 0LL);
-			//   }
-			//   else
-			//   {
-			//     this.fields.m_renderer = (Renderer *)UnityEngine::Component::GetComponent<System::Object>(
-			//                                             (Component *)this,
-			//                                             MethodInfo::UnityEngine::Component::GetComponent<UnityEngine::Renderer>);
-			//     sub_1800054D0((HGRenderPathScene *)&this.fields.m_renderer, v3, v4, v5, v9, v10);
-			//   }
-			// }
-			// 
+		  HGRuntimeGrassQuery_Node *v3; // rdx
+		  HGRuntimeGrassQuery_Node *v4; // r8
+		  Int32__Array **v5; // r9
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v7; // rdx
+		  __int64 v8; // rcx
+		  MethodInfo *v9; // [rsp+50h] [rbp+28h]
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(2610, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(2610, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(v8, v7);
+		    IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_0((ILFixDynamicMethodWrapper_39 *)Patch, (Object *)this, 0LL);
+		  }
+		  else
+		  {
+		    this->fields.m_renderer = (Renderer *)UnityEngine::Component::GetComponent<System::Object>(
+		                                            (Component *)this,
+		                                            MethodInfo::UnityEngine::Component::GetComponent<UnityEngine::Renderer>);
+		    sub_18002D1B0((HGRuntimeGrassQuery_Node *)&this->fields.m_renderer, v3, v4, v5, v9);
+		  }
 		}
-
-		private void OnEnable()
+		
+		private void OnEnable() {} // 0x00000001837D5040-0x00000001837D50C0
+		// Void OnEnable()
+		void HG::Rendering::Runtime::VFXSortingOrder::OnEnable(VFXSortingOrder *this, MethodInfo *method)
 		{
-			// // Void OnEnable()
-			// void HG::Rendering::Runtime::VFXSortingOrder::OnEnable(VFXSortingOrder *this, MethodInfo *method)
-			// {
-			//   __int64 v3; // rdx
-			//   Object_1 *m_renderer; // rdi
-			//   __int64 v5; // rdx
-			//   Renderer *v6; // rcx
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			// 
-			//   if ( !byte_18D8ED9B1 )
-			//   {
-			//     sub_18003C530(&TypeInfo::UnityEngine::Object);
-			//     byte_18D8ED9B1 = 1;
-			//   }
-			//   if ( IFix::WrappersManagerImpl::IsPatched(2162, 0LL) )
-			//   {
-			//     Patch = IFix::WrappersManagerImpl::GetPatch(2162, 0LL);
-			//     if ( !Patch )
-			//       goto LABEL_10;
-			//     IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_0((ILFixDynamicMethodWrapper_37 *)Patch, (Object *)this, 0LL);
-			//   }
-			//   else
-			//   {
-			//     m_renderer = (Object_1 *)this.fields.m_renderer;
-			//     if ( !TypeInfo::UnityEngine::Object._1.cctor_finished_or_no_cctor )
-			//       il2cpp_runtime_class_init_0(TypeInfo::UnityEngine::Object, v3);
-			//     if ( UnityEngine::Object::op_Implicit(m_renderer, 0LL) )
-			//     {
-			//       v6 = this.fields.m_renderer;
-			//       if ( v6 )
-			//       {
-			//         UnityEngine::Renderer::set_sortingOrder(v6, this.fields.sortingOrder, 0LL);
-			//         return;
-			//       }
-			// LABEL_10:
-			//       sub_180B536AC(v6, v5);
-			//     }
-			//   }
-			// }
-			// 
+		  Object_1 *m_renderer; // rdi
+		  __int64 v4; // rdx
+		  Renderer *v5; // rcx
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(2611, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(2611, 0LL);
+		    if ( !Patch )
+		      goto LABEL_8;
+		    IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_0((ILFixDynamicMethodWrapper_39 *)Patch, (Object *)this, 0LL);
+		  }
+		  else
+		  {
+		    m_renderer = (Object_1 *)this->fields.m_renderer;
+		    if ( !TypeInfo::UnityEngine::Object->_1.cctor_finished_or_no_cctor )
+		      il2cpp_runtime_class_init_1(TypeInfo::UnityEngine::Object);
+		    if ( UnityEngine::Object::op_Implicit(m_renderer, 0LL) )
+		    {
+		      v5 = this->fields.m_renderer;
+		      if ( v5 )
+		      {
+		        UnityEngine::Renderer::set_sortingOrder(v5, this->fields.sortingOrder, 0LL);
+		        return;
+		      }
+		LABEL_8:
+		      sub_1800D8260(v5, v4);
+		    }
+		  }
 		}
-
-		private void OnValidate()
+		
+		private void OnValidate() {} // 0x0000000189B6E170-0x0000000189B6E230
+		// Void OnValidate()
+		void HG::Rendering::Runtime::VFXSortingOrder::OnValidate(VFXSortingOrder *this, MethodInfo *method)
 		{
+		  Object_1 *m_renderer; // rbx
+		  HGRuntimeGrassQuery_Node *v4; // rdx
+		  HGRuntimeGrassQuery_Node *v5; // r8
+		  Int32__Array **v6; // r9
+		  Object_1 *v7; // rbx
+		  __int64 v8; // rdx
+		  Renderer *v9; // rcx
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  MethodInfo *v11; // [rsp+20h] [rbp-8h]
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(2612, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(2612, 0LL);
+		    if ( !Patch )
+		      goto LABEL_8;
+		    IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_0((ILFixDynamicMethodWrapper_39 *)Patch, (Object *)this, 0LL);
+		  }
+		  else
+		  {
+		    m_renderer = (Object_1 *)this->fields.m_renderer;
+		    sub_1800036A0(TypeInfo::UnityEngine::Object);
+		    if ( UnityEngine::Object::op_Equality(m_renderer, 0LL, 0LL) )
+		    {
+		      this->fields.m_renderer = (Renderer *)UnityEngine::Component::GetComponent<System::Object>(
+		                                              (Component *)this,
+		                                              MethodInfo::UnityEngine::Component::GetComponent<UnityEngine::Renderer>);
+		      sub_18002D1B0((HGRuntimeGrassQuery_Node *)&this->fields.m_renderer, v4, v5, v6, v11);
+		    }
+		    v7 = (Object_1 *)this->fields.m_renderer;
+		    sub_1800036A0(TypeInfo::UnityEngine::Object);
+		    if ( UnityEngine::Object::op_Implicit(v7, 0LL) )
+		    {
+		      v9 = this->fields.m_renderer;
+		      if ( v9 )
+		      {
+		        UnityEngine::Renderer::set_sortingOrder(v9, this->fields.sortingOrder, 0LL);
+		        return;
+		      }
+		LABEL_8:
+		      sub_1800D8260(v9, v8);
+		    }
+		  }
 		}
-
-		public int sortingOrder;
-
-		private Renderer m_renderer;
+		
 	}
 }

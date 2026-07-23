@@ -1,16 +1,17 @@
-﻿using System;
-using System.Runtime.InteropServices;
+using System;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using Unity.Mathematics;
+
+// Image 4: HG.RenderPipelines.Runtime.dll - Assembly: HG.RenderPipelines.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null - Types 37354-38879
 
 namespace HG.Rendering.Runtime
 {
-	[StructLayout(LayoutKind.Sequential, Pack = 1, Size = 48)]
-	internal struct ClothGroupUploadDataMap
+	internal struct ClothGroupUploadDataMap // TypeDefIndex: 37564
 	{
-		public int4 clothNodeDataMap;
-
-		public int4 clothBatchMetaDataMap;
-
-		public int4 clothBatchCacheDataMap;
+		// Fields
+		public int4 clothNodeDataMap; // 0x00
+		public int4 clothBatchMetaDataMap; // 0x10
+		public int4 clothBatchCacheDataMap; // 0x20
 	}
 }

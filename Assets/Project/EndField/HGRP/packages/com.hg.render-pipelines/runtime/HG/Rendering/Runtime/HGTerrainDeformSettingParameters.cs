@@ -1,105 +1,152 @@
-﻿using System;
+using System;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
+
+// Image 4: HG.RenderPipelines.Runtime.dll - Assembly: HG.RenderPipelines.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null - Types 37354-38879
 
 namespace HG.Rendering.Runtime
 {
-	public class HGTerrainDeformSettingParameters
+	public class HGTerrainDeformSettingParameters // TypeDefIndex: 38596
 	{
-		// (get) Token: 0x0600148B RID: 5259 RVA: 0x000025D2 File Offset: 0x000007D2
-		public SettingParameter<bool> Enable
+		// Fields
+		public static readonly string FEATURE_NAME; // 0x00
+	
+		// Properties
+		public SettingParameter<bool> Enable { get; } // 0x0000000182B2ECC0-0x0000000182B2ECD0 
+		// IValueSource get_source()
+		IValueSource *Beyond::ValueAdapter<Beyond::GameSetting::ScreenResolution>::get_source(
+		        ValueAdapter_1_GameSetting_ScreenResolution_ *this,
+		        MethodInfo *method)
 		{
-			[CompilerGenerated]
-			get
-			{
-				// // Object get_Current()
-				// Object *Rewired::Utils::Classes::Data::RingBuffer_1_T_::VFEweixJrFjiYwjUzBFjtcEMiCZW<System::Object>::get_Current(
-				//         RingBuffer_1_T_VFEweixJrFjiYwjUzBFjtcEMiCZW_System_Object_ *this,
-				//         MethodInfo *method)
-				// {
-				//   return this.current;
-				// }
-				// 
-				return null;
-			}
+		  return this->fields.m_source;
 		}
-
-		// (get) Token: 0x0600148C RID: 5260 RVA: 0x000025D2 File Offset: 0x000007D2
-		public SettingParameter<int> SubdMode
+		
+		public SettingParameter<int> SubdMode { get; } // 0x000000018385B100-0x000000018385B110 
+		// Object System.Collections.IEnumerator.get_Current()
+		Object *Rewired::Platforms::Custom::HardwareJoystickMapCustomPlatformMap_1_TMatchingCriteria_::vFJqwhcHvHdpsRAHqwODiJDbwkcr<System::Object>::System_Collections_IEnumerator_get_Current(
+		        HardwareJoystickMapCustomPlatformMap_1_TMatchingCriteria_vFJqwhcHvHdpsRAHqwODiJDbwkcr_System_Object_ *this,
+		        MethodInfo *method)
 		{
-			[CompilerGenerated]
-			get
-			{
-				// // Object System.Collections.IEnumerator.get_Current()
-				// Object *Rewired::Platforms::Custom::HardwareJoystickMapCustomPlatformMap_1_TMatchingCriteria_::vFJqwhcHvHdpsRAHqwODiJDbwkcr<System::Object>::System_Collections_IEnumerator_get_Current(
-				//         HardwareJoystickMapCustomPlatformMap_1_TMatchingCriteria_vFJqwhcHvHdpsRAHqwODiJDbwkcr_System_Object_ *this,
-				//         MethodInfo *method)
-				// {
-				//   return (Object *)this.fields.YcoKziTgrGqKCwJTNRuXadHqwkUP;
-				// }
-				// 
-				return null;
-			}
+		  return (Object *)this->fields.YcoKziTgrGqKCwJTNRuXadHqwkUP;
 		}
-
-		// (get) Token: 0x0600148D RID: 5261 RVA: 0x000025D2 File Offset: 0x000007D2
-		public SettingParameter<int> SubdModeV2
+		
+		public SettingParameter<int> SubdModeV2 { get; } // 0x0000000184D862C0-0x0000000184D862D0 
+		// Func`1[Single] get_getValueDelegate()
+		Func_1_Single_ *Rewired::Utils::Classes::Utility::ValueWatcher<float>::get_getValueDelegate(
+		        ValueWatcher_1_System_Single_ *this,
+		        MethodInfo *method)
 		{
-			[CompilerGenerated]
-			get
-			{
-				// // Func`1[Single] get_getValueDelegate()
-				// Func_1_Single_ *Rewired::Utils::Classes::Utility::ValueWatcher<float>::get_getValueDelegate(
-				//         ValueWatcher_1_System_Single_ *this,
-				//         MethodInfo *method)
-				// {
-				//   return this.fields.MHRAQZbVaKflzQthDWnBRvhnUSmRA;
-				// }
-				// 
-				return null;
-			}
+		  return this->fields.MHRAQZbVaKflzQthDWnBRvhnUSmRA;
 		}
-
-		// (get) Token: 0x0600148E RID: 5262 RVA: 0x000025D2 File Offset: 0x000007D2
-		public SettingParameter<int> GpuSubd
+		
+		public SettingParameter<int> GpuSubd { get; } // 0x0000000184D86240-0x0000000184D86250 
+		// Func`1[Object] get_getValueDelegate()
+		Func_1_Object_ *Rewired::Utils::Classes::Utility::ValueWatcher<System::Object>::get_getValueDelegate(
+		        ValueWatcher_1_System_Object_ *this,
+		        MethodInfo *method)
 		{
-			[CompilerGenerated]
-			get
-			{
-				// // Func`1[Object] get_getValueDelegate()
-				// Func_1_Object_ *Rewired::Utils::Classes::Utility::ValueWatcher<System::Object>::get_getValueDelegate(
-				//         ValueWatcher_1_System_Object_ *this,
-				//         MethodInfo *method)
-				// {
-				//   return this.fields.MHRAQZbVaKflzQthDWnBRvhnUSmRA;
-				// }
-				// 
-				return null;
-			}
+		  return this->fields.MHRAQZbVaKflzQthDWnBRvhnUSmRA;
 		}
-
-		// (get) Token: 0x0600148F RID: 5263 RVA: 0x000025D2 File Offset: 0x000007D2
-		public SettingParameter<int> PrimitivePixelLengthTargetLog2
+		
+		public SettingParameter<int> PrimitivePixelLengthTargetLog2 { get; } // 0x00000001811F36E0-0x00000001811F36F0 
+		// IList`1[System.Object] HkgvubNsiKaMGZpZDhgJNXzxwNEY()
+		IList_1_System_Object_ *aDnpaQcaHrbMtqQtSgzqebcYvhXN<System::Object>::HkgvubNsiKaMGZpZDhgJNXzxwNEY(
+		        aDnpaQcaHrbMtqQtSgzqebcYvhXN_1_System_Object_ *this,
+		        MethodInfo *method)
 		{
-			[CompilerGenerated]
-			get
-			{
-				// // IList`1[System.Object] HkgvubNsiKaMGZpZDhgJNXzxwNEY()
-				// IList_1_System_Object_ *aDnpaQcaHrbMtqQtSgzqebcYvhXN<System::Object>::HkgvubNsiKaMGZpZDhgJNXzxwNEY(
-				//         aDnpaQcaHrbMtqQtSgzqebcYvhXN_1_System_Object_ *this,
-				//         MethodInfo *method)
-				// {
-				//   return this.fields.YbVoRkZMMUxLLJcbAdHsvRhntcjw;
-				// }
-				// 
-				return null;
-			}
+		  return this->fields.YbVoRkZMMUxLLJcbAdHsvRhntcjw;
 		}
-
-		public HGTerrainDeformSettingParameters()
+		
+	
+		// Constructors
+		public HGTerrainDeformSettingParameters() {} // 0x00000001848AD230-0x00000001848AD370
+		// HGTerrainDeformSettingParameters()
+		void HG::Rendering::Runtime::HGTerrainDeformSettingParameters::HGTerrainDeformSettingParameters(
+		        HGTerrainDeformSettingParameters *this,
+		        MethodInfo *method)
 		{
+		  struct HGTerrainDeformSettingParameters__Class *v2; // rax
+		  HGRuntimeGrassQuery_Node *v4; // rdx
+		  HGRuntimeGrassQuery_Node *v5; // r8
+		  Int32__Array **v6; // r9
+		  HGRuntimeGrassQuery_Node *v7; // rdx
+		  HGRuntimeGrassQuery_Node *v8; // r8
+		  Int32__Array **v9; // r9
+		  HGRuntimeGrassQuery_Node *v10; // rdx
+		  HGRuntimeGrassQuery_Node *v11; // r8
+		  Int32__Array **v12; // r9
+		  HGRuntimeGrassQuery_Node *v13; // rdx
+		  HGRuntimeGrassQuery_Node *v14; // r8
+		  Int32__Array **v15; // r9
+		  HGRuntimeGrassQuery_Node *v16; // rdx
+		  HGRuntimeGrassQuery_Node *v17; // r8
+		  Int32__Array **v18; // r9
+		  MethodInfo *v19; // [rsp+20h] [rbp-8h]
+		  MethodInfo *v20; // [rsp+20h] [rbp-8h]
+		  MethodInfo *v21; // [rsp+20h] [rbp-8h]
+		  MethodInfo *v22; // [rsp+20h] [rbp-8h]
+		  MethodInfo *v23; // [rsp+50h] [rbp+28h]
+		
+		  v2 = TypeInfo::HG::Rendering::Runtime::HGTerrainDeformSettingParameters;
+		  if ( !TypeInfo::HG::Rendering::Runtime::HGTerrainDeformSettingParameters->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(TypeInfo::HG::Rendering::Runtime::HGTerrainDeformSettingParameters);
+		    v2 = TypeInfo::HG::Rendering::Runtime::HGTerrainDeformSettingParameters;
+		  }
+		  this->fields._Enable_k__BackingField = HG::Rendering::Runtime::SettingParameter::Create<bool>(
+		                                           0,
+		                                           v2->static_fields->FEATURE_NAME,
+		                                           (String *)"Enable",
+		                                           MethodInfo::HG::Rendering::Runtime::SettingParameter::Create<bool>);
+		  sub_18002D1B0((HGRuntimeGrassQuery_Node *)&this->fields, v4, v5, v6, v19);
+		  this->fields._SubdMode_k__BackingField = HG::Rendering::Runtime::SettingParameter::Create<int>(
+		                                             2,
+		                                             TypeInfo::HG::Rendering::Runtime::HGTerrainDeformSettingParameters->static_fields->FEATURE_NAME,
+		                                             (String *)"SubdMode",
+		                                             MethodInfo::HG::Rendering::Runtime::SettingParameter::Create<int>);
+		  sub_18002D1B0((HGRuntimeGrassQuery_Node *)&this->fields._SubdMode_k__BackingField, v7, v8, v9, v20);
+		  this->fields._SubdModeV2_k__BackingField = HG::Rendering::Runtime::SettingParameter::Create<int>(
+		                                               2,
+		                                               TypeInfo::HG::Rendering::Runtime::HGTerrainDeformSettingParameters->static_fields->FEATURE_NAME,
+		                                               (String *)"SubdModeV2",
+		                                               MethodInfo::HG::Rendering::Runtime::SettingParameter::Create<int>);
+		  sub_18002D1B0((HGRuntimeGrassQuery_Node *)&this->fields._SubdModeV2_k__BackingField, v10, v11, v12, v21);
+		  this->fields._GpuSubd_k__BackingField = HG::Rendering::Runtime::SettingParameter::Create<int>(
+		                                            3,
+		                                            TypeInfo::HG::Rendering::Runtime::HGTerrainDeformSettingParameters->static_fields->FEATURE_NAME,
+		                                            (String *)"GpuSubd",
+		                                            MethodInfo::HG::Rendering::Runtime::SettingParameter::Create<int>);
+		  sub_18002D1B0((HGRuntimeGrassQuery_Node *)&this->fields._GpuSubd_k__BackingField, v13, v14, v15, v22);
+		  this->fields._PrimitivePixelLengthTargetLog2_k__BackingField = HG::Rendering::Runtime::SettingParameter::Create<int>(
+		                                                                   3,
+		                                                                   TypeInfo::HG::Rendering::Runtime::HGTerrainDeformSettingParameters->static_fields->FEATURE_NAME,
+		                                                                   (String *)"PrimitivePixelLengthTargetLog2",
+		                                                                   MethodInfo::HG::Rendering::Runtime::SettingParameter::Create<int>);
+		  sub_18002D1B0(
+		    (HGRuntimeGrassQuery_Node *)&this->fields._PrimitivePixelLengthTargetLog2_k__BackingField,
+		    v16,
+		    v17,
+		    v18,
+		    v23);
 		}
-
-		[StaticFieldOffset(ThreadStatic = false, Offset = "0x00")]
-		public static readonly string FEATURE_NAME;
+		
+		static HGTerrainDeformSettingParameters() {} // 0x0000000184D80200-0x0000000184D80230
+		// HGTerrainDeformSettingParameters()
+		void HG::Rendering::Runtime::HGTerrainDeformSettingParameters::cctor(MethodInfo *method)
+		{
+		  HGRuntimeGrassQuery_Node *v1; // rdx
+		  HGRuntimeGrassQuery_Node *v2; // r8
+		  Int32__Array **v3; // r9
+		  MethodInfo *v4; // [rsp+28h] [rbp+28h]
+		
+		  TypeInfo::HG::Rendering::Runtime::HGTerrainDeformSettingParameters->static_fields->FEATURE_NAME = (String *)"TerrainDeform";
+		  sub_18002D1B0(
+		    (HGRuntimeGrassQuery_Node *)TypeInfo::HG::Rendering::Runtime::HGTerrainDeformSettingParameters->static_fields,
+		    v1,
+		    v2,
+		    v3,
+		    v4);
+		}
+		
 	}
 }

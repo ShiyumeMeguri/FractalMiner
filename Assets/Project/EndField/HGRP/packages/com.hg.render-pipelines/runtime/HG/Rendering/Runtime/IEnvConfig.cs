@@ -1,17 +1,18 @@
-﻿using System;
+using System;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
+
+// Image 4: HG.RenderPipelines.Runtime.dll - Assembly: HG.RenderPipelines.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null - Types 37354-38879
 
 namespace HG.Rendering.Runtime
 {
-	public interface IEnvConfig
+	public interface IEnvConfig // TypeDefIndex: 37636
 	{
-		// (get) Token: 0x060005D5 RID: 1493
-		// (set) Token: 0x060005D6 RID: 1494
-		bool active
-		{
-			get;
-			set;
-		}
-
-		void Lerp<T>(ref T src, ref T dst, float t) where T : struct, IEnvConfig;
+		// Properties
+		bool active { get; set; }
+	
+		// Methods
+		void Lerp<T>(ref ref T src, ref ref T dst, float t)
+			where T : struct, IEnvConfig;
 	}
 }

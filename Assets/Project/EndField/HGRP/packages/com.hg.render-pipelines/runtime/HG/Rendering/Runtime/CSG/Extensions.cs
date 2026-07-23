@@ -1,1419 +1,1304 @@
-﻿using System;
+using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using IFix.Core;
 using UnityEngine;
 
+// Image 4: HG.RenderPipelines.Runtime.dll - Assembly: HG.RenderPipelines.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null - Types 37354-38879
+
 namespace HG.Rendering.Runtime.CSG
 {
-	public static class Extensions
+	public static class Extensions // TypeDefIndex: 38816
 	{
-		public static void SplitPolygon(this Plane plane, CSGPolygon polygon, IList<CSGPolygon> coPlanarFront, IList<CSGPolygon> coPlanarBack, IList<CSGPolygon> front, IList<CSGPolygon> back)
+		// Fields
+		public const float EPSILON = 0.001f; // Metadata: 0x023044D9
+		public const float Epsilon = 0.001f; // Metadata: 0x023044DD
+		public static object lock1; // 0x00
+		public static object lock2; // 0x08
+		public static object lock3; // 0x10
+		public static object lock4; // 0x18
+	
+		// Constructors
+		static Extensions() {} // 0x0000000189C77DE8-0x0000000189C77EE4
+	
+		// Methods
+		public static Quaternion QuaternionFromMatrix(Matrix4x4 m) => default; // 0x0000000189C76220-0x0000000189C76520
+		// Quaternion QuaternionFromMatrix(Matrix4x4)
+		Quaternion *HG::Rendering::Runtime::CSG::Extensions::QuaternionFromMatrix(
+		        Quaternion *__return_ptr retstr,
+		        Matrix4x4 *m,
+		        MethodInfo *method)
 		{
-			// // Void SplitPolygon(Plane, CSGPolygon, IList`1[HG.Rendering.Runtime.CSG.CSGPolygon], IList`1[HG.Rendering.Runtime.CSG.CSGPolygon], IList`1[HG.Rendering.Runtime.CSG.CSGPolygon], IList`1[HG.Rendering.Runtime.CSG.CSGPolygon])
-			// // Hidden C++ exception states: #wind=6
-			// void HG::Rendering::Runtime::CSG::Extensions::SplitPolygon(
-			//         Plane *plane,
-			//         CSGPolygon *polygon,
-			//         IList_1_HG_Rendering_Runtime_CSG_CSGPolygon_ *coPlanarFront,
-			//         IList_1_HG_Rendering_Runtime_CSG_CSGPolygon_ *coPlanarBack,
-			//         IList_1_HG_Rendering_Runtime_CSG_CSGPolygon_ *front,
-			//         IList_1_HG_Rendering_Runtime_CSG_CSGPolygon_ *back,
-			//         MethodInfo *method)
-			// {
-			//   Object *v7; // r12
-			//   Object *v8; // rbx
-			//   CSGPolygon *v9; // rsi
-			//   Plane *v10; // r13
-			//   CSGVertex *v11; // rax
-			//   __int64 v12; // rdx
-			//   __int64 v13; // rcx
-			//   List_1_System_UInt32_ *v14; // r15
-			//   __int64 v15; // rdx
-			//   __int64 v16; // rcx
-			//   __int64 v17; // r8
-			//   int v18; // r14d
-			//   Object *v19; // rax
-			//   __int64 v20; // rdx
-			//   __int64 v21; // rcx
-			//   MethodInfo *v22; // r8
-			//   Int32Enum__Enum i; // ebx
-			//   CSGVertex__Array *Vertices; // rax
-			//   CSGVertex__Array *v25; // rcx
-			//   CSGVertex *v26; // r12
-			//   __int64 v27; // xmm6_8
-			//   float z; // ebx
-			//   __int64 v29; // rdx
-			//   __int64 v30; // rcx
-			//   float v31; // xmm0_4
-			//   __int64 v32; // rbx
-			//   int v33; // r14d
-			//   int v34; // r14d
-			//   __m128i v35; // xmm0
-			//   __int64 v36; // rdx
-			//   __int64 v37; // rcx
-			//   __int64 v38; // rdx
-			//   __int64 v39; // rcx
-			//   __int64 v40; // rdx
-			//   __int64 v41; // rcx
-			//   __int64 v42; // rdx
-			//   __int64 v43; // rcx
-			//   List_1_Beyond_Gameplay_ZhuangfySleeveSolver_BoneData_ *v44; // rax
-			//   CSGVertex__Array *v45; // rdx
-			//   unsigned __int64 j; // rcx
-			//   List_1_Beyond_Gameplay_ZhuangfySleeveSolver_BoneData_ *v47; // rbx
-			//   List_1_Beyond_Gameplay_ZhuangfySleeveSolver_BoneData_ *v48; // rax
-			//   List_1_Beyond_Gameplay_ZhuangfySleeveSolver_BoneData_ *v49; // r14
-			//   unsigned int v50; // r12d
-			//   CSGVertex__Array *v51; // rax
-			//   __int64 v52; // r8
-			//   __int64 v53; // r9
-			//   CSGVertex__Array *v54; // rax
-			//   CSGVertex *v55; // rax
-			//   Int32Enum__Enum v56; // eax
-			//   float v57; // xmm7_4
-			//   Object *v58; // rbx
-			//   int32_t objID; // r12d
-			//   int32_t materialID; // r13d
-			//   CSGPolygon *v61; // rax
-			//   __int64 v62; // rdx
-			//   __int64 v63; // rcx
-			//   CSGPolygon *v64; // r15
-			//   __int64 v65; // rdx
-			//   __int64 v66; // rcx
-			//   int32_t v67; // r15d
-			//   int32_t v68; // esi
-			//   CSGPolygon *v69; // rax
-			//   __int64 v70; // rdx
-			//   __int64 v71; // rcx
-			//   CSGPolygon *v72; // rbx
-			//   __int64 v73; // rdx
-			//   __int64 v74; // rcx
-			//   __int64 v75; // rdx
-			//   __int64 v76; // rcx
-			//   ILFixDynamicMethodWrapper_2 *Patch; // r14
-			//   bool lockTaken; // [rsp+40h] [rbp-168h] BYREF
-			//   Object *obj; // [rsp+48h] [rbp-160h] BYREF
-			//   Int32Enum__Enum Item; // [rsp+50h] [rbp-158h]
-			//   Plane v81; // [rsp+60h] [rbp-148h] BYREF
-			//   Il2CppException *ex; // [rsp+70h] [rbp-138h] BYREF
-			//   Plane v83; // [rsp+78h] [rbp-130h]
-			//   Vector3 m_Normal; // [rsp+90h] [rbp-118h] BYREF
-			//   Vector3 v85; // [rsp+A0h] [rbp-108h] BYREF
-			//   int32_t index[2]; // [rsp+B0h] [rbp-F8h]
-			//   CSGVertex *v87; // [rsp+B8h] [rbp-F0h]
-			//   Int32Enum__Enum v88; // [rsp+C0h] [rbp-E8h]
-			//   __int64 v89; // [rsp+D0h] [rbp-D8h]
-			//   __int64 v90; // [rsp+E0h] [rbp-C8h]
-			//   __int64 v91; // [rsp+F0h] [rbp-B8h]
-			//   Il2CppExceptionWrapper *v92; // [rsp+100h] [rbp-A8h] BYREF
-			//   Il2CppExceptionWrapper *v93; // [rsp+108h] [rbp-A0h] BYREF
-			//   Il2CppExceptionWrapper *v94; // [rsp+110h] [rbp-98h] BYREF
-			//   Il2CppExceptionWrapper *v95; // [rsp+118h] [rbp-90h] BYREF
-			//   Il2CppExceptionWrapper *v96; // [rsp+120h] [rbp-88h] BYREF
-			//   Il2CppExceptionWrapper *v97; // [rsp+128h] [rbp-80h] BYREF
-			//   Object o1; // [rsp+130h] [rbp-78h] BYREF
-			//   Plane v99; // [rsp+140h] [rbp-68h]
-			// 
-			//   v7 = (Object *)coPlanarBack;
-			//   v8 = (Object *)coPlanarFront;
-			//   v9 = polygon;
-			//   v10 = plane;
-			//   if ( !byte_18D919D16 )
-			//   {
-			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::CSG::CSGPolygon);
-			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::CSG::Extensions);
-			//     sub_18003C530(&TypeInfo::System::Collections::Generic::ICollection<HG::Rendering::Runtime::CSG::CSGPolygon>);
-			//     sub_18003C530(&MethodInfo::System::Collections::Generic::List<HG::Rendering::Runtime::CSG::CSGVertex>::Add);
-			//     sub_18003C530(&MethodInfo::System::Collections::Generic::List<HG::Rendering::Runtime::CSG::PolygonType>::Add);
-			//     sub_18003C530(&MethodInfo::System::Collections::Generic::List<HG::Rendering::Runtime::CSG::CSGVertex>::List);
-			//     sub_18003C530(&MethodInfo::System::Collections::Generic::List<HG::Rendering::Runtime::CSG::PolygonType>::List);
-			//     sub_18003C530(&MethodInfo::System::Collections::Generic::List<HG::Rendering::Runtime::CSG::CSGVertex>::get_Count);
-			//     sub_18003C530(&MethodInfo::System::Collections::Generic::List<HG::Rendering::Runtime::CSG::PolygonType>::get_Item);
-			//     sub_18003C530(&TypeInfo::System::Collections::Generic::List<HG::Rendering::Runtime::CSG::PolygonType>);
-			//     sub_18003C530(&TypeInfo::System::Collections::Generic::List<HG::Rendering::Runtime::CSG::CSGVertex>);
-			//     sub_18003C530(&TypeInfo::UnityEngine::Plane);
-			//     byte_18D919D16 = 1;
-			//   }
-			//   obj = 0LL;
-			//   lockTaken = 0;
-			//   if ( !IFix::WrappersManagerImpl::IsPatched(4588, 0LL) )
-			//   {
-			//     v11 = (CSGVertex *)sub_180004920(TypeInfo::System::Collections::Generic::List<HG::Rendering::Runtime::CSG::PolygonType>);
-			//     v14 = (List_1_System_UInt32_ *)v11;
-			//     v87 = v11;
-			//     if ( !v11 )
-			//       sub_180B536AC(v13, v12);
-			//     System::Collections::Generic::List<Beyond::Gameplay::Core::PullComponent::PullAttenuationValueConfig>::List(
-			//       (List_1_Beyond_Gameplay_Core_PullComponent_PullAttenuationValueConfig_ *)v11,
-			//       10,
-			//       MethodInfo::System::Collections::Generic::List<HG::Rendering::Runtime::CSG::PolygonType>::List);
-			//     v18 = 0;
-			//     if ( !v9 )
-			//       sub_180B536AC(v16, v15);
-			//     v81 = v9.fields.Plane;
-			//     v19 = (Object *)il2cpp_value_box_0(TypeInfo::UnityEngine::Plane, &v81, v17);
-			//     o1.klass = (Object__Class *)TypeInfo::UnityEngine::Plane;
-			//     o1.monitor = (MonitorData *)-1LL;
-			//     v99 = *v10;
-			//     if ( System::ValueType::DefaultEquals(&o1, v19, 0LL) )
-			//     {
-			//       if ( !v14 )
-			//         sub_180B536AC(v21, v20);
-			//       sub_1826AA8C0(v14, 0);
-			//     }
-			//     else
-			//     {
-			//       for ( i = 0; ; i = Item + 1 )
-			//       {
-			//         Item = i;
-			//         Vertices = v9.fields.Vertices;
-			//         if ( !Vertices )
-			//           sub_180B536AC(v21, v20);
-			//         if ( (int)i >= Vertices.max_length.size )
-			//           break;
-			//         v25 = v9.fields.Vertices;
-			//         if ( i >= Vertices.max_length.size )
-			//           sub_180070270(v25, v20);
-			//         v26 = v25.vector[i];
-			//         if ( !v26 )
-			//           sub_180B536AC(v25, v20);
-			//         v27 = *(_QWORD *)&v26.fields.Position.x;
-			//         z = v26.fields.Position.z;
-			//         sub_180002C70(TypeInfo::HG::Rendering::Runtime::CSG::Extensions);
-			//         v81 = *v10;
-			//         *(_QWORD *)&v85.x = v27;
-			//         v85.z = z;
-			//         v31 = HG::Rendering::Runtime::CSG::Extensions::Distance(&v85, &v81, 0LL);
-			//         if ( v31 >= -0.001 )
-			//           v32 = v31 > 0.001;
-			//         else
-			//           LODWORD(v32) = 2;
-			//         v18 |= v32;
-			//         if ( !v14 )
-			//           sub_180B536AC(v30, v29);
-			//         sub_1826AA8C0(v14, v32);
-			//       }
-			//       v7 = (Object *)coPlanarBack;
-			//       if ( v18 )
-			//       {
-			//         v33 = v18 - 1;
-			//         if ( !v33 )
-			//           goto LABEL_33;
-			//         v34 = v33 - 1;
-			//         if ( !v34 )
-			//           goto LABEL_36;
-			//         if ( v34 == 1 )
-			//           goto LABEL_39;
-			//         return;
-			//       }
-			//       v8 = (Object *)coPlanarFront;
-			//     }
-			//     v35 = _mm_loadu_si128((const __m128i *)&v9.fields);
-			//     *(_QWORD *)&v85.x = v35.m128i_i64[0];
-			//     LODWORD(v85.z) = _mm_cvtsi128_si32(_mm_srli_si128(v35, 8));
-			//     m_Normal = v10.m_Normal;
-			//     if ( UnityEngine::Vector3::Dot(&m_Normal, &v85, v22) <= 0.0 )
-			//       goto LABEL_30;
-			//     sub_180002C70(TypeInfo::HG::Rendering::Runtime::CSG::Extensions);
-			//     obj = TypeInfo::HG::Rendering::Runtime::CSG::Extensions.static_fields.lock3;
-			//     *(_QWORD *)&v81.m_Normal.x = &lockTaken;
-			//     *(_QWORD *)&v81.m_Normal.z = &obj;
-			//     ex = 0LL;
-			//     v83 = v81;
-			//     try
-			//     {
-			//       System::Threading::Monitor::Enter(obj, &lockTaken, 0LL);
-			//       if ( !v8 )
-			//         sub_1802DC2C8(v37, v36);
-			//       sub_180835264(v37, v36, v8, v9);
-			//     }
-			//     catch ( Il2CppExceptionWrapper *v92 )
-			//     {
-			//       ex = v92.ex;
-			//       sub_1801E36E0(&ex);
-			//       v7 = (Object *)coPlanarBack;
-			//       v9 = polygon;
-			// LABEL_30:
-			//       sub_180002C70(TypeInfo::HG::Rendering::Runtime::CSG::Extensions);
-			//       obj = TypeInfo::HG::Rendering::Runtime::CSG::Extensions.static_fields.lock4;
-			//       lockTaken = 0;
-			//       *(_QWORD *)&v81.m_Normal.x = &lockTaken;
-			//       *(_QWORD *)&v81.m_Normal.z = &obj;
-			//       ex = 0LL;
-			//       v83 = v81;
-			//       try
-			//       {
-			//         System::Threading::Monitor::Enter(obj, &lockTaken, 0LL);
-			//         if ( !v7 )
-			//           sub_1802DC2C8(v39, v38);
-			//         sub_180835264(v39, v38, v7, v9);
-			//       }
-			//       catch ( Il2CppExceptionWrapper *v93 )
-			//       {
-			//         ex = v93.ex;
-			//         sub_1801E36E0(&ex);
-			//         v9 = polygon;
-			// LABEL_33:
-			//         sub_180002C70(TypeInfo::HG::Rendering::Runtime::CSG::Extensions);
-			//         obj = TypeInfo::HG::Rendering::Runtime::CSG::Extensions.static_fields.lock1;
-			//         lockTaken = 0;
-			//         *(_QWORD *)&v81.m_Normal.x = &lockTaken;
-			//         *(_QWORD *)&v81.m_Normal.z = &obj;
-			//         ex = 0LL;
-			//         v83 = v81;
-			//         try
-			//         {
-			//           System::Threading::Monitor::Enter(obj, &lockTaken, 0LL);
-			//           if ( !front )
-			//             sub_1802DC2C8(v41, v40);
-			//           sub_180835264(v41, v40, front, v9);
-			//         }
-			//         catch ( Il2CppExceptionWrapper *v94 )
-			//         {
-			//           ex = v94.ex;
-			//           sub_1801E36E0(&ex);
-			//           v9 = polygon;
-			// LABEL_36:
-			//           sub_180002C70(TypeInfo::HG::Rendering::Runtime::CSG::Extensions);
-			//           obj = TypeInfo::HG::Rendering::Runtime::CSG::Extensions.static_fields.lock2;
-			//           lockTaken = 0;
-			//           *(_QWORD *)&v81.m_Normal.x = &lockTaken;
-			//           *(_QWORD *)&v81.m_Normal.z = &obj;
-			//           ex = 0LL;
-			//           v83 = v81;
-			//           try
-			//           {
-			//             System::Threading::Monitor::Enter(obj, &lockTaken, 0LL);
-			//             if ( !back )
-			//               sub_1802DC2C8(v43, v42);
-			//             sub_180835264(v43, v42, back, v9);
-			//           }
-			//           catch ( Il2CppExceptionWrapper *v95 )
-			//           {
-			//             ex = v95.ex;
-			//             sub_1801E36E0(&ex);
-			//             v9 = polygon;
-			//             v10 = plane;
-			//             v14 = (List_1_System_UInt32_ *)v87;
-			// LABEL_39:
-			//             v44 = (List_1_Beyond_Gameplay_ZhuangfySleeveSolver_BoneData_ *)sub_180004920(TypeInfo::System::Collections::Generic::List<HG::Rendering::Runtime::CSG::CSGVertex>);
-			//             v47 = v44;
-			//             *(_QWORD *)&m_Normal.x = v44;
-			//             if ( !v44
-			//               || (System::Collections::Generic::List<Beyond::Gameplay::ZhuangfySleeveSolver::BoneData>::List(
-			//                     v44,
-			//                     10,
-			//                     MethodInfo::System::Collections::Generic::List<HG::Rendering::Runtime::CSG::CSGVertex>::List),
-			//                   v48 = (List_1_Beyond_Gameplay_ZhuangfySleeveSolver_BoneData_ *)sub_180004920(TypeInfo::System::Collections::Generic::List<HG::Rendering::Runtime::CSG::CSGVertex>),
-			//                   v49 = v48,
-			//                   (*(_QWORD *)&v85.x = v48) == 0LL) )
-			//             {
-			// LABEL_89:
-			//               sub_1802DC2C8(j, v45);
-			//             }
-			//             System::Collections::Generic::List<Beyond::Gameplay::ZhuangfySleeveSolver::BoneData>::List(
-			//               v48,
-			//               10,
-			//               MethodInfo::System::Collections::Generic::List<HG::Rendering::Runtime::CSG::CSGVertex>::List);
-			//             v50 = 0;
-			//             for ( j = 0LL; ; j = v50 )
-			//             {
-			//               v51 = v9.fields.Vertices;
-			//               if ( !v51 )
-			//                 goto LABEL_89;
-			//               if ( (int)j >= v51.max_length.size )
-			//               {
-			//                 if ( v47.fields._size >= 3
-			//                   && !HG::Rendering::Runtime::CSG::CSGPolygon::IsDegenerateSet(
-			//                         (IEnumerable_1_HG_Rendering_Runtime_CSG_CSGVertex_ *)v47,
-			//                         0LL) )
-			//                 {
-			//                   sub_180002C70(TypeInfo::HG::Rendering::Runtime::CSG::Extensions);
-			//                   obj = TypeInfo::HG::Rendering::Runtime::CSG::Extensions.static_fields.lock1;
-			//                   lockTaken = 0;
-			//                   *(_QWORD *)&v81.m_Normal.x = &lockTaken;
-			//                   *(_QWORD *)&v81.m_Normal.z = &obj;
-			//                   ex = 0LL;
-			//                   v83 = v81;
-			//                   try
-			//                   {
-			//                     System::Threading::Monitor::Enter(obj, &lockTaken, 0LL);
-			//                     objID = v9.fields.objID;
-			//                     materialID = v9.fields.materialID;
-			//                     v61 = (CSGPolygon *)sub_180004920(TypeInfo::HG::Rendering::Runtime::CSG::CSGPolygon);
-			//                     v64 = v61;
-			//                     if ( !v61 )
-			//                       sub_1802DC2C8(v63, v62);
-			//                     HG::Rendering::Runtime::CSG::CSGPolygon::CSGPolygon(
-			//                       v61,
-			//                       (IEnumerable_1_HG_Rendering_Runtime_CSG_CSGVertex_ *)v47,
-			//                       objID,
-			//                       materialID,
-			//                       0LL);
-			//                     if ( !front )
-			//                       sub_1802DC2C8(v66, v65);
-			//                     sub_180835264(v66, v65, front, v64);
-			//                   }
-			//                   catch ( Il2CppExceptionWrapper *v96 )
-			//                   {
-			//                     ex = v96.ex;
-			//                     sub_1801E36E0(&ex);
-			//                     v9 = polygon;
-			//                     v49 = *(List_1_Beyond_Gameplay_ZhuangfySleeveSolver_BoneData_ **)&v85.x;
-			//                     goto LABEL_64;
-			//                   }
-			//                   sub_1801E36E0(&ex);
-			//                 }
-			// LABEL_64:
-			//                 if ( v49.fields._size < 3 )
-			//                   return;
-			//                 if ( HG::Rendering::Runtime::CSG::CSGPolygon::IsDegenerateSet(
-			//                        (IEnumerable_1_HG_Rendering_Runtime_CSG_CSGVertex_ *)v49,
-			//                        0LL) )
-			//                 {
-			//                   return;
-			//                 }
-			//                 sub_180002C70(TypeInfo::HG::Rendering::Runtime::CSG::Extensions);
-			//                 obj = TypeInfo::HG::Rendering::Runtime::CSG::Extensions.static_fields.lock2;
-			//                 lockTaken = 0;
-			//                 *(_QWORD *)&v81.m_Normal.x = &lockTaken;
-			//                 *(_QWORD *)&v81.m_Normal.z = &obj;
-			//                 ex = 0LL;
-			//                 v83 = v81;
-			//                 try
-			//                 {
-			//                   System::Threading::Monitor::Enter(obj, &lockTaken, 0LL);
-			//                   v67 = v9.fields.objID;
-			//                   v68 = v9.fields.materialID;
-			//                   v69 = (CSGPolygon *)sub_180004920(TypeInfo::HG::Rendering::Runtime::CSG::CSGPolygon);
-			//                   v72 = v69;
-			//                   if ( !v69 )
-			//                     sub_1802DC2C8(v71, v70);
-			//                   HG::Rendering::Runtime::CSG::CSGPolygon::CSGPolygon(
-			//                     v69,
-			//                     (IEnumerable_1_HG_Rendering_Runtime_CSG_CSGVertex_ *)v49,
-			//                     v67,
-			//                     v68,
-			//                     0LL);
-			//                   if ( !back )
-			//                     sub_1802DC2C8(v74, v73);
-			//                   sub_180835264(v74, v73, back, v72);
-			//                 }
-			//                 catch ( Il2CppExceptionWrapper *v97 )
-			//                 {
-			//                   ex = v97.ex;
-			//                   sub_1801E36E0(&ex);
-			//                   return;
-			//                 }
-			//                 break;
-			//               }
-			//               j = (unsigned __int64)v9.fields.Vertices;
-			//               v45 = (CSGVertex__Array *)(unsigned int)((int)(v50 + 1) >> 31);
-			//               LODWORD(v45) = (int)(v50 + 1) % v51.max_length.size;
-			//               index[0] = (int)(v50 + 1) % *(_DWORD *)(j + 24);
-			//               if ( !v14 )
-			//                 goto LABEL_89;
-			//               Item = System::Collections::Generic::List<System::Int32Enum>::get_Item(
-			//                        (List_1_System_Int32Enum_ *)v14,
-			//                        v50,
-			//                        MethodInfo::System::Collections::Generic::List<HG::Rendering::Runtime::CSG::PolygonType>::get_Item);
-			//               v88 = System::Collections::Generic::List<System::Int32Enum>::get_Item(
-			//                       (List_1_System_Int32Enum_ *)v14,
-			//                       index[0],
-			//                       MethodInfo::System::Collections::Generic::List<HG::Rendering::Runtime::CSG::PolygonType>::get_Item);
-			//               v54 = v9.fields.Vertices;
-			//               if ( !v54 )
-			//                 goto LABEL_89;
-			//               if ( v50 >= v54.max_length.size
-			//                 || (v55 = v54.vector[v50],
-			//                     v87 = v55,
-			//                     v45 = v9.fields.Vertices,
-			//                     j = index[0],
-			//                     index[0] >= (unsigned int)v45.max_length.size) )
-			//               {
-			//                 sub_180070260(j, v45, v52, v53);
-			//               }
-			//               *(_QWORD *)index = v45.vector[index[0]];
-			//               if ( Item != 2 )
-			//               {
-			//                 sub_1822AD140((List_1_System_Object_ *)v47, (Object *)v55);
-			//                 v56 = Item;
-			//                 if ( Item == 1 )
-			//                   goto LABEL_52;
-			//                 v55 = v87;
-			//               }
-			//               sub_1822AD140((List_1_System_Object_ *)v49, (Object *)v55);
-			//               v56 = Item;
-			// LABEL_52:
-			//               j = v56 | v88;
-			//               if ( (_DWORD)j == 3 )
-			//               {
-			//                 if ( !v87 )
-			//                   goto LABEL_89;
-			//                 v91 = *(_QWORD *)&v87.fields.Position.x;
-			//                 ex = *(Il2CppException **)&v10.m_Normal.x;
-			//                 j = *(_QWORD *)index;
-			//                 if ( !*(_QWORD *)index )
-			//                   goto LABEL_89;
-			//                 v90 = *(_QWORD *)&v87.fields.Position.x;
-			//                 v89 = *(_QWORD *)(*(_QWORD *)index + 16LL);
-			//                 v57 = *(float *)(*(_QWORD *)index + 24LL) - v87.fields.Position.z;
-			//                 *(_QWORD *)&v81.m_Normal.x = *(_QWORD *)&v10.m_Normal.x;
-			//                 v58 = (Object *)HG::Rendering::Runtime::CSG::CSGVertex::Interpolate(
-			//                                   v87,
-			//                                   *(CSGVertex **)index,
-			//                                   (float)((float)-v10.m_Distance
-			//                                         - (float)((float)((float)(*((float *)&v91 + 1) * *((float *)&ex + 1))
-			//                                                         + (float)(*(float *)&v91 * *(float *)&ex))
-			//                                                 + (float)(v87.fields.Position.z * v10.m_Normal.z)))
-			//                                 / (float)((float)((float)(v81.m_Normal.x * (float)(*(float *)&v89 - *(float *)&v90))
-			//                                                 + (float)(v81.m_Normal.y
-			//                                                         * (float)(*((float *)&v89 + 1) - *((float *)&v90 + 1))))
-			//                                         + (float)(v10.m_Normal.z * v57)),
-			//                                   0LL);
-			//                 sub_1822AD140(*(List_1_System_Object_ **)&m_Normal.x, v58);
-			//                 sub_1822AD140((List_1_System_Object_ *)v49, v58);
-			//                 v47 = *(List_1_Beyond_Gameplay_ZhuangfySleeveSolver_BoneData_ **)&m_Normal.x;
-			//               }
-			//               ++v50;
-			//             }
-			//           }
-			//         }
-			//       }
-			//     }
-			//     sub_1801E36E0(&ex);
-			//     return;
-			//   }
-			//   Patch = IFix::WrappersManagerImpl::GetPatch(4588, 0LL);
-			//   if ( !Patch )
-			//     sub_180B536AC(v76, v75);
-			//   v81 = *v10;
-			//   IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_1318(
-			//     Patch,
-			//     &v81,
-			//     (Object *)v9,
-			//     v8,
-			//     v7,
-			//     (Object *)front,
-			//     (Object *)back,
-			//     0LL);
-			// }
-			// 
+		  __int64 v5; // rdx
+		  __int64 v6; // rcx
+		  __int64 v7; // rdx
+		  __int64 v8; // rcx
+		  float v9; // xmm9_4
+		  __int64 v10; // rdx
+		  __int64 v11; // rcx
+		  float v12; // xmm8_4
+		  float Item; // xmm7_4
+		  float v14; // xmm6_4
+		  __int64 v15; // rdx
+		  __int64 v16; // rcx
+		  float v17; // xmm7_4
+		  float v18; // xmm0_4
+		  float v19; // xmm6_4
+		  MethodInfo *v20; // rdx
+		  float v21; // xmm0_4
+		  float v22; // xmm6_4
+		  MethodInfo *v23; // rdx
+		  float v24; // xmm6_4
+		  float v25; // xmm0_4
+		  MethodInfo *v26; // rdx
+		  Quaternion v27; // xmm0
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v29; // rdx
+		  __int64 v30; // rcx
+		  __int128 v31; // xmm1
+		  __int128 v32; // xmm0
+		  __int128 v33; // xmm1
+		  Quaternion *result; // rax
+		  Quaternion v35; // [rsp+28h] [rbp-59h] BYREF
+		  Matrix4x4 v36; // [rsp+38h] [rbp-49h] BYREF
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(5421, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(5421, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(v30, v29);
+		    v31 = *(_OWORD *)&m->m01;
+		    *(_OWORD *)&v36.m00 = *(_OWORD *)&m->m00;
+		    v32 = *(_OWORD *)&m->m02;
+		    *(_OWORD *)&v36.m01 = v31;
+		    v33 = *(_OWORD *)&m->m03;
+		    *(_OWORD *)&v36.m02 = v32;
+		    *(_OWORD *)&v36.m03 = v33;
+		    v27 = *IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_1563(&v35, Patch, &v36, 0LL);
+		  }
+		  else
+		  {
+		    UnityEngine::Matrix4x4::get_Item(m, 0, 0LL);
+		    UnityEngine::Matrix4x4::get_Item(m, 5, 0LL);
+		    UnityEngine::Matrix4x4::get_Item(m, 10, 0LL);
+		    v35.w = sub_1803386C0(v6, v5) * 0.5;
+		    UnityEngine::Matrix4x4::get_Item(m, 0, 0LL);
+		    UnityEngine::Matrix4x4::get_Item(m, 5, 0LL);
+		    UnityEngine::Matrix4x4::get_Item(m, 10, 0LL);
+		    v9 = sub_1803386C0(v8, v7) * 0.5;
+		    UnityEngine::Matrix4x4::get_Item(m, 0, 0LL);
+		    UnityEngine::Matrix4x4::get_Item(m, 5, 0LL);
+		    UnityEngine::Matrix4x4::get_Item(m, 10, 0LL);
+		    v12 = sub_1803386C0(v11, v10) * 0.5;
+		    Item = UnityEngine::Matrix4x4::get_Item(m, 0, 0LL);
+		    v14 = UnityEngine::Matrix4x4::get_Item(m, 5, 0LL);
+		    fmaxf(0.0, UnityEngine::Matrix4x4::get_Item(m, 10, 0LL) + (float)((float)(1.0 - Item) - v14));
+		    v17 = sub_1803386C0(v16, v15) * 0.5;
+		    v18 = UnityEngine::Matrix4x4::get_Item(m, 6, 0LL);
+		    v19 = (float)(v18 - UnityEngine::Matrix4x4::get_Item(m, 9, 0LL)) * v9;
+		    v35.x = UnityEngine::Mathf::Sign(v19, v20) * v9;
+		    v21 = UnityEngine::Matrix4x4::get_Item(m, 8, 0LL);
+		    v22 = (float)(v21 - UnityEngine::Matrix4x4::get_Item(m, 2, 0LL)) * v12;
+		    v35.y = UnityEngine::Mathf::Sign(v22, v23) * v12;
+		    v24 = UnityEngine::Matrix4x4::get_Item(m, 1, 0LL);
+		    v25 = UnityEngine::Matrix4x4::get_Item(m, 4, 0LL);
+		    v35.z = UnityEngine::Mathf::Sign((float)(v24 - v25) * v17, v26) * v17;
+		    v27 = v35;
+		  }
+		  result = retstr;
+		  *retstr = v27;
+		  return result;
 		}
-
-		public static void ToTriangleList<V, I>(this ICsgProvider tree, Func<Vector3, Vector2, int, int, V> positionNormalToVertex, Func<V, I> insertVertex, Action<I, I, I, PostionUVPair> createTriangle)
+		
+	
+		// Extension methods
+		public static void SplitPolygon(this Plane plane, CSGPolygon polygon, IList<CSGPolygon> coPlanarFront, IList<CSGPolygon> coPlanarBack, IList<CSGPolygon> front, IList<CSGPolygon> back) {} // 0x0000000189C76520-0x0000000189C77120
+		// Void SplitPolygon(Plane, CSGPolygon, IList`1[HG.Rendering.Runtime.CSG.CSGPolygon], IList`1[HG.Rendering.Runtime.CSG.CSGPolygon], IList`1[HG.Rendering.Runtime.CSG.CSGPolygon], IList`1[HG.Rendering.Runtime.CSG.CSGPolygon])
+		// Hidden C++ exception states: #wind=6
+		void HG::Rendering::Runtime::CSG::Extensions::SplitPolygon(
+		        Plane *plane,
+		        CSGPolygon *polygon,
+		        IList_1_HG_Rendering_Runtime_CSG_CSGPolygon_ *coPlanarFront,
+		        IList_1_HG_Rendering_Runtime_CSG_CSGPolygon_ *coPlanarBack,
+		        IList_1_HG_Rendering_Runtime_CSG_CSGPolygon_ *front,
+		        IList_1_HG_Rendering_Runtime_CSG_CSGPolygon_ *back,
+		        MethodInfo *method)
 		{
+		  Object *v7; // r12
+		  Object *v8; // rbx
+		  CSGPolygon *v9; // rsi
+		  Plane *v10; // r13
+		  CSGVertex *v11; // rax
+		  __int64 v12; // rdx
+		  __int64 v13; // rcx
+		  CSGVertex *v14; // r15
+		  __int64 v15; // rdx
+		  __int64 v16; // rcx
+		  int v17; // r14d
+		  Object *v18; // rax
+		  __int64 v19; // rdx
+		  __int64 v20; // rcx
+		  MethodInfo *v21; // r8
+		  Int32Enum__Enum i; // ebx
+		  CSGVertex__Array *Vertices; // rax
+		  CSGVertex__Array *v24; // rcx
+		  CSGVertex *v25; // r12
+		  __int64 v26; // xmm6_8
+		  float z; // ebx
+		  __int64 v28; // rdx
+		  __int64 v29; // rcx
+		  float v30; // xmm0_4
+		  __int64 v31; // rbx
+		  int v32; // r14d
+		  int v33; // r14d
+		  __m128i v34; // xmm0
+		  __int64 v35; // rdx
+		  __int64 v36; // rcx
+		  __int64 v37; // rdx
+		  __int64 v38; // rcx
+		  __int64 v39; // rdx
+		  __int64 v40; // rcx
+		  __int64 v41; // rdx
+		  __int64 v42; // rcx
+		  List_1_Beyond_Gameplay_Core_CinematicTimelineManagerBase_TimelineHandle_AsyncCompileAnimationOutput_ *v43; // rax
+		  CSGVertex__Array *v44; // rdx
+		  unsigned __int64 j; // rcx
+		  List_1_Beyond_Gameplay_Core_CinematicTimelineManagerBase_TimelineHandle_AsyncCompileAnimationOutput_ *v46; // rbx
+		  List_1_Beyond_Gameplay_Core_CinematicTimelineManagerBase_TimelineHandle_AsyncCompileAnimationOutput_ *v47; // rax
+		  List_1_Beyond_Gameplay_Core_CinematicTimelineManagerBase_TimelineHandle_AsyncCompileAnimationOutput_ *v48; // r14
+		  unsigned int v49; // r12d
+		  CSGVertex__Array *v50; // rax
+		  __int64 v51; // r8
+		  CSGVertex__Array *v52; // rax
+		  CSGVertex *v53; // rax
+		  Int32Enum__Enum v54; // eax
+		  float v55; // xmm7_4
+		  Object *v56; // rbx
+		  int32_t objID; // r12d
+		  int32_t materialID; // r13d
+		  CSGPolygon *v59; // rax
+		  __int64 v60; // rdx
+		  __int64 v61; // rcx
+		  CSGPolygon *v62; // r15
+		  __int64 v63; // rdx
+		  __int64 v64; // rcx
+		  int32_t v65; // r15d
+		  int32_t v66; // esi
+		  CSGPolygon *v67; // rax
+		  __int64 v68; // rdx
+		  __int64 v69; // rcx
+		  CSGPolygon *v70; // rbx
+		  __int64 v71; // rdx
+		  __int64 v72; // rcx
+		  __int64 v73; // rdx
+		  __int64 v74; // rcx
+		  ILFixDynamicMethodWrapper_2 *Patch; // r14
+		  bool lockTaken; // [rsp+40h] [rbp-158h] BYREF
+		  Object *obj; // [rsp+48h] [rbp-150h] BYREF
+		  Int32Enum__Enum Item; // [rsp+50h] [rbp-148h]
+		  Il2CppException *ex; // [rsp+60h] [rbp-138h] BYREF
+		  Object v80; // [rsp+68h] [rbp-130h]
+		  Object o1; // [rsp+80h] [rbp-118h] BYREF
+		  Object v82; // [rsp+90h] [rbp-108h]
+		  Vector3 m_Normal; // [rsp+A0h] [rbp-F8h] BYREF
+		  Vector3 v84; // [rsp+B0h] [rbp-E8h] BYREF
+		  int32_t index[2]; // [rsp+C0h] [rbp-D8h]
+		  CSGVertex *v86; // [rsp+C8h] [rbp-D0h]
+		  Int32Enum__Enum v87; // [rsp+D0h] [rbp-C8h]
+		  __int64 v88; // [rsp+E0h] [rbp-B8h]
+		  __int64 v89; // [rsp+F0h] [rbp-A8h]
+		  __int64 v90; // [rsp+100h] [rbp-98h]
+		  Il2CppExceptionWrapper *v91; // [rsp+110h] [rbp-88h] BYREF
+		  Il2CppExceptionWrapper *v92; // [rsp+118h] [rbp-80h] BYREF
+		  Il2CppExceptionWrapper *v93; // [rsp+120h] [rbp-78h] BYREF
+		  Il2CppExceptionWrapper *v94; // [rsp+128h] [rbp-70h] BYREF
+		  Il2CppExceptionWrapper *v95; // [rsp+130h] [rbp-68h] BYREF
+		  Il2CppExceptionWrapper *v96; // [rsp+138h] [rbp-60h] BYREF
+		
+		  v7 = (Object *)coPlanarBack;
+		  v8 = (Object *)coPlanarFront;
+		  v9 = polygon;
+		  v10 = plane;
+		  obj = 0LL;
+		  lockTaken = 0;
+		  if ( !IFix::WrappersManagerImpl::IsPatched(5264, 0LL) )
+		  {
+		    v11 = (CSGVertex *)sub_18002C620(TypeInfo::System::Collections::Generic::List<HG::Rendering::Runtime::CSG::PolygonType>);
+		    v14 = v11;
+		    v86 = v11;
+		    if ( !v11 )
+		      sub_1800D8260(v13, v12);
+		    System::Collections::Generic::List<Beyond::Gameplay::Core::PullComponent::PullAttenuationValueConfig>::List(
+		      (List_1_Beyond_Gameplay_Core_PullComponent_PullAttenuationValueConfig_ *)v11,
+		      10,
+		      MethodInfo::System::Collections::Generic::List<HG::Rendering::Runtime::CSG::PolygonType>::List);
+		    v17 = 0;
+		    if ( !v9 )
+		      sub_1800D8260(v16, v15);
+		    o1 = (Object)v9->fields.Plane;
+		    v18 = (Object *)il2cpp_value_box_0(TypeInfo::UnityEngine::Plane, &o1);
+		    o1.klass = (Object__Class *)TypeInfo::UnityEngine::Plane;
+		    o1.monitor = (MonitorData *)-1LL;
+		    v82 = (Object)*v10;
+		    if ( System::ValueType::DefaultEquals(&o1, v18, 0LL) )
+		    {
+		      if ( !v14 )
+		        sub_1800D8260(v20, v19);
+		      sub_1836FCDC0(
+		        v14,
+		        0LL,
+		        MethodInfo::System::Collections::Generic::List<HG::Rendering::Runtime::CSG::PolygonType>::Add);
+		    }
+		    else
+		    {
+		      for ( i = 0; ; i = Item + 1 )
+		      {
+		        Item = i;
+		        Vertices = v9->fields.Vertices;
+		        if ( !Vertices )
+		          sub_1800D8260(v20, v19);
+		        if ( (int)i >= Vertices->max_length.size )
+		          break;
+		        v24 = v9->fields.Vertices;
+		        if ( i >= Vertices->max_length.size )
+		          sub_1800D2AB0(v24, v19);
+		        v25 = v24->vector[i];
+		        if ( !v25 )
+		          sub_1800D8260(v24, v19);
+		        v26 = *(_QWORD *)&v25->fields.Position.x;
+		        z = v25->fields.Position.z;
+		        sub_1800036A0(TypeInfo::HG::Rendering::Runtime::CSG::Extensions);
+		        o1 = (Object)*v10;
+		        *(_QWORD *)&v84.x = v26;
+		        v84.z = z;
+		        v30 = HG::Rendering::Runtime::CSG::Extensions::Distance(&v84, (Plane *)&o1, 0LL);
+		        if ( v30 >= -0.001 )
+		          v31 = v30 > 0.001;
+		        else
+		          LODWORD(v31) = 2;
+		        v17 |= v31;
+		        if ( !v14 )
+		          sub_1800D8260(v29, v28);
+		        sub_1836FCDC0(
+		          v14,
+		          (unsigned int)v31,
+		          MethodInfo::System::Collections::Generic::List<HG::Rendering::Runtime::CSG::PolygonType>::Add);
+		      }
+		      v7 = (Object *)coPlanarBack;
+		      if ( v17 )
+		      {
+		        v32 = v17 - 1;
+		        if ( !v32 )
+		          goto LABEL_31;
+		        v33 = v32 - 1;
+		        if ( !v33 )
+		          goto LABEL_34;
+		        if ( v33 == 1 )
+		          goto LABEL_37;
+		        return;
+		      }
+		      v8 = (Object *)coPlanarFront;
+		    }
+		    v34 = _mm_loadu_si128((const __m128i *)&v9->fields);
+		    *(_QWORD *)&v84.x = v34.m128i_i64[0];
+		    LODWORD(v84.z) = _mm_cvtsi128_si32(_mm_srli_si128(v34, 8));
+		    m_Normal = v10->m_Normal;
+		    if ( UnityEngine::Vector3::Dot(&m_Normal, &v84, v21) <= 0.0 )
+		      goto LABEL_28;
+		    sub_1800036A0(TypeInfo::HG::Rendering::Runtime::CSG::Extensions);
+		    obj = TypeInfo::HG::Rendering::Runtime::CSG::Extensions->static_fields->lock3;
+		    o1.klass = (Object__Class *)&lockTaken;
+		    o1.monitor = (MonitorData *)&obj;
+		    ex = 0LL;
+		    v80 = o1;
+		    try
+		    {
+		      System::Threading::Monitor::Enter(obj, &lockTaken, 0LL);
+		      if ( !v8 )
+		        sub_1800D8250(v36, v35);
+		      sub_1808B38EC(v36, v35, v8, v9);
+		    }
+		    catch ( Il2CppExceptionWrapper *v91 )
+		    {
+		      ex = v91->ex;
+		      sub_1801F4710(&ex);
+		      v7 = (Object *)coPlanarBack;
+		      v9 = polygon;
+		LABEL_28:
+		      sub_1800036A0(TypeInfo::HG::Rendering::Runtime::CSG::Extensions);
+		      obj = TypeInfo::HG::Rendering::Runtime::CSG::Extensions->static_fields->lock4;
+		      lockTaken = 0;
+		      o1.klass = (Object__Class *)&lockTaken;
+		      o1.monitor = (MonitorData *)&obj;
+		      ex = 0LL;
+		      v80 = o1;
+		      try
+		      {
+		        System::Threading::Monitor::Enter(obj, &lockTaken, 0LL);
+		        if ( !v7 )
+		          sub_1800D8250(v38, v37);
+		        sub_1808B38EC(v38, v37, v7, v9);
+		      }
+		      catch ( Il2CppExceptionWrapper *v92 )
+		      {
+		        ex = v92->ex;
+		        sub_1801F4710(&ex);
+		        v9 = polygon;
+		LABEL_31:
+		        sub_1800036A0(TypeInfo::HG::Rendering::Runtime::CSG::Extensions);
+		        obj = TypeInfo::HG::Rendering::Runtime::CSG::Extensions->static_fields->lock1;
+		        lockTaken = 0;
+		        o1.klass = (Object__Class *)&lockTaken;
+		        o1.monitor = (MonitorData *)&obj;
+		        ex = 0LL;
+		        v80 = o1;
+		        try
+		        {
+		          System::Threading::Monitor::Enter(obj, &lockTaken, 0LL);
+		          if ( !front )
+		            sub_1800D8250(v40, v39);
+		          sub_1808B38EC(v40, v39, front, v9);
+		        }
+		        catch ( Il2CppExceptionWrapper *v93 )
+		        {
+		          ex = v93->ex;
+		          sub_1801F4710(&ex);
+		          v9 = polygon;
+		LABEL_34:
+		          sub_1800036A0(TypeInfo::HG::Rendering::Runtime::CSG::Extensions);
+		          obj = TypeInfo::HG::Rendering::Runtime::CSG::Extensions->static_fields->lock2;
+		          lockTaken = 0;
+		          o1.klass = (Object__Class *)&lockTaken;
+		          o1.monitor = (MonitorData *)&obj;
+		          ex = 0LL;
+		          v80 = o1;
+		          try
+		          {
+		            System::Threading::Monitor::Enter(obj, &lockTaken, 0LL);
+		            if ( !back )
+		              sub_1800D8250(v42, v41);
+		            sub_1808B38EC(v42, v41, back, v9);
+		          }
+		          catch ( Il2CppExceptionWrapper *v94 )
+		          {
+		            ex = v94->ex;
+		            sub_1801F4710(&ex);
+		            v9 = polygon;
+		            v10 = plane;
+		            v14 = v86;
+		LABEL_37:
+		            v43 = (List_1_Beyond_Gameplay_Core_CinematicTimelineManagerBase_TimelineHandle_AsyncCompileAnimationOutput_ *)sub_18002C620(TypeInfo::System::Collections::Generic::List<HG::Rendering::Runtime::CSG::CSGVertex>);
+		            v46 = v43;
+		            *(_QWORD *)&m_Normal.x = v43;
+		            if ( !v43
+		              || (System::Collections::Generic::List<Beyond::Gameplay::Core::CinematicTimelineManagerBase_TimelineHandle::AsyncCompileAnimationOutput>::List(
+		                    v43,
+		                    10,
+		                    MethodInfo::System::Collections::Generic::List<HG::Rendering::Runtime::CSG::CSGVertex>::List),
+		                  v47 = (List_1_Beyond_Gameplay_Core_CinematicTimelineManagerBase_TimelineHandle_AsyncCompileAnimationOutput_ *)sub_18002C620(TypeInfo::System::Collections::Generic::List<HG::Rendering::Runtime::CSG::CSGVertex>),
+		                  v48 = v47,
+		                  (*(_QWORD *)&v84.x = v47) == 0LL) )
+		            {
+		LABEL_87:
+		              sub_1800D8250(j, v44);
+		            }
+		            System::Collections::Generic::List<Beyond::Gameplay::Core::CinematicTimelineManagerBase_TimelineHandle::AsyncCompileAnimationOutput>::List(
+		              v47,
+		              10,
+		              MethodInfo::System::Collections::Generic::List<HG::Rendering::Runtime::CSG::CSGVertex>::List);
+		            v49 = 0;
+		            for ( j = 0LL; ; j = v49 )
+		            {
+		              v50 = v9->fields.Vertices;
+		              if ( !v50 )
+		                goto LABEL_87;
+		              if ( (int)j >= v50->max_length.size )
+		              {
+		                if ( v46->fields._size >= 3
+		                  && !HG::Rendering::Runtime::CSG::CSGPolygon::IsDegenerateSet(
+		                        (IEnumerable_1_HG_Rendering_Runtime_CSG_CSGVertex_ *)v46,
+		                        0LL) )
+		                {
+		                  sub_1800036A0(TypeInfo::HG::Rendering::Runtime::CSG::Extensions);
+		                  obj = TypeInfo::HG::Rendering::Runtime::CSG::Extensions->static_fields->lock1;
+		                  lockTaken = 0;
+		                  o1.klass = (Object__Class *)&lockTaken;
+		                  o1.monitor = (MonitorData *)&obj;
+		                  ex = 0LL;
+		                  v80 = o1;
+		                  try
+		                  {
+		                    System::Threading::Monitor::Enter(obj, &lockTaken, 0LL);
+		                    objID = v9->fields.objID;
+		                    materialID = v9->fields.materialID;
+		                    v59 = (CSGPolygon *)sub_18002C620(TypeInfo::HG::Rendering::Runtime::CSG::CSGPolygon);
+		                    v62 = v59;
+		                    if ( !v59 )
+		                      sub_1800D8250(v61, v60);
+		                    HG::Rendering::Runtime::CSG::CSGPolygon::CSGPolygon(
+		                      v59,
+		                      (IEnumerable_1_HG_Rendering_Runtime_CSG_CSGVertex_ *)v46,
+		                      objID,
+		                      materialID,
+		                      0LL);
+		                    if ( !front )
+		                      sub_1800D8250(v64, v63);
+		                    sub_1808B38EC(v64, v63, front, v62);
+		                  }
+		                  catch ( Il2CppExceptionWrapper *v95 )
+		                  {
+		                    ex = v95->ex;
+		                    sub_1801F4710(&ex);
+		                    v9 = polygon;
+		                    v48 = *(List_1_Beyond_Gameplay_Core_CinematicTimelineManagerBase_TimelineHandle_AsyncCompileAnimationOutput_ **)&v84.x;
+		                    goto LABEL_62;
+		                  }
+		                  sub_1801F4710(&ex);
+		                }
+		LABEL_62:
+		                if ( v48->fields._size < 3 )
+		                  return;
+		                if ( HG::Rendering::Runtime::CSG::CSGPolygon::IsDegenerateSet(
+		                       (IEnumerable_1_HG_Rendering_Runtime_CSG_CSGVertex_ *)v48,
+		                       0LL) )
+		                {
+		                  return;
+		                }
+		                sub_1800036A0(TypeInfo::HG::Rendering::Runtime::CSG::Extensions);
+		                obj = TypeInfo::HG::Rendering::Runtime::CSG::Extensions->static_fields->lock2;
+		                lockTaken = 0;
+		                o1.klass = (Object__Class *)&lockTaken;
+		                o1.monitor = (MonitorData *)&obj;
+		                ex = 0LL;
+		                v80 = o1;
+		                try
+		                {
+		                  System::Threading::Monitor::Enter(obj, &lockTaken, 0LL);
+		                  v65 = v9->fields.objID;
+		                  v66 = v9->fields.materialID;
+		                  v67 = (CSGPolygon *)sub_18002C620(TypeInfo::HG::Rendering::Runtime::CSG::CSGPolygon);
+		                  v70 = v67;
+		                  if ( !v67 )
+		                    sub_1800D8250(v69, v68);
+		                  HG::Rendering::Runtime::CSG::CSGPolygon::CSGPolygon(
+		                    v67,
+		                    (IEnumerable_1_HG_Rendering_Runtime_CSG_CSGVertex_ *)v48,
+		                    v65,
+		                    v66,
+		                    0LL);
+		                  if ( !back )
+		                    sub_1800D8250(v72, v71);
+		                  sub_1808B38EC(v72, v71, back, v70);
+		                }
+		                catch ( Il2CppExceptionWrapper *v96 )
+		                {
+		                  ex = v96->ex;
+		                  sub_1801F4710(&ex);
+		                  return;
+		                }
+		                break;
+		              }
+		              j = (unsigned __int64)v9->fields.Vertices;
+		              v44 = (CSGVertex__Array *)(unsigned int)((int)(v49 + 1) >> 31);
+		              LODWORD(v44) = (int)(v49 + 1) % v50->max_length.size;
+		              index[0] = (int)(v49 + 1) % *(_DWORD *)(j + 24);
+		              if ( !v14 )
+		                goto LABEL_87;
+		              Item = System::Collections::Generic::List<System::Int32Enum>::get_Item(
+		                       (List_1_System_Int32Enum_ *)v14,
+		                       v49,
+		                       MethodInfo::System::Collections::Generic::List<HG::Rendering::Runtime::CSG::PolygonType>::get_Item);
+		              v87 = System::Collections::Generic::List<System::Int32Enum>::get_Item(
+		                      (List_1_System_Int32Enum_ *)v14,
+		                      index[0],
+		                      MethodInfo::System::Collections::Generic::List<HG::Rendering::Runtime::CSG::PolygonType>::get_Item);
+		              v52 = v9->fields.Vertices;
+		              if ( !v52 )
+		                goto LABEL_87;
+		              if ( v49 >= v52->max_length.size
+		                || (v53 = v52->vector[v49],
+		                    v86 = v53,
+		                    v44 = v9->fields.Vertices,
+		                    j = index[0],
+		                    index[0] >= (unsigned int)v44->max_length.size) )
+		              {
+		                sub_1800D2AA0(j, v44, v51);
+		              }
+		              *(_QWORD *)index = v44->vector[index[0]];
+		              if ( Item != 2 )
+		              {
+		                sub_182F01190((List_1_System_Object_ *)v46, (Object *)v53);
+		                v54 = Item;
+		                if ( Item == 1 )
+		                  goto LABEL_50;
+		                v53 = v86;
+		              }
+		              sub_182F01190((List_1_System_Object_ *)v48, (Object *)v53);
+		              v54 = Item;
+		LABEL_50:
+		              j = v54 | v87;
+		              if ( (_DWORD)j == 3 )
+		              {
+		                if ( !v86 )
+		                  goto LABEL_87;
+		                v90 = *(_QWORD *)&v86->fields.Position.x;
+		                ex = *(Il2CppException **)&v10->m_Normal.x;
+		                j = *(_QWORD *)index;
+		                if ( !*(_QWORD *)index )
+		                  goto LABEL_87;
+		                v89 = *(_QWORD *)&v86->fields.Position.x;
+		                v88 = *(_QWORD *)(*(_QWORD *)index + 16LL);
+		                v55 = *(float *)(*(_QWORD *)index + 24LL) - v86->fields.Position.z;
+		                o1.klass = *(Object__Class **)&v10->m_Normal.x;
+		                v56 = (Object *)HG::Rendering::Runtime::CSG::CSGVertex::Interpolate(
+		                                  v86,
+		                                  *(CSGVertex **)index,
+		                                  (float)((float)-v10->m_Distance
+		                                        - (float)((float)((float)(*((float *)&v90 + 1) * *((float *)&ex + 1))
+		                                                        + (float)(*(float *)&v90 * *(float *)&ex))
+		                                                + (float)(v86->fields.Position.z * v10->m_Normal.z)))
+		                                / (float)((float)((float)(*(float *)&o1.klass * (float)(*(float *)&v88 - *(float *)&v89))
+		                                                + (float)(*((float *)&o1.klass + 1)
+		                                                        * (float)(*((float *)&v88 + 1) - *((float *)&v89 + 1))))
+		                                        + (float)(v10->m_Normal.z * v55)),
+		                                  0LL);
+		                sub_182F01190(*(List_1_System_Object_ **)&m_Normal.x, v56);
+		                sub_182F01190((List_1_System_Object_ *)v48, v56);
+		                v46 = *(List_1_Beyond_Gameplay_Core_CinematicTimelineManagerBase_TimelineHandle_AsyncCompileAnimationOutput_ **)&m_Normal.x;
+		              }
+		              ++v49;
+		            }
+		          }
+		        }
+		      }
+		    }
+		    sub_1801F4710(&ex);
+		    return;
+		  }
+		  Patch = IFix::WrappersManagerImpl::GetPatch(5264, 0LL);
+		  if ( !Patch )
+		    sub_1800D8260(v74, v73);
+		  o1 = (Object)*v10;
+		  IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_1527(
+		    Patch,
+		    (Plane *)&o1,
+		    (Object *)v9,
+		    v8,
+		    v7,
+		    (Object *)front,
+		    (Object *)back,
+		    0LL);
 		}
-
-		public static void ToListLine<V, I>(this ICsgProvider tree, Func<Vector3, Vector3, V> positionNormalToVertex, Func<V, I> insertVertex, Action<I, I> createLine)
+		
+		public static void ToTriangleList<V, I>(this ICsgProvider tree, Func<Vector3, Vector2, int, int, V> positionNormalToVertex, Func<V, I> insertVertex, Action<I, I, I, PostionUVPair> createTriangle) {}
+		public static void ToListLine<V, I>(this ICsgProvider tree, Func<Vector3, Vector3, V> positionNormalToVertex, Func<V, I> insertVertex, Action<I, I> createLine) {}
+		public static bool IsEmpty<T>(this IEnumerable<T> e) => default;
+		public static float? Intersects(this Ray ray, BSP bsp) => default; // 0x0000000189C7618C-0x0000000189C76220
+		// Nullable`1[Single] Intersects(Ray, BSP)
+		Nullable_1_Single_ HG::Rendering::Runtime::CSG::Extensions::Intersects(Ray *ray, BSP *bsp, MethodInfo *method)
 		{
+		  __int64 v5; // rdx
+		  __int64 v6; // rcx
+		  __int64 v7; // xmm1_8
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v10; // xmm1_8
+		  Ray v11; // [rsp+20h] [rbp-28h] BYREF
+		
+		  if ( !IFix::WrappersManagerImpl::IsPatched(5440, 0LL) )
+		  {
+		    if ( bsp )
+		    {
+		      v7 = *(_QWORD *)&ray->m_Direction.y;
+		      *(_OWORD *)&v11.m_Origin.x = *(_OWORD *)&ray->m_Origin.x;
+		      *(_QWORD *)&v11.m_Direction.y = v7;
+		      return HG::Rendering::Runtime::CSG::BSP::RayCast(bsp, &v11, 0LL);
+		    }
+		LABEL_5:
+		    sub_1800D8260(v6, v5);
+		  }
+		  Patch = IFix::WrappersManagerImpl::GetPatch(5440, 0LL);
+		  if ( !Patch )
+		    goto LABEL_5;
+		  v10 = *(_QWORD *)&ray->m_Direction.y;
+		  *(_OWORD *)&v11.m_Origin.x = *(_OWORD *)&ray->m_Origin.x;
+		  *(_QWORD *)&v11.m_Direction.y = v10;
+		  return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_1574(Patch, &v11, (Object *)bsp, 0LL);
 		}
-
-		public static bool IsEmpty<T>(this IEnumerable<T> e)
+		
+		public static float Distance(this Vector3 point, Plane plane) => default; // 0x0000000189C75EDC-0x0000000189C75F88
+		// Single Distance(Vector3, Plane)
+		float HG::Rendering::Runtime::CSG::Extensions::Distance(Vector3 *point, Plane *plane, MethodInfo *method)
 		{
-			return default(bool);
+		  MethodInfo *v5; // r8
+		  float v6; // eax
+		  __int64 v7; // xmm0_8
+		  float v8; // eax
+		  __int64 v10; // rdx
+		  ILFixDynamicMethodWrapper_2 *Patch; // rcx
+		  Plane v12; // xmm0
+		  float z; // eax
+		  Plane v14; // [rsp+20h] [rbp-28h] BYREF
+		  Vector3 v15[2]; // [rsp+30h] [rbp-18h] BYREF
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(5265, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(5265, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(0LL, v10);
+		    v12 = *plane;
+		    z = point->z;
+		    *(_QWORD *)&v15[0].x = *(_QWORD *)&point->x;
+		    v14 = v12;
+		    v15[0].z = z;
+		    return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_1522(Patch, v15, &v14, 0LL);
+		  }
+		  else
+		  {
+		    v6 = point->z;
+		    *(_QWORD *)&v14.m_Normal.x = *(_QWORD *)&point->x;
+		    v7 = *(_QWORD *)&plane->m_Normal.x;
+		    v14.m_Normal.z = v6;
+		    v8 = plane->m_Normal.z;
+		    *(_QWORD *)&v15[0].x = v7;
+		    v15[0].z = v8;
+		    return UnityEngine::Vector3::Dot(v15, &v14.m_Normal, v5) + plane->m_Distance;
+		  }
 		}
-
-		public static Nullable<float> Intersects(this Ray ray, BSP bsp)
+		
+		public static Bounds IncludePoint(this Bounds bound, Vector3 point) => default; // 0x0000000189C75F88-0x0000000189C7618C
+		// Bounds IncludePoint(Bounds, Vector3)
+		Bounds *HG::Rendering::Runtime::CSG::Extensions::IncludePoint(
+		        Bounds *__return_ptr retstr,
+		        Bounds *bound,
+		        Vector3 *point,
+		        MethodInfo *method)
 		{
-			// // Nullable`1[Single] Intersects(Ray, BSP)
-			// Nullable_1_Single_ HG::Rendering::Runtime::CSG::Extensions::Intersects(Ray *ray, BSP *bsp, MethodInfo *method)
-			// {
-			//   __int64 v5; // rdx
-			//   __int64 v6; // rcx
-			//   __int64 v7; // xmm1_8
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			//   __int64 v10; // xmm1_8
-			//   Ray v11; // [rsp+20h] [rbp-28h] BYREF
-			// 
-			//   if ( !IFix::WrappersManagerImpl::IsPatched(4740, 0LL) )
-			//   {
-			//     if ( bsp )
-			//     {
-			//       v7 = *(_QWORD *)&ray.m_Direction.y;
-			//       *(_OWORD *)&v11.m_Origin.x = *(_OWORD *)&ray.m_Origin.x;
-			//       *(_QWORD *)&v11.m_Direction.y = v7;
-			//       return HG::Rendering::Runtime::CSG::BSP::RayCast(bsp, &v11, 0LL);
-			//     }
-			// LABEL_5:
-			//     sub_180B536AC(v6, v5);
-			//   }
-			//   Patch = IFix::WrappersManagerImpl::GetPatch(4740, 0LL);
-			//   if ( !Patch )
-			//     goto LABEL_5;
-			//   v10 = *(_QWORD *)&ray.m_Direction.y;
-			//   *(_OWORD *)&v11.m_Origin.x = *(_OWORD *)&ray.m_Origin.x;
-			//   *(_QWORD *)&v11.m_Direction.y = v10;
-			//   return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_1365(Patch, &v11, (Object *)bsp, 0LL);
-			// }
-			// 
-			return null;
+		  __m128 x_low; // xmm6
+		  __m128 v8; // xmm0
+		  __m128 v9; // xmm10
+		  __m128 y_low; // xmm0
+		  __m128 v11; // xmm9
+		  Vector3 *min; // rax
+		  float v13; // xmm8_4
+		  __m128 v14; // xmm0
+		  __m128 v15; // xmm7
+		  __int128 v16; // xmm0
+		  __m128 v17; // xmm6
+		  Vector3 *max; // rax
+		  __int128 v19; // xmm0
+		  __int64 v20; // xmm1_8
+		  ILFixDynamicMethodWrapper_2 *Patch; // rdx
+		  __int64 v22; // rcx
+		  __int64 v23; // xmm1_8
+		  float z; // eax
+		  __int128 v25; // xmm0
+		  Bounds *v26; // rax
+		  Bounds *result; // rax
+		  Bounds v28; // [rsp+38h] [rbp-49h] BYREF
+		  Vector3 v29; // [rsp+58h] [rbp-29h] BYREF
+		  Bounds v30[4]; // [rsp+68h] [rbp-19h] BYREF
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(5123, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(5123, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(v22, 0LL);
+		    v23 = *(_QWORD *)&bound->m_Extents.y;
+		    z = point->z;
+		    *(_QWORD *)&v29.x = *(_QWORD *)&point->x;
+		    v25 = *(_OWORD *)&bound->m_Center.x;
+		    v29.z = z;
+		    *(_QWORD *)&v28.m_Extents.y = v23;
+		    *(_OWORD *)&v28.m_Center.x = v25;
+		    v26 = IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_1492(v30, Patch, &v28, &v29, 0LL);
+		    v19 = *(_OWORD *)&v26->m_Center.x;
+		    v20 = *(_QWORD *)&v26->m_Extents.y;
+		  }
+		  else
+		  {
+		    x_low = (__m128)LODWORD(UnityEngine::Bounds::get_min(&v29, bound, 0LL)->x);
+		    sub_1800036A0(TypeInfo::System::Math);
+		    v8 = x_low;
+		    v8.m128_f32[0] = System::Math::Min(x_low.m128_f32[0], point->x, 0LL);
+		    v9 = v8;
+		    y_low = (__m128)LODWORD(UnityEngine::Bounds::get_min(&v29, bound, 0LL)->y);
+		    y_low.m128_f32[0] = System::Math::Min(y_low.m128_f32[0], point->y, 0LL);
+		    v11 = y_low;
+		    min = UnityEngine::Bounds::get_min(&v29, bound, 0LL);
+		    v13 = System::Math::Min(min->z, point->z, 0LL);
+		    v14 = (__m128)LODWORD(UnityEngine::Bounds::get_max(&v29, bound, 0LL)->x);
+		    v14.m128_f32[0] = System::Math::Max(v14.m128_f32[0], point->x, 0LL);
+		    v15 = v14;
+		    v16 = LODWORD(UnityEngine::Bounds::get_max(&v29, bound, 0LL)->y);
+		    *(float *)&v16 = System::Math::Max(*(float *)&v16, point->y, 0LL);
+		    v17 = (__m128)v16;
+		    max = UnityEngine::Bounds::get_max(&v29, bound, 0LL);
+		    *(float *)&v16 = System::Math::Max(max->z, point->z, 0LL);
+		    *(_QWORD *)&v28.m_Center.x = _mm_unpacklo_ps(v15, v17).m128_u64[0];
+		    *(_QWORD *)&v29.x = _mm_unpacklo_ps(v9, v11).m128_u64[0];
+		    LODWORD(v28.m_Center.z) = v16;
+		    v29.z = v13;
+		    UnityEngine::Bounds::SetMinMax(bound, &v29, &v28.m_Center, 0LL);
+		    v19 = *(_OWORD *)&bound->m_Center.x;
+		    v20 = *(_QWORD *)&bound->m_Extents.y;
+		  }
+		  result = retstr;
+		  *(_OWORD *)&retstr->m_Center.x = v19;
+		  *(_QWORD *)&retstr->m_Extents.y = v20;
+		  return result;
 		}
-
-		public static float Distance(this Vector3 point, Plane plane)
-		{
-			// // Single Distance(Vector3, Plane)
-			// float HG::Rendering::Runtime::CSG::Extensions::Distance(Vector3 *point, Plane *plane, MethodInfo *method)
-			// {
-			//   MethodInfo *v5; // r8
-			//   float v6; // eax
-			//   __int64 v7; // xmm0_8
-			//   float v8; // eax
-			//   __int64 v10; // rdx
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rcx
-			//   Plane v12; // xmm0
-			//   float z; // eax
-			//   Plane v14; // [rsp+20h] [rbp-28h] BYREF
-			//   Vector3 v15[2]; // [rsp+30h] [rbp-18h] BYREF
-			// 
-			//   if ( IFix::WrappersManagerImpl::IsPatched(4589, 0LL) )
-			//   {
-			//     Patch = IFix::WrappersManagerImpl::GetPatch(4589, 0LL);
-			//     if ( !Patch )
-			//       sub_180B536AC(0LL, v10);
-			//     v12 = *plane;
-			//     z = point.z;
-			//     *(_QWORD *)&v15[0].x = *(_QWORD *)&point.x;
-			//     v14 = v12;
-			//     v15[0].z = z;
-			//     return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_1313(Patch, v15, &v14, 0LL);
-			//   }
-			//   else
-			//   {
-			//     v6 = point.z;
-			//     *(_QWORD *)&v14.m_Normal.x = *(_QWORD *)&point.x;
-			//     v7 = *(_QWORD *)&plane.m_Normal.x;
-			//     v14.m_Normal.z = v6;
-			//     v8 = plane.m_Normal.z;
-			//     *(_QWORD *)&v15[0].x = v7;
-			//     v15[0].z = v8;
-			//     return UnityEngine::Vector3::Dot(v15, &v14.m_Normal, v5) + plane.m_Distance;
-			//   }
-			// }
-			// 
-			return 0f;
-		}
-
-		public static Bounds IncludePoint(this Bounds bound, Vector3 point)
-		{
-			// // Bounds IncludePoint(Bounds, Vector3)
-			// Bounds *HG::Rendering::Runtime::CSG::Extensions::IncludePoint(
-			//         Bounds *__return_ptr retstr,
-			//         Bounds *bound,
-			//         Vector3 *point,
-			//         MethodInfo *method)
-			// {
-			//   __m128 x_low; // xmm6
-			//   __m128 v8; // xmm0
-			//   __m128 v9; // xmm10
-			//   __m128 y_low; // xmm0
-			//   __m128 v11; // xmm9
-			//   Vector3 *min; // rax
-			//   float v13; // xmm8_4
-			//   __m128 v14; // xmm0
-			//   __m128 v15; // xmm7
-			//   __int128 v16; // xmm0
-			//   __m128 v17; // xmm6
-			//   Vector3 *max; // rax
-			//   __int128 v19; // xmm0
-			//   __int64 v20; // xmm1_8
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rdx
-			//   __int64 v22; // rcx
-			//   __int64 v23; // xmm1_8
-			//   float z; // eax
-			//   __int128 v25; // xmm0
-			//   Bounds *v26; // rax
-			//   Bounds *result; // rax
-			//   Bounds v28; // [rsp+38h] [rbp-49h] BYREF
-			//   Vector3 v29; // [rsp+58h] [rbp-29h] BYREF
-			//   Bounds v30[4]; // [rsp+68h] [rbp-19h] BYREF
-			// 
-			//   if ( !byte_18D919D17 )
-			//   {
-			//     sub_18003C530(&TypeInfo::System::Math);
-			//     byte_18D919D17 = 1;
-			//   }
-			//   if ( IFix::WrappersManagerImpl::IsPatched(4459, 0LL) )
-			//   {
-			//     Patch = IFix::WrappersManagerImpl::GetPatch(4459, 0LL);
-			//     if ( !Patch )
-			//       sub_180B536AC(v22, 0LL);
-			//     v23 = *(_QWORD *)&bound.m_Extents.y;
-			//     z = point.z;
-			//     *(_QWORD *)&v29.x = *(_QWORD *)&point.x;
-			//     v25 = *(_OWORD *)&bound.m_Center.x;
-			//     v29.z = z;
-			//     *(_QWORD *)&v28.m_Extents.y = v23;
-			//     *(_OWORD *)&v28.m_Center.x = v25;
-			//     v26 = IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_1280(v30, Patch, &v28, &v29, 0LL);
-			//     v19 = *(_OWORD *)&v26.m_Center.x;
-			//     v20 = *(_QWORD *)&v26.m_Extents.y;
-			//   }
-			//   else
-			//   {
-			//     x_low = (__m128)LODWORD(UnityEngine::Bounds::get_min(&v29, bound, 0LL).x);
-			//     sub_180002C70(TypeInfo::System::Math);
-			//     v8 = x_low;
-			//     v8.m128_f32[0] = System::Math::Min(x_low.m128_f32[0], point.x, 0LL);
-			//     v9 = v8;
-			//     y_low = (__m128)LODWORD(UnityEngine::Bounds::get_min(&v29, bound, 0LL).y);
-			//     y_low.m128_f32[0] = System::Math::Min(y_low.m128_f32[0], point.y, 0LL);
-			//     v11 = y_low;
-			//     min = UnityEngine::Bounds::get_min(&v29, bound, 0LL);
-			//     v13 = System::Math::Min(min.z, point.z, 0LL);
-			//     v14 = (__m128)LODWORD(UnityEngine::Bounds::get_max(&v29, bound, 0LL).x);
-			//     v14.m128_f32[0] = System::Math::Max(v14.m128_f32[0], point.x, 0LL);
-			//     v15 = v14;
-			//     v16 = LODWORD(UnityEngine::Bounds::get_max(&v29, bound, 0LL).y);
-			//     *(float *)&v16 = System::Math::Max(*(float *)&v16, point.y, 0LL);
-			//     v17 = (__m128)v16;
-			//     max = UnityEngine::Bounds::get_max(&v29, bound, 0LL);
-			//     *(float *)&v16 = System::Math::Max(max.z, point.z, 0LL);
-			//     *(_QWORD *)&v28.m_Center.x = _mm_unpacklo_ps(v15, v17).m128_u64[0];
-			//     *(_QWORD *)&v29.x = _mm_unpacklo_ps(v9, v11).m128_u64[0];
-			//     LODWORD(v28.m_Center.z) = v16;
-			//     v29.z = v13;
-			//     UnityEngine::Bounds::SetMinMax(bound, &v29, &v28.m_Center, 0LL);
-			//     v19 = *(_OWORD *)&bound.m_Center.x;
-			//     v20 = *(_QWORD *)&bound.m_Extents.y;
-			//   }
-			//   result = retstr;
-			//   *(_OWORD *)&retstr.m_Center.x = v19;
-			//   *(_QWORD *)&retstr.m_Extents.y = v20;
-			//   return result;
-			// }
-			// 
-			return null;
-		}
-
+		
 		[IDTag(1)]
-		public static Bounds Transform(this Bounds bound, Matrix4x4 transform)
+		public static Bounds Transform(this Bounds bound, Matrix4x4 transform) => default; // 0x0000000189C77564-0x0000000189C77C20
+		// Bounds Transform(Bounds, Matrix4x4)
+		// Hidden C++ exception states: #wind=1
+		Bounds *HG::Rendering::Runtime::CSG::Extensions::Transform(
+		        Bounds *__return_ptr retstr,
+		        Bounds *bound,
+		        Matrix4x4 *transform,
+		        MethodInfo *method)
 		{
-			// // Bounds Transform(Bounds, Matrix4x4)
-			// // Hidden C++ exception states: #wind=1
-			// Bounds *HG::Rendering::Runtime::CSG::Extensions::Transform(
-			//         Bounds *__return_ptr retstr,
-			//         Bounds *bound,
-			//         Matrix4x4 *transform,
-			//         MethodInfo *method)
-			// {
-			//   Bounds *v6; // rdi
-			//   Object *v7; // rax
-			//   __int64 v8; // rdx
-			//   __int64 v9; // rcx
-			//   __int64 v10; // r8
-			//   __int64 v11; // r9
-			//   Object *v12; // r14
-			//   IEnumerable_1_UnityEngine_Vector3_ *v13; // rsi
-			//   Vector3 *min; // rax
-			//   __int64 v15; // rdx
-			//   __int64 v16; // rcx
-			//   float z; // r15d
-			//   __m128 x_low; // xmm6
-			//   __m128 y_low; // xmm7
-			//   float v20; // xmm8_4
-			//   __m128 v21; // xmm6
-			//   __m128 v22; // xmm7
-			//   float v23; // xmm8_4
-			//   __m128 v24; // xmm6
-			//   __m128 v25; // xmm7
-			//   float v26; // xmm8_4
-			//   Vector3 *max; // rax
-			//   float v28; // r15d
-			//   __m128 v29; // xmm6
-			//   __m128 v30; // xmm7
-			//   float v31; // xmm8_4
-			//   __m128 v32; // xmm6
-			//   __m128 v33; // xmm7
-			//   float v34; // xmm8_4
-			//   __m128 v35; // xmm6
-			//   __m128 v36; // xmm7
-			//   float v37; // xmm8_4
-			//   Func_2_UnityEngine_Vector3_UnityEngine_Vector3_ *v38; // rax
-			//   __int64 v39; // rdx
-			//   __int64 v40; // rcx
-			//   Func_2_UnityEngine_Vector3_UnityEngine_Vector3_ *v41; // rbx
-			//   IEnumerable_1_UnityEngine_Vector3_ *v42; // rbx
-			//   IEnumerable_1_UnityEngine_Vector3_ *v43; // rax
-			//   __int64 v44; // rdx
-			//   __int64 v45; // rcx
-			//   __int64 v46; // rdx
-			//   __int64 v47; // rcx
-			//   __int64 v48; // rdx
-			//   __int64 v49; // rcx
-			//   __int64 v50; // rax
-			//   __int64 v51; // xmm8_8
-			//   float v52; // ebx
-			//   Bounds *v53; // rax
-			//   __int128 v54; // xmm7
-			//   __int64 v55; // xmm6_8
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			//   __int64 v57; // rdx
-			//   __int64 v58; // rcx
-			//   Il2CppException *ex; // [rsp+30h] [rbp-118h] BYREF
-			//   __int64 *v61; // [rsp+38h] [rbp-110h]
-			//   Vector3 v62; // [rsp+40h] [rbp-108h] BYREF
-			//   __int64 v63; // [rsp+50h] [rbp-F8h] BYREF
-			//   Bounds v64; // [rsp+58h] [rbp-F0h] BYREF
-			//   Vector3 v65; // [rsp+70h] [rbp-D8h] BYREF
-			//   Bounds v66; // [rsp+80h] [rbp-C8h] BYREF
-			//   Il2CppExceptionWrapper *v67; // [rsp+A0h] [rbp-A8h] BYREF
-			//   Bounds v68; // [rsp+A8h] [rbp-A0h] BYREF
-			//   Matrix4x4 v69; // [rsp+C0h] [rbp-88h] BYREF
-			// 
-			//   v6 = retstr;
-			//   if ( !byte_18D919D18 )
-			//   {
-			//     sub_18003C530(&MethodInfo::System::Linq::Enumerable::First<UnityEngine::Vector3>);
-			//     sub_18003C530(&MethodInfo::System::Linq::Enumerable::Select<UnityEngine::Vector3,UnityEngine::Vector3>);
-			//     sub_18003C530(&MethodInfo::System::Linq::Enumerable::Skip<UnityEngine::Vector3>);
-			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::CSG::Extensions);
-			//     sub_18003C530(&TypeInfo::System::Func<UnityEngine::Vector3,UnityEngine::Vector3>);
-			//     sub_18003C530(&TypeInfo::System::IDisposable);
-			//     sub_18003C530(&TypeInfo::System::Collections::Generic::IEnumerable<UnityEngine::Vector3>);
-			//     sub_18003C530(&TypeInfo::System::Collections::Generic::IEnumerator<UnityEngine::Vector3>);
-			//     sub_18003C530(&TypeInfo::System::Collections::IEnumerator);
-			//     sub_18003C530(MethodInfo::HG::Rendering::Runtime::CSG::Extensions::__c__DisplayClass13_0::_Transform_b__0);
-			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::CSG::Extensions::__c__DisplayClass13_0);
-			//     sub_18003C530(&TypeInfo::UnityEngine::Vector3);
-			//     byte_18D919D18 = 1;
-			//   }
-			//   memset(&v64, 0, sizeof(v64));
-			//   if ( IFix::WrappersManagerImpl::IsPatched(4723, 0LL) )
-			//   {
-			//     Patch = IFix::WrappersManagerImpl::GetPatch(4723, 0LL);
-			//     if ( !Patch )
-			//       sub_180B536AC(v58, v57);
-			//     v69 = *transform;
-			//     v66 = *bound;
-			//     *v6 = *IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_1356(&v68, Patch, &v66, &v69, 0LL);
-			//   }
-			//   else
-			//   {
-			//     v7 = (Object *)sub_180004920(TypeInfo::HG::Rendering::Runtime::CSG::Extensions::__c__DisplayClass13_0);
-			//     v12 = v7;
-			//     if ( !v7 )
-			//       sub_180B536AC(v9, v8);
-			//     v7[1] = *(Object *)&transform.m00;
-			//     v7[2] = *(Object *)&transform.m01;
-			//     v7[3] = *(Object *)&transform.m02;
-			//     v7[4] = *(Object *)&transform.m03;
-			//     v13 = (IEnumerable_1_UnityEngine_Vector3_ *)il2cpp_array_new_specific_0(
-			//                                                   TypeInfo::UnityEngine::Vector3,
-			//                                                   8LL,
-			//                                                   v10,
-			//                                                   v11);
-			//     min = UnityEngine::Bounds::get_min(&v62, bound, 0LL);
-			//     z = min.z;
-			//     if ( !v13 )
-			//       sub_180B536AC(v16, v15);
-			//     ex = *(Il2CppException **)&min.x;
-			//     *(float *)&v61 = z;
-			//     sub_180040FA0(v13, 0LL, &ex);
-			//     x_low = (__m128)LODWORD(UnityEngine::Bounds::get_min(&v62, bound, 0LL).x);
-			//     y_low = (__m128)LODWORD(UnityEngine::Bounds::get_min(&v62, bound, 0LL).y);
-			//     v20 = UnityEngine::Bounds::get_max(&v62, bound, 0LL).z;
-			//     ex = (Il2CppException *)_mm_unpacklo_ps(x_low, y_low).m128_u64[0];
-			//     *(float *)&v61 = v20;
-			//     sub_180040FA0(v13, 1LL, &ex);
-			//     v21 = (__m128)LODWORD(UnityEngine::Bounds::get_min(&v62, bound, 0LL).x);
-			//     v22 = (__m128)LODWORD(UnityEngine::Bounds::get_max(&v62, bound, 0LL).y);
-			//     v23 = UnityEngine::Bounds::get_min(&v62, bound, 0LL).z;
-			//     ex = (Il2CppException *)_mm_unpacklo_ps(v21, v22).m128_u64[0];
-			//     *(float *)&v61 = v23;
-			//     sub_180040FA0(v13, 2LL, &ex);
-			//     v24 = (__m128)LODWORD(UnityEngine::Bounds::get_min(&v62, bound, 0LL).x);
-			//     v25 = (__m128)LODWORD(UnityEngine::Bounds::get_max(&v62, bound, 0LL).y);
-			//     v26 = UnityEngine::Bounds::get_max(&v62, bound, 0LL).z;
-			//     ex = (Il2CppException *)_mm_unpacklo_ps(v24, v25).m128_u64[0];
-			//     *(float *)&v61 = v26;
-			//     sub_180040FA0(v13, 3LL, &ex);
-			//     max = UnityEngine::Bounds::get_max(&v62, bound, 0LL);
-			//     v28 = max.z;
-			//     ex = *(Il2CppException **)&max.x;
-			//     *(float *)&v61 = v28;
-			//     sub_180040FA0(v13, 4LL, &ex);
-			//     v29 = (__m128)LODWORD(UnityEngine::Bounds::get_max(&v62, bound, 0LL).x);
-			//     v30 = (__m128)LODWORD(UnityEngine::Bounds::get_min(&v62, bound, 0LL).y);
-			//     v31 = UnityEngine::Bounds::get_max(&v62, bound, 0LL).z;
-			//     ex = (Il2CppException *)_mm_unpacklo_ps(v29, v30).m128_u64[0];
-			//     *(float *)&v61 = v31;
-			//     sub_180040FA0(v13, 5LL, &ex);
-			//     v32 = (__m128)LODWORD(UnityEngine::Bounds::get_max(&v62, bound, 0LL).x);
-			//     v33 = (__m128)LODWORD(UnityEngine::Bounds::get_min(&v62, bound, 0LL).y);
-			//     v34 = UnityEngine::Bounds::get_min(&v62, bound, 0LL).z;
-			//     ex = (Il2CppException *)_mm_unpacklo_ps(v32, v33).m128_u64[0];
-			//     *(float *)&v61 = v34;
-			//     sub_180040FA0(v13, 6LL, &ex);
-			//     v35 = (__m128)LODWORD(UnityEngine::Bounds::get_max(&v62, bound, 0LL).x);
-			//     v36 = (__m128)LODWORD(UnityEngine::Bounds::get_min(&v62, bound, 0LL).y);
-			//     v37 = UnityEngine::Bounds::get_min(&v62, bound, 0LL).z;
-			//     ex = (Il2CppException *)_mm_unpacklo_ps(v35, v36).m128_u64[0];
-			//     *(float *)&v61 = v37;
-			//     sub_180040FA0(v13, 7LL, &ex);
-			//     v38 = (Func_2_UnityEngine_Vector3_UnityEngine_Vector3_ *)sub_180004920(TypeInfo::System::Func<UnityEngine::Vector3,UnityEngine::Vector3>);
-			//     v41 = v38;
-			//     if ( !v38 )
-			//       sub_180B536AC(v40, v39);
-			//     System::Func<UnityEngine::Vector3,UnityEngine::Vector3>::Func(
-			//       v38,
-			//       v12,
-			//       MethodInfo::HG::Rendering::Runtime::CSG::Extensions::__c__DisplayClass13_0::_Transform_b__0[0],
-			//       0LL);
-			//     v42 = System::Linq::Enumerable::Select<UnityEngine::Vector3,UnityEngine::Vector3>(
-			//             v13,
-			//             v41,
-			//             MethodInfo::System::Linq::Enumerable::Select<UnityEngine::Vector3,UnityEngine::Vector3>);
-			//     System::Linq::Enumerable::First<UnityEngine::Vector3>(
-			//       &v65,
-			//       v42,
-			//       MethodInfo::System::Linq::Enumerable::First<UnityEngine::Vector3>);
-			//     System::Linq::Enumerable::First<UnityEngine::Vector3>(
-			//       (Vector3 *)&ex,
-			//       v42,
-			//       MethodInfo::System::Linq::Enumerable::First<UnityEngine::Vector3>);
-			//     *(_QWORD *)&v62.x = ex;
-			//     LODWORD(v62.z) = (_DWORD)v61;
-			//     ex = *(Il2CppException **)&v65.x;
-			//     *(float *)&v61 = v65.z;
-			//     UnityEngine::Bounds::Bounds(&v64, (Vector3 *)&ex, &v62, 0LL);
-			//     v43 = System::Linq::Enumerable::Skip<UnityEngine::Vector3>(
-			//             v42,
-			//             1,
-			//             MethodInfo::System::Linq::Enumerable::Skip<UnityEngine::Vector3>);
-			//     if ( !v43 )
-			//       sub_180B536AC(v45, v44);
-			//     v63 = sub_1800513A0(0LL, TypeInfo::System::Collections::Generic::IEnumerable<UnityEngine::Vector3>, v43);
-			//     ex = 0LL;
-			//     v61 = &v63;
-			//     try
-			//     {
-			//       v55 = *(_QWORD *)&v64.m_Extents.y;
-			//       v54 = *(_OWORD *)&v64.m_Center.x;
-			//       while ( 1 )
-			//       {
-			//         if ( !v63 )
-			//           sub_1802DC2C8(v47, v46);
-			//         if ( !(unsigned __int8)sub_1800518F0(0LL, TypeInfo::System::Collections::IEnumerator) )
-			//           break;
-			//         if ( !v63 )
-			//           sub_1802DC2C8(v49, v48);
-			//         v50 = sub_1801F9C08(&v65, 0LL, TypeInfo::System::Collections::Generic::IEnumerator<UnityEngine::Vector3>, v63);
-			//         v51 = *(_QWORD *)v50;
-			//         v52 = *(float *)(v50 + 8);
-			//         sub_180002C70(TypeInfo::HG::Rendering::Runtime::CSG::Extensions);
-			//         *(_QWORD *)&v62.x = v51;
-			//         v62.z = v52;
-			//         *(_OWORD *)&v66.m_Center.x = v54;
-			//         *(_QWORD *)&v66.m_Extents.y = v55;
-			//         v53 = HG::Rendering::Runtime::CSG::Extensions::IncludePoint(&v68, &v66, &v62, 0LL);
-			//         v54 = *(_OWORD *)&v53.m_Center.x;
-			//         *(_OWORD *)&v64.m_Center.x = *(_OWORD *)&v53.m_Center.x;
-			//         v55 = *(_QWORD *)&v53.m_Extents.y;
-			//         *(_QWORD *)&v64.m_Extents.y = v55;
-			//       }
-			//     }
-			//     catch ( Il2CppExceptionWrapper *v67 )
-			//     {
-			//       ex = v67.ex;
-			//       sub_1801E4D90(&ex);
-			//       v6 = retstr;
-			//       v55 = *(_QWORD *)&v64.m_Extents.y;
-			//       v54 = *(_OWORD *)&v64.m_Center.x;
-			//       goto LABEL_14;
-			//     }
-			//     sub_1801E4D90(&ex);
-			// LABEL_14:
-			//     *(_OWORD *)&v6.m_Center.x = v54;
-			//     *(_QWORD *)&v6.m_Extents.y = v55;
-			//   }
-			//   return v6;
-			// }
-			// 
-			return null;
+		  Bounds *v6; // rdi
+		  Object *v7; // rax
+		  __int64 v8; // rdx
+		  __int64 v9; // rcx
+		  Object *v10; // r14
+		  IEnumerable_1_UnityEngine_Vector3_ *v11; // rsi
+		  Vector3 *min; // rax
+		  __int64 v13; // rdx
+		  __int64 v14; // rcx
+		  float z; // r15d
+		  __m128 x_low; // xmm6
+		  __m128 y_low; // xmm7
+		  float v18; // xmm8_4
+		  __m128 v19; // xmm6
+		  __m128 v20; // xmm7
+		  float v21; // xmm8_4
+		  __m128 v22; // xmm6
+		  __m128 v23; // xmm7
+		  float v24; // xmm8_4
+		  Vector3 *max; // rax
+		  float v26; // r15d
+		  __m128 v27; // xmm6
+		  __m128 v28; // xmm7
+		  float v29; // xmm8_4
+		  __m128 v30; // xmm6
+		  __m128 v31; // xmm7
+		  float v32; // xmm8_4
+		  __m128 v33; // xmm6
+		  __m128 v34; // xmm7
+		  float v35; // xmm8_4
+		  Func_2_UnityEngine_Vector3_UnityEngine_Vector3_ *v36; // rax
+		  __int64 v37; // rdx
+		  __int64 v38; // rcx
+		  Func_2_UnityEngine_Vector3_UnityEngine_Vector3_ *v39; // rbx
+		  IEnumerable_1_UnityEngine_Vector3_ *v40; // rbx
+		  IEnumerable_1_UnityEngine_Vector3_ *v41; // rax
+		  __int64 v42; // rdx
+		  __int64 v43; // rcx
+		  __int64 v44; // rdx
+		  __int64 v45; // rcx
+		  __int64 v46; // rdx
+		  __int64 v47; // rcx
+		  __int64 v48; // rax
+		  __int64 v49; // xmm8_8
+		  float v50; // ebx
+		  Bounds *v51; // rax
+		  __int128 v52; // xmm7
+		  __int64 v53; // xmm6_8
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v55; // rdx
+		  __int64 v56; // rcx
+		  Il2CppException *ex; // [rsp+30h] [rbp-118h] BYREF
+		  __int64 *v59; // [rsp+38h] [rbp-110h]
+		  Vector3 v60; // [rsp+40h] [rbp-108h] BYREF
+		  __int64 v61; // [rsp+50h] [rbp-F8h] BYREF
+		  Bounds v62; // [rsp+58h] [rbp-F0h] BYREF
+		  Vector3 v63; // [rsp+70h] [rbp-D8h] BYREF
+		  Bounds v64; // [rsp+80h] [rbp-C8h] BYREF
+		  Il2CppExceptionWrapper *v65; // [rsp+A0h] [rbp-A8h] BYREF
+		  Bounds v66; // [rsp+A8h] [rbp-A0h] BYREF
+		  Matrix4x4 v67; // [rsp+C0h] [rbp-88h] BYREF
+		
+		  v6 = retstr;
+		  memset(&v62, 0, sizeof(v62));
+		  if ( IFix::WrappersManagerImpl::IsPatched(5423, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(5423, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(v56, v55);
+		    v67 = *transform;
+		    v64 = *bound;
+		    *v6 = *IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_1565(&v66, Patch, &v64, &v67, 0LL);
+		  }
+		  else
+		  {
+		    v7 = (Object *)sub_18002C620(TypeInfo::HG::Rendering::Runtime::CSG::Extensions::__c__DisplayClass13_0);
+		    v10 = v7;
+		    if ( !v7 )
+		      sub_1800D8260(v9, v8);
+		    v7[1] = *(Object *)&transform->m00;
+		    v7[2] = *(Object *)&transform->m01;
+		    v7[3] = *(Object *)&transform->m02;
+		    v7[4] = *(Object *)&transform->m03;
+		    v11 = (IEnumerable_1_UnityEngine_Vector3_ *)il2cpp_array_new_specific_1(TypeInfo::UnityEngine::Vector3, 8LL);
+		    min = UnityEngine::Bounds::get_min(&v60, bound, 0LL);
+		    z = min->z;
+		    if ( !v11 )
+		      sub_1800D8260(v14, v13);
+		    ex = *(Il2CppException **)&min->x;
+		    *(float *)&v59 = z;
+		    sub_180049BD0(v11, 0LL, &ex);
+		    x_low = (__m128)LODWORD(UnityEngine::Bounds::get_min(&v60, bound, 0LL)->x);
+		    y_low = (__m128)LODWORD(UnityEngine::Bounds::get_min(&v60, bound, 0LL)->y);
+		    v18 = UnityEngine::Bounds::get_max(&v60, bound, 0LL)->z;
+		    ex = (Il2CppException *)_mm_unpacklo_ps(x_low, y_low).m128_u64[0];
+		    *(float *)&v59 = v18;
+		    sub_180049BD0(v11, 1LL, &ex);
+		    v19 = (__m128)LODWORD(UnityEngine::Bounds::get_min(&v60, bound, 0LL)->x);
+		    v20 = (__m128)LODWORD(UnityEngine::Bounds::get_max(&v60, bound, 0LL)->y);
+		    v21 = UnityEngine::Bounds::get_min(&v60, bound, 0LL)->z;
+		    ex = (Il2CppException *)_mm_unpacklo_ps(v19, v20).m128_u64[0];
+		    *(float *)&v59 = v21;
+		    sub_180049BD0(v11, 2LL, &ex);
+		    v22 = (__m128)LODWORD(UnityEngine::Bounds::get_min(&v60, bound, 0LL)->x);
+		    v23 = (__m128)LODWORD(UnityEngine::Bounds::get_max(&v60, bound, 0LL)->y);
+		    v24 = UnityEngine::Bounds::get_max(&v60, bound, 0LL)->z;
+		    ex = (Il2CppException *)_mm_unpacklo_ps(v22, v23).m128_u64[0];
+		    *(float *)&v59 = v24;
+		    sub_180049BD0(v11, 3LL, &ex);
+		    max = UnityEngine::Bounds::get_max(&v60, bound, 0LL);
+		    v26 = max->z;
+		    ex = *(Il2CppException **)&max->x;
+		    *(float *)&v59 = v26;
+		    sub_180049BD0(v11, 4LL, &ex);
+		    v27 = (__m128)LODWORD(UnityEngine::Bounds::get_max(&v60, bound, 0LL)->x);
+		    v28 = (__m128)LODWORD(UnityEngine::Bounds::get_min(&v60, bound, 0LL)->y);
+		    v29 = UnityEngine::Bounds::get_max(&v60, bound, 0LL)->z;
+		    ex = (Il2CppException *)_mm_unpacklo_ps(v27, v28).m128_u64[0];
+		    *(float *)&v59 = v29;
+		    sub_180049BD0(v11, 5LL, &ex);
+		    v30 = (__m128)LODWORD(UnityEngine::Bounds::get_max(&v60, bound, 0LL)->x);
+		    v31 = (__m128)LODWORD(UnityEngine::Bounds::get_min(&v60, bound, 0LL)->y);
+		    v32 = UnityEngine::Bounds::get_min(&v60, bound, 0LL)->z;
+		    ex = (Il2CppException *)_mm_unpacklo_ps(v30, v31).m128_u64[0];
+		    *(float *)&v59 = v32;
+		    sub_180049BD0(v11, 6LL, &ex);
+		    v33 = (__m128)LODWORD(UnityEngine::Bounds::get_max(&v60, bound, 0LL)->x);
+		    v34 = (__m128)LODWORD(UnityEngine::Bounds::get_min(&v60, bound, 0LL)->y);
+		    v35 = UnityEngine::Bounds::get_min(&v60, bound, 0LL)->z;
+		    ex = (Il2CppException *)_mm_unpacklo_ps(v33, v34).m128_u64[0];
+		    *(float *)&v59 = v35;
+		    sub_180049BD0(v11, 7LL, &ex);
+		    v36 = (Func_2_UnityEngine_Vector3_UnityEngine_Vector3_ *)sub_18002C620(TypeInfo::System::Func<UnityEngine::Vector3,UnityEngine::Vector3>);
+		    v39 = v36;
+		    if ( !v36 )
+		      sub_1800D8260(v38, v37);
+		    System::Func<UnityEngine::Vector3,UnityEngine::Vector3>::Func(
+		      v36,
+		      v10,
+		      MethodInfo::HG::Rendering::Runtime::CSG::Extensions::__c__DisplayClass13_0::_Transform_b__0,
+		      0LL);
+		    v40 = System::Linq::Enumerable::Select<UnityEngine::Vector3,UnityEngine::Vector3>(
+		            v11,
+		            v39,
+		            MethodInfo::System::Linq::Enumerable::Select<UnityEngine::Vector3,UnityEngine::Vector3>);
+		    System::Linq::Enumerable::First<UnityEngine::Vector3>(
+		      &v63,
+		      v40,
+		      MethodInfo::System::Linq::Enumerable::First<UnityEngine::Vector3>);
+		    System::Linq::Enumerable::First<UnityEngine::Vector3>(
+		      (Vector3 *)&ex,
+		      v40,
+		      MethodInfo::System::Linq::Enumerable::First<UnityEngine::Vector3>);
+		    *(_QWORD *)&v60.x = ex;
+		    LODWORD(v60.z) = (_DWORD)v59;
+		    ex = *(Il2CppException **)&v63.x;
+		    *(float *)&v59 = v63.z;
+		    UnityEngine::Bounds::Bounds(&v62, (Vector3 *)&ex, &v60, 0LL);
+		    v41 = System::Linq::Enumerable::Skip<UnityEngine::Vector3>(
+		            v40,
+		            1,
+		            MethodInfo::System::Linq::Enumerable::Skip<UnityEngine::Vector3>);
+		    if ( !v41 )
+		      sub_1800D8260(v43, v42);
+		    v61 = sub_1800428A0(0LL, TypeInfo::System::Collections::Generic::IEnumerable<UnityEngine::Vector3>, v41);
+		    ex = 0LL;
+		    v59 = &v61;
+		    try
+		    {
+		      v53 = *(_QWORD *)&v62.m_Extents.y;
+		      v52 = *(_OWORD *)&v62.m_Center.x;
+		      while ( 1 )
+		      {
+		        if ( !v61 )
+		          sub_1800D8250(v45, v44);
+		        if ( !(unsigned __int8)sub_180042E60(0LL, TypeInfo::System::Collections::IEnumerator) )
+		          break;
+		        if ( !v61 )
+		          sub_1800D8250(v47, v46);
+		        v48 = sub_1802089F8(&v63, 0LL, TypeInfo::System::Collections::Generic::IEnumerator<UnityEngine::Vector3>, v61);
+		        v49 = *(_QWORD *)v48;
+		        v50 = *(float *)(v48 + 8);
+		        sub_1800036A0(TypeInfo::HG::Rendering::Runtime::CSG::Extensions);
+		        *(_QWORD *)&v60.x = v49;
+		        v60.z = v50;
+		        *(_OWORD *)&v64.m_Center.x = v52;
+		        *(_QWORD *)&v64.m_Extents.y = v53;
+		        v51 = HG::Rendering::Runtime::CSG::Extensions::IncludePoint(&v66, &v64, &v60, 0LL);
+		        v52 = *(_OWORD *)&v51->m_Center.x;
+		        *(_OWORD *)&v62.m_Center.x = *(_OWORD *)&v51->m_Center.x;
+		        v53 = *(_QWORD *)&v51->m_Extents.y;
+		        *(_QWORD *)&v62.m_Extents.y = v53;
+		      }
+		    }
+		    catch ( Il2CppExceptionWrapper *v65 )
+		    {
+		      ex = v65->ex;
+		      sub_1801F6A10(&ex);
+		      v6 = retstr;
+		      v53 = *(_QWORD *)&v62.m_Extents.y;
+		      v52 = *(_OWORD *)&v62.m_Center.x;
+		      goto LABEL_12;
+		    }
+		    sub_1801F6A10(&ex);
+		LABEL_12:
+		    *(_OWORD *)&v6->m_Center.x = v52;
+		    *(_QWORD *)&v6->m_Extents.y = v53;
+		  }
+		  return v6;
 		}
-
-		public static IEnumerable<T> Append<T>(this IEnumerable<T> start, IEnumerable<T> end)
-		{
-			return null;
-		}
-
-		public static IEnumerable<T> Append<T>(this IEnumerable<T> start, params T[] end)
-		{
-			return null;
-		}
-
+		
+		[IteratorStateMachine(typeof(_Append_d__14<T>))]
+		public static IEnumerable<T> Append<T>(this IEnumerable<T> start, IEnumerable<T> end) => default;
+		public static IEnumerable<T> Append<T>(this IEnumerable<T> start, params T[] end) => default;
 		[IDTag(0)]
-		public static Vector3 Transform(this Vector3 vector, Matrix4x4 transform)
+		public static Vector3 Transform(this Vector3 vector, Matrix4x4 transform) => default; // 0x0000000189C77C20-0x0000000189C77DE8
+		// Vector3 Transform(Vector3, Matrix4x4)
+		Vector3 *HG::Rendering::Runtime::CSG::Extensions::Transform(
+		        Vector3 *__return_ptr retstr,
+		        Vector3 *vector,
+		        Matrix4x4 *transform,
+		        MethodInfo *method)
 		{
-			// // Vector3 Transform(Vector3, Matrix4x4)
-			// Vector3 *HG::Rendering::Runtime::CSG::Extensions::Transform(
-			//         Vector3 *__return_ptr retstr,
-			//         Vector3 *vector,
-			//         Matrix4x4 *transform,
-			//         MethodInfo *method)
-			// {
-			//   __m128 v7; // xmm0
-			//   MethodInfo *v8; // r9
-			//   Vector3 *v9; // rax
-			//   __int64 v10; // xmm6_8
-			//   float v11; // ebx
-			//   __int128 v12; // xmm0
-			//   __int128 v13; // xmm1
-			//   __int128 v14; // xmm0
-			//   __int128 v15; // xmm1
-			//   Vector3 *v16; // rax
-			//   float m22; // xmm2_4
-			//   MethodInfo *v18; // r8
-			//   float v19; // eax
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rdx
-			//   __int64 v21; // rcx
-			//   float z; // eax
-			//   __int128 v23; // xmm1
-			//   __int128 v24; // xmm0
-			//   __int128 v25; // xmm1
-			//   Vector3 *v26; // rax
-			//   Quaternion v28; // [rsp+38h] [rbp-29h] BYREF
-			//   Vector3 v29; // [rsp+48h] [rbp-19h] BYREF
-			//   Quaternion v30; // [rsp+58h] [rbp-9h] BYREF
-			//   Matrix4x4 v31; // [rsp+68h] [rbp+7h] BYREF
-			// 
-			//   if ( !byte_18D919D19 )
-			//   {
-			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::CSG::Extensions);
-			//     byte_18D919D19 = 1;
-			//   }
-			//   if ( IFix::WrappersManagerImpl::IsPatched(4720, 0LL) )
-			//   {
-			//     Patch = IFix::WrappersManagerImpl::GetPatch(4720, 0LL);
-			//     if ( !Patch )
-			//       sub_180B536AC(v21, 0LL);
-			//     z = vector.z;
-			//     v23 = *(_OWORD *)&transform.m01;
-			//     *(_OWORD *)&v31.m00 = *(_OWORD *)&transform.m00;
-			//     v24 = *(_OWORD *)&transform.m02;
-			//     v29.z = z;
-			//     *(_OWORD *)&v31.m01 = v23;
-			//     v25 = *(_OWORD *)&transform.m03;
-			//     *(_OWORD *)&v31.m02 = v24;
-			//     *(_QWORD *)&v29.x = *(_QWORD *)&vector.x;
-			//     *(_OWORD *)&v31.m03 = v25;
-			//     v26 = IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_1355((Vector3 *)&v30, Patch, &v29, &v31, 0LL);
-			//     *(_QWORD *)&v24 = *(_QWORD *)&v26.x;
-			//     v19 = v26.z;
-			//     *(_QWORD *)&retstr.x = v24;
-			//   }
-			//   else
-			//   {
-			//     v7 = (__m128)_mm_loadu_si128((const __m128i *)UnityEngine::Matrix4x4::GetColumn((Vector4 *)&v30, transform, 3, 0LL));
-			//     v29.z = vector.z;
-			//     *(_QWORD *)&v28.x = _mm_unpacklo_ps(v7, _mm_shuffle_ps(v7, v7, 85)).m128_u64[0];
-			//     *(_QWORD *)&v29.x = *(_QWORD *)&vector.x;
-			//     LODWORD(v28.z) = _mm_shuffle_ps(v7, v7, 170).m128_u32[0];
-			//     v9 = UnityEngine::Vector3::op_Addition((Vector3 *)&v30, &v29, (Vector3 *)&v28, v8);
-			//     v10 = *(_QWORD *)&v9.x;
-			//     v11 = v9.z;
-			//     sub_180002C70(TypeInfo::HG::Rendering::Runtime::CSG::Extensions);
-			//     v12 = *(_OWORD *)&transform.m00;
-			//     v13 = *(_OWORD *)&transform.m01;
-			//     v29.z = v11;
-			//     *(_OWORD *)&v31.m00 = v12;
-			//     v14 = *(_OWORD *)&transform.m02;
-			//     *(_OWORD *)&v31.m01 = v13;
-			//     v15 = *(_OWORD *)&transform.m03;
-			//     *(_OWORD *)&v31.m02 = v14;
-			//     *(_OWORD *)&v31.m03 = v15;
-			//     *(_QWORD *)&v29.x = v10;
-			//     v28 = *HG::Rendering::Runtime::CSG::Extensions::QuaternionFromMatrix(&v30, &v31, 0LL);
-			//     v16 = UnityEngine::Quaternion::op_Multiply((Vector3 *)&v30, &v28, &v29, 0LL);
-			//     *(_QWORD *)&v14 = *(_QWORD *)&v16.x;
-			//     m22 = transform.m22;
-			//     *(float *)&v16 = v16.z;
-			//     *(_QWORD *)&v29.x = _mm_unpacklo_ps(*(__m128 *)&transform.m00, (__m128)LODWORD(transform.m11)).m128_u64[0];
-			//     v29.z = m22;
-			//     *(_QWORD *)&v28.x = v14;
-			//     LODWORD(v28.z) = (_DWORD)v16;
-			//     UnityEngine::Vector3::Scale((Vector3 *)&v28, &v29, v18);
-			//     v19 = v28.z;
-			//     *(_QWORD *)&retstr.x = *(_QWORD *)&v28.x;
-			//   }
-			//   retstr.z = v19;
-			//   return retstr;
-			// }
-			// 
-			return null;
+		  __m128 v7; // xmm0
+		  MethodInfo *v8; // r9
+		  Vector3 *v9; // rax
+		  __int64 v10; // xmm6_8
+		  float v11; // ebx
+		  __int128 v12; // xmm0
+		  __int128 v13; // xmm1
+		  __int128 v14; // xmm0
+		  __int128 v15; // xmm1
+		  Vector3 *v16; // rax
+		  float m22; // xmm2_4
+		  MethodInfo *v18; // r8
+		  float v19; // eax
+		  ILFixDynamicMethodWrapper_2 *Patch; // rdx
+		  __int64 v21; // rcx
+		  float z; // eax
+		  __int128 v23; // xmm1
+		  __int128 v24; // xmm0
+		  __int128 v25; // xmm1
+		  Vector3 *v26; // rax
+		  Quaternion v28; // [rsp+38h] [rbp-29h] BYREF
+		  Vector3 v29; // [rsp+48h] [rbp-19h] BYREF
+		  Quaternion v30; // [rsp+58h] [rbp-9h] BYREF
+		  Matrix4x4 v31; // [rsp+68h] [rbp+7h] BYREF
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(5420, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(5420, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(v21, 0LL);
+		    z = vector->z;
+		    v23 = *(_OWORD *)&transform->m01;
+		    *(_OWORD *)&v31.m00 = *(_OWORD *)&transform->m00;
+		    v24 = *(_OWORD *)&transform->m02;
+		    v29.z = z;
+		    *(_OWORD *)&v31.m01 = v23;
+		    v25 = *(_OWORD *)&transform->m03;
+		    *(_OWORD *)&v31.m02 = v24;
+		    *(_QWORD *)&v29.x = *(_QWORD *)&vector->x;
+		    *(_OWORD *)&v31.m03 = v25;
+		    v26 = IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_1564((Vector3 *)&v30, Patch, &v29, &v31, 0LL);
+		    *(_QWORD *)&v24 = *(_QWORD *)&v26->x;
+		    v19 = v26->z;
+		    *(_QWORD *)&retstr->x = v24;
+		  }
+		  else
+		  {
+		    v7 = (__m128)_mm_loadu_si128((const __m128i *)UnityEngine::Matrix4x4::GetColumn((Vector4 *)&v30, transform, 3, 0LL));
+		    v29.z = vector->z;
+		    *(_QWORD *)&v28.x = _mm_unpacklo_ps(v7, _mm_shuffle_ps(v7, v7, 85)).m128_u64[0];
+		    *(_QWORD *)&v29.x = *(_QWORD *)&vector->x;
+		    LODWORD(v28.z) = _mm_shuffle_ps(v7, v7, 170).m128_u32[0];
+		    v9 = UnityEngine::Vector3::op_Addition((Vector3 *)&v30, &v29, (Vector3 *)&v28, v8);
+		    v10 = *(_QWORD *)&v9->x;
+		    v11 = v9->z;
+		    sub_1800036A0(TypeInfo::HG::Rendering::Runtime::CSG::Extensions);
+		    v12 = *(_OWORD *)&transform->m00;
+		    v13 = *(_OWORD *)&transform->m01;
+		    v29.z = v11;
+		    *(_OWORD *)&v31.m00 = v12;
+		    v14 = *(_OWORD *)&transform->m02;
+		    *(_OWORD *)&v31.m01 = v13;
+		    v15 = *(_OWORD *)&transform->m03;
+		    *(_OWORD *)&v31.m02 = v14;
+		    *(_OWORD *)&v31.m03 = v15;
+		    *(_QWORD *)&v29.x = v10;
+		    v28 = *HG::Rendering::Runtime::CSG::Extensions::QuaternionFromMatrix(&v30, &v31, 0LL);
+		    v16 = UnityEngine::Quaternion::op_Multiply((Vector3 *)&v30, &v28, &v29, 0LL);
+		    *(_QWORD *)&v14 = *(_QWORD *)&v16->x;
+		    m22 = transform->m22;
+		    *(float *)&v16 = v16->z;
+		    *(_QWORD *)&v29.x = _mm_unpacklo_ps(*(__m128 *)&transform->m00, (__m128)LODWORD(transform->m11)).m128_u64[0];
+		    v29.z = m22;
+		    *(_QWORD *)&v28.x = v14;
+		    LODWORD(v28.z) = (_DWORD)v16;
+		    UnityEngine::Vector3::Scale((Vector3 *)&v28, &v29, v18);
+		    v19 = v28.z;
+		    *(_QWORD *)&retstr->x = *(_QWORD *)&v28.x;
+		  }
+		  retstr->z = v19;
+		  return retstr;
 		}
-
+		
 		[IDTag(2)]
-		public static Vector3 Transform(this Vector3 vector, Vector3 pos, Quaternion rotation, Vector3 scale)
+		public static Vector3 Transform(this Vector3 vector, Vector3 pos, Quaternion rotation, Vector3 scale) => default; // 0x0000000189C773DC-0x0000000189C77564
+		// Vector3 Transform(Vector3, Vector3, Quaternion, Vector3)
+		Vector3 *HG::Rendering::Runtime::CSG::Extensions::Transform(
+		        Vector3 *__return_ptr retstr,
+		        Vector3 *vector,
+		        Vector3 *pos,
+		        Quaternion *rotation,
+		        Vector3 *scale,
+		        MethodInfo *method)
 		{
-			// // Vector3 Transform(Vector3, Vector3, Quaternion, Vector3)
-			// Vector3 *HG::Rendering::Runtime::CSG::Extensions::Transform(
-			//         Vector3 *__return_ptr retstr,
-			//         Vector3 *vector,
-			//         Vector3 *pos,
-			//         Quaternion *rotation,
-			//         Vector3 *scale,
-			//         MethodInfo *method)
-			// {
-			//   MethodInfo *v10; // r9
-			//   float v11; // eax
-			//   __int64 v12; // xmm0_8
-			//   float v13; // eax
-			//   Vector3 *v14; // rax
-			//   Quaternion v15; // xmm0
-			//   __int64 v16; // xmm3_8
-			//   Vector3 *v17; // rax
-			//   MethodInfo *v18; // r8
-			//   float v19; // eax
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rdx
-			//   __int64 v21; // rcx
-			//   __int64 v22; // xmm0_8
-			//   float z; // eax
-			//   Quaternion v24; // xmm0
-			//   Vector3 *v25; // rax
-			//   Vector3 v27; // [rsp+48h] [rbp-9h] BYREF
-			//   Vector3 v28; // [rsp+58h] [rbp+7h] BYREF
-			//   Vector3 v29; // [rsp+68h] [rbp+17h] BYREF
-			//   Quaternion v30; // [rsp+78h] [rbp+27h] BYREF
-			//   Quaternion v31; // [rsp+88h] [rbp+37h] BYREF
-			// 
-			//   if ( IFix::WrappersManagerImpl::IsPatched(4741, 0LL) )
-			//   {
-			//     Patch = IFix::WrappersManagerImpl::GetPatch(4741, 0LL);
-			//     if ( !Patch )
-			//       sub_180B536AC(v21, 0LL);
-			//     *(_QWORD *)&v27.x = *(_QWORD *)&pos.x;
-			//     v22 = *(_QWORD *)&scale.x;
-			//     v28.z = scale.z;
-			//     v27.z = pos.z;
-			//     z = vector.z;
-			//     *(_QWORD *)&v28.x = v22;
-			//     v24 = *rotation;
-			//     v29.z = z;
-			//     v31 = v24;
-			//     *(_QWORD *)&v29.x = *(_QWORD *)&vector.x;
-			//     v25 = IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_1366((Vector3 *)&v30, Patch, &v29, &v27, &v31, &v28, 0LL);
-			//     *(_QWORD *)&v24.x = *(_QWORD *)&v25.x;
-			//     v19 = v25.z;
-			//     *(_QWORD *)&retstr.x = *(_QWORD *)&v24.x;
-			//   }
-			//   else
-			//   {
-			//     v11 = pos.z;
-			//     *(_QWORD *)&v27.x = *(_QWORD *)&pos.x;
-			//     v12 = *(_QWORD *)&vector.x;
-			//     v27.z = v11;
-			//     v13 = vector.z;
-			//     *(_QWORD *)&v28.x = v12;
-			//     v28.z = v13;
-			//     v14 = UnityEngine::Vector3::op_Addition(&v29, &v28, &v27, v10);
-			//     v15 = *rotation;
-			//     v16 = *(_QWORD *)&v14.x;
-			//     *(float *)&v14 = v14.z;
-			//     *(_QWORD *)&v28.x = v16;
-			//     LODWORD(v28.z) = (_DWORD)v14;
-			//     v30 = v15;
-			//     v17 = UnityEngine::Quaternion::op_Multiply(&v29, &v30, &v28, 0LL);
-			//     *(_QWORD *)&v15.x = *(_QWORD *)&v17.x;
-			//     v27.z = v17.z;
-			//     *(_QWORD *)&v27.x = *(_QWORD *)&v15.x;
-			//     *(float *)&v17 = scale.z;
-			//     *(_QWORD *)&v28.x = *(_QWORD *)&scale.x;
-			//     LODWORD(v28.z) = (_DWORD)v17;
-			//     UnityEngine::Vector3::Scale(&v27, &v28, v18);
-			//     v19 = v27.z;
-			//     *(_QWORD *)&retstr.x = *(_QWORD *)&v27.x;
-			//   }
-			//   retstr.z = v19;
-			//   return retstr;
-			// }
-			// 
-			return null;
+		  MethodInfo *v10; // r9
+		  float v11; // eax
+		  __int64 v12; // xmm0_8
+		  float v13; // eax
+		  Vector3 *v14; // rax
+		  Quaternion v15; // xmm0
+		  __int64 v16; // xmm3_8
+		  Vector3 *v17; // rax
+		  MethodInfo *v18; // r8
+		  float v19; // eax
+		  ILFixDynamicMethodWrapper_2 *Patch; // rdx
+		  __int64 v21; // rcx
+		  __int64 v22; // xmm0_8
+		  float z; // eax
+		  Quaternion v24; // xmm0
+		  Vector3 *v25; // rax
+		  Vector3 v27; // [rsp+48h] [rbp-9h] BYREF
+		  Vector3 v28; // [rsp+58h] [rbp+7h] BYREF
+		  Vector3 v29; // [rsp+68h] [rbp+17h] BYREF
+		  Quaternion v30; // [rsp+78h] [rbp+27h] BYREF
+		  Quaternion v31; // [rsp+88h] [rbp+37h] BYREF
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(5441, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(5441, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(v21, 0LL);
+		    *(_QWORD *)&v27.x = *(_QWORD *)&pos->x;
+		    v22 = *(_QWORD *)&scale->x;
+		    v28.z = scale->z;
+		    v27.z = pos->z;
+		    z = vector->z;
+		    *(_QWORD *)&v28.x = v22;
+		    v24 = *rotation;
+		    v29.z = z;
+		    v31 = v24;
+		    *(_QWORD *)&v29.x = *(_QWORD *)&vector->x;
+		    v25 = IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_1575((Vector3 *)&v30, Patch, &v29, &v27, &v31, &v28, 0LL);
+		    *(_QWORD *)&v24.x = *(_QWORD *)&v25->x;
+		    v19 = v25->z;
+		    *(_QWORD *)&retstr->x = *(_QWORD *)&v24.x;
+		  }
+		  else
+		  {
+		    v11 = pos->z;
+		    *(_QWORD *)&v27.x = *(_QWORD *)&pos->x;
+		    v12 = *(_QWORD *)&vector->x;
+		    v27.z = v11;
+		    v13 = vector->z;
+		    *(_QWORD *)&v28.x = v12;
+		    v28.z = v13;
+		    v14 = UnityEngine::Vector3::op_Addition(&v29, &v28, &v27, v10);
+		    v15 = *rotation;
+		    v16 = *(_QWORD *)&v14->x;
+		    *(float *)&v14 = v14->z;
+		    *(_QWORD *)&v28.x = v16;
+		    LODWORD(v28.z) = (_DWORD)v14;
+		    v30 = v15;
+		    v17 = UnityEngine::Quaternion::op_Multiply(&v29, &v30, &v28, 0LL);
+		    *(_QWORD *)&v15.x = *(_QWORD *)&v17->x;
+		    v27.z = v17->z;
+		    *(_QWORD *)&v27.x = *(_QWORD *)&v15.x;
+		    *(float *)&v17 = scale->z;
+		    *(_QWORD *)&v28.x = *(_QWORD *)&scale->x;
+		    LODWORD(v28.z) = (_DWORD)v17;
+		    UnityEngine::Vector3::Scale(&v27, &v28, v18);
+		    v19 = v27.z;
+		    *(_QWORD *)&retstr->x = *(_QWORD *)&v27.x;
+		  }
+		  retstr->z = v19;
+		  return retstr;
 		}
-
+		
 		[IDTag(1)]
-		public static Vector3 TransformNormal(this Vector3 vector, Vector3 pos, Quaternion rotation, Vector3 scale)
+		public static Vector3 TransformNormal(this Vector3 vector, Vector3 pos, Quaternion rotation, Vector3 scale) => default; // 0x0000000189C7724C-0x0000000189C773DC
+		// Vector3 TransformNormal(Vector3, Vector3, Quaternion, Vector3)
+		Vector3 *HG::Rendering::Runtime::CSG::Extensions::TransformNormal(
+		        Vector3 *__return_ptr retstr,
+		        Vector3 *vector,
+		        Vector3 *pos,
+		        Quaternion *rotation,
+		        Vector3 *scale,
+		        MethodInfo *method)
 		{
-			// // Vector3 TransformNormal(Vector3, Vector3, Quaternion, Vector3)
-			// Vector3 *HG::Rendering::Runtime::CSG::Extensions::TransformNormal(
-			//         Vector3 *__return_ptr retstr,
-			//         Vector3 *vector,
-			//         Vector3 *pos,
-			//         Quaternion *rotation,
-			//         Vector3 *scale,
-			//         MethodInfo *method)
-			// {
-			//   __m128 y_low; // xmm6
-			//   float v11; // xmm7_4
-			//   __int64 v12; // xmm1_8
-			//   float v13; // eax
-			//   Quaternion v14; // xmm0
-			//   float v15; // eax
-			//   Vector3 *v16; // rax
-			//   Vector3 *v17; // rax
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rdx
-			//   __int64 v19; // rcx
-			//   __int64 v20; // xmm0_8
-			//   float z; // eax
-			//   Quaternion v22; // xmm0
-			//   __int64 v23; // xmm0_8
-			//   float v24; // eax
-			//   Vector3 v26; // [rsp+48h] [rbp-29h] BYREF
-			//   Vector3 v27; // [rsp+58h] [rbp-19h] BYREF
-			//   Vector3 v28; // [rsp+68h] [rbp-9h] BYREF
-			//   Vector3 v29; // [rsp+78h] [rbp+7h] BYREF
-			//   Quaternion v30[3]; // [rsp+88h] [rbp+17h] BYREF
-			// 
-			//   if ( !byte_18D919D1A )
-			//   {
-			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::CSG::Extensions);
-			//     byte_18D919D1A = 1;
-			//   }
-			//   if ( IFix::WrappersManagerImpl::IsPatched(4742, 0LL) )
-			//   {
-			//     Patch = IFix::WrappersManagerImpl::GetPatch(4742, 0LL);
-			//     if ( !Patch )
-			//       sub_180B536AC(v19, 0LL);
-			//     *(_QWORD *)&v27.x = *(_QWORD *)&pos.x;
-			//     v20 = *(_QWORD *)&scale.x;
-			//     v28.z = scale.z;
-			//     v27.z = pos.z;
-			//     z = vector.z;
-			//     *(_QWORD *)&v28.x = v20;
-			//     v22 = *rotation;
-			//     v26.z = z;
-			//     v30[0] = v22;
-			//     *(_QWORD *)&v26.x = *(_QWORD *)&vector.x;
-			//     v17 = IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_1366(&v29, Patch, &v26, &v27, v30, &v28, 0LL);
-			//   }
-			//   else
-			//   {
-			//     y_low = (__m128)LODWORD(vector.y);
-			//     v11 = vector.z;
-			//     sub_180002C70(TypeInfo::HG::Rendering::Runtime::CSG::Extensions);
-			//     v12 = *(_QWORD *)&pos.x;
-			//     v28.z = v11;
-			//     v13 = scale.z;
-			//     *(_QWORD *)&v26.x = *(_QWORD *)&scale.x;
-			//     v14 = *rotation;
-			//     v26.z = v13;
-			//     v15 = pos.z;
-			//     v30[0] = v14;
-			//     v27.z = v15;
-			//     *(_QWORD *)&v28.x = _mm_unpacklo_ps((__m128)LODWORD(vector.x), y_low).m128_u64[0];
-			//     *(_QWORD *)&v27.x = v12;
-			//     v16 = HG::Rendering::Runtime::CSG::Extensions::Transform(&v29, &v28, &v27, v30, &v26, 0LL);
-			//     *(_QWORD *)&v14.x = *(_QWORD *)&v16.x;
-			//     *(float *)&v16 = v16.z;
-			//     *(_QWORD *)&v28.x = *(_QWORD *)&v14.x;
-			//     LODWORD(v28.z) = (_DWORD)v16;
-			//     v17 = (Vector3 *)sub_182413270(&v29, &v28);
-			//   }
-			//   v23 = *(_QWORD *)&v17.x;
-			//   v24 = v17.z;
-			//   *(_QWORD *)&retstr.x = v23;
-			//   retstr.z = v24;
-			//   return retstr;
-			// }
-			// 
-			return null;
+		  __m128 y_low; // xmm6
+		  float v11; // xmm7_4
+		  __int64 v12; // xmm1_8
+		  float v13; // eax
+		  Quaternion v14; // xmm0
+		  float v15; // eax
+		  Vector3 *v16; // rax
+		  Vector3 *v17; // rax
+		  ILFixDynamicMethodWrapper_2 *Patch; // rdx
+		  __int64 v19; // rcx
+		  __int64 v20; // xmm0_8
+		  float z; // eax
+		  Quaternion v22; // xmm0
+		  __int64 v23; // xmm0_8
+		  float v24; // eax
+		  Vector3 v26; // [rsp+48h] [rbp-29h] BYREF
+		  Vector3 v27; // [rsp+58h] [rbp-19h] BYREF
+		  Vector3 v28; // [rsp+68h] [rbp-9h] BYREF
+		  Vector3 v29; // [rsp+78h] [rbp+7h] BYREF
+		  Quaternion v30[3]; // [rsp+88h] [rbp+17h] BYREF
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(5442, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(5442, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(v19, 0LL);
+		    *(_QWORD *)&v27.x = *(_QWORD *)&pos->x;
+		    v20 = *(_QWORD *)&scale->x;
+		    v28.z = scale->z;
+		    v27.z = pos->z;
+		    z = vector->z;
+		    *(_QWORD *)&v28.x = v20;
+		    v22 = *rotation;
+		    v26.z = z;
+		    v30[0] = v22;
+		    *(_QWORD *)&v26.x = *(_QWORD *)&vector->x;
+		    v17 = IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_1575(&v29, Patch, &v26, &v27, v30, &v28, 0LL);
+		  }
+		  else
+		  {
+		    y_low = (__m128)LODWORD(vector->y);
+		    v11 = vector->z;
+		    sub_1800036A0(TypeInfo::HG::Rendering::Runtime::CSG::Extensions);
+		    v12 = *(_QWORD *)&pos->x;
+		    v28.z = v11;
+		    v13 = scale->z;
+		    *(_QWORD *)&v26.x = *(_QWORD *)&scale->x;
+		    v14 = *rotation;
+		    v26.z = v13;
+		    v15 = pos->z;
+		    v30[0] = v14;
+		    v27.z = v15;
+		    *(_QWORD *)&v28.x = _mm_unpacklo_ps((__m128)LODWORD(vector->x), y_low).m128_u64[0];
+		    *(_QWORD *)&v27.x = v12;
+		    v16 = HG::Rendering::Runtime::CSG::Extensions::Transform(&v29, &v28, &v27, v30, &v26, 0LL);
+		    *(_QWORD *)&v14.x = *(_QWORD *)&v16->x;
+		    *(float *)&v16 = v16->z;
+		    *(_QWORD *)&v28.x = *(_QWORD *)&v14.x;
+		    LODWORD(v28.z) = (_DWORD)v16;
+		    v17 = (Vector3 *)sub_182FAE2B0(&v29, &v28);
+		  }
+		  v23 = *(_QWORD *)&v17->x;
+		  v24 = v17->z;
+		  *(_QWORD *)&retstr->x = v23;
+		  retstr->z = v24;
+		  return retstr;
 		}
-
+		
 		[IDTag(0)]
-		public static Vector3 TransformNormal(this Vector3 vector, Matrix4x4 transform)
+		public static Vector3 TransformNormal(this Vector3 vector, Matrix4x4 transform) => default; // 0x0000000189C77120-0x0000000189C7724C
+		// Vector3 TransformNormal(Vector3, Matrix4x4)
+		Vector3 *HG::Rendering::Runtime::CSG::Extensions::TransformNormal(
+		        Vector3 *__return_ptr retstr,
+		        Vector3 *vector,
+		        Matrix4x4 *transform,
+		        MethodInfo *method)
 		{
-			// // Vector3 TransformNormal(Vector3, Matrix4x4)
-			// Vector3 *HG::Rendering::Runtime::CSG::Extensions::TransformNormal(
-			//         Vector3 *__return_ptr retstr,
-			//         Vector3 *vector,
-			//         Matrix4x4 *transform,
-			//         MethodInfo *method)
-			// {
-			//   __int128 v7; // xmm0
-			//   __int128 v8; // xmm1
-			//   __int128 v9; // xmm0
-			//   __int128 v10; // xmm1
-			//   Vector3 *v11; // rax
-			//   Vector3 *v12; // rax
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rdx
-			//   __int64 v14; // rcx
-			//   float z; // eax
-			//   __int128 v16; // xmm1
-			//   __int128 v17; // xmm0
-			//   __int128 v18; // xmm1
-			//   __int64 v19; // xmm0_8
-			//   float v20; // eax
-			//   Vector3 v22; // [rsp+38h] [rbp-9h] BYREF
-			//   Vector3 v23; // [rsp+48h] [rbp+7h] BYREF
-			//   Matrix4x4 v24; // [rsp+58h] [rbp+17h] BYREF
-			// 
-			//   if ( !byte_18D919D1B )
-			//   {
-			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::CSG::Extensions);
-			//     byte_18D919D1B = 1;
-			//   }
-			//   if ( IFix::WrappersManagerImpl::IsPatched(4722, 0LL) )
-			//   {
-			//     Patch = IFix::WrappersManagerImpl::GetPatch(4722, 0LL);
-			//     if ( !Patch )
-			//       sub_180B536AC(v14, 0LL);
-			//     z = vector.z;
-			//     v16 = *(_OWORD *)&transform.m01;
-			//     *(_OWORD *)&v24.m00 = *(_OWORD *)&transform.m00;
-			//     v17 = *(_OWORD *)&transform.m02;
-			//     v22.z = z;
-			//     *(_OWORD *)&v24.m01 = v16;
-			//     v18 = *(_OWORD *)&transform.m03;
-			//     *(_OWORD *)&v24.m02 = v17;
-			//     *(_QWORD *)&v22.x = *(_QWORD *)&vector.x;
-			//     *(_OWORD *)&v24.m03 = v18;
-			//     v12 = IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_1355(&v23, Patch, &v22, &v24, 0LL);
-			//   }
-			//   else
-			//   {
-			//     sub_180002C70(TypeInfo::HG::Rendering::Runtime::CSG::Extensions);
-			//     v7 = *(_OWORD *)&transform.m00;
-			//     v8 = *(_OWORD *)&transform.m01;
-			//     v22.z = vector.z;
-			//     *(_OWORD *)&v24.m00 = v7;
-			//     v9 = *(_OWORD *)&transform.m02;
-			//     *(_OWORD *)&v24.m01 = v8;
-			//     v10 = *(_OWORD *)&transform.m03;
-			//     *(_OWORD *)&v24.m02 = v9;
-			//     *(_QWORD *)&v22.x = *(_QWORD *)&vector.x;
-			//     *(_OWORD *)&v24.m03 = v10;
-			//     v11 = HG::Rendering::Runtime::CSG::Extensions::Transform(&v23, &v22, &v24, 0LL);
-			//     *(_QWORD *)&v9 = *(_QWORD *)&v11.x;
-			//     *(float *)&v11 = v11.z;
-			//     *(_QWORD *)&v22.x = v9;
-			//     LODWORD(v22.z) = (_DWORD)v11;
-			//     v12 = (Vector3 *)sub_182413270(&v23, &v22);
-			//   }
-			//   v19 = *(_QWORD *)&v12.x;
-			//   v20 = v12.z;
-			//   *(_QWORD *)&retstr.x = v19;
-			//   retstr.z = v20;
-			//   return retstr;
-			// }
-			// 
-			return null;
+		  __int128 v7; // xmm0
+		  __int128 v8; // xmm1
+		  __int128 v9; // xmm0
+		  __int128 v10; // xmm1
+		  Vector3 *v11; // rax
+		  Vector3 *v12; // rax
+		  ILFixDynamicMethodWrapper_2 *Patch; // rdx
+		  __int64 v14; // rcx
+		  float z; // eax
+		  __int128 v16; // xmm1
+		  __int128 v17; // xmm0
+		  __int128 v18; // xmm1
+		  __int64 v19; // xmm0_8
+		  float v20; // eax
+		  Vector3 v22; // [rsp+38h] [rbp-9h] BYREF
+		  Vector3 v23; // [rsp+48h] [rbp+7h] BYREF
+		  Matrix4x4 v24; // [rsp+58h] [rbp+17h] BYREF
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(5422, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(5422, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(v14, 0LL);
+		    z = vector->z;
+		    v16 = *(_OWORD *)&transform->m01;
+		    *(_OWORD *)&v24.m00 = *(_OWORD *)&transform->m00;
+		    v17 = *(_OWORD *)&transform->m02;
+		    v22.z = z;
+		    *(_OWORD *)&v24.m01 = v16;
+		    v18 = *(_OWORD *)&transform->m03;
+		    *(_OWORD *)&v24.m02 = v17;
+		    *(_QWORD *)&v22.x = *(_QWORD *)&vector->x;
+		    *(_OWORD *)&v24.m03 = v18;
+		    v12 = IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_1564(&v23, Patch, &v22, &v24, 0LL);
+		  }
+		  else
+		  {
+		    sub_1800036A0(TypeInfo::HG::Rendering::Runtime::CSG::Extensions);
+		    v7 = *(_OWORD *)&transform->m00;
+		    v8 = *(_OWORD *)&transform->m01;
+		    v22.z = vector->z;
+		    *(_OWORD *)&v24.m00 = v7;
+		    v9 = *(_OWORD *)&transform->m02;
+		    *(_OWORD *)&v24.m01 = v8;
+		    v10 = *(_OWORD *)&transform->m03;
+		    *(_OWORD *)&v24.m02 = v9;
+		    *(_QWORD *)&v22.x = *(_QWORD *)&vector->x;
+		    *(_OWORD *)&v24.m03 = v10;
+		    v11 = HG::Rendering::Runtime::CSG::Extensions::Transform(&v23, &v22, &v24, 0LL);
+		    *(_QWORD *)&v9 = *(_QWORD *)&v11->x;
+		    *(float *)&v11 = v11->z;
+		    *(_QWORD *)&v22.x = v9;
+		    LODWORD(v22.z) = (_DWORD)v11;
+		    v12 = (Vector3 *)sub_182FAE2B0(&v23, &v22);
+		  }
+		  v19 = *(_QWORD *)&v12->x;
+		  v20 = v12->z;
+		  *(_QWORD *)&retstr->x = v19;
+		  retstr->z = v20;
+		  return retstr;
 		}
-
-		public static Quaternion QuaternionFromMatrix(Matrix4x4 m)
-		{
-			// // Quaternion QuaternionFromMatrix(Matrix4x4)
-			// Quaternion *HG::Rendering::Runtime::CSG::Extensions::QuaternionFromMatrix(
-			//         Quaternion *__return_ptr retstr,
-			//         Matrix4x4 *m,
-			//         MethodInfo *method)
-			// {
-			//   float3 *v5; // rdx
-			//   float3 *v6; // rcx
-			//   float3 *v7; // r8
-			//   float3 *v8; // r9
-			//   float3 *v9; // rdx
-			//   float3 *v10; // rcx
-			//   float3 *v11; // r8
-			//   float3 *v12; // r9
-			//   float v13; // xmm9_4
-			//   float3 *v14; // rdx
-			//   float3 *v15; // rcx
-			//   float3 *v16; // r8
-			//   float3 *v17; // r9
-			//   float v18; // xmm8_4
-			//   float Item; // xmm7_4
-			//   float v20; // xmm6_4
-			//   float3 *v21; // rdx
-			//   float3 *v22; // rcx
-			//   float3 *v23; // r8
-			//   float3 *v24; // r9
-			//   float v25; // xmm7_4
-			//   float v26; // xmm0_4
-			//   float v27; // xmm6_4
-			//   MethodInfo *v28; // rdx
-			//   float v29; // xmm0_4
-			//   float v30; // xmm6_4
-			//   MethodInfo *v31; // rdx
-			//   float v32; // xmm6_4
-			//   float v33; // xmm0_4
-			//   MethodInfo *v34; // rdx
-			//   Quaternion v35; // xmm0
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			//   __int64 v37; // rdx
-			//   __int64 v38; // rcx
-			//   __int128 v39; // xmm1
-			//   __int128 v40; // xmm0
-			//   __int128 v41; // xmm1
-			//   Quaternion *result; // rax
-			//   Quaternion v43; // [rsp+28h] [rbp-59h] BYREF
-			//   Matrix4x4 v44; // [rsp+38h] [rbp-49h] BYREF
-			// 
-			//   if ( IFix::WrappersManagerImpl::IsPatched(4721, 0LL) )
-			//   {
-			//     Patch = IFix::WrappersManagerImpl::GetPatch(4721, 0LL);
-			//     if ( !Patch )
-			//       sub_180B536AC(v38, v37);
-			//     v39 = *(_OWORD *)&m.m01;
-			//     *(_OWORD *)&v44.m00 = *(_OWORD *)&m.m00;
-			//     v40 = *(_OWORD *)&m.m02;
-			//     *(_OWORD *)&v44.m01 = v39;
-			//     v41 = *(_OWORD *)&m.m03;
-			//     *(_OWORD *)&v44.m02 = v40;
-			//     *(_OWORD *)&v44.m03 = v41;
-			//     v35 = *IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_1354(&v43, Patch, &v44, 0LL);
-			//   }
-			//   else
-			//   {
-			//     UnityEngine::Matrix4x4::get_Item(m, 0, 0LL);
-			//     UnityEngine::Matrix4x4::get_Item(m, 5, 0LL);
-			//     UnityEngine::Matrix4x4::get_Item(m, 10, 0LL);
-			//     v43.w = sub_1802ECED0(v6, v5, v7, v8) * 0.5;
-			//     UnityEngine::Matrix4x4::get_Item(m, 0, 0LL);
-			//     UnityEngine::Matrix4x4::get_Item(m, 5, 0LL);
-			//     UnityEngine::Matrix4x4::get_Item(m, 10, 0LL);
-			//     v13 = sub_1802ECED0(v10, v9, v11, v12) * 0.5;
-			//     UnityEngine::Matrix4x4::get_Item(m, 0, 0LL);
-			//     UnityEngine::Matrix4x4::get_Item(m, 5, 0LL);
-			//     UnityEngine::Matrix4x4::get_Item(m, 10, 0LL);
-			//     v18 = sub_1802ECED0(v15, v14, v16, v17) * 0.5;
-			//     Item = UnityEngine::Matrix4x4::get_Item(m, 0, 0LL);
-			//     v20 = UnityEngine::Matrix4x4::get_Item(m, 5, 0LL);
-			//     fmaxf(0.0, UnityEngine::Matrix4x4::get_Item(m, 10, 0LL) + (float)((float)(1.0 - Item) - v20));
-			//     v25 = sub_1802ECED0(v22, v21, v23, v24) * 0.5;
-			//     v26 = UnityEngine::Matrix4x4::get_Item(m, 6, 0LL);
-			//     v27 = (float)(v26 - UnityEngine::Matrix4x4::get_Item(m, 9, 0LL)) * v13;
-			//     v43.x = UnityEngine::Mathf::Sign(v27, v28) * v13;
-			//     v29 = UnityEngine::Matrix4x4::get_Item(m, 8, 0LL);
-			//     v30 = (float)(v29 - UnityEngine::Matrix4x4::get_Item(m, 2, 0LL)) * v18;
-			//     v43.y = UnityEngine::Mathf::Sign(v30, v31) * v18;
-			//     v32 = UnityEngine::Matrix4x4::get_Item(m, 1, 0LL);
-			//     v33 = UnityEngine::Matrix4x4::get_Item(m, 4, 0LL);
-			//     v43.z = UnityEngine::Mathf::Sign((float)(v32 - v33) * v25, v34) * v25;
-			//     v35 = v43;
-			//   }
-			//   result = retstr;
-			//   *retstr = v35;
-			//   return result;
-			// }
-			// 
-			return null;
-		}
-
-		public const float EPSILON = 0.001f;
-
-		public const float Epsilon = 0.001f;
-
-		[StaticFieldOffset(ThreadStatic = false, Offset = "0x00")]
-		public static object lock1;
-
-		[StaticFieldOffset(ThreadStatic = false, Offset = "0x08")]
-		public static object lock2;
-
-		[StaticFieldOffset(ThreadStatic = false, Offset = "0x10")]
-		public static object lock3;
-
-		[StaticFieldOffset(ThreadStatic = false, Offset = "0x18")]
-		public static object lock4;
+		
 	}
 }

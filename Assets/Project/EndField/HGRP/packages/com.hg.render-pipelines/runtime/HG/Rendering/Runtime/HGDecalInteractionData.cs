@@ -1,22 +1,20 @@
-﻿using System;
-using System.Runtime.InteropServices;
+using System;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using UnityEngine;
+
+// Image 4: HG.RenderPipelines.Runtime.dll - Assembly: HG.RenderPipelines.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null - Types 37354-38879
 
 namespace HG.Rendering.Runtime
 {
-	[StructLayout(LayoutKind.Sequential, Pack = 1, Size = 144)]
-	internal struct HGDecalInteractionData
+	internal struct HGDecalInteractionData // TypeDefIndex: 37743
 	{
-		public Matrix4x4 _transform;
-
-		public Vector4 _data0;
-
-		public Vector4 _data1;
-
-		public Vector4 _data2;
-
-		public Vector4 _data3;
-
-		public Vector4 _data4;
+		// Fields
+		public Matrix4x4 _transform; // 0x00
+		public Vector4 _data0; // 0x40
+		public Vector4 _data1; // 0x50
+		public Vector4 _data2; // 0x60
+		public Vector4 _data3; // 0x70
+		public Vector4 _data4; // 0x80
 	}
 }

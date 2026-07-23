@@ -1,10 +1,14 @@
-﻿using System;
+using System;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
+
+// Image 4: HG.RenderPipelines.Runtime.dll - Assembly: HG.RenderPipelines.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null - Types 37354-38879
 
 namespace HG.Rendering.Runtime
 {
 	[Flags]
 	[Obsolete("For data migration")]
-	internal enum ObsoleteFrameSettingsOverrides
+	internal enum ObsoleteFrameSettingsOverrides // TypeDefIndex: 38540
 	{
 		Shadow = 1,
 		ContactShadow = 2,
@@ -29,9 +33,9 @@ namespace HG.Rendering.Runtime
 		Postprocess = 1048576,
 		ShaderLitMode = 2097152,
 		DepthPrepassWithDeferredRendering = 4194304,
+		AsyncCompute = 8388608,
 		OpaqueObjects = 16777216,
 		TransparentObjects = 33554432,
-		AsyncCompute = 8388608,
 		LightListAsync = 134217728,
 		SSRAsync = 268435456,
 		SSAOAsync = 536870912,

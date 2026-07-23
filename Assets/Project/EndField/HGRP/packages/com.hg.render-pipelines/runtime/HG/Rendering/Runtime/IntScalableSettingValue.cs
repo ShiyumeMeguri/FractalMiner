@@ -1,24 +1,26 @@
-﻿using System;
+using System;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
+
+// Image 4: HG.RenderPipelines.Runtime.dll - Assembly: HG.RenderPipelines.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null - Types 37354-38879
 
 namespace HG.Rendering.Runtime
 {
 	[Serializable]
-	public class IntScalableSettingValue : ScalableSettingValue<int>
+	public class IntScalableSettingValue : ScalableSettingValue<int> // TypeDefIndex: 38562
 	{
-		public IntScalableSettingValue()
+		// Constructors
+		public IntScalableSettingValue() {} // 0x00000001841E1670-0x00000001841E1680
+		// Void Lerp[HGWindConfig](HGWindConfig ByRef, HGWindConfig ByRef, Single)
+		void HG::Rendering::Runtime::HGCelestialConfig::HGCelestialAdvancedObjectConfig::Lerp<HG::Rendering::Runtime::HGWindConfig>(
+		        HGCelestialConfig_HGCelestialAdvancedObjectConfig *this,
+		        HGWindConfig *cSrc,
+		        HGWindConfig *cDst,
+		        float t,
+		        MethodInfo *method)
 		{
-			// // IntScalableSettingValue()
-			// void HG::Rendering::Runtime::IntScalableSettingValue::IntScalableSettingValue(
-			//         IntScalableSettingValue *this,
-			//         MethodInfo *method)
-			// {
-			//   if ( !byte_18D919699 )
-			//   {
-			//     sub_18003C530(&MethodInfo::HG::Rendering::Runtime::ScalableSettingValue<int>::ScalableSettingValue);
-			//     byte_18D919699 = 1;
-			//   }
-			// }
-			// 
+		  ;
 		}
+		
 	}
 }

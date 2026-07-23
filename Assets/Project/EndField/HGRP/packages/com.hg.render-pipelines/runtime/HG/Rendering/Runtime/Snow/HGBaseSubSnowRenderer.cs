@@ -1,361 +1,259 @@
-﻿using System;
+using System;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using HG.Rendering.RenderGraphModule;
+using HG.Rendering.Runtime;
 using UnityEngine;
 using UnityEngine.Rendering;
 
+// Image 4: HG.RenderPipelines.Runtime.dll - Assembly: HG.RenderPipelines.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null - Types 37354-38879
+
 namespace HG.Rendering.Runtime.Snow
 {
-	public abstract class HGBaseSubSnowRenderer
+	public abstract class HGBaseSubSnowRenderer // TypeDefIndex: 38835
 	{
-		protected HGBaseSubSnowRenderer()
+		// Fields
+		internal bool enabled; // 0x10
+		internal int snowRenderQueue; // 0x14
+		protected static readonly HideFlags RSC_HIDE_FLAGS; // 0x00
+	
+		// Constructors
+		protected HGBaseSubSnowRenderer() {} // 0x0000000184DA1FC0-0x0000000184DA1FD0
+		// HGBaseSubSnowRenderer()
+		void HG::Rendering::Runtime::Snow::HGBaseSubSnowRenderer::HGBaseSubSnowRenderer(
+		        HGBaseSubSnowRenderer *this,
+		        MethodInfo *method)
 		{
-			// // HGBaseSubSnowRenderer()
-			// void HG::Rendering::Runtime::Snow::HGBaseSubSnowRenderer::HGBaseSubSnowRenderer(
-			//         HGBaseSubSnowRenderer *this,
-			//         MethodInfo *method)
-			// {
-			//   this.fields.enabled = 1;
-			//   this.fields.snowRenderQueue = 3000;
-			// }
-			// 
+		  this->fields.enabled = 1;
+		  this->fields.snowRenderQueue = 3000;
 		}
-
+		
+		static HGBaseSubSnowRenderer() {} // 0x0000000184D84C60-0x0000000184D84C80
+		// HGBaseSubSnowRenderer()
+		void HG::Rendering::Runtime::Snow::HGBaseSubSnowRenderer::cctor(MethodInfo *method)
+		{
+		  TypeInfo::HG::Rendering::Runtime::Snow::HGBaseSubSnowRenderer->static_fields->RSC_HIDE_FLAGS = 63;
+		}
+		
+	
+		// Methods
 		internal abstract void PrepareResources(SnowCommonResources commonResources);
-
-		internal abstract void UpdateData(in SnowCommonRenderingParam rainCommonRenderingParam, HGCamera hgCamera, float deltaTime);
-
-		internal virtual void PerFrameClear()
+		internal abstract void UpdateData([IsReadOnly] in SnowCommonRenderingParam rainCommonRenderingParam, HGCamera hgCamera, float deltaTime);
+		internal virtual void PerFrameClear() {} // 0x00000001832DAE10-0x00000001832DAE60
+		// Void PerFrameClear()
+		void HG::Rendering::Runtime::Snow::HGBaseSubSnowRenderer::PerFrameClear(
+		        HGBaseSubSnowRenderer *this,
+		        MethodInfo *method)
 		{
-			// // Void PerFrameClear()
-			// void HG::Rendering::Runtime::Snow::HGBaseSubSnowRenderer::PerFrameClear(
-			//         HGBaseSubSnowRenderer *this,
-			//         MethodInfo *method)
-			// {
-			//   struct ILFixDynamicMethodWrapper_2__Class *v3; // rax
-			//   ILFixDynamicMethodWrapper_2__StaticFields *static_fields; // rcx
-			//   ILFixDynamicMethodWrapper_2__Array *wrapperArray; // rdx
-			//   ILFixDynamicMethodWrapper_2__Array *v6; // rax
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			// 
-			//   if ( !byte_18D8EDC37 )
-			//   {
-			//     sub_18003C530(&TypeInfo::IFix::ILFixDynamicMethodWrapper);
-			//     byte_18D8EDC37 = 1;
-			//   }
-			//   v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper._1.cctor_finished_or_no_cctor )
-			//   {
-			//     il2cpp_runtime_class_init_0(TypeInfo::IFix::ILFixDynamicMethodWrapper, method);
-			//     v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   }
-			//   static_fields = v3.static_fields;
-			//   wrapperArray = static_fields.wrapperArray;
-			//   if ( !static_fields.wrapperArray )
-			//     goto LABEL_8;
-			//   if ( wrapperArray.max_length.size <= 632 )
-			//     return;
-			//   if ( !v3._1.cctor_finished_or_no_cctor )
-			//   {
-			//     il2cpp_runtime_class_init_0(v3, wrapperArray);
-			//     v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   }
-			//   static_fields = v3.static_fields;
-			//   v6 = static_fields.wrapperArray;
-			//   if ( !static_fields.wrapperArray )
-			// LABEL_8:
-			//     sub_180B536AC(static_fields, wrapperArray);
-			//   if ( v6.max_length.size <= 0x278u )
-			//     sub_180070270(static_fields, wrapperArray);
-			//   if ( v6[17].vector[20] )
-			//   {
-			//     Patch = IFix::WrappersManagerImpl::GetPatch(632, 0LL);
-			//     if ( Patch )
-			//     {
-			//       IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_0((ILFixDynamicMethodWrapper_37 *)Patch, (Object *)this, 0LL);
-			//       return;
-			//     }
-			//     goto LABEL_8;
-			//   }
-			// }
-			// 
+		  struct ILFixDynamicMethodWrapper_2__Class *v3; // rcx
+		  ILFixDynamicMethodWrapper_2__Array *wrapperArray; // rax
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		
+		  v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(TypeInfo::IFix::ILFixDynamicMethodWrapper);
+		    v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  wrapperArray = v3->static_fields->wrapperArray;
+		  if ( !wrapperArray )
+		    goto LABEL_6;
+		  if ( wrapperArray->max_length.size <= 669 )
+		    return;
+		  if ( !v3->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(v3);
+		    v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  v3 = (struct ILFixDynamicMethodWrapper_2__Class *)v3->static_fields->wrapperArray;
+		  if ( !v3 )
+		LABEL_6:
+		    sub_1800D8260(v3, method);
+		  if ( LODWORD(v3->_0.namespaze) <= 0x29D )
+		    sub_1800D2AB0(v3, method);
+		  if ( v3[14]._0.klass )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(669, 0LL);
+		    if ( Patch )
+		    {
+		      IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_0((ILFixDynamicMethodWrapper_39 *)Patch, (Object *)this, 0LL);
+		      return;
+		    }
+		    goto LABEL_6;
+		  }
 		}
-
-		internal virtual void SetMaterialData(in SnowCommonRenderingParam rainCommonRenderingParam, ref ScriptableRenderContext context)
+		
+		internal virtual void SetMaterialData([IsReadOnly] in SnowCommonRenderingParam rainCommonRenderingParam, ref ScriptableRenderContext context) {} // 0x0000000189C77FD4-0x0000000189C7803C
+		// Void SetMaterialData(SnowCommonRenderingParam ByRef, ScriptableRenderContext ByRef)
+		void HG::Rendering::Runtime::Snow::HGBaseSubSnowRenderer::SetMaterialData(
+		        HGBaseSubSnowRenderer *this,
+		        SnowCommonRenderingParam **rainCommonRenderingParam,
+		        ScriptableRenderContext *context,
+		        MethodInfo *method)
 		{
-			// // Void SetMaterialData(SnowCommonRenderingParam ByRef, ScriptableRenderContext ByRef)
-			// void HG::Rendering::Runtime::Snow::HGBaseSubSnowRenderer::SetMaterialData(
-			//         HGBaseSubSnowRenderer *this,
-			//         SnowCommonRenderingParam **rainCommonRenderingParam,
-			//         ScriptableRenderContext *context,
-			//         MethodInfo *method)
-			// {
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			//   __int64 v8; // rdx
-			//   __int64 v9; // rcx
-			// 
-			//   if ( IFix::WrappersManagerImpl::IsPatched(757, 0LL) )
-			//   {
-			//     Patch = IFix::WrappersManagerImpl::GetPatch(757, 0LL);
-			//     if ( !Patch )
-			//       sub_180B536AC(v9, v8);
-			//     IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_286(Patch, (Object *)this, rainCommonRenderingParam, context, 0LL);
-			//   }
-			// }
-			// 
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v8; // rdx
+		  __int64 v9; // rcx
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(824, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(824, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(v9, v8);
+		    IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_326(Patch, (Object *)this, rainCommonRenderingParam, context, 0LL);
+		  }
 		}
-
-		internal virtual void UpdateRendererObjs(in SnowCommonRenderingParam rainCommonRenderingParam, HGCamera hgCamera)
+		
+		internal virtual void Render(HGRenderGraphContext ctx, HGCamera hgCamera) {} // 0x0000000189C77F6C-0x0000000189C77FD4
+		// Void Render(HGRenderGraphContext, HGCamera)
+		void HG::Rendering::Runtime::Snow::HGBaseSubSnowRenderer::Render(
+		        HGBaseSubSnowRenderer *this,
+		        HGRenderGraphContext *ctx,
+		        HGCamera *hgCamera,
+		        MethodInfo *method)
 		{
-			// // Void UpdateRendererObjs(SnowCommonRenderingParam ByRef, HGCamera)
-			// void HG::Rendering::Runtime::Snow::HGBaseSubSnowRenderer::UpdateRendererObjs(
-			//         HGBaseSubSnowRenderer *this,
-			//         SnowCommonRenderingParam **rainCommonRenderingParam,
-			//         HGCamera *hgCamera,
-			//         MethodInfo *method)
-			// {
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			//   __int64 v8; // rdx
-			//   __int64 v9; // rcx
-			// 
-			//   if ( IFix::WrappersManagerImpl::IsPatched(760, 0LL) )
-			//   {
-			//     Patch = IFix::WrappersManagerImpl::GetPatch(760, 0LL);
-			//     if ( !Patch )
-			//       sub_180B536AC(v9, v8);
-			//     IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_287(
-			//       Patch,
-			//       (Object *)this,
-			//       rainCommonRenderingParam,
-			//       (Object *)hgCamera,
-			//       0LL);
-			//   }
-			// }
-			// 
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v8; // rdx
+		  __int64 v9; // rcx
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(1671, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(1671, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(v9, v8);
+		    IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_11(
+		      (ILFixDynamicMethodWrapper_30 *)Patch,
+		      (Object *)this,
+		      (Object *)ctx,
+		      (Object *)hgCamera,
+		      0LL);
+		  }
 		}
-
-		internal virtual void Render(HGRenderGraphContext ctx, HGCamera hgCamera)
+		
+		internal virtual bool IsDirty() => default; // 0x00000001832DD110-0x00000001832DD170
+		// Boolean IsDirty()
+		bool HG::Rendering::Runtime::Snow::HGBaseSubSnowRenderer::IsDirty(HGBaseSubSnowRenderer *this, MethodInfo *method)
 		{
-			// // Void Render(HGRenderGraphContext, HGCamera)
-			// void HG::Rendering::Runtime::Snow::HGBaseSubSnowRenderer::Render(
-			//         HGBaseSubSnowRenderer *this,
-			//         HGRenderGraphContext *ctx,
-			//         HGCamera *hgCamera,
-			//         MethodInfo *method)
-			// {
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			//   __int64 v8; // rdx
-			//   __int64 v9; // rcx
-			// 
-			//   if ( IFix::WrappersManagerImpl::IsPatched(4773, 0LL) )
-			//   {
-			//     Patch = IFix::WrappersManagerImpl::GetPatch(4773, 0LL);
-			//     if ( !Patch )
-			//       sub_180B536AC(v9, v8);
-			//     IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_11(
-			//       (ILFixDynamicMethodWrapper_28 *)Patch,
-			//       (Object *)this,
-			//       (Object *)ctx,
-			//       (Object *)hgCamera,
-			//       0LL);
-			//   }
-			// }
-			// 
+		  struct ILFixDynamicMethodWrapper_2__Class *v3; // rcx
+		  ILFixDynamicMethodWrapper_2__Array *wrapperArray; // rax
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		
+		  v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(TypeInfo::IFix::ILFixDynamicMethodWrapper);
+		    v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  wrapperArray = v3->static_fields->wrapperArray;
+		  if ( !wrapperArray )
+		    goto LABEL_6;
+		  if ( wrapperArray->max_length.size <= 825 )
+		    return 0;
+		  if ( !v3->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(v3);
+		    v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  v3 = (struct ILFixDynamicMethodWrapper_2__Class *)v3->static_fields->wrapperArray;
+		  if ( !v3 )
+		    goto LABEL_6;
+		  if ( LODWORD(v3->_0.namespaze) <= 0x339 )
+		    sub_1800D2AB0(v3, method);
+		  if ( !v3[17]._1.genericContainerHandle )
+		    return 0;
+		  Patch = IFix::WrappersManagerImpl::GetPatch(825, 0LL);
+		  if ( !Patch )
+		LABEL_6:
+		    sub_1800D8260(v3, method);
+		  return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_14((ILFixDynamicMethodWrapper_20 *)Patch, (Object *)this, 0LL);
 		}
-
-		internal virtual bool IsDirty()
+		
+		internal virtual void ClearData() {} // 0x0000000189C77EE4-0x0000000189C77F28
+		// Void ClearData()
+		void HG::Rendering::Runtime::Snow::HGBaseSubSnowRenderer::ClearData(HGBaseSubSnowRenderer *this, MethodInfo *method)
 		{
-			// // Boolean IsDirty()
-			// bool HG::Rendering::Runtime::Snow::HGBaseSubSnowRenderer::IsDirty(HGBaseSubSnowRenderer *this, MethodInfo *method)
-			// {
-			//   struct ILFixDynamicMethodWrapper_2__Class *v3; // rax
-			//   ILFixDynamicMethodWrapper_2__StaticFields *static_fields; // rcx
-			//   ILFixDynamicMethodWrapper_2__Array *wrapperArray; // rdx
-			//   ILFixDynamicMethodWrapper_2__Array *v7; // rax
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			// 
-			//   if ( !byte_18D8EDC37 )
-			//   {
-			//     sub_18003C530(&TypeInfo::IFix::ILFixDynamicMethodWrapper);
-			//     byte_18D8EDC37 = 1;
-			//   }
-			//   v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper._1.cctor_finished_or_no_cctor )
-			//   {
-			//     il2cpp_runtime_class_init_0(TypeInfo::IFix::ILFixDynamicMethodWrapper, method);
-			//     v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   }
-			//   static_fields = v3.static_fields;
-			//   wrapperArray = static_fields.wrapperArray;
-			//   if ( !static_fields.wrapperArray )
-			//     goto LABEL_8;
-			//   if ( wrapperArray.max_length.size <= 758 )
-			//     return 0;
-			//   if ( !v3._1.cctor_finished_or_no_cctor )
-			//   {
-			//     il2cpp_runtime_class_init_0(v3, wrapperArray);
-			//     v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   }
-			//   static_fields = v3.static_fields;
-			//   v7 = static_fields.wrapperArray;
-			//   if ( !static_fields.wrapperArray )
-			//     goto LABEL_8;
-			//   if ( v7.max_length.size <= 0x2F6u )
-			//     sub_180070270(static_fields, wrapperArray);
-			//   if ( !v7[21].vector[2] )
-			//     return 0;
-			//   Patch = IFix::WrappersManagerImpl::GetPatch(758, 0LL);
-			//   if ( !Patch )
-			// LABEL_8:
-			//     sub_180B536AC(static_fields, wrapperArray);
-			//   return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_8((ILFixDynamicMethodWrapper_27 *)Patch, (Object *)this, 0LL);
-			// }
-			// 
-			return default(bool);
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v4; // rdx
+		  __int64 v5; // rcx
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(826, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(826, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(v5, v4);
+		    IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_0((ILFixDynamicMethodWrapper_39 *)Patch, (Object *)this, 0LL);
+		  }
 		}
-
-		internal virtual void ClearData()
+		
+		internal virtual void Dispose() {} // 0x0000000189C77F28-0x0000000189C77F6C
+		// Void Dispose()
+		void HG::Rendering::Runtime::Snow::HGBaseSubSnowRenderer::Dispose(HGBaseSubSnowRenderer *this, MethodInfo *method)
 		{
-			// // Void ClearData()
-			// void HG::Rendering::Runtime::Snow::HGBaseSubSnowRenderer::ClearData(HGBaseSubSnowRenderer *this, MethodInfo *method)
-			// {
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			//   __int64 v4; // rdx
-			//   __int64 v5; // rcx
-			// 
-			//   if ( IFix::WrappersManagerImpl::IsPatched(759, 0LL) )
-			//   {
-			//     Patch = IFix::WrappersManagerImpl::GetPatch(759, 0LL);
-			//     if ( !Patch )
-			//       sub_180B536AC(v5, v4);
-			//     IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_0((ILFixDynamicMethodWrapper_37 *)Patch, (Object *)this, 0LL);
-			//   }
-			// }
-			// 
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v4; // rdx
+		  __int64 v5; // rcx
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(524, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(524, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(v5, v4);
+		    IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_0((ILFixDynamicMethodWrapper_39 *)Patch, (Object *)this, 0LL);
+		  }
 		}
-
-		internal virtual void Dispose()
+		
+		protected void DisposeMaterial(Material mat) {} // 0x0000000184CE4DC0-0x0000000184CE4E60
+		// Void DisposeMaterial(Material)
+		void HG::Rendering::Runtime::Snow::HGBaseSubSnowRenderer::DisposeMaterial(
+		        HGBaseSubSnowRenderer *this,
+		        Material *mat,
+		        MethodInfo *method)
 		{
-			// // Void Dispose()
-			// void HG::Rendering::Runtime::Snow::HGBaseSubSnowRenderer::Dispose(HGBaseSubSnowRenderer *this, MethodInfo *method)
-			// {
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			//   __int64 v4; // rdx
-			//   __int64 v5; // rcx
-			// 
-			//   if ( IFix::WrappersManagerImpl::IsPatched(497, 0LL) )
-			//   {
-			//     Patch = IFix::WrappersManagerImpl::GetPatch(497, 0LL);
-			//     if ( !Patch )
-			//       sub_180B536AC(v5, v4);
-			//     IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_0((ILFixDynamicMethodWrapper_37 *)Patch, (Object *)this, 0LL);
-			//   }
-			// }
-			// 
+		  struct Object_1__Class *v5; // rcx
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v7; // rdx
+		  __int64 v8; // rcx
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(5473, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(5473, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(v8, v7);
+		    IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_1(
+		      (ILFixDynamicMethodWrapper_39 *)Patch,
+		      (Object *)this,
+		      (Object *)mat,
+		      0LL);
+		  }
+		  else
+		  {
+		    v5 = TypeInfo::UnityEngine::Object;
+		    if ( !TypeInfo::UnityEngine::Object->_1.cctor_finished_or_no_cctor )
+		    {
+		      il2cpp_runtime_class_init_1(TypeInfo::UnityEngine::Object);
+		      v5 = TypeInfo::UnityEngine::Object;
+		      if ( !TypeInfo::UnityEngine::Object->_1.cctor_finished_or_no_cctor )
+		      {
+		        il2cpp_runtime_class_init_1(TypeInfo::UnityEngine::Object);
+		        v5 = TypeInfo::UnityEngine::Object;
+		      }
+		    }
+		    if ( mat )
+		    {
+		      if ( !v5->_1.cctor_finished_or_no_cctor )
+		      {
+		        il2cpp_runtime_class_init_1(v5);
+		        v5 = TypeInfo::UnityEngine::Object;
+		      }
+		      if ( mat->fields._.m_CachedPtr )
+		      {
+		        if ( !v5->_1.cctor_finished_or_no_cctor )
+		          il2cpp_runtime_class_init_1(v5);
+		        UnityEngine::Object::Destroy((Object_1 *)mat, 0LL);
+		      }
+		    }
+		  }
 		}
-
-		protected void DisposeRendererObj(Transform objTrans)
-		{
-			// // Void DisposeRendererObj(Transform)
-			// void HG::Rendering::Runtime::Snow::HGBaseSubSnowRenderer::DisposeRendererObj(
-			//         HGBaseSubSnowRenderer *this,
-			//         Transform *objTrans,
-			//         MethodInfo *method)
-			// {
-			//   __int64 v5; // rdx
-			//   __int64 v6; // rdx
-			//   __int64 v7; // rcx
-			//   __int64 v8; // rdx
-			//   Object_1 *gameObject; // rbx
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			// 
-			//   if ( !byte_18D8EDC1E )
-			//   {
-			//     sub_18003C530(&TypeInfo::UnityEngine::Object);
-			//     byte_18D8EDC1E = 1;
-			//   }
-			//   if ( IFix::WrappersManagerImpl::IsPatched(4774, 0LL) )
-			//   {
-			//     Patch = IFix::WrappersManagerImpl::GetPatch(4774, 0LL);
-			//     if ( Patch )
-			//     {
-			//       IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_1(
-			//         (ILFixDynamicMethodWrapper_37 *)Patch,
-			//         (Object *)this,
-			//         (Object *)objTrans,
-			//         0LL);
-			//       return;
-			//     }
-			//     goto LABEL_12;
-			//   }
-			//   if ( !TypeInfo::UnityEngine::Object._1.cctor_finished_or_no_cctor )
-			//     il2cpp_runtime_class_init_0(TypeInfo::UnityEngine::Object, v5);
-			//   if ( UnityEngine::Object::op_Inequality((Object_1 *)objTrans, 0LL, 0LL) )
-			//   {
-			//     if ( objTrans )
-			//     {
-			//       gameObject = (Object_1 *)UnityEngine::Component::get_gameObject((Component *)objTrans, 0LL);
-			//       if ( !TypeInfo::UnityEngine::Object._1.cctor_finished_or_no_cctor )
-			//         il2cpp_runtime_class_init_0(TypeInfo::UnityEngine::Object, v8);
-			//       UnityEngine::Object::Destroy(gameObject, 0LL);
-			//       return;
-			//     }
-			// LABEL_12:
-			//     sub_180B536AC(v7, v6);
-			//   }
-			// }
-			// 
-		}
-
-		protected void DisposeMaterial(Material mat)
-		{
-			// // Void DisposeMaterial(Material)
-			// void HG::Rendering::Runtime::Snow::HGBaseSubSnowRenderer::DisposeMaterial(
-			//         HGBaseSubSnowRenderer *this,
-			//         Material *mat,
-			//         MethodInfo *method)
-			// {
-			//   __int64 v5; // rdx
-			//   __int64 v6; // rdx
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			//   __int64 v8; // rdx
-			//   __int64 v9; // rcx
-			// 
-			//   if ( !byte_18D8EDC1F )
-			//   {
-			//     sub_18003C530(&TypeInfo::UnityEngine::Object);
-			//     byte_18D8EDC1F = 1;
-			//   }
-			//   if ( IFix::WrappersManagerImpl::IsPatched(4775, 0LL) )
-			//   {
-			//     Patch = IFix::WrappersManagerImpl::GetPatch(4775, 0LL);
-			//     if ( !Patch )
-			//       sub_180B536AC(v9, v8);
-			//     IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_1(
-			//       (ILFixDynamicMethodWrapper_37 *)Patch,
-			//       (Object *)this,
-			//       (Object *)mat,
-			//       0LL);
-			//   }
-			//   else
-			//   {
-			//     if ( !TypeInfo::UnityEngine::Object._1.cctor_finished_or_no_cctor )
-			//       il2cpp_runtime_class_init_0(TypeInfo::UnityEngine::Object, v5);
-			//     if ( UnityEngine::Object::op_Inequality((Object_1 *)mat, 0LL, 0LL) )
-			//     {
-			//       if ( !TypeInfo::UnityEngine::Object._1.cctor_finished_or_no_cctor )
-			//         il2cpp_runtime_class_init_0(TypeInfo::UnityEngine::Object, v6);
-			//       UnityEngine::Object::Destroy((Object_1 *)mat, 0LL);
-			//     }
-			//   }
-			// }
-			// 
-		}
-
-		internal bool enabled;
-
-		internal int snowRenderQueue;
-
-		[StaticFieldOffset(ThreadStatic = false, Offset = "0x00")]
-		protected static readonly HideFlags RSC_HIDE_FLAGS;
+		
 	}
 }

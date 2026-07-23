@@ -1,30 +1,24 @@
-﻿using System;
-using System.Runtime.InteropServices;
+using System;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using UnityEngine;
+
+// Image 4: HG.RenderPipelines.Runtime.dll - Assembly: HG.RenderPipelines.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null - Types 37354-38879
 
 namespace HG.Rendering.Runtime
 {
-	[StructLayout(LayoutKind.Sequential, Pack = 1, Size = 224)]
-	public struct HGInteractionNodeInstanceData
+	public struct HGInteractionNodeInstanceData // TypeDefIndex: 37750
 	{
-		public Matrix4x4 localToWorld;
-
-		public Matrix4x4 worldToLocal;
-
-		public Matrix4x4 prevLocalToWorld;
-
-		public float radius;
-
-		public float length;
-
-		public float height;
-
-		public float heightScale;
-
-		public float groundHeight;
-
-		public float capsuleLocalHeight;
-
-		public Vector2 padding;
+		// Fields
+		public Matrix4x4 localToWorld; // 0x00
+		public Matrix4x4 worldToLocal; // 0x40
+		public Matrix4x4 prevLocalToWorld; // 0x80
+		public float radius; // 0xC0
+		public float length; // 0xC4
+		public float height; // 0xC8
+		public float heightScale; // 0xCC
+		public float groundHeight; // 0xD0
+		public float capsuleLocalHeight; // 0xD4
+		public Vector2 padding; // 0xD8
 	}
 }

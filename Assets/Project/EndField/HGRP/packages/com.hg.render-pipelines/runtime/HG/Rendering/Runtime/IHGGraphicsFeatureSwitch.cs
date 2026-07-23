@@ -1,19 +1,15 @@
-﻿using System;
+using System;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
+
+// Image 4: HG.RenderPipelines.Runtime.dll - Assembly: HG.RenderPipelines.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null - Types 37354-38879
 
 namespace HG.Rendering.Runtime
 {
-	public interface IHGGraphicsFeatureSwitch
+	public interface IHGGraphicsFeatureSwitch // TypeDefIndex: 37530
 	{
-		// (get) Token: 0x060003FA RID: 1018
-		bool enabled
-		{
-			get;
-		}
-
-		// (get) Token: 0x060003FB RID: 1019
-		bool enabledForCPUCommands
-		{
-			get;
-		}
+		// Properties
+		bool enabled { get; }
+		bool enabledForCPUCommands { get; }
 	}
 }

@@ -1,1012 +1,1140 @@
-﻿using System;
+using System;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using HG.Rendering.RenderGraphModule;
+
+// Image 4: HG.RenderPipelines.Runtime.dll - Assembly: HG.RenderPipelines.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null - Types 37354-38879
 
 namespace HG.Rendering.Runtime
 {
-	internal abstract class HGRenderPathDeferred : HGRenderPathScene
+	internal abstract class HGRenderPathDeferred : HGRenderPathScene // TypeDefIndex: 38522
 	{
-		// (get) Token: 0x0600129A RID: 4762 RVA: 0x000025D2 File Offset: 0x000007D2
-		// (set) Token: 0x0600129B RID: 4763 RVA: 0x000025D0 File Offset: 0x000007D0
-		private protected GBufferOutput gBufferOutput
+		// Fields
+		internal const int MAX_GBUFFER_COUNT = 8; // Metadata: 0x02303DB9
+		protected GBufferProfileManager m_gBufferProfileMgr; // 0x13B0
+		protected uint m_deferredOpaquePreZECSList; // 0x13C0
+		protected uint m_forwardOpaquePreZECSList; // 0x13C4
+		protected uint m_characterOpaqueOutlinePreZECSList; // 0x13C8
+		protected uint m_deferredGrassPreZECSList; // 0x13CC
+		protected uint m_deferredTreePreZECSList; // 0x13D0
+		protected uint m_characterPrePassECSList; // 0x13D4
+		protected uint m_deferredOpaqueECSList; // 0x13D8
+		protected uint m_deferredOpaqueEqualECSList; // 0x13DC
+		protected uint m_deferredGrassECSList; // 0x13E0
+		protected uint m_deferredTreeECSList; // 0x13E4
+		protected uint m_deferredSludgeECSList; // 0x13E8
+		protected uint m_forwardOpaqueECSList; // 0x13EC
+		protected uint m_forwardOpaqueEqualECSList; // 0x13F0
+		protected uint m_characterOpaqueOutlineECSList; // 0x13F4
+		protected uint m_characterOpaqueOutlineEqualECSList; // 0x13F8
+		protected uint m_characterOpaqueECSList; // 0x13FC
+		protected uint m_forwardTransparentECSList; // 0x1400
+		protected uint m_forwardTransparentAfterDistortionECSList; // 0x1404
+		protected uint m_forwardReflectionECSList; // 0x1408
+		protected uint m_deferredOpaquePreZGPUDrivenList; // 0x140C
+		protected uint m_deferredOpaqueGPUDrivenList; // 0x1410
+		protected uint m_deferredOpaqueEqualGPUDrivenList; // 0x1414
+	
+		// Properties
+		protected GBufferOutput gBufferOutput { get; private set; } // 0x0000000184DA1840-0x0000000184DA1860 0x0000000184DA1880-0x0000000184DA18A0
+		// GBufferOutput get_gBufferOutput()
+		GBufferOutput *HG::Rendering::Runtime::HGRenderPathDeferred::get_gBufferOutput(
+		        GBufferOutput *__return_ptr retstr,
+		        HGRenderPathDeferred *this,
+		        MethodInfo *method)
 		{
-			[CompilerGenerated]
-			protected get
-			{
-				// // GBufferOutput get_gBufferOutput()
-				// GBufferOutput *HG::Rendering::Runtime::HGRenderPathDeferred::get_gBufferOutput(
-				//         GBufferOutput *__return_ptr retstr,
-				//         HGRenderPathDeferred *this,
-				//         MethodInfo *method)
-				// {
-				//   GBufferOutput *result; // rax
-				//   NativeArray_1_System_Int32_ v4; // xmm1
-				// 
-				//   result = retstr;
-				//   v4 = *(NativeArray_1_System_Int32_ *)&this[1].fields._._.m_shaderVariablesGlobal._PrevNonJitteredViewNoTransProjMatrix.m03;
-				//   retstr.m_attachments = *(NativeArray_1_HG_Rendering_RenderGraphModule_TextureHandle_ *)&this[1].fields._._.m_shaderVariablesGlobal._PrevNonJitteredViewNoTransProjMatrix.m02;
-				//   retstr.m_gbufferMapping = v4;
-				//   return result;
-				// }
-				// 
-				return null;
-			}
-			[CompilerGenerated]
-			private set
-			{
-				// // Void set_gBufferOutput(GBufferOutput)
-				// void HG::Rendering::Runtime::HGRenderPathDeferred::set_gBufferOutput(
-				//         HGRenderPathDeferred *this,
-				//         GBufferOutput *value,
-				//         MethodInfo *method)
-				// {
-				//   NativeArray_1_System_Int32_ m_gbufferMapping; // xmm1
-				// 
-				//   m_gbufferMapping = value.m_gbufferMapping;
-				//   *(NativeArray_1_HG_Rendering_RenderGraphModule_TextureHandle_ *)&this[1].fields._._.m_shaderVariablesGlobal._PrevNonJitteredViewNoTransProjMatrix.m02 = value.m_attachments;
-				//   *(NativeArray_1_System_Int32_ *)&this[1].fields._._.m_shaderVariablesGlobal._PrevNonJitteredViewNoTransProjMatrix.m03 = m_gbufferMapping;
-				// }
-				// 
-			}
+		  GBufferOutput *result; // rax
+		  NativeArray_1_System_Int32_ v4; // xmm1
+		
+		  result = retstr;
+		  v4 = *(NativeArray_1_System_Int32_ *)&this[1].fields._._.m_basicTransformConstants._PrevNonJitteredViewNoTransProjMatrix.m02;
+		  retstr->m_attachments = *(NativeArray_1_HG_Rendering_RenderGraphModule_TextureHandle_ *)&this[1].fields._._.m_basicTransformConstants._PrevNonJitteredViewNoTransProjMatrix.m01;
+		  retstr->m_gbufferMapping = v4;
+		  return result;
 		}
+		
 
-		// (get) Token: 0x0600129C RID: 4764 RVA: 0x000025D8 File Offset: 0x000007D8
-		// (set) Token: 0x0600129D RID: 4765 RVA: 0x000025D0 File Offset: 0x000007D0
-		private protected bool enableGPUDriven
+		// Void set_gBufferOutput(GBufferOutput)
+		void HG::Rendering::Runtime::HGRenderPathDeferred::set_gBufferOutput(
+		        HGRenderPathDeferred *this,
+		        GBufferOutput *value,
+		        MethodInfo *method)
 		{
-			[CompilerGenerated]
-			protected get
-			{
-				// // Boolean get_enableGPUDriven()
-				// bool HG::Rendering::Runtime::HGRenderPathDeferred::get_enableGPUDriven(HGRenderPathDeferred *this, MethodInfo *method)
-				// {
-				//   return LOBYTE(this[1].fields._._.m_shaderVariablesGlobal._PrevNonJitteredInvViewProjMatrix.m21);
-				// }
-				// 
-				return default(bool);
-			}
-			[CompilerGenerated]
-			private set
-			{
-				// // Void set_enableGPUDriven(Boolean)
-				// void HG::Rendering::Runtime::HGRenderPathDeferred::set_enableGPUDriven(
-				//         HGRenderPathDeferred *this,
-				//         bool value,
-				//         MethodInfo *method)
-				// {
-				//   LOBYTE(this[1].fields._._.m_shaderVariablesGlobal._PrevNonJitteredInvViewProjMatrix.m21) = value;
-				// }
-				// 
-			}
+		  NativeArray_1_System_Int32_ m_gbufferMapping; // xmm1
+		
+		  m_gbufferMapping = value->m_gbufferMapping;
+		  *(NativeArray_1_HG_Rendering_RenderGraphModule_TextureHandle_ *)&this[1].fields._._.m_basicTransformConstants._PrevNonJitteredViewNoTransProjMatrix.m01 = value->m_attachments;
+		  *(NativeArray_1_System_Int32_ *)&this[1].fields._._.m_basicTransformConstants._PrevNonJitteredViewNoTransProjMatrix.m02 = m_gbufferMapping;
 		}
-
-		// (get) Token: 0x0600129E RID: 4766 RVA: 0x000025D8 File Offset: 0x000007D8
-		// (set) Token: 0x0600129F RID: 4767 RVA: 0x000025D0 File Offset: 0x000007D0
-		private protected bool enableGPUDrivenInspection
+		
+		internal CustomDepthOnlyRequestManager customDepthOnlyRequestMgr { get; private set; } // 0x0000000184DA1810-0x0000000184DA1820 0x0000000189BF7BC8-0x0000000189BF7BDC
+		// CustomDepthOnlyRequestManager get_customDepthOnlyRequestMgr()
+		CustomDepthOnlyRequestManager *HG::Rendering::Runtime::HGRenderPathDeferred::get_customDepthOnlyRequestMgr(
+		        HGRenderPathDeferred *this,
+		        MethodInfo *method)
 		{
-			[CompilerGenerated]
-			protected get
-			{
-				// // Boolean get_enableGPUDrivenInspection()
-				// bool HG::Rendering::Runtime::HGRenderPathDeferred::get_enableGPUDrivenInspection(
-				//         HGRenderPathDeferred *this,
-				//         MethodInfo *method)
-				// {
-				//   return BYTE1(this[1].fields._._.m_shaderVariablesGlobal._PrevNonJitteredInvViewProjMatrix.m21);
-				// }
-				// 
-				return default(bool);
-			}
-			[CompilerGenerated]
-			private set
-			{
-				// // Void set_enableGPUDrivenInspection(Boolean)
-				// void HG::Rendering::Runtime::HGRenderPathDeferred::set_enableGPUDrivenInspection(
-				//         HGRenderPathDeferred *this,
-				//         bool value,
-				//         MethodInfo *method)
-				// {
-				//   BYTE1(this[1].fields._._.m_shaderVariablesGlobal._PrevNonJitteredInvViewProjMatrix.m21) = value;
-				// }
-				// 
-			}
+		  return *(CustomDepthOnlyRequestManager **)&this[1].fields._._.m_basicTransformConstants._PrevNonJitteredViewNoTransProjMatrix.m23;
 		}
+		
 
-		internal HGRenderPathDeferred(HGRenderPathBase.HGRenderPathResources resources, PassConstructorID[] passConstructorIDs, HGCamera camera, HGRenderPathInternal renderPath)
+		// Void set_customDepthOnlyRequestMgr(CustomDepthOnlyRequestManager)
+		void HG::Rendering::Runtime::HGRenderPathDeferred::set_customDepthOnlyRequestMgr(
+		        HGRenderPathDeferred *this,
+		        CustomDepthOnlyRequestManager *value,
+		        MethodInfo *method)
 		{
-			// // HGRenderPathDeferred(HGRenderPathBase+HGRenderPathResources, PassConstructorID[], HGCamera, HGRenderPathInternal)
-			// // local variable allocation has failed, the output may be wrong!
-			// void HG::Rendering::Runtime::HGRenderPathDeferred::HGRenderPathDeferred(
-			//         HGRenderPathDeferred *this,
-			//         HGRenderPathBase_HGRenderPathResources *resources,
-			//         PassConstructorID__Enum__Array *passConstructorIDs,
-			//         HGCamera *camera,
-			//         HGRenderPathInternal__Enum renderPath,
-			//         MethodInfo *method)
-			// {
-			//   GBufferProfileManager *v10; // rax
-			//   __int64 v11; // rdx
-			//   __int64 v12; // rcx
-			//   GBufferProfileManager *v13; // rdi
-			//   HGRenderPathBase_HGRenderPathResources *v14; // rdx
-			//   PassConstructorID__Enum__Array *v15; // r8
-			//   HGCamera *v16; // r9
-			//   HGRenderPathBase_HGRenderPathResources v17; // [rsp+30h] [rbp-18h] BYREF
-			// 
-			//   if ( !byte_18D8EDB15 )
-			//   {
-			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::GBufferProfileManager);
-			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGRenderPathScene);
-			//     byte_18D8EDB15 = 1;
-			//   }
-			//   *(_QWORD *)&this[1].fields._._.m_shaderVariablesGlobal._PrevInvViewProjMatrix.m20 = -1LL;
-			//   *(_QWORD *)&this[1].fields._._.m_shaderVariablesGlobal._PrevInvViewProjMatrix.m01 = -1LL;
-			//   *(_QWORD *)&this[1].fields._._.m_shaderVariablesGlobal._PrevInvViewProjMatrix.m21 = -1LL;
-			//   *(_QWORD *)&this[1].fields._._.m_shaderVariablesGlobal._PrevInvViewProjMatrix.m02 = -1LL;
-			//   *(_QWORD *)&this[1].fields._._.m_shaderVariablesGlobal._PrevInvViewProjMatrix.m22 = -1LL;
-			//   *(_QWORD *)&this[1].fields._._.m_shaderVariablesGlobal._PrevInvViewProjMatrix.m03 = -1LL;
-			//   *(_QWORD *)&this[1].fields._._.m_shaderVariablesGlobal._PrevInvViewProjMatrix.m23 = -1LL;
-			//   *(_QWORD *)&this[1].fields._._.m_shaderVariablesGlobal._PrevNonJitteredInvViewProjMatrix.m00 = -1LL;
-			//   *(_QWORD *)&this[1].fields._._.m_shaderVariablesGlobal._PrevNonJitteredInvViewProjMatrix.m20 = -1LL;
-			//   *(_QWORD *)&this[1].fields._._.m_shaderVariablesGlobal._PrevNonJitteredInvViewProjMatrix.m01 = -1LL;
-			//   if ( !TypeInfo::HG::Rendering::Runtime::HGRenderPathScene._1.cctor_finished_or_no_cctor )
-			//     il2cpp_runtime_class_init_0(TypeInfo::HG::Rendering::Runtime::HGRenderPathScene, resources);
-			//   v17 = *resources;
-			//   HG::Rendering::Runtime::HGRenderPathScene::HGRenderPathScene(
-			//     (HGRenderPathScene *)this,
-			//     &v17,
-			//     passConstructorIDs,
-			//     camera,
-			//     renderPath,
-			//     0LL);
-			//   v10 = (GBufferProfileManager *)sub_180004920(TypeInfo::HG::Rendering::Runtime::GBufferProfileManager);
-			//   v13 = v10;
-			//   if ( !v10 )
-			//     sub_180B536AC(v12, v11);
-			//   HG::Rendering::Runtime::GBufferProfileManager::GBufferProfileManager(v10, 0LL);
-			//   *(_QWORD *)&this[1].fields._._.m_shaderVariablesGlobal._PrevInvViewProjMatrix.m00 = v13;
-			//   sub_1800054D0((HGRenderPathDeferred *)((char *)this + 4976), v14, v15, v16, *(MethodInfo **)&renderPath, method);
-			// }
-			// 
+		  Int32__Array **v3; // r9
+		  MethodInfo *v4; // [rsp+28h] [rbp+28h]
+		
+		  *(_QWORD *)&this[1].fields._._.m_basicTransformConstants._PrevNonJitteredViewNoTransProjMatrix.m23 = value;
+		  sub_18002D1B0(
+		    (HGRenderPathDefaultDeferred *)&this[1].fields._._.m_basicTransformConstants._PrevNonJitteredViewNoTransProjMatrix.m23,
+		    (HGRenderPathBase_HGRenderPathResources *)value,
+		    (HGCamera *)method,
+		    v3,
+		    v4);
 		}
-
-		protected override void OnPreRendering(ref HGRenderPathBase.HGRenderPathParams renderPathParams)
+		
+		protected bool enableGPUDriven { get; private set; } // 0x0000000184DA1830-0x0000000184DA1840 0x0000000184DA1870-0x0000000184DA1880
+		// Boolean get_enableGPUDriven()
+		bool HG::Rendering::Runtime::HGRenderPathDeferred::get_enableGPUDriven(HGRenderPathDeferred *this, MethodInfo *method)
 		{
-			// // Void OnPreRendering(HGRenderPathBase+HGRenderPathParams ByRef)
-			// void HG::Rendering::Runtime::HGRenderPathDeferred::OnPreRendering(
-			//         HGRenderPathDeferred *this,
-			//         HGRenderPathBase_HGRenderPathParams *renderPathParams,
-			//         MethodInfo *method)
-			// {
-			//   __int64 characterPrePass; // rdx
-			//   __int64 m_hgCharacterVolume; // rcx
-			//   HGRenderPipeline *hgrp; // r15
-			//   HGRenderPipeline_RenderRequest *p_renderRequest; // rax
-			//   HGRenderGraph *m_RenderGraph; // r15
-			//   __int128 v10; // xmm1
-			//   __int128 v11; // xmm0
-			//   __int128 v12; // xmm1
-			//   __int128 v13; // xmm0
-			//   __int128 v14; // xmm1
-			//   CullingResults cullingResults; // xmm0
-			//   __int128 v16; // xmm1
-			//   __int128 v17; // xmm0
-			//   __int128 v18; // xmm1
-			//   __int64 v19; // rax
-			//   HGCamera *v20; // r14
-			//   HGCamera_VolumeComponentsData *m_volumeComponentsData; // rax
-			//   bool v22; // al
-			//   bool v23; // al
-			//   HGGraphicsFeatureManager__StaticFields *static_fields; // rax
-			//   char v25; // si
-			//   GBufferOutput *v26; // rax
-			//   NativeArray_1_System_Int32_ m_gbufferMapping; // xmm1
-			//   uint32_t cullingViewHandle; // r12d
-			//   HGRenderGraphContext *m_RenderGraphContext; // rbx
-			//   float v30; // esi
-			//   float v31; // eax
-			//   uint32_t v32; // r12d
-			//   HGRenderGraphContext *v33; // rbx
-			//   float v34; // eax
-			//   float v35; // eax
-			//   float v36; // eax
-			//   uint32_t v37; // r12d
-			//   HGRenderGraphContext *v38; // rbx
-			//   float v39; // eax
-			//   float v40; // eax
-			//   char v41; // r13
-			//   float v42; // eax
-			//   uint32_t v43; // r12d
-			//   HGRenderGraphContext *v44; // rbx
-			//   void *m_Ptr; // rdx
-			//   float v46; // eax
-			//   float v47; // eax
-			//   float v48; // eax
-			//   HGRenderGraphContext *v49; // rbx
-			//   uint32_t v50; // r12d
-			//   float v51; // eax
-			//   HGRenderGraphContext *v52; // rbx
-			//   uint32_t v53; // r12d
-			//   float v54; // eax
-			//   Camera *camera; // r12
-			//   Vector2Int sceneRTSize_k__BackingField; // rbx
-			//   HGRenderGraphContext *v57; // r13
-			//   uint32_t v58; // edx
-			//   float v59; // eax
-			//   uint32_t v60; // r13d
-			//   bool enableTransparentAfterDOF; // bl
-			//   bool v62; // al
-			//   HGRenderFlags__Enum v63; // ebx
-			//   int v64; // r12d
-			//   float v65; // eax
-			//   int v66; // ebx
-			//   HGRenderGraphContext *v67; // r12
-			//   float v68; // eax
-			//   HGRenderGraphContext *v69; // rbx
-			//   uint32_t v70; // r12d
-			//   float v71; // eax
-			//   HGRenderGraphContext *v72; // rbx
-			//   uint32_t v73; // r12d
-			//   float v74; // eax
-			//   HGRenderGraphContext *v75; // rbx
-			//   uint32_t v76; // r12d
-			//   void *v77; // rax
-			//   float v78; // eax
-			//   float v79; // eax
-			//   float v80; // eax
-			//   HGRenderGraphContext *v81; // rbx
-			//   uint32_t v82; // r14d
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			//   HGRenderKeyword__Enum globalKeywords; // [rsp+28h] [rbp-E0h]
-			//   HGRenderKeyword__Enum globalKeywordsa; // [rsp+28h] [rbp-E0h]
-			//   HGRenderKeyword__Enum globalKeywordsb; // [rsp+28h] [rbp-E0h]
-			//   char cullingLayerMask; // [rsp+48h] [rbp-C0h]
-			//   char v88; // [rsp+68h] [rbp-A0h]
-			//   char v89; // [rsp+69h] [rbp-9Fh]
-			//   char v90; // [rsp+6Ah] [rbp-9Eh]
-			//   bool CharOutlinePassEnableState; // [rsp+6Bh] [rbp-9Dh]
-			//   char v92; // [rsp+6Ch] [rbp-9Ch]
-			//   char v93; // [rsp+6Dh] [rbp-9Bh]
-			//   char v94; // [rsp+6Eh] [rbp-9Ah]
-			//   char v95; // [rsp+6Fh] [rbp-99h]
-			//   char v96; // [rsp+70h] [rbp-98h]
-			//   char v97; // [rsp+71h] [rbp-97h]
-			//   char v98; // [rsp+72h] [rbp-96h]
-			//   uint32_t normalList; // [rsp+74h] [rbp-94h] BYREF
-			//   uint32_t preZPart0List; // [rsp+78h] [rbp-90h] BYREF
-			//   uint32_t preZPart1List; // [rsp+7Ch] [rbp-8Ch] BYREF
-			//   uint32_t v102; // [rsp+80h] [rbp-88h] BYREF
-			//   uint32_t v103; // [rsp+84h] [rbp-84h] BYREF
-			//   uint32_t v104; // [rsp+88h] [rbp-80h] BYREF
-			//   uint32_t v105; // [rsp+8Ch] [rbp-7Ch] BYREF
-			//   uint32_t v106; // [rsp+90h] [rbp-78h] BYREF
-			//   uint32_t v107; // [rsp+94h] [rbp-74h] BYREF
-			//   uint32_t v108; // [rsp+98h] [rbp-70h] BYREF
-			//   uint32_t v109; // [rsp+9Ch] [rbp-6Ch] BYREF
-			//   uint32_t v110; // [rsp+A0h] [rbp-68h] BYREF
-			//   uint32_t viewHandle[2]; // [rsp+A8h] [rbp-60h]
-			//   GBufferOutput v112; // [rsp+B0h] [rbp-58h] BYREF
-			//   HGCamera *v113; // [rsp+D8h] [rbp-30h] BYREF
-			//   char v114; // [rsp+3D0h] [rbp+2C8h]
-			//   int32_t renderPath_k__BackingField; // [rsp+3D0h] [rbp+2C8h]
-			//   uint32_t v116; // [rsp+3D0h] [rbp+2C8h]
-			//   bool v117; // [rsp+3D0h] [rbp+2C8h]
-			// 
-			//   if ( !byte_18D91964E )
-			//   {
-			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGCamera);
-			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGGraphicsFeatureManager);
-			//     sub_18003C530(&TypeInfo::UnityEngine::Rendering::ScriptableRenderContext);
-			//     byte_18D91964E = 1;
-			//   }
-			//   normalList = 0;
-			//   preZPart0List = 0;
-			//   preZPart1List = 0;
-			//   v102 = 0;
-			//   v103 = 0;
-			//   v104 = 0;
-			//   if ( !IFix::WrappersManagerImpl::IsPatched(2978, 0LL) )
-			//   {
-			//     HG::Rendering::Runtime::HGRenderPathScene::OnPreRendering((HGRenderPathScene *)this, renderPathParams, 0LL);
-			//     hgrp = renderPathParams.hgrp;
-			//     p_renderRequest = &renderPathParams.renderRequest;
-			//     if ( hgrp )
-			//     {
-			//       m_RenderGraph = hgrp.fields.m_RenderGraph;
-			//       m_hgCharacterVolume = (__int64)&v113;
-			//       characterPrePass = 5LL;
-			//       do
-			//       {
-			//         v10 = *(_OWORD *)&p_renderRequest.clearCameraSettings;
-			//         *(_OWORD *)m_hgCharacterVolume = *(_OWORD *)&p_renderRequest.hgCamera;
-			//         v11 = *(_OWORD *)&p_renderRequest.target.id.m_InstanceID;
-			//         *(_OWORD *)(m_hgCharacterVolume + 16) = v10;
-			//         v12 = *(_OWORD *)&p_renderRequest.target.id.m_MipLevel;
-			//         *(_OWORD *)(m_hgCharacterVolume + 32) = v11;
-			//         v13 = *(_OWORD *)&p_renderRequest.target.face;
-			//         *(_OWORD *)(m_hgCharacterVolume + 48) = v12;
-			//         v14 = *(_OWORD *)&p_renderRequest.target.targetDepth;
-			//         *(_OWORD *)(m_hgCharacterVolume + 64) = v13;
-			//         cullingResults = p_renderRequest.cullingResults.cullingResults;
-			//         *(_OWORD *)(m_hgCharacterVolume + 80) = v14;
-			//         v16 = *(_OWORD *)&p_renderRequest.cullingResults.customPassCullingResults.hasValue;
-			//         p_renderRequest = (HGRenderPipeline_RenderRequest *)((char *)p_renderRequest + 128);
-			//         *(CullingResults *)(m_hgCharacterVolume + 96) = cullingResults;
-			//         m_hgCharacterVolume += 128LL;
-			//         *(_OWORD *)(m_hgCharacterVolume - 16) = v16;
-			//         --characterPrePass;
-			//       }
-			//       while ( characterPrePass );
-			//       v17 = *(_OWORD *)&p_renderRequest.hgCamera;
-			//       v18 = *(_OWORD *)&p_renderRequest.clearCameraSettings;
-			//       v19 = *(_QWORD *)&p_renderRequest.target.id.m_InstanceID;
-			//       *(_OWORD *)m_hgCharacterVolume = v17;
-			//       *(_OWORD *)(m_hgCharacterVolume + 16) = v18;
-			//       *(_QWORD *)(m_hgCharacterVolume + 32) = v19;
-			//       v20 = v113;
-			//       if ( v113 )
-			//       {
-			//         m_volumeComponentsData = v113.fields.m_volumeComponentsData;
-			//         if ( m_volumeComponentsData )
-			//         {
-			//           m_hgCharacterVolume = (__int64)m_volumeComponentsData.fields.m_hgCharacterVolume;
-			//           if ( m_hgCharacterVolume )
-			//           {
-			//             CharOutlinePassEnableState = HG::Rendering::Runtime::HGCharacterVolume::GetCharOutlinePassEnableState(
-			//                                            (HGCharacterVolume *)m_hgCharacterVolume,
-			//                                            0LL);
-			//             v22 = UnityEngine::HyperGryph::GPUDrivenRendererV1::Valid(0LL)
-			//                || UnityEngine::HyperGryph::GPUDrivenRendererV2::Valid(0LL);
-			//             if ( this )
-			//             {
-			//               LOBYTE(this[1].fields._._.m_shaderVariablesGlobal._PrevNonJitteredInvViewProjMatrix.m21) = v22;
-			//               v23 = (UnityEngine::HyperGryph::GPUDrivenRendererV1::Valid(0LL)
-			//                   || UnityEngine::HyperGryph::GPUDrivenRendererV2::Valid(0LL))
-			//                  && UnityEngine::HyperGryph::GPUDrivenRendererV1::CullingInspectionMode(0LL);
-			//               BYTE1(this[1].fields._._.m_shaderVariablesGlobal._PrevNonJitteredInvViewProjMatrix.m21) = v23;
-			//               if ( LOBYTE(this[1].fields._._.m_shaderVariablesGlobal._PrevNonJitteredInvViewProjMatrix.m21) )
-			//               {
-			//                 if ( UnityEngine::HyperGryph::GPUDrivenRendererV1::Valid(0LL) )
-			//                   UnityEngine::HyperGryph::GPUDrivenRendererV1::AdvanceFrame(0LL);
-			//                 if ( UnityEngine::HyperGryph::GPUDrivenRendererV2::Valid(0LL) )
-			//                   UnityEngine::HyperGryph::GPUDrivenRendererV2::AdvanceFrame(0LL);
-			//               }
-			//               sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGGraphicsFeatureManager);
-			//               m_hgCharacterVolume = (__int64)TypeInfo::HG::Rendering::Runtime::HGGraphicsFeatureManager;
-			//               static_fields = TypeInfo::HG::Rendering::Runtime::HGGraphicsFeatureManager.static_fields;
-			//               characterPrePass = (__int64)static_fields.characterPrePass;
-			//               if ( characterPrePass )
-			//               {
-			//                 v25 = *(_BYTE *)(characterPrePass + 16);
-			//                 characterPrePass = (__int64)static_fields.deferredOpaque;
-			//                 if ( characterPrePass )
-			//                 {
-			//                   v89 = *(_BYTE *)(characterPrePass + 16);
-			//                   characterPrePass = (__int64)TypeInfo::HG::Rendering::Runtime::HGGraphicsFeatureManager.static_fields.deferredOpaquePreZ;
-			//                   if ( characterPrePass )
-			//                   {
-			//                     v90 = *(_BYTE *)(characterPrePass + 16);
-			//                     characterPrePass = (__int64)TypeInfo::HG::Rendering::Runtime::HGGraphicsFeatureManager.static_fields.deferredOpaqueEqual;
-			//                     if ( characterPrePass )
-			//                     {
-			//                       v114 = *(_BYTE *)(characterPrePass + 16);
-			//                       characterPrePass = (__int64)TypeInfo::HG::Rendering::Runtime::HGGraphicsFeatureManager.static_fields.deferredGrassPreZ;
-			//                       if ( characterPrePass )
-			//                       {
-			//                         v92 = *(_BYTE *)(characterPrePass + 16);
-			//                         characterPrePass = (__int64)TypeInfo::HG::Rendering::Runtime::HGGraphicsFeatureManager.static_fields.deferredGrass;
-			//                         if ( characterPrePass )
-			//                         {
-			//                           v93 = *(_BYTE *)(characterPrePass + 16);
-			//                           characterPrePass = (__int64)TypeInfo::HG::Rendering::Runtime::HGGraphicsFeatureManager.static_fields.deferredSludge;
-			//                           if ( characterPrePass )
-			//                           {
-			//                             v94 = *(_BYTE *)(characterPrePass + 16);
-			//                             characterPrePass = (__int64)TypeInfo::HG::Rendering::Runtime::HGGraphicsFeatureManager.static_fields.forwardTransparent;
-			//                             if ( characterPrePass )
-			//                             {
-			//                               v88 = *(_BYTE *)(characterPrePass + 16);
-			//                               characterPrePass = (__int64)TypeInfo::HG::Rendering::Runtime::HGGraphicsFeatureManager.static_fields.forwardOpaque;
-			//                               if ( characterPrePass )
-			//                               {
-			//                                 v95 = *(_BYTE *)(characterPrePass + 16);
-			//                                 characterPrePass = (__int64)TypeInfo::HG::Rendering::Runtime::HGGraphicsFeatureManager.static_fields.forwardOpaquePreZ;
-			//                                 if ( characterPrePass )
-			//                                 {
-			//                                   v96 = *(_BYTE *)(characterPrePass + 16);
-			//                                   characterPrePass = (__int64)TypeInfo::HG::Rendering::Runtime::HGGraphicsFeatureManager.static_fields.forwardOpaqueEqual;
-			//                                   if ( characterPrePass )
-			//                                   {
-			//                                     v97 = *(_BYTE *)(characterPrePass + 16);
-			//                                     m_hgCharacterVolume = (__int64)TypeInfo::HG::Rendering::Runtime::HGGraphicsFeatureManager.static_fields.forwardCharacter;
-			//                                     if ( m_hgCharacterVolume )
-			//                                     {
-			//                                       v98 = *(_BYTE *)(m_hgCharacterVolume + 16);
-			//                                       v26 = HG::Rendering::Runtime::HGRenderPathDeferred::PrepareGBufferOutput(
-			//                                               &v112,
-			//                                               this,
-			//                                               renderPathParams,
-			//                                               0LL);
-			//                                       m_gbufferMapping = v26.m_gbufferMapping;
-			//                                       *(NativeArray_1_HG_Rendering_RenderGraphModule_TextureHandle_ *)&this[1].fields._._.m_shaderVariablesGlobal._PrevNonJitteredViewNoTransProjMatrix.m02 = v26.m_attachments;
-			//                                       *(NativeArray_1_System_Int32_ *)&this[1].fields._._.m_shaderVariablesGlobal._PrevNonJitteredViewNoTransProjMatrix.m03 = m_gbufferMapping;
-			//                                       if ( v25 )
-			//                                       {
-			//                                         cullingViewHandle = v20.fields.cullingViewHandle;
-			//                                         if ( !m_RenderGraph )
-			//                                           goto LABEL_114;
-			//                                         m_RenderGraphContext = m_RenderGraph.fields.m_RenderGraphContext;
-			//                                         if ( !m_RenderGraphContext )
-			//                                           goto LABEL_114;
-			//                                         sub_180002C70(TypeInfo::UnityEngine::Rendering::ScriptableRenderContext);
-			//                                         v30 = NAN;
-			//                                         LOWORD(globalKeywords) = 0;
-			//                                         v31 = COERCE_FLOAT(
-			//                                                 UnityEngine::HyperGryph::HGMeshRender::CreateRendererList(
-			//                                                   cullingViewHandle,
-			//                                                   HGRenderFlags__Enum_ShadowOnly|HGRenderFlags__Enum_Opaque,
-			//                                                   HGRenderFlags__Enum_Opaque,
-			//                                                   HGShaderLightMode__Enum_DepthCharacterOnly,
-			//                                                   globalKeywords,
-			//                                                   m_RenderGraphContext.fields.renderContext.m_Ptr,
-			//                                                   0,
-			//                                                   0,
-			//                                                   0xFFFFFFFF,
-			//                                                   0,
-			//                                                   0,
-			//                                                   0LL));
-			//                                       }
-			//                                       else
-			//                                       {
-			//                                         v30 = NAN;
-			//                                         v31 = NAN;
-			//                                       }
-			//                                       this[1].fields._._.m_shaderVariablesGlobal._PrevInvViewProjMatrix.m21 = v31;
-			//                                       this[1].fields._._.m_shaderVariablesGlobal._PrevNonJitteredInvViewProjMatrix.m01 = NAN;
-			//                                       this[1].fields._._.m_shaderVariablesGlobal._PrevNonJitteredInvViewProjMatrix.m30 = NAN;
-			//                                       this[1].fields._._.m_shaderVariablesGlobal._PrevNonJitteredInvViewProjMatrix.m11 = NAN;
-			//                                       if ( !LOBYTE(this[1].fields._._.m_shaderVariablesGlobal._PrevNonJitteredInvViewProjMatrix.m21) )
-			//                                         goto LABEL_62;
-			//                                       if ( UnityEngine::HyperGryph::GPUDrivenRendererV1::Valid(0LL) )
-			//                                       {
-			//                                         v32 = v20.fields.cullingViewHandle;
-			//                                         if ( !m_RenderGraph )
-			//                                           goto LABEL_114;
-			//                                         v33 = m_RenderGraph.fields.m_RenderGraphContext;
-			//                                         if ( !v33 )
-			//                                           goto LABEL_114;
-			//                                         sub_180002C70(TypeInfo::UnityEngine::Rendering::ScriptableRenderContext);
-			//                                         UnityEngine::HyperGryph::GPUDrivenRendererV1::CreateRendererListWithPreZ(
-			//                                           v32,
-			//                                           0x500u,
-			//                                           0x100u,
-			//                                           1u,
-			//                                           v33.fields.renderContext.m_Ptr,
-			//                                           1,
-			//                                           &normalList,
-			//                                           &preZPart0List,
-			//                                           &preZPart1List,
-			//                                           &v20.fields.mainViewConstants.prevNonJitteredViewProjMatrix,
-			//                                           0LL);
-			//                                         v34 = NAN;
-			//                                         if ( v89 )
-			//                                           v34 = *(float *)&normalList;
-			//                                         this[1].fields._._.m_shaderVariablesGlobal._PrevNonJitteredInvViewProjMatrix.m01 = v34;
-			//                                         v35 = NAN;
-			//                                         if ( v90 )
-			//                                           v35 = *(float *)&preZPart0List;
-			//                                         this[1].fields._._.m_shaderVariablesGlobal._PrevNonJitteredInvViewProjMatrix.m30 = v35;
-			//                                         v36 = NAN;
-			//                                         if ( v114 )
-			//                                           v36 = *(float *)&preZPart1List;
-			//                                         this[1].fields._._.m_shaderVariablesGlobal._PrevNonJitteredInvViewProjMatrix.m11 = v36;
-			//                                       }
-			//                                       if ( LOBYTE(this[1].fields._._.m_shaderVariablesGlobal._PrevNonJitteredInvViewProjMatrix.m21)
-			//                                         && UnityEngine::HyperGryph::GPUDrivenRendererV2::Valid(0LL) )
-			//                                       {
-			//                                         v37 = v20.fields.cullingViewHandle;
-			//                                         if ( !m_RenderGraph )
-			//                                           goto LABEL_114;
-			//                                         v38 = m_RenderGraph.fields.m_RenderGraphContext;
-			//                                         if ( !v38 )
-			//                                           goto LABEL_114;
-			//                                         sub_180002C70(TypeInfo::UnityEngine::Rendering::ScriptableRenderContext);
-			//                                         UnityEngine::HyperGryph::GPUDrivenRendererV2::CreateRendererListWithPreZ(
-			//                                           v37,
-			//                                           0x500u,
-			//                                           0x100u,
-			//                                           1u,
-			//                                           v38.fields.renderContext.m_Ptr,
-			//                                           1,
-			//                                           &v102,
-			//                                           &v103,
-			//                                           &v104,
-			//                                           &v20.fields.mainViewConstants.prevNonJitteredViewProjMatrix,
-			//                                           0LL);
-			//                                         v39 = NAN;
-			//                                         if ( v89 )
-			//                                           v39 = *(float *)&v102;
-			//                                         this[1].fields._._.m_shaderVariablesGlobal._PrevNonJitteredInvViewProjMatrix.m01 = v39;
-			//                                         v40 = NAN;
-			//                                         if ( v90 )
-			//                                           v40 = *(float *)&v103;
-			//                                         v41 = v114;
-			//                                         this[1].fields._._.m_shaderVariablesGlobal._PrevNonJitteredInvViewProjMatrix.m30 = v40;
-			//                                         v42 = NAN;
-			//                                         if ( v114 )
-			//                                           v42 = *(float *)&v104;
-			//                                         this[1].fields._._.m_shaderVariablesGlobal._PrevNonJitteredInvViewProjMatrix.m11 = v42;
-			//                                       }
-			//                                       else
-			//                                       {
-			// LABEL_62:
-			//                                         v41 = v114;
-			//                                       }
-			//                                       v43 = v20.fields.cullingViewHandle;
-			//                                       if ( m_RenderGraph )
-			//                                       {
-			//                                         v44 = m_RenderGraph.fields.m_RenderGraphContext;
-			//                                         if ( v44 )
-			//                                         {
-			//                                           sub_180002C70(TypeInfo::UnityEngine::Rendering::ScriptableRenderContext);
-			//                                           m_Ptr = v44.fields.renderContext.m_Ptr;
-			//                                           cullingLayerMask = LOBYTE(this[1].fields._._.m_shaderVariablesGlobal._PrevNonJitteredInvViewProjMatrix.m21);
-			//                                           v105 = 0;
-			//                                           v106 = 0;
-			//                                           v107 = 0;
-			//                                           UnityEngine::HyperGryph::HGMeshRender::CreateRendererListWithPreZ(
-			//                                             v43,
-			//                                             0x500u,
-			//                                             0x100u,
-			//                                             1u,
-			//                                             m_Ptr,
-			//                                             &v105,
-			//                                             &v106,
-			//                                             &v107,
-			//                                             cullingLayerMask,
-			//                                             0LL);
-			//                                           v46 = NAN;
-			//                                           if ( v89 )
-			//                                             v46 = *(float *)&v105;
-			//                                           this[1].fields._._.m_shaderVariablesGlobal._PrevInvViewProjMatrix.m31 = v46;
-			//                                           v47 = NAN;
-			//                                           if ( v90 )
-			//                                             v47 = *(float *)&v106;
-			//                                           this[1].fields._._.m_shaderVariablesGlobal._PrevInvViewProjMatrix.m20 = v47;
-			//                                           v48 = NAN;
-			//                                           if ( v41 )
-			//                                             v48 = *(float *)&v107;
-			//                                           this[1].fields._._.m_shaderVariablesGlobal._PrevInvViewProjMatrix.m02 = v48;
-			//                                           if ( v92 )
-			//                                           {
-			//                                             v49 = m_RenderGraph.fields.m_RenderGraphContext;
-			//                                             v50 = v20.fields.cullingViewHandle;
-			//                                             if ( !v49 )
-			//                                               goto LABEL_114;
-			//                                             sub_180002C70(TypeInfo::UnityEngine::Rendering::ScriptableRenderContext);
-			//                                             v51 = COERCE_FLOAT(
-			//                                                     UnityEngine::HyperGryph::HGGrassRender::CreateRendererList(
-			//                                                       v50,
-			//                                                       HGRenderFlags__Enum_ShadowOnly|HGRenderFlags__Enum_Opaque,
-			//                                                       HGRenderFlags__Enum_Opaque,
-			//                                                       HGShaderLightMode__Enum_DepthOnly,
-			//                                                       v49.fields.renderContext.m_Ptr,
-			//                                                       0,
-			//                                                       0LL));
-			//                                           }
-			//                                           else
-			//                                           {
-			//                                             v51 = NAN;
-			//                                           }
-			//                                           this[1].fields._._.m_shaderVariablesGlobal._PrevInvViewProjMatrix.m11 = v51;
-			//                                           if ( v93 )
-			//                                           {
-			//                                             v52 = m_RenderGraph.fields.m_RenderGraphContext;
-			//                                             v53 = v20.fields.cullingViewHandle;
-			//                                             if ( !v52 )
-			//                                               goto LABEL_114;
-			//                                             sub_180002C70(TypeInfo::UnityEngine::Rendering::ScriptableRenderContext);
-			//                                             v54 = COERCE_FLOAT(
-			//                                                     UnityEngine::HyperGryph::HGGrassRender::CreateRendererList(
-			//                                                       v53,
-			//                                                       HGRenderFlags__Enum_ShadowOnly|HGRenderFlags__Enum_Opaque,
-			//                                                       HGRenderFlags__Enum_Opaque,
-			//                                                       HGShaderLightMode__Enum_GBuffer,
-			//                                                       v52.fields.renderContext.m_Ptr,
-			//                                                       0,
-			//                                                       0LL));
-			//                                           }
-			//                                           else
-			//                                           {
-			//                                             v54 = NAN;
-			//                                           }
-			//                                           this[1].fields._._.m_shaderVariablesGlobal._PrevInvViewProjMatrix.m12 = v54;
-			//                                           if ( v94 )
-			//                                           {
-			//                                             camera = v20.fields.camera;
-			//                                             sceneRTSize_k__BackingField = v20.fields._sceneRTSize_k__BackingField;
-			//                                             viewHandle[0] = v20.fields.cullingViewHandle;
-			//                                             renderPath_k__BackingField = this.fields._._._renderPath_k__BackingField;
-			//                                             v57 = m_RenderGraph.fields.m_RenderGraphContext;
-			//                                             if ( !v57 )
-			//                                               goto LABEL_114;
-			//                                             sub_180002C70(TypeInfo::UnityEngine::Rendering::ScriptableRenderContext);
-			//                                             v58 = 8;
-			//                                             if ( renderPath_k__BackingField != 4 )
-			//                                               v58 = 4;
-			//                                             v59 = COERCE_FLOAT(
-			//                                                     UnityEngine::HyperGryph::HGSludgeRender::CreateRendererList(
-			//                                                       camera,
-			//                                                       sceneRTSize_k__BackingField,
-			//                                                       viewHandle[0],
-			//                                                       1u,
-			//                                                       v58,
-			//                                                       1200.0,
-			//                                                       v57.fields.renderContext.m_Ptr,
-			//                                                       1,
-			//                                                       0LL));
-			//                                           }
-			//                                           else
-			//                                           {
-			//                                             v59 = NAN;
-			//                                           }
-			//                                           this[1].fields._._.m_shaderVariablesGlobal._PrevInvViewProjMatrix.m22 = v59;
-			//                                           sub_180002C70(TypeInfo::HG::Rendering::Runtime::HGCamera);
-			//                                           v60 = HG::Rendering::Runtime::HGCamera::RemoveWorldUILayer(0xFFFFFFFF, 0LL);
-			//                                           if ( v88 )
-			//                                           {
-			//                                             v116 = v20.fields.cullingViewHandle;
-			//                                             enableTransparentAfterDOF = HG::Rendering::Runtime::HGCamera::get_enableTransparentAfterDOF(
-			//                                                                           v20,
-			//                                                                           0LL);
-			//                                             v62 = HG::Rendering::Runtime::HGCamera::get_enableTransparentAfterDOF(
-			//                                                     v20,
-			//                                                     0LL);
-			//                                             m_hgCharacterVolume = 1536LL;
-			//                                             v63 = enableTransparentAfterDOF
-			//                                                 ? HGRenderFlags__Enum_TransparentBeforeDistortion|HGRenderFlags__Enum_ShadowOnly
-			//                                                 : HGRenderFlags__Enum_ShadowOnly|HGRenderFlags__Enum_Transparent;
-			//                                             v64 = v62 ? 0x600 : 0;
-			//                                             *(_QWORD *)viewHandle = m_RenderGraph.fields.m_RenderGraphContext;
-			//                                             if ( !*(_QWORD *)viewHandle )
-			//                                               goto LABEL_114;
-			//                                             sub_180002C70(TypeInfo::UnityEngine::Rendering::ScriptableRenderContext);
-			//                                             LOWORD(globalKeywordsa) = 0;
-			//                                             v65 = COERCE_FLOAT(
-			//                                                     UnityEngine::HyperGryph::HGMeshRender::CreateRendererList(
-			//                                                       v116,
-			//                                                       v63,
-			//                                                       (HGRenderFlags__Enum)(v64 + 512),
-			//                                                       (HGShaderLightMode__Enum)((CharOutlinePassEnableState << 9) + 8416),
-			//                                                       globalKeywordsa,
-			//                                                       *(void **)(*(_QWORD *)viewHandle + 16LL),
-			//                                                       1,
-			//                                                       1,
-			//                                                       v60,
-			//                                                       0,
-			//                                                       0,
-			//                                                       0LL));
-			//                                           }
-			//                                           else
-			//                                           {
-			//                                             v65 = NAN;
-			//                                           }
-			//                                           this[1].fields._._.m_shaderVariablesGlobal._PrevNonJitteredInvViewProjMatrix.m00 = v65;
-			//                                           if ( v88 )
-			//                                           {
-			//                                             viewHandle[0] = v20.fields.cullingViewHandle;
-			//                                             v66 = (!HG::Rendering::Runtime::HGCamera::get_enableTransparentAfterDOF(
-			//                                                       v20,
-			//                                                       0LL)
-			//                                                  + 1) << 12;
-			//                                             v117 = HG::Rendering::Runtime::HGCamera::get_enableTransparentAfterDOF(
-			//                                                      v20,
-			//                                                      0LL);
-			//                                             v67 = m_RenderGraph.fields.m_RenderGraphContext;
-			//                                             if ( !v67 )
-			//                                               goto LABEL_114;
-			//                                             sub_180002C70(TypeInfo::UnityEngine::Rendering::ScriptableRenderContext);
-			//                                             LOWORD(globalKeywordsa) = 0;
-			//                                             v68 = COERCE_FLOAT(
-			//                                                     UnityEngine::HyperGryph::HGMeshRender::CreateRendererList(
-			//                                                       viewHandle[0],
-			//                                                       (HGRenderFlags__Enum)(v66 | 0x400),
-			//                                                       (HGRenderFlags__Enum)((!v117 + 1) << 12),
-			//                                                       (HGShaderLightMode__Enum)((CharOutlinePassEnableState << 9) + 8416),
-			//                                                       globalKeywordsa,
-			//                                                       v67.fields.renderContext.m_Ptr,
-			//                                                       1,
-			//                                                       1,
-			//                                                       v60,
-			//                                                       0,
-			//                                                       0,
-			//                                                       0LL));
-			//                                           }
-			//                                           else
-			//                                           {
-			//                                             v68 = NAN;
-			//                                           }
-			//                                           this[1].fields._._.m_shaderVariablesGlobal._PrevNonJitteredInvViewProjMatrix.m10 = v68;
-			//                                           if ( v88
-			//                                             && HG::Rendering::Runtime::HGCamera::get_enableTransparentAfterDOF(v20, 0LL) )
-			//                                           {
-			//                                             v69 = m_RenderGraph.fields.m_RenderGraphContext;
-			//                                             v70 = v20.fields.cullingViewHandle;
-			//                                             if ( !v69 )
-			//                                               goto LABEL_114;
-			//                                             sub_180002C70(TypeInfo::UnityEngine::Rendering::ScriptableRenderContext);
-			//                                             LOWORD(globalKeywordsa) = 0;
-			//                                             v71 = COERCE_FLOAT(
-			//                                                     UnityEngine::HyperGryph::HGMeshRender::CreateRendererList(
-			//                                                       v70,
-			//                                                       HGRenderFlags__Enum_TransparentAfterPP|HGRenderFlags__Enum_ShadowOnly,
-			//                                                       HGRenderFlags__Enum_TransparentAfterPP,
-			//                                                       (HGShaderLightMode__Enum)((CharOutlinePassEnableState << 9) + 8416),
-			//                                                       globalKeywordsa,
-			//                                                       v69.fields.renderContext.m_Ptr,
-			//                                                       1,
-			//                                                       1,
-			//                                                       v60,
-			//                                                       0,
-			//                                                       0,
-			//                                                       0LL));
-			//                                           }
-			//                                           else
-			//                                           {
-			//                                             v71 = NAN;
-			//                                           }
-			//                                           this[1].fields._._.m_shaderVariablesGlobal._PrevNonJitteredViewNoTransProjMatrix.m21 = v71;
-			//                                           if ( v88 )
-			//                                           {
-			//                                             v72 = m_RenderGraph.fields.m_RenderGraphContext;
-			//                                             v73 = v20.fields.cullingViewHandle;
-			//                                             if ( !v72 )
-			//                                               goto LABEL_114;
-			//                                             sub_180002C70(TypeInfo::UnityEngine::Rendering::ScriptableRenderContext);
-			//                                             LOWORD(globalKeywordsa) = 0;
-			//                                             v74 = COERCE_FLOAT(
-			//                                                     UnityEngine::HyperGryph::HGMeshRender::CreateRendererList(
-			//                                                       v73,
-			//                                                       HGRenderFlags__Enum_Transparent,
-			//                                                       HGRenderFlags__Enum_Transparent,
-			//                                                       HGShaderLightMode__Enum_ForwardReflection,
-			//                                                       globalKeywordsa,
-			//                                                       v72.fields.renderContext.m_Ptr,
-			//                                                       1,
-			//                                                       1,
-			//                                                       v60,
-			//                                                       0,
-			//                                                       0,
-			//                                                       0LL));
-			//                                           }
-			//                                           else
-			//                                           {
-			//                                             v74 = NAN;
-			//                                           }
-			//                                           this[1].fields._._.m_shaderVariablesGlobal._PrevNonJitteredInvViewProjMatrix.m20 = v74;
-			//                                           v75 = m_RenderGraph.fields.m_RenderGraphContext;
-			//                                           v76 = v20.fields.cullingViewHandle;
-			//                                           if ( v75 )
-			//                                           {
-			//                                             sub_180002C70(TypeInfo::UnityEngine::Rendering::ScriptableRenderContext);
-			//                                             v77 = v75.fields.renderContext.m_Ptr;
-			//                                             v108 = 0;
-			//                                             v109 = 0;
-			//                                             v110 = 0;
-			//                                             UnityEngine::HyperGryph::HGMeshRender::CreateRendererListWithPreZ(
-			//                                               v76,
-			//                                               0x500u,
-			//                                               0x100u,
-			//                                               0x2020u,
-			//                                               v77,
-			//                                               &v108,
-			//                                               &v109,
-			//                                               &v110,
-			//                                               0,
-			//                                               0LL);
-			//                                             v78 = NAN;
-			//                                             if ( v95 )
-			//                                               v78 = *(float *)&v108;
-			//                                             this[1].fields._._.m_shaderVariablesGlobal._PrevInvViewProjMatrix.m32 = v78;
-			//                                             v79 = NAN;
-			//                                             if ( v96 )
-			//                                               v79 = *(float *)&v109;
-			//                                             this[1].fields._._.m_shaderVariablesGlobal._PrevInvViewProjMatrix.m30 = v79;
-			//                                             v80 = NAN;
-			//                                             if ( v97 )
-			//                                               v80 = *(float *)&v110;
-			//                                             this[1].fields._._.m_shaderVariablesGlobal._PrevInvViewProjMatrix.m03 = v80;
-			//                                             if ( !v98 )
-			//                                               goto LABEL_112;
-			//                                             v81 = m_RenderGraph.fields.m_RenderGraphContext;
-			//                                             v82 = v20.fields.cullingViewHandle;
-			//                                             if ( v81 )
-			//                                             {
-			//                                               sub_180002C70(TypeInfo::UnityEngine::Rendering::ScriptableRenderContext);
-			//                                               LOWORD(globalKeywordsb) = 0;
-			//                                               v30 = COERCE_FLOAT(
-			//                                                       UnityEngine::HyperGryph::HGMeshRender::CreateRendererList(
-			//                                                         v82,
-			//                                                         HGRenderFlags__Enum_ShadowOnly|HGRenderFlags__Enum_Opaque,
-			//                                                         HGRenderFlags__Enum_Opaque,
-			//                                                         HGShaderLightMode__Enum_ForwardCharacterOnly,
-			//                                                         globalKeywordsb,
-			//                                                         v81.fields.renderContext.m_Ptr,
-			//                                                         0,
-			//                                                         0,
-			//                                                         0xFFFFFFFF,
-			//                                                         0,
-			//                                                         0,
-			//                                                         0LL));
-			// LABEL_112:
-			//                                               this[1].fields._._.m_shaderVariablesGlobal._PrevInvViewProjMatrix.m33 = v30;
-			//                                               return;
-			//                                             }
-			//                                           }
-			//                                         }
-			//                                       }
-			//                                     }
-			//                                   }
-			//                                 }
-			//                               }
-			//                             }
-			//                           }
-			//                         }
-			//                       }
-			//                     }
-			//                   }
-			//                 }
-			//               }
-			//             }
-			//           }
-			//         }
-			//       }
-			//     }
-			// LABEL_114:
-			//     sub_180B536AC(m_hgCharacterVolume, characterPrePass);
-			//   }
-			//   Patch = IFix::WrappersManagerImpl::GetPatch(2978, 0LL);
-			//   if ( !Patch )
-			//     goto LABEL_114;
-			//   IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_389(Patch, (Object *)this, renderPathParams, 0LL);
-			// }
-			// 
+		  return LOBYTE(this[1].fields._._.m_basicTransformConstants._PrevNonJitteredInvViewProjMatrix.m21);
 		}
+		
 
+		// Void set_enableGPUDriven(Boolean)
+		void HG::Rendering::Runtime::HGRenderPathDeferred::set_enableGPUDriven(
+		        HGRenderPathDeferred *this,
+		        bool value,
+		        MethodInfo *method)
+		{
+		  LOBYTE(this[1].fields._._.m_basicTransformConstants._PrevNonJitteredInvViewProjMatrix.m21) = value;
+		}
+		
+		protected bool enableGPUDrivenInspection { get; private set; } // 0x0000000184DA1820-0x0000000184DA1830 0x0000000184DA1860-0x0000000184DA1870
+		// Boolean get_enableGPUDrivenInspection()
+		bool HG::Rendering::Runtime::HGRenderPathDeferred::get_enableGPUDrivenInspection(
+		        HGRenderPathDeferred *this,
+		        MethodInfo *method)
+		{
+		  return BYTE1(this[1].fields._._.m_basicTransformConstants._PrevNonJitteredInvViewProjMatrix.m21);
+		}
+		
+
+		// Void set_enableGPUDrivenInspection(Boolean)
+		void HG::Rendering::Runtime::HGRenderPathDeferred::set_enableGPUDrivenInspection(
+		        HGRenderPathDeferred *this,
+		        bool value,
+		        MethodInfo *method)
+		{
+		  BYTE1(this[1].fields._._.m_basicTransformConstants._PrevNonJitteredInvViewProjMatrix.m21) = value;
+		}
+		
+	
+		// Constructors
+		protected HGRenderPathDeferred() {} // Dummy constructor
+		internal HGRenderPathDeferred(HGRenderPathResources resources, PassConstructorID[] passConstructorIDs, HGCamera camera, HGRenderPathInternal renderPath) {} // 0x0000000182EDA4F0-0x0000000182EDA650
+		// HGRenderPathDeferred(HGRenderPathBase+HGRenderPathResources, PassConstructorID[], HGCamera, HGRenderPathInternal)
+		// local variable allocation has failed, the output may be wrong!
+		void HG::Rendering::Runtime::HGRenderPathDeferred::HGRenderPathDeferred(
+		        HGRenderPathDeferred *this,
+		        HGRenderPathBase_HGRenderPathResources *resources,
+		        PassConstructorID__Enum__Array *passConstructorIDs,
+		        HGCamera *camera,
+		        HGRenderPathInternal__Enum renderPath,
+		        MethodInfo *method)
+		{
+		  GBufferProfileManager *v10; // rax
+		  __int64 v11; // rdx
+		  __int64 v12; // rcx
+		  GBufferProfileManager *v13; // rdi
+		  HGRenderPathBase_HGRenderPathResources *v14; // rdx
+		  PassConstructorID__Enum__Array *v15; // r8
+		  Int32__Array **v16; // r9
+		  CustomDepthOnlyRequestManager *v17; // rax
+		  CustomDepthOnlyRequestManager *v18; // rdi
+		  HGRenderPathBase_HGRenderPathResources *v19; // rdx
+		  PassConstructorID__Enum__Array *v20; // r8
+		  Int32__Array **v21; // r9
+		  MethodInfo *v22; // [rsp+20h] [rbp-28h]
+		  MethodInfo *v23; // [rsp+28h] [rbp-20h]
+		  HGRenderPathBase_HGRenderPathResources v24; // [rsp+30h] [rbp-18h] BYREF
+		
+		  *(_QWORD *)&this[1].fields._._.m_basicTransformConstants._PrevInvViewProjMatrix.m00 = -1LL;
+		  *(_QWORD *)&this[1].fields._._.m_basicTransformConstants._PrevInvViewProjMatrix.m20 = -1LL;
+		  *(_QWORD *)&this[1].fields._._.m_basicTransformConstants._PrevInvViewProjMatrix.m01 = -1LL;
+		  *(_QWORD *)&this[1].fields._._.m_basicTransformConstants._PrevInvViewProjMatrix.m21 = -1LL;
+		  *(_QWORD *)&this[1].fields._._.m_basicTransformConstants._PrevInvViewProjMatrix.m02 = -1LL;
+		  *(_QWORD *)&this[1].fields._._.m_basicTransformConstants._PrevInvViewProjMatrix.m22 = -1LL;
+		  *(_QWORD *)&this[1].fields._._.m_basicTransformConstants._PrevInvViewProjMatrix.m03 = -1LL;
+		  *(_QWORD *)&this[1].fields._._.m_basicTransformConstants._PrevInvViewProjMatrix.m23 = -1LL;
+		  *(_QWORD *)&this[1].fields._._.m_basicTransformConstants._PrevNonJitteredInvViewProjMatrix.m00 = -1LL;
+		  *(_QWORD *)&this[1].fields._._.m_basicTransformConstants._PrevNonJitteredInvViewProjMatrix.m20 = -1LL;
+		  *(_QWORD *)&this[1].fields._._.m_basicTransformConstants._PrevNonJitteredInvViewProjMatrix.m01 = -1LL;
+		  if ( !TypeInfo::HG::Rendering::Runtime::HGRenderPathScene->_1.cctor_finished_or_no_cctor )
+		    il2cpp_runtime_class_init_1(TypeInfo::HG::Rendering::Runtime::HGRenderPathScene);
+		  v24 = *resources;
+		  HG::Rendering::Runtime::HGRenderPathScene::HGRenderPathScene(
+		    (HGRenderPathScene *)this,
+		    &v24,
+		    passConstructorIDs,
+		    camera,
+		    renderPath,
+		    0LL);
+		  v10 = (GBufferProfileManager *)sub_1800368D0(TypeInfo::HG::Rendering::Runtime::GBufferProfileManager);
+		  v13 = v10;
+		  if ( !v10
+		    || (HG::Rendering::Runtime::GBufferProfileManager::GBufferProfileManager(v10, 0LL),
+		        *(_QWORD *)&this[1].fields._._.m_basicTransformConstants._PrevNonJitteredViewNoTransProjMatrix.m03 = v13,
+		        sub_18002D1B0((HGRenderPathDeferred *)((char *)this + 5040), v14, v15, v16, v22, v23),
+		        v17 = (CustomDepthOnlyRequestManager *)sub_1800368D0(TypeInfo::HG::Rendering::Runtime::CustomDepthOnlyRequestManager),
+		        (v18 = v17) == 0LL) )
+		  {
+		    sub_1800D8260(v12, v11);
+		  }
+		  HG::Rendering::Runtime::CustomDepthOnlyRequestManager::CustomDepthOnlyRequestManager(v17, 0LL);
+		  *(_QWORD *)&this[1].fields._._.m_basicTransformConstants._PrevNonJitteredViewNoTransProjMatrix.m23 = v18;
+		  sub_18002D1B0((HGRenderPathDeferred *)((char *)this + 5048), v19, v20, v21, *(MethodInfo **)&renderPath, method);
+		}
+		
+	
+		// Methods
+		internal override void Dispose(HGRenderGraph renderGraph) {} // 0x0000000184CB0310-0x0000000184CB0360
+		// Void Dispose(HGRenderGraph)
+		void HG::Rendering::Runtime::HGRenderPathDeferred::Dispose(
+		        HGRenderPathDeferred *this,
+		        HGRenderGraph *renderGraph,
+		        MethodInfo *method)
+		{
+		  CustomDepthOnlyRequestManager *v5; // rcx
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v7; // rdx
+		  __int64 v8; // rcx
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(3605, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(3605, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(v8, v7);
+		    IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_1(
+		      (ILFixDynamicMethodWrapper_39 *)Patch,
+		      (Object *)this,
+		      (Object *)renderGraph,
+		      0LL);
+		  }
+		  else
+		  {
+		    v5 = *(CustomDepthOnlyRequestManager **)&this[1].fields._._.m_basicTransformConstants._PrevNonJitteredViewNoTransProjMatrix.m23;
+		    if ( v5 )
+		      HG::Rendering::Runtime::CustomDepthOnlyRequestManager::Dispose(v5, 0LL);
+		    HG::Rendering::Runtime::HGRenderPathScene::Dispose((HGRenderPathScene *)this, renderGraph, 0LL);
+		  }
+		}
+		
+		protected override void OnPreRendering(ref HGRenderPathParams renderPathParams) {} // 0x0000000189BF6CBC-0x0000000189BF7AA0
+		// Void OnPreRendering(HGRenderPathBase+HGRenderPathParams ByRef)
+		void HG::Rendering::Runtime::HGRenderPathDeferred::OnPreRendering(
+		        HGRenderPathDeferred *this,
+		        HGRenderPathBase_HGRenderPathParams *renderPathParams,
+		        MethodInfo *method)
+		{
+		  HGRenderPipeline *hgrp; // rcx
+		  __int64 v6; // r8
+		  HGRenderPipeline_RenderRequest *p_renderRequest; // rax
+		  char *static_fields; // rdx
+		  __int128 v9; // xmm1
+		  __int128 v10; // xmm0
+		  __int128 v11; // xmm1
+		  __int128 v12; // xmm0
+		  __int128 v13; // xmm1
+		  CullingResults cullingResults; // xmm0
+		  __int128 v15; // xmm1
+		  HGRenderGraph *renderGraph; // rax
+		  HGCamera *v17; // r14
+		  HGRenderGraph *v18; // r15
+		  HGCamera_VolumeComponentsData *volumeComponentsData; // rax
+		  bool v20; // r12
+		  bool v21; // si
+		  bool v22; // al
+		  bool enabledForCPUCommands; // si
+		  GBufferOutput *v24; // rax
+		  NativeArray_1_System_Int32_ m_gbufferMapping; // xmm1
+		  uint32_t cullingViewHandle; // r12d
+		  HGRenderGraphContext *HGContext; // rbx
+		  float v28; // esi
+		  float v29; // eax
+		  uint32_t v30; // r12d
+		  HGRenderGraphContext *v31; // rbx
+		  float v32; // eax
+		  float v33; // eax
+		  float v34; // eax
+		  uint32_t v35; // r12d
+		  HGRenderGraphContext *v36; // rbx
+		  float v37; // eax
+		  float v38; // eax
+		  bool v39; // r13
+		  float v40; // eax
+		  uint32_t v41; // r12d
+		  HGRenderGraphContext *v42; // rbx
+		  void *m_Ptr; // rdx
+		  float v44; // eax
+		  float v45; // eax
+		  float v46; // eax
+		  uint32_t v47; // r12d
+		  HGRenderGraphContext *v48; // rbx
+		  float v49; // eax
+		  uint32_t v50; // r12d
+		  HGRenderGraphContext *v51; // rbx
+		  float v52; // eax
+		  uint32_t v53; // ecx
+		  uint32_t v54; // edx
+		  uint32_t v55; // r12d
+		  HGRenderGraphContext *v56; // rbx
+		  float v57; // eax
+		  float v58; // eax
+		  Camera *camera; // r12
+		  Vector2Int sceneRTSize_k__BackingField; // rbx
+		  HGRenderGraphContext *v61; // r13
+		  uint32_t v62; // edx
+		  float v63; // eax
+		  uint32_t v64; // r13d
+		  HGRenderFlags__Enum v65; // ebx
+		  int v66; // r12d
+		  float v67; // eax
+		  int v68; // ebx
+		  HGRenderGraphContext *v69; // r12
+		  float v70; // eax
+		  uint32_t v71; // r12d
+		  HGRenderGraphContext *v72; // rbx
+		  float v73; // eax
+		  uint32_t v74; // r12d
+		  HGRenderGraphContext *v75; // rbx
+		  float v76; // eax
+		  uint32_t v77; // r12d
+		  HGRenderGraphContext *v78; // rbx
+		  void *v79; // rax
+		  float v80; // eax
+		  float v81; // eax
+		  float v82; // eax
+		  uint32_t v83; // r14d
+		  HGRenderGraphContext *v84; // rbx
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  HGRenderKeyword__Enum globalKeywords; // [rsp+28h] [rbp-F0h]
+		  HGRenderKeyword__Enum globalKeywordsa; // [rsp+28h] [rbp-F0h]
+		  HGRenderKeyword__Enum globalKeywordsb; // [rsp+28h] [rbp-F0h]
+		  char cullingLayerMask; // [rsp+48h] [rbp-D0h]
+		  bool v90; // [rsp+98h] [rbp-80h]
+		  bool v91; // [rsp+99h] [rbp-7Fh]
+		  bool v92; // [rsp+9Ah] [rbp-7Eh]
+		  bool CharOutlinePassEnableState; // [rsp+9Bh] [rbp-7Dh]
+		  bool v94; // [rsp+9Ch] [rbp-7Ch]
+		  bool v95; // [rsp+9Dh] [rbp-7Bh]
+		  bool v96; // [rsp+9Eh] [rbp-7Ah]
+		  bool v97; // [rsp+9Fh] [rbp-79h]
+		  bool v98; // [rsp+A0h] [rbp-78h]
+		  bool v99; // [rsp+A1h] [rbp-77h]
+		  bool v100; // [rsp+A2h] [rbp-76h]
+		  bool v101; // [rsp+A3h] [rbp-75h]
+		  bool v102; // [rsp+A4h] [rbp-74h]
+		  uint32_t normalList; // [rsp+A8h] [rbp-70h] BYREF
+		  uint32_t preZPart0List; // [rsp+ACh] [rbp-6Ch] BYREF
+		  uint32_t preZPart1List; // [rsp+B0h] [rbp-68h] BYREF
+		  uint32_t v106; // [rsp+B4h] [rbp-64h] BYREF
+		  uint32_t v107; // [rsp+B8h] [rbp-60h] BYREF
+		  uint32_t v108; // [rsp+BCh] [rbp-5Ch] BYREF
+		  uint32_t v109; // [rsp+C0h] [rbp-58h] BYREF
+		  uint32_t v110; // [rsp+C4h] [rbp-54h] BYREF
+		  uint32_t v111; // [rsp+C8h] [rbp-50h] BYREF
+		  uint32_t v112; // [rsp+CCh] [rbp-4Ch] BYREF
+		  uint32_t v113; // [rsp+D0h] [rbp-48h] BYREF
+		  uint32_t v114; // [rsp+D4h] [rbp-44h] BYREF
+		  uint32_t v115; // [rsp+D8h] [rbp-40h] BYREF
+		  uint32_t v116; // [rsp+DCh] [rbp-3Ch] BYREF
+		  uint32_t viewHandle[2]; // [rsp+E0h] [rbp-38h]
+		  uint32_t v118; // [rsp+E8h] [rbp-30h] BYREF
+		  GBufferOutput v119; // [rsp+F0h] [rbp-28h] BYREF
+		  HGCamera *v120; // [rsp+118h] [rbp+0h] BYREF
+		  bool v121; // [rsp+3E0h] [rbp+2C8h]
+		  int32_t renderPath_k__BackingField; // [rsp+3E0h] [rbp+2C8h]
+		  uint32_t v123; // [rsp+3E0h] [rbp+2C8h]
+		  bool enableTransparentAfterDOF; // [rsp+3E0h] [rbp+2C8h]
+		
+		  normalList = 0;
+		  preZPart0List = 0;
+		  preZPart1List = 0;
+		  v106 = 0;
+		  v107 = 0;
+		  v108 = 0;
+		  v118 = 0;
+		  if ( !IFix::WrappersManagerImpl::IsPatched(3574, 0LL) )
+		  {
+		    HG::Rendering::Runtime::HGRenderPathScene::OnPreRendering((HGRenderPathScene *)this, renderPathParams, 0LL);
+		    hgrp = renderPathParams->hgrp;
+		    v6 = 5LL;
+		    p_renderRequest = &renderPathParams->renderRequest;
+		    static_fields = (char *)&v120;
+		    do
+		    {
+		      v9 = *(_OWORD *)&p_renderRequest->clearCameraSettings;
+		      *(_OWORD *)static_fields = *(_OWORD *)&p_renderRequest->hgCamera;
+		      v10 = *(_OWORD *)&p_renderRequest->target.id.m_InstanceID;
+		      *((_OWORD *)static_fields + 1) = v9;
+		      v11 = *(_OWORD *)&p_renderRequest->target.id.m_MipLevel;
+		      *((_OWORD *)static_fields + 2) = v10;
+		      v12 = *(_OWORD *)&p_renderRequest->target.face;
+		      *((_OWORD *)static_fields + 3) = v11;
+		      v13 = *(_OWORD *)&p_renderRequest->target.targetDepth;
+		      *((_OWORD *)static_fields + 4) = v12;
+		      cullingResults = p_renderRequest->cullingResults.cullingResults;
+		      *((_OWORD *)static_fields + 5) = v13;
+		      v15 = *(_OWORD *)&p_renderRequest->cullingResults.customPassCullingResults.hasValue;
+		      p_renderRequest = (HGRenderPipeline_RenderRequest *)((char *)p_renderRequest + 128);
+		      *((CullingResults *)static_fields + 6) = cullingResults;
+		      static_fields += 128;
+		      *((_OWORD *)static_fields - 1) = v15;
+		      --v6;
+		    }
+		    while ( v6 );
+		    if ( hgrp )
+		    {
+		      renderGraph = HG::Rendering::Runtime::HGRenderPipeline::get_renderGraph(hgrp, 0LL);
+		      v17 = v120;
+		      v18 = renderGraph;
+		      if ( v120 )
+		      {
+		        volumeComponentsData = HG::Rendering::Runtime::HGCamera::get_volumeComponentsData(v120, 0LL);
+		        if ( volumeComponentsData )
+		        {
+		          hgrp = (HGRenderPipeline *)volumeComponentsData->fields.m_hgCharacterVolume;
+		          if ( hgrp )
+		          {
+		            CharOutlinePassEnableState = HG::Rendering::Runtime::HGCharacterVolume::GetCharOutlinePassEnableState(
+		                                           (HGCharacterVolume *)hgrp,
+		                                           0LL);
+		            v20 = UnityEngine::HyperGryph::GPUDrivenRendererV1::Valid(0LL);
+		            v21 = UnityEngine::HyperGryph::GPUDrivenRendererV2::Valid(0LL);
+		            LOBYTE(this[1].fields._._.m_basicTransformConstants._PrevNonJitteredInvViewProjMatrix.m21) = v20 || v21;
+		            if ( v20 )
+		              UnityEngine::HyperGryph::GPUDrivenRendererV1::ToggleCullingInspectionMode(0, 0LL);
+		            if ( v21 )
+		              UnityEngine::HyperGryph::GPUDrivenRendererV2::ToggleCullingInspectionMode(0, 0LL);
+		            v22 = v20 && UnityEngine::HyperGryph::GPUDrivenRendererV1::CullingInspectionMode(0LL)
+		               || v21 && UnityEngine::HyperGryph::GPUDrivenRendererV2::CullingInspectionMode(0LL);
+		            BYTE1(this[1].fields._._.m_basicTransformConstants._PrevNonJitteredInvViewProjMatrix.m21) = v22;
+		            if ( LOBYTE(this[1].fields._._.m_basicTransformConstants._PrevNonJitteredInvViewProjMatrix.m21) )
+		            {
+		              if ( UnityEngine::HyperGryph::GPUDrivenRendererV1::Valid(0LL) )
+		                UnityEngine::HyperGryph::GPUDrivenRendererV1::AdvanceFrame(0LL);
+		              if ( UnityEngine::HyperGryph::GPUDrivenRendererV2::Valid(0LL) )
+		                UnityEngine::HyperGryph::GPUDrivenRendererV2::AdvanceFrame(0LL);
+		            }
+		            sub_1800036A0(TypeInfo::HG::Rendering::Runtime::HGGraphicsFeatureManager);
+		            hgrp = (HGRenderPipeline *)TypeInfo::HG::Rendering::Runtime::HGGraphicsFeatureManager->static_fields->characterPrePass;
+		            if ( hgrp )
+		            {
+		              enabledForCPUCommands = HG::Rendering::Runtime::HGGraphicsFeatureSwitch::get_enabledForCPUCommands(
+		                                        (HGGraphicsFeatureSwitch *)hgrp,
+		                                        0LL);
+		              static_fields = (char *)TypeInfo::HG::Rendering::Runtime::HGGraphicsFeatureManager->static_fields;
+		              hgrp = (HGRenderPipeline *)*((_QWORD *)static_fields + 11);
+		              if ( hgrp )
+		              {
+		                v91 = HG::Rendering::Runtime::HGGraphicsFeatureSwitch::get_enabledForCPUCommands(
+		                        (HGGraphicsFeatureSwitch *)hgrp,
+		                        0LL);
+		                static_fields = (char *)TypeInfo::HG::Rendering::Runtime::HGGraphicsFeatureManager->static_fields;
+		                hgrp = (HGRenderPipeline *)*((_QWORD *)static_fields + 12);
+		                if ( hgrp )
+		                {
+		                  v92 = HG::Rendering::Runtime::HGGraphicsFeatureSwitch::get_enabledForCPUCommands(
+		                          (HGGraphicsFeatureSwitch *)hgrp,
+		                          0LL);
+		                  static_fields = (char *)TypeInfo::HG::Rendering::Runtime::HGGraphicsFeatureManager->static_fields;
+		                  hgrp = (HGRenderPipeline *)*((_QWORD *)static_fields + 13);
+		                  if ( hgrp )
+		                  {
+		                    v121 = HG::Rendering::Runtime::HGGraphicsFeatureSwitch::get_enabledForCPUCommands(
+		                             (HGGraphicsFeatureSwitch *)hgrp,
+		                             0LL);
+		                    static_fields = (char *)TypeInfo::HG::Rendering::Runtime::HGGraphicsFeatureManager->static_fields;
+		                    hgrp = (HGRenderPipeline *)*((_QWORD *)static_fields + 14);
+		                    if ( hgrp )
+		                    {
+		                      v95 = HG::Rendering::Runtime::HGGraphicsFeatureSwitch::get_enabledForCPUCommands(
+		                              (HGGraphicsFeatureSwitch *)hgrp,
+		                              0LL);
+		                      static_fields = (char *)TypeInfo::HG::Rendering::Runtime::HGGraphicsFeatureManager->static_fields;
+		                      hgrp = (HGRenderPipeline *)*((_QWORD *)static_fields + 15);
+		                      if ( hgrp )
+		                      {
+		                        v96 = HG::Rendering::Runtime::HGGraphicsFeatureSwitch::get_enabledForCPUCommands(
+		                                (HGGraphicsFeatureSwitch *)hgrp,
+		                                0LL);
+		                        static_fields = (char *)TypeInfo::HG::Rendering::Runtime::HGGraphicsFeatureManager->static_fields;
+		                        hgrp = (HGRenderPipeline *)*((_QWORD *)static_fields + 16);
+		                        if ( hgrp )
+		                        {
+		                          v94 = HG::Rendering::Runtime::HGGraphicsFeatureSwitch::get_enabledForCPUCommands(
+		                                  (HGGraphicsFeatureSwitch *)hgrp,
+		                                  0LL);
+		                          static_fields = (char *)TypeInfo::HG::Rendering::Runtime::HGGraphicsFeatureManager->static_fields;
+		                          hgrp = (HGRenderPipeline *)*((_QWORD *)static_fields + 17);
+		                          if ( hgrp )
+		                          {
+		                            v97 = HG::Rendering::Runtime::HGGraphicsFeatureSwitch::get_enabledForCPUCommands(
+		                                    (HGGraphicsFeatureSwitch *)hgrp,
+		                                    0LL);
+		                            static_fields = (char *)TypeInfo::HG::Rendering::Runtime::HGGraphicsFeatureManager->static_fields;
+		                            hgrp = (HGRenderPipeline *)*((_QWORD *)static_fields + 20);
+		                            if ( hgrp )
+		                            {
+		                              v98 = HG::Rendering::Runtime::HGGraphicsFeatureSwitch::get_enabledForCPUCommands(
+		                                      (HGGraphicsFeatureSwitch *)hgrp,
+		                                      0LL);
+		                              static_fields = (char *)TypeInfo::HG::Rendering::Runtime::HGGraphicsFeatureManager->static_fields;
+		                              hgrp = (HGRenderPipeline *)*((_QWORD *)static_fields + 22);
+		                              if ( hgrp )
+		                              {
+		                                v90 = HG::Rendering::Runtime::HGGraphicsFeatureSwitch::get_enabledForCPUCommands(
+		                                        (HGGraphicsFeatureSwitch *)hgrp,
+		                                        0LL);
+		                                static_fields = (char *)TypeInfo::HG::Rendering::Runtime::HGGraphicsFeatureManager->static_fields;
+		                                hgrp = (HGRenderPipeline *)*((_QWORD *)static_fields + 23);
+		                                if ( hgrp )
+		                                {
+		                                  v99 = HG::Rendering::Runtime::HGGraphicsFeatureSwitch::get_enabledForCPUCommands(
+		                                          (HGGraphicsFeatureSwitch *)hgrp,
+		                                          0LL);
+		                                  static_fields = (char *)TypeInfo::HG::Rendering::Runtime::HGGraphicsFeatureManager->static_fields;
+		                                  hgrp = (HGRenderPipeline *)*((_QWORD *)static_fields + 24);
+		                                  if ( hgrp )
+		                                  {
+		                                    v100 = HG::Rendering::Runtime::HGGraphicsFeatureSwitch::get_enabledForCPUCommands(
+		                                             (HGGraphicsFeatureSwitch *)hgrp,
+		                                             0LL);
+		                                    static_fields = (char *)TypeInfo::HG::Rendering::Runtime::HGGraphicsFeatureManager->static_fields;
+		                                    hgrp = (HGRenderPipeline *)*((_QWORD *)static_fields + 25);
+		                                    if ( hgrp )
+		                                    {
+		                                      v101 = HG::Rendering::Runtime::HGGraphicsFeatureSwitch::get_enabledForCPUCommands(
+		                                               (HGGraphicsFeatureSwitch *)hgrp,
+		                                               0LL);
+		                                      static_fields = (char *)TypeInfo::HG::Rendering::Runtime::HGGraphicsFeatureManager->static_fields;
+		                                      hgrp = (HGRenderPipeline *)*((_QWORD *)static_fields + 27);
+		                                      if ( hgrp )
+		                                      {
+		                                        v102 = HG::Rendering::Runtime::HGGraphicsFeatureSwitch::get_enabledForCPUCommands(
+		                                                 (HGGraphicsFeatureSwitch *)hgrp,
+		                                                 0LL);
+		                                        v24 = HG::Rendering::Runtime::HGRenderPathDeferred::PrepareGBufferOutput(
+		                                                &v119,
+		                                                this,
+		                                                renderPathParams,
+		                                                0LL);
+		                                        m_gbufferMapping = v24->m_gbufferMapping;
+		                                        *(NativeArray_1_HG_Rendering_RenderGraphModule_TextureHandle_ *)&this[1].fields._._.m_basicTransformConstants._PrevNonJitteredViewNoTransProjMatrix.m01 = v24->m_attachments;
+		                                        *(NativeArray_1_System_Int32_ *)&this[1].fields._._.m_basicTransformConstants._PrevNonJitteredViewNoTransProjMatrix.m02 = m_gbufferMapping;
+		                                        if ( enabledForCPUCommands )
+		                                        {
+		                                          cullingViewHandle = v17->fields.cullingViewHandle;
+		                                          if ( !v18 )
+		                                            goto LABEL_123;
+		                                          HGContext = HG::Rendering::RenderGraphModule::HGRenderGraph::get_HGContext(
+		                                                        v18,
+		                                                        0LL);
+		                                          if ( !HGContext )
+		                                            goto LABEL_123;
+		                                          sub_1800036A0(TypeInfo::UnityEngine::Rendering::ScriptableRenderContext);
+		                                          v28 = NAN;
+		                                          LOWORD(globalKeywords) = 0;
+		                                          v29 = COERCE_FLOAT(
+		                                                  UnityEngine::HyperGryph::HGMeshRender::CreateRendererList(
+		                                                    cullingViewHandle,
+		                                                    HGRenderFlags__Enum_ShadowOnly|HGRenderFlags__Enum_Opaque,
+		                                                    HGRenderFlags__Enum_Opaque,
+		                                                    HGShaderLightMode__Enum_DepthCharacterOnly,
+		                                                    globalKeywords,
+		                                                    HGContext->fields.renderContext.m_Ptr,
+		                                                    0,
+		                                                    0,
+		                                                    0xFFFFFFFF,
+		                                                    0,
+		                                                    0,
+		                                                    0LL));
+		                                        }
+		                                        else
+		                                        {
+		                                          v28 = NAN;
+		                                          v29 = NAN;
+		                                        }
+		                                        this[1].fields._._.m_basicTransformConstants._PrevInvViewProjMatrix.m11 = v29;
+		                                        this[1].fields._._.m_basicTransformConstants._PrevNonJitteredInvViewProjMatrix.m01 = NAN;
+		                                        this[1].fields._._.m_basicTransformConstants._PrevNonJitteredInvViewProjMatrix.m30 = NAN;
+		                                        this[1].fields._._.m_basicTransformConstants._PrevNonJitteredInvViewProjMatrix.m11 = NAN;
+		                                        if ( !LOBYTE(this[1].fields._._.m_basicTransformConstants._PrevNonJitteredInvViewProjMatrix.m21) )
+		                                          goto LABEL_64;
+		                                        if ( UnityEngine::HyperGryph::GPUDrivenRendererV1::Valid(0LL) )
+		                                        {
+		                                          v30 = v17->fields.cullingViewHandle;
+		                                          if ( !v18 )
+		                                            goto LABEL_123;
+		                                          v31 = HG::Rendering::RenderGraphModule::HGRenderGraph::get_HGContext(v18, 0LL);
+		                                          if ( !v31 )
+		                                            goto LABEL_123;
+		                                          sub_1800036A0(TypeInfo::UnityEngine::Rendering::ScriptableRenderContext);
+		                                          UnityEngine::HyperGryph::GPUDrivenRendererV1::CreateRendererListWithPreZ(
+		                                            v30,
+		                                            HGRenderFlags__Enum_ShadowOnly|HGRenderFlags__Enum_Opaque,
+		                                            HGRenderFlags__Enum_Opaque,
+		                                            HGShaderLightMode__Enum_GBuffer,
+		                                            v31->fields.renderContext.m_Ptr,
+		                                            1,
+		                                            &normalList,
+		                                            &preZPart0List,
+		                                            &preZPart1List,
+		                                            &v17->fields.mainViewConstants.viewMatrix,
+		                                            &v17->fields.mainViewConstants.projMatrix,
+		                                            &v17->fields.mainViewConstants.nonJitteredProjMatrix,
+		                                            &v17->fields.zBufferParams,
+		                                            &v17->fields.mainViewConstants.prevViewMatrix,
+		                                            &v17->fields.mainViewConstants.prevViewProjMatrix,
+		                                            &v17->fields.mainViewConstants.prevNonJitteredViewProjMatrix,
+		                                            &v17->fields.mainViewConstants.worldSpaceCameraPos,
+		                                            0LL);
+		                                          v32 = NAN;
+		                                          if ( v91 )
+		                                            v32 = *(float *)&normalList;
+		                                          this[1].fields._._.m_basicTransformConstants._PrevNonJitteredInvViewProjMatrix.m01 = v32;
+		                                          v33 = NAN;
+		                                          if ( v92 )
+		                                            v33 = *(float *)&preZPart0List;
+		                                          this[1].fields._._.m_basicTransformConstants._PrevNonJitteredInvViewProjMatrix.m30 = v33;
+		                                          v34 = NAN;
+		                                          if ( v121 )
+		                                            v34 = *(float *)&preZPart1List;
+		                                          this[1].fields._._.m_basicTransformConstants._PrevNonJitteredInvViewProjMatrix.m11 = v34;
+		                                        }
+		                                        if ( LOBYTE(this[1].fields._._.m_basicTransformConstants._PrevNonJitteredInvViewProjMatrix.m21)
+		                                          && UnityEngine::HyperGryph::GPUDrivenRendererV2::Valid(0LL) )
+		                                        {
+		                                          v35 = v17->fields.cullingViewHandle;
+		                                          if ( !v18 )
+		                                            goto LABEL_123;
+		                                          v36 = HG::Rendering::RenderGraphModule::HGRenderGraph::get_HGContext(v18, 0LL);
+		                                          if ( !v36 )
+		                                            goto LABEL_123;
+		                                          sub_1800036A0(TypeInfo::UnityEngine::Rendering::ScriptableRenderContext);
+		                                          UnityEngine::HyperGryph::GPUDrivenRendererV2::CreateRendererListWithPreZ(
+		                                            v35,
+		                                            HGRenderFlags__Enum_ShadowOnly|HGRenderFlags__Enum_Opaque,
+		                                            HGRenderFlags__Enum_Opaque,
+		                                            HGShaderLightMode__Enum_GBuffer,
+		                                            v36->fields.renderContext.m_Ptr,
+		                                            &v106,
+		                                            &v107,
+		                                            &v108,
+		                                            &v17->fields.mainViewConstants.viewMatrix,
+		                                            &v17->fields.mainViewConstants.projMatrix,
+		                                            &v17->fields.mainViewConstants.nonJitteredProjMatrix,
+		                                            &v17->fields.zBufferParams,
+		                                            &v17->fields.mainViewConstants.prevViewMatrix,
+		                                            &v17->fields.mainViewConstants.prevViewProjMatrix,
+		                                            &v17->fields.mainViewConstants.prevNonJitteredViewProjMatrix,
+		                                            &v17->fields.mainViewConstants.worldSpaceCameraPos,
+		                                            0LL);
+		                                          v37 = NAN;
+		                                          if ( v91 )
+		                                            v37 = *(float *)&v106;
+		                                          this[1].fields._._.m_basicTransformConstants._PrevNonJitteredInvViewProjMatrix.m01 = v37;
+		                                          v38 = NAN;
+		                                          if ( v92 )
+		                                            v38 = *(float *)&v107;
+		                                          v39 = v121;
+		                                          this[1].fields._._.m_basicTransformConstants._PrevNonJitteredInvViewProjMatrix.m30 = v38;
+		                                          v40 = NAN;
+		                                          if ( v121 )
+		                                            v40 = *(float *)&v108;
+		                                          this[1].fields._._.m_basicTransformConstants._PrevNonJitteredInvViewProjMatrix.m11 = v40;
+		                                        }
+		                                        else
+		                                        {
+		LABEL_64:
+		                                          v39 = v121;
+		                                        }
+		                                        v41 = v17->fields.cullingViewHandle;
+		                                        if ( v18 )
+		                                        {
+		                                          v42 = HG::Rendering::RenderGraphModule::HGRenderGraph::get_HGContext(v18, 0LL);
+		                                          if ( v42 )
+		                                          {
+		                                            sub_1800036A0(TypeInfo::UnityEngine::Rendering::ScriptableRenderContext);
+		                                            m_Ptr = v42->fields.renderContext.m_Ptr;
+		                                            cullingLayerMask = LOBYTE(this[1].fields._._.m_basicTransformConstants._PrevNonJitteredInvViewProjMatrix.m21);
+		                                            v109 = 0;
+		                                            v110 = 0;
+		                                            v111 = 0;
+		                                            UnityEngine::HyperGryph::HGMeshRender::CreateRendererListWithPreZ(
+		                                              v41,
+		                                              0x500u,
+		                                              0x100u,
+		                                              1u,
+		                                              m_Ptr,
+		                                              &v109,
+		                                              &v110,
+		                                              &v111,
+		                                              cullingLayerMask,
+		                                              0LL);
+		                                            v44 = NAN;
+		                                            if ( v91 )
+		                                              v44 = *(float *)&v109;
+		                                            this[1].fields._._.m_basicTransformConstants._PrevInvViewProjMatrix.m21 = v44;
+		                                            v45 = NAN;
+		                                            if ( v92 )
+		                                              v45 = *(float *)&v110;
+		                                            this[1].fields._._.m_basicTransformConstants._PrevInvViewProjMatrix.m00 = v45;
+		                                            v46 = NAN;
+		                                            if ( v39 )
+		                                              v46 = *(float *)&v111;
+		                                            this[1].fields._._.m_basicTransformConstants._PrevInvViewProjMatrix.m31 = v46;
+		                                            if ( v95 )
+		                                            {
+		                                              v47 = v17->fields.cullingViewHandle;
+		                                              v48 = HG::Rendering::RenderGraphModule::HGRenderGraph::get_HGContext(
+		                                                      v18,
+		                                                      0LL);
+		                                              if ( !v48 )
+		                                                goto LABEL_123;
+		                                              sub_1800036A0(TypeInfo::UnityEngine::Rendering::ScriptableRenderContext);
+		                                              v49 = COERCE_FLOAT(
+		                                                      UnityEngine::HyperGryph::HGGrassRender::CreateRendererList(
+		                                                        v47,
+		                                                        HGRenderFlags__Enum_ShadowOnly|HGRenderFlags__Enum_Opaque,
+		                                                        HGRenderFlags__Enum_Opaque,
+		                                                        HGShaderLightMode__Enum_DepthOnly,
+		                                                        v48->fields.renderContext.m_Ptr,
+		                                                        0,
+		                                                        0LL));
+		                                            }
+		                                            else
+		                                            {
+		                                              v49 = NAN;
+		                                            }
+		                                            this[1].fields._._.m_basicTransformConstants._PrevInvViewProjMatrix.m30 = v49;
+		                                            if ( v96 )
+		                                            {
+		                                              v50 = v17->fields.cullingViewHandle;
+		                                              v51 = HG::Rendering::RenderGraphModule::HGRenderGraph::get_HGContext(
+		                                                      v18,
+		                                                      0LL);
+		                                              if ( !v51 )
+		                                                goto LABEL_123;
+		                                              sub_1800036A0(TypeInfo::UnityEngine::Rendering::ScriptableRenderContext);
+		                                              v52 = COERCE_FLOAT(
+		                                                      UnityEngine::HyperGryph::HGGrassRender::CreateRendererList(
+		                                                        v50,
+		                                                        HGRenderFlags__Enum_ShadowOnly|HGRenderFlags__Enum_Opaque,
+		                                                        HGRenderFlags__Enum_Opaque,
+		                                                        HGShaderLightMode__Enum_GBuffer,
+		                                                        v51->fields.renderContext.m_Ptr,
+		                                                        0,
+		                                                        0LL));
+		                                            }
+		                                            else
+		                                            {
+		                                              v52 = NAN;
+		                                            }
+		                                            v53 = -1;
+		                                            this[1].fields._._.m_basicTransformConstants._PrevInvViewProjMatrix.m02 = v52;
+		                                            v54 = -1;
+		                                            v112 = -1;
+		                                            v113 = -1;
+		                                            if ( v94 || v97 )
+		                                            {
+		                                              v55 = v17->fields.cullingViewHandle;
+		                                              v56 = HG::Rendering::RenderGraphModule::HGRenderGraph::get_HGContext(
+		                                                      v18,
+		                                                      0LL);
+		                                              if ( !v56 )
+		                                                goto LABEL_123;
+		                                              sub_1800036A0(TypeInfo::UnityEngine::Rendering::ScriptableRenderContext);
+		                                              UnityEngine::HyperGryph::HGTreeRender::CreateRendererListWithPreZ(
+		                                                v55,
+		                                                HGRenderFlags__Enum_ShadowOnly|HGRenderFlags__Enum_Opaque,
+		                                                HGRenderFlags__Enum_Opaque,
+		                                                HGShaderLightMode__Enum_GBuffer,
+		                                                v56->fields.renderContext.m_Ptr,
+		                                                &v112,
+		                                                &v113,
+		                                                &v118,
+		                                                0,
+		                                                0LL);
+		                                              v53 = v112;
+		                                              v54 = v113;
+		                                            }
+		                                            v57 = NAN;
+		                                            if ( v97 )
+		                                              v57 = *(float *)&v53;
+		                                            this[1].fields._._.m_basicTransformConstants._PrevInvViewProjMatrix.m12 = v57;
+		                                            v58 = NAN;
+		                                            if ( v94 )
+		                                              v58 = *(float *)&v54;
+		                                            this[1].fields._._.m_basicTransformConstants._PrevInvViewProjMatrix.m01 = v58;
+		                                            if ( v98 )
+		                                            {
+		                                              camera = v17->fields.camera;
+		                                              sceneRTSize_k__BackingField = v17->fields._sceneRTSize_k__BackingField;
+		                                              viewHandle[0] = v17->fields.cullingViewHandle;
+		                                              renderPath_k__BackingField = this->fields._._._renderPath_k__BackingField;
+		                                              v61 = HG::Rendering::RenderGraphModule::HGRenderGraph::get_HGContext(
+		                                                      v18,
+		                                                      0LL);
+		                                              if ( !v61 )
+		                                                goto LABEL_123;
+		                                              sub_1800036A0(TypeInfo::UnityEngine::Rendering::ScriptableRenderContext);
+		                                              v62 = 8;
+		                                              if ( renderPath_k__BackingField != 4 )
+		                                                v62 = 4;
+		                                              v63 = COERCE_FLOAT(
+		                                                      UnityEngine::HyperGryph::HGSludgeRender::CreateRendererList(
+		                                                        camera,
+		                                                        sceneRTSize_k__BackingField,
+		                                                        viewHandle[0],
+		                                                        1u,
+		                                                        v62,
+		                                                        1200.0,
+		                                                        v61->fields.renderContext.m_Ptr,
+		                                                        1,
+		                                                        0LL));
+		                                            }
+		                                            else
+		                                            {
+		                                              v63 = NAN;
+		                                            }
+		                                            this[1].fields._._.m_basicTransformConstants._PrevInvViewProjMatrix.m22 = v63;
+		                                            sub_1800036A0(TypeInfo::HG::Rendering::Runtime::HGCamera);
+		                                            v64 = HG::Rendering::Runtime::HGCamera::RemoveWorldUILayer(0xFFFFFFFF, 0LL);
+		                                            if ( v90 )
+		                                            {
+		                                              v123 = v17->fields.cullingViewHandle;
+		                                              v65 = HG::Rendering::Runtime::HGCamera::get_enableTransparentAfterDOF(
+		                                                      v17,
+		                                                      0LL)
+		                                                  ? HGRenderFlags__Enum_TransparentBeforeDistortion|HGRenderFlags__Enum_ShadowOnly
+		                                                  : HGRenderFlags__Enum_ShadowOnly|HGRenderFlags__Enum_Transparent;
+		                                              v66 = HG::Rendering::Runtime::HGCamera::get_enableTransparentAfterDOF(
+		                                                      v17,
+		                                                      0LL)
+		                                                  ? 0x600
+		                                                  : 0;
+		                                              *(_QWORD *)viewHandle = HG::Rendering::RenderGraphModule::HGRenderGraph::get_HGContext(
+		                                                                        v18,
+		                                                                        0LL);
+		                                              if ( !*(_QWORD *)viewHandle )
+		                                                goto LABEL_123;
+		                                              sub_1800036A0(TypeInfo::UnityEngine::Rendering::ScriptableRenderContext);
+		                                              LOWORD(globalKeywordsa) = 0;
+		                                              v67 = COERCE_FLOAT(
+		                                                      UnityEngine::HyperGryph::HGMeshRender::CreateRendererList(
+		                                                        v123,
+		                                                        v65,
+		                                                        (HGRenderFlags__Enum)(v66 + 512),
+		                                                        (HGShaderLightMode__Enum)((CharOutlinePassEnableState << 9)
+		                                                                                + 8416),
+		                                                        globalKeywordsa,
+		                                                        *(void **)(*(_QWORD *)viewHandle + 16LL),
+		                                                        1,
+		                                                        1,
+		                                                        v64,
+		                                                        0,
+		                                                        0,
+		                                                        0LL));
+		                                            }
+		                                            else
+		                                            {
+		                                              v67 = NAN;
+		                                            }
+		                                            this[1].fields._._.m_basicTransformConstants._PrevNonJitteredInvViewProjMatrix.m00 = v67;
+		                                            if ( v90 )
+		                                            {
+		                                              viewHandle[0] = v17->fields.cullingViewHandle;
+		                                              v68 = (!HG::Rendering::Runtime::HGCamera::get_enableTransparentAfterDOF(
+		                                                        v17,
+		                                                        0LL)
+		                                                   + 1) << 12;
+		                                              enableTransparentAfterDOF = HG::Rendering::Runtime::HGCamera::get_enableTransparentAfterDOF(
+		                                                                            v17,
+		                                                                            0LL);
+		                                              v69 = HG::Rendering::RenderGraphModule::HGRenderGraph::get_HGContext(
+		                                                      v18,
+		                                                      0LL);
+		                                              if ( !v69 )
+		                                                goto LABEL_123;
+		                                              sub_1800036A0(TypeInfo::UnityEngine::Rendering::ScriptableRenderContext);
+		                                              LOWORD(globalKeywordsa) = 0;
+		                                              v70 = COERCE_FLOAT(
+		                                                      UnityEngine::HyperGryph::HGMeshRender::CreateRendererList(
+		                                                        viewHandle[0],
+		                                                        (HGRenderFlags__Enum)(v68 | 0x400),
+		                                                        (HGRenderFlags__Enum)((!enableTransparentAfterDOF + 1) << 12),
+		                                                        (HGShaderLightMode__Enum)((CharOutlinePassEnableState << 9)
+		                                                                                + 8416),
+		                                                        globalKeywordsa,
+		                                                        v69->fields.renderContext.m_Ptr,
+		                                                        1,
+		                                                        1,
+		                                                        v64,
+		                                                        0,
+		                                                        0,
+		                                                        0LL));
+		                                            }
+		                                            else
+		                                            {
+		                                              v70 = NAN;
+		                                            }
+		                                            this[1].fields._._.m_basicTransformConstants._PrevNonJitteredInvViewProjMatrix.m10 = v70;
+		                                            if ( v90
+		                                              && HG::Rendering::Runtime::HGCamera::get_enableTransparentAfterDOF(
+		                                                   v17,
+		                                                   0LL) )
+		                                            {
+		                                              v71 = v17->fields.cullingViewHandle;
+		                                              v72 = HG::Rendering::RenderGraphModule::HGRenderGraph::get_HGContext(
+		                                                      v18,
+		                                                      0LL);
+		                                              if ( !v72 )
+		                                                goto LABEL_123;
+		                                              sub_1800036A0(TypeInfo::UnityEngine::Rendering::ScriptableRenderContext);
+		                                              LOWORD(globalKeywordsa) = 0;
+		                                              v73 = COERCE_FLOAT(
+		                                                      UnityEngine::HyperGryph::HGMeshRender::CreateRendererList(
+		                                                        v71,
+		                                                        HGRenderFlags__Enum_TransparentAfterPP|HGRenderFlags__Enum_ShadowOnly,
+		                                                        HGRenderFlags__Enum_TransparentAfterPP,
+		                                                        (HGShaderLightMode__Enum)((CharOutlinePassEnableState << 9)
+		                                                                                + 8416),
+		                                                        globalKeywordsa,
+		                                                        v72->fields.renderContext.m_Ptr,
+		                                                        1,
+		                                                        1,
+		                                                        v64,
+		                                                        0,
+		                                                        0,
+		                                                        0LL));
+		                                            }
+		                                            else
+		                                            {
+		                                              v73 = NAN;
+		                                            }
+		                                            this[1].fields._._.m_basicTransformConstants._PrevNonJitteredViewNoTransProjMatrix.m20 = v73;
+		                                            if ( v90 )
+		                                            {
+		                                              v74 = v17->fields.cullingViewHandle;
+		                                              v75 = HG::Rendering::RenderGraphModule::HGRenderGraph::get_HGContext(
+		                                                      v18,
+		                                                      0LL);
+		                                              if ( !v75 )
+		                                                goto LABEL_123;
+		                                              sub_1800036A0(TypeInfo::UnityEngine::Rendering::ScriptableRenderContext);
+		                                              LOWORD(globalKeywordsa) = 0;
+		                                              v76 = COERCE_FLOAT(
+		                                                      UnityEngine::HyperGryph::HGMeshRender::CreateRendererList(
+		                                                        v74,
+		                                                        HGRenderFlags__Enum_Transparent,
+		                                                        HGRenderFlags__Enum_Transparent,
+		                                                        HGShaderLightMode__Enum_ForwardReflection,
+		                                                        globalKeywordsa,
+		                                                        v75->fields.renderContext.m_Ptr,
+		                                                        1,
+		                                                        1,
+		                                                        v64,
+		                                                        0,
+		                                                        0,
+		                                                        0LL));
+		                                            }
+		                                            else
+		                                            {
+		                                              v76 = NAN;
+		                                            }
+		                                            this[1].fields._._.m_basicTransformConstants._PrevNonJitteredInvViewProjMatrix.m20 = v76;
+		                                            v77 = v17->fields.cullingViewHandle;
+		                                            v78 = HG::Rendering::RenderGraphModule::HGRenderGraph::get_HGContext(
+		                                                    v18,
+		                                                    0LL);
+		                                            if ( v78 )
+		                                            {
+		                                              sub_1800036A0(TypeInfo::UnityEngine::Rendering::ScriptableRenderContext);
+		                                              v79 = v78->fields.renderContext.m_Ptr;
+		                                              v114 = 0;
+		                                              v115 = 0;
+		                                              v116 = 0;
+		                                              UnityEngine::HyperGryph::HGMeshRender::CreateRendererListWithPreZ(
+		                                                v77,
+		                                                0x500u,
+		                                                0x100u,
+		                                                0x2020u,
+		                                                v79,
+		                                                &v114,
+		                                                &v115,
+		                                                &v116,
+		                                                0,
+		                                                0LL);
+		                                              v80 = NAN;
+		                                              if ( v99 )
+		                                                v80 = *(float *)&v114;
+		                                              this[1].fields._._.m_basicTransformConstants._PrevInvViewProjMatrix.m32 = v80;
+		                                              v81 = NAN;
+		                                              if ( v100 )
+		                                                v81 = *(float *)&v115;
+		                                              this[1].fields._._.m_basicTransformConstants._PrevInvViewProjMatrix.m10 = v81;
+		                                              v82 = NAN;
+		                                              if ( v101 )
+		                                                v82 = *(float *)&v116;
+		                                              this[1].fields._._.m_basicTransformConstants._PrevInvViewProjMatrix.m03 = v82;
+		                                              if ( !v102 )
+		                                                goto LABEL_121;
+		                                              v83 = v17->fields.cullingViewHandle;
+		                                              v84 = HG::Rendering::RenderGraphModule::HGRenderGraph::get_HGContext(
+		                                                      v18,
+		                                                      0LL);
+		                                              if ( v84 )
+		                                              {
+		                                                sub_1800036A0(TypeInfo::UnityEngine::Rendering::ScriptableRenderContext);
+		                                                LOWORD(globalKeywordsb) = 0;
+		                                                v28 = COERCE_FLOAT(
+		                                                        UnityEngine::HyperGryph::HGMeshRender::CreateRendererList(
+		                                                          v83,
+		                                                          HGRenderFlags__Enum_ShadowOnly|HGRenderFlags__Enum_Opaque,
+		                                                          HGRenderFlags__Enum_Opaque,
+		                                                          HGShaderLightMode__Enum_ForwardCharacterOnly,
+		                                                          globalKeywordsb,
+		                                                          v84->fields.renderContext.m_Ptr,
+		                                                          0,
+		                                                          0,
+		                                                          0xFFFFFFFF,
+		                                                          0,
+		                                                          0,
+		                                                          0LL));
+		LABEL_121:
+		                                                this[1].fields._._.m_basicTransformConstants._PrevInvViewProjMatrix.m33 = v28;
+		                                                return;
+		                                              }
+		                                            }
+		                                          }
+		                                        }
+		                                      }
+		                                    }
+		                                  }
+		                                }
+		                              }
+		                            }
+		                          }
+		                        }
+		                      }
+		                    }
+		                  }
+		                }
+		              }
+		            }
+		          }
+		        }
+		      }
+		    }
+		LABEL_123:
+		    sub_1800D8260(hgrp, static_fields);
+		  }
+		  Patch = IFix::WrappersManagerImpl::GetPatch(3574, 0LL);
+		  if ( !Patch )
+		    goto LABEL_123;
+		  IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_457(Patch, (Object *)this, renderPathParams, 0LL);
+		}
+		
 		protected abstract GBufferProfileManager.GBufferProfileConfig GetGBufferProfileConfig();
-
-		private GBufferOutput PrepareGBufferOutput(ref HGRenderPathBase.HGRenderPathParams renderPathParams)
+		private GBufferOutput PrepareGBufferOutput(ref HGRenderPathParams renderPathParams) => default; // 0x0000000189BF7AA0-0x0000000189BF7BB8
+		// GBufferOutput PrepareGBufferOutput(HGRenderPathBase+HGRenderPathParams ByRef)
+		GBufferOutput *HG::Rendering::Runtime::HGRenderPathDeferred::PrepareGBufferOutput(
+		        GBufferOutput *__return_ptr retstr,
+		        HGRenderPathDeferred *this,
+		        HGRenderPathBase_HGRenderPathParams *renderPathParams,
+		        MethodInfo *method)
 		{
-			// // GBufferOutput PrepareGBufferOutput(HGRenderPathBase+HGRenderPathParams ByRef)
-			// GBufferOutput *HG::Rendering::Runtime::HGRenderPathDeferred::PrepareGBufferOutput(
-			//         GBufferOutput *__return_ptr retstr,
-			//         HGRenderPathDeferred *this,
-			//         HGRenderPathBase_HGRenderPathParams *renderPathParams,
-			//         MethodInfo *method)
-			// {
-			//   __int64 v7; // rdx
-			//   __int64 v8; // rcx
-			//   HGRenderPipeline *hgrp; // rax
-			//   HGCamera *hgCamera; // r14
-			//   HGSettingParameters *settingParameters_k__BackingField; // rbx
-			//   HGRenderGraph *m_RenderGraph; // rbp
-			//   SettingParameter_1_System_Single_ *copySceneRTScale_k__BackingField; // rbx
-			//   GBufferProfileManager *v14; // r15
-			//   GBufferProfileManager_GBufferProfileConfig__Enum v15; // esi
-			//   float v16; // xmm0_4
-			//   GBufferOutput *v17; // rax
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			//   NativeArray_1_HG_Rendering_RenderGraphModule_TextureHandle_ m_attachments; // xmm0
-			//   NativeArray_1_System_Int32_ m_gbufferMapping; // xmm1
-			//   GBufferOutput *result; // rax
-			//   GBufferOutput v22; // [rsp+40h] [rbp-38h] BYREF
-			// 
-			//   if ( !byte_18D91964F )
-			//   {
-			//     sub_18003C530(&MethodInfo::HG::Rendering::Runtime::SettingParameter<float>::op_Implicit);
-			//     byte_18D91964F = 1;
-			//   }
-			//   if ( IFix::WrappersManagerImpl::IsPatched(2988, 0LL) )
-			//   {
-			//     Patch = IFix::WrappersManagerImpl::GetPatch(2988, 0LL);
-			//     if ( Patch )
-			//     {
-			//       v17 = IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_1070(&v22, Patch, (Object *)this, renderPathParams, 0LL);
-			//       goto LABEL_11;
-			//     }
-			// LABEL_9:
-			//     sub_180B536AC(v8, v7);
-			//   }
-			//   hgrp = renderPathParams.hgrp;
-			//   if ( !hgrp )
-			//     goto LABEL_9;
-			//   hgCamera = renderPathParams.renderRequest.hgCamera;
-			//   settingParameters_k__BackingField = hgrp.fields._settingParameters_k__BackingField;
-			//   m_RenderGraph = hgrp.fields.m_RenderGraph;
-			//   if ( !settingParameters_k__BackingField )
-			//     goto LABEL_9;
-			//   copySceneRTScale_k__BackingField = settingParameters_k__BackingField.fields._copySceneRTScale_k__BackingField;
-			//   v14 = *(GBufferProfileManager **)&this[1].fields._._.m_shaderVariablesGlobal._PrevInvViewProjMatrix.m00;
-			//   v15 = (unsigned int)sub_18003ED00(18LL);
-			//   v16 = HG::Rendering::Runtime::SettingParameter<float>::op_Implicit(
-			//           copySceneRTScale_k__BackingField,
-			//           MethodInfo::HG::Rendering::Runtime::SettingParameter<float>::op_Implicit);
-			//   if ( !v14 )
-			//     goto LABEL_9;
-			//   v17 = HG::Rendering::Runtime::GBufferProfileManager::SetupGBufferOutput(
-			//           &v22,
-			//           v14,
-			//           v15,
-			//           m_RenderGraph,
-			//           hgCamera,
-			//           v16,
-			//           0LL);
-			// LABEL_11:
-			//   m_attachments = v17.m_attachments;
-			//   m_gbufferMapping = v17.m_gbufferMapping;
-			//   result = retstr;
-			//   retstr.m_attachments = m_attachments;
-			//   retstr.m_gbufferMapping = m_gbufferMapping;
-			//   return result;
-			// }
-			// 
-			return null;
+		  __int64 v7; // rdx
+		  HGRenderPipeline *hgrp; // rcx
+		  HGRenderGraph *renderGraph; // rax
+		  HGRenderGraph *v10; // r14
+		  HGCamera *hgCamera; // r15
+		  HGSettingParameters *settingParameters_k__BackingField; // rbx
+		  SettingParameter_1_System_Single_ *copySceneRTScale_k__BackingField; // rbx
+		  GBufferProfileManager *v14; // rbp
+		  GBufferProfileManager_GBufferProfileConfig__Enum v15; // esi
+		  float v16; // xmm0_4
+		  GBufferOutput *v17; // rax
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  NativeArray_1_HG_Rendering_RenderGraphModule_TextureHandle_ m_attachments; // xmm0
+		  NativeArray_1_System_Int32_ m_gbufferMapping; // xmm1
+		  GBufferOutput *result; // rax
+		  GBufferOutput v22; // [rsp+40h] [rbp-38h] BYREF
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(3584, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(3584, 0LL);
+		    if ( Patch )
+		    {
+		      v17 = IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_1274(&v22, Patch, (Object *)this, renderPathParams, 0LL);
+		      goto LABEL_10;
+		    }
+		LABEL_8:
+		    sub_1800D8260(hgrp, v7);
+		  }
+		  hgrp = renderPathParams->hgrp;
+		  if ( !hgrp )
+		    goto LABEL_8;
+		  renderGraph = HG::Rendering::Runtime::HGRenderPipeline::get_renderGraph(hgrp, 0LL);
+		  hgrp = renderPathParams->hgrp;
+		  v10 = renderGraph;
+		  hgCamera = renderPathParams->renderRequest.hgCamera;
+		  if ( !hgrp )
+		    goto LABEL_8;
+		  settingParameters_k__BackingField = hgrp->fields._settingParameters_k__BackingField;
+		  if ( !settingParameters_k__BackingField )
+		    goto LABEL_8;
+		  copySceneRTScale_k__BackingField = settingParameters_k__BackingField->fields._copySceneRTScale_k__BackingField;
+		  v14 = *(GBufferProfileManager **)&this[1].fields._._.m_basicTransformConstants._PrevNonJitteredViewNoTransProjMatrix.m03;
+		  v15 = (unsigned int)sub_180002F70(18LL, this);
+		  v16 = HG::Rendering::Runtime::SettingParameter<float>::op_Implicit(
+		          copySceneRTScale_k__BackingField,
+		          MethodInfo::HG::Rendering::Runtime::SettingParameter<float>::op_Implicit);
+		  if ( !v14 )
+		    goto LABEL_8;
+		  v17 = HG::Rendering::Runtime::GBufferProfileManager::SetupGBufferOutput(&v22, v14, v15, v10, hgCamera, v16, 0LL);
+		LABEL_10:
+		  m_attachments = v17->m_attachments;
+		  m_gbufferMapping = v17->m_gbufferMapping;
+		  result = retstr;
+		  retstr->m_attachments = m_attachments;
+		  retstr->m_gbufferMapping = m_gbufferMapping;
+		  return result;
 		}
-
-		public new void <>iFixBaseProxy_OnPreRendering(ref HGRenderPathBase.HGRenderPathParams P0)
+		
+		public void __iFixBaseProxy_OnPreRendering(ref HGRenderPathParams P0) {} // 0x0000000189BF7BC0-0x0000000189BF7BC8
+		// Void <>iFixBaseProxy_OnPreRendering(HGRenderPathBase+HGRenderPathParams ByRef)
+		void HG::Rendering::Runtime::HGRenderPathForward::__iFixBaseProxy_OnPreRendering(
+		        HGRenderPathForward *this,
+		        HGRenderPathBase_HGRenderPathParams *P0,
+		        MethodInfo *method)
 		{
-			// // Void <>iFixBaseProxy_OnPreRendering(HGRenderPathBase+HGRenderPathParams ByRef)
-			// void HG::Rendering::Runtime::HGRenderPathForward::__iFixBaseProxy_OnPreRendering(
-			//         HGRenderPathForward *this,
-			//         HGRenderPathBase_HGRenderPathParams *P0,
-			//         MethodInfo *method)
-			// {
-			//   HG::Rendering::Runtime::HGRenderPathScene::OnPreRendering((HGRenderPathScene *)this, P0, 0LL);
-			// }
-			// 
+		  HG::Rendering::Runtime::HGRenderPathScene::OnPreRendering((HGRenderPathScene *)this, P0, 0LL);
 		}
-
-		internal const int MAX_GBUFFER_COUNT = 8;
-
-		protected GBufferProfileManager m_gBufferProfileMgr;
-
-		protected uint m_deferredOpaquePreZECSList;
-
-		protected uint m_forwardOpaquePreZECSList;
-
-		protected uint m_characterOpaqueOutlinePreZECSList;
-
-		protected uint m_deferredGrassPreZECSList;
-
-		protected uint m_characterPrePassECSList;
-
-		protected uint m_deferredOpaqueECSList;
-
-		protected uint m_deferredOpaqueEqualECSList;
-
-		protected uint m_deferredGrassECSList;
-
-		protected uint m_deferredSludgeECSList;
-
-		protected uint m_forwardOpaqueECSList;
-
-		protected uint m_forwardOpaqueEqualECSList;
-
-		protected uint m_characterOpaqueOutlineECSList;
-
-		protected uint m_characterOpaqueOutlineEqualECSList;
-
-		protected uint m_characterOpaqueECSList;
-
-		protected uint m_forwardTransparentECSList;
-
-		protected uint m_forwardTransparentAfterDistortionECSList;
-
-		protected uint m_forwardReflectionECSList;
-
-		protected uint m_deferredOpaquePreZGPUDrivenList;
-
-		protected uint m_deferredOpaqueGPUDrivenList;
-
-		protected uint m_deferredOpaqueEqualGPUDrivenList;
+		
+		public void __iFixBaseProxy_Dispose(HGRenderGraph P0) {} // 0x0000000189BF7BB8-0x0000000189BF7BC0
+		// Void <>iFixBaseProxy_Dispose(HGRenderGraph)
+		void HG::Rendering::Runtime::HGRenderPathDeferred::__iFixBaseProxy_Dispose(
+		        HGRenderPathDeferred *this,
+		        HGRenderGraph *P0,
+		        MethodInfo *method)
+		{
+		  HG::Rendering::Runtime::HGRenderPathScene::Dispose((HGRenderPathScene *)this, P0, 0LL);
+		}
+		
 	}
 }

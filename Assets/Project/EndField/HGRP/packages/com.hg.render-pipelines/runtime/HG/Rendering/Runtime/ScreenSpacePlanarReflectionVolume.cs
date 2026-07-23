@@ -1,203 +1,162 @@
-﻿using System;
+using System;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.Rendering;
 
+// Image 4: HG.RenderPipelines.Runtime.dll - Assembly: HG.RenderPipelines.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null - Types 37354-38879
+
 namespace HG.Rendering.Runtime
 {
-	[VolumeComponentMenuForRenderPipeline("Post-processing/ScreenSpacePlanarReflection", new Type[] { typeof(HGRenderPipeline) })]
 	[Serializable]
-	public class ScreenSpacePlanarReflectionVolume : VolumeComponent
+	[VolumeComponentMenuForRenderPipeline("Post-processing/ScreenSpacePlanarReflection", new System.Type[1] {typeof(HGRenderPipeline) })]
+	public class ScreenSpacePlanarReflectionVolume : VolumeComponent // TypeDefIndex: 38059
 	{
-		public ScreenSpacePlanarReflectionVolume()
-		{
-			// // ScreenSpacePlanarReflectionVolume()
-			// void HG::Rendering::Runtime::ScreenSpacePlanarReflectionVolume::ScreenSpacePlanarReflectionVolume(
-			//         ScreenSpacePlanarReflectionVolume *this,
-			//         MethodInfo *method)
-			// {
-			//   BoolParameter *v3; // rax
-			//   HGRenderPathBase_HGRenderPathResources *v4; // rdx
-			//   __int64 v5; // rcx
-			//   BoolParameter *v6; // rdi
-			//   HGRenderPathBase_HGRenderPathResources *v7; // rdx
-			//   PassConstructorID__Enum__Array *v8; // r8
-			//   HGCamera *v9; // r9
-			//   FloatParameter *v10; // rax
-			//   FloatParameter *v11; // rdi
-			//   HGRenderPathBase_HGRenderPathResources *v12; // rdx
-			//   PassConstructorID__Enum__Array *v13; // r8
-			//   HGCamera *v14; // r9
-			//   ClampedFloatParameter *v15; // rax
-			//   ClampedFloatParameter *v16; // rdi
-			//   HGRenderPathBase_HGRenderPathResources *v17; // rdx
-			//   PassConstructorID__Enum__Array *v18; // r8
-			//   HGCamera *v19; // r9
-			//   MethodInfo *v20; // rdx
-			//   Vector4 v21; // xmm6
-			//   __int64 v22; // rdi
-			//   PassConstructorID__Enum__Array *v23; // r8
-			//   HGCamera *v24; // r9
-			//   BoolParameter *v25; // rax
-			//   BoolParameter *v26; // rdi
-			//   HGRenderPathBase_HGRenderPathResources *v27; // rdx
-			//   PassConstructorID__Enum__Array *v28; // r8
-			//   HGCamera *v29; // r9
-			//   Texture2DParameter *v30; // rax
-			//   Texture2DParameter *v31; // rdi
-			//   HGRenderPathBase_HGRenderPathResources *v32; // rdx
-			//   PassConstructorID__Enum__Array *v33; // r8
-			//   HGCamera *v34; // r9
-			//   FloatParameter *v35; // rax
-			//   FloatParameter *v36; // rdi
-			//   HGRenderPathBase_HGRenderPathResources *v37; // rdx
-			//   PassConstructorID__Enum__Array *v38; // r8
-			//   HGCamera *v39; // r9
-			//   ClampedFloatParameter *v40; // rax
-			//   ClampedFloatParameter *v41; // rdi
-			//   HGRenderPathBase_HGRenderPathResources *v42; // rdx
-			//   PassConstructorID__Enum__Array *v43; // r8
-			//   HGCamera *v44; // r9
-			//   MethodInfo *overrideState; // [rsp+20h] [rbp-58h]
-			//   MethodInfo *overrideStatea; // [rsp+20h] [rbp-58h]
-			//   MethodInfo *overrideStatef; // [rsp+20h] [rbp-58h]
-			//   MethodInfo *overrideStateb; // [rsp+20h] [rbp-58h]
-			//   MethodInfo *overrideStatec; // [rsp+20h] [rbp-58h]
-			//   MethodInfo *overrideStated; // [rsp+20h] [rbp-58h]
-			//   MethodInfo *overrideStatee; // [rsp+20h] [rbp-58h]
-			//   MethodInfo *overrideStateg; // [rsp+20h] [rbp-58h]
-			//   MethodInfo *methoda; // [rsp+28h] [rbp-50h]
-			//   MethodInfo *methodb; // [rsp+28h] [rbp-50h]
-			//   MethodInfo *methodg; // [rsp+28h] [rbp-50h]
-			//   MethodInfo *methodc; // [rsp+28h] [rbp-50h]
-			//   MethodInfo *methodd; // [rsp+28h] [rbp-50h]
-			//   MethodInfo *methode; // [rsp+28h] [rbp-50h]
-			//   MethodInfo *methodf; // [rsp+28h] [rbp-50h]
-			//   MethodInfo *methodh; // [rsp+28h] [rbp-50h]
-			//   Vector4 v61; // [rsp+30h] [rbp-48h] BYREF
-			// 
-			//   if ( !byte_18D8ED9E5 )
-			//   {
-			//     sub_18003C530(&TypeInfo::UnityEngine::Rendering::BoolParameter);
-			//     sub_18003C530(&TypeInfo::UnityEngine::Rendering::ClampedFloatParameter);
-			//     sub_18003C530(&TypeInfo::UnityEngine::Rendering::ColorParameter);
-			//     sub_18003C530(&TypeInfo::UnityEngine::Rendering::FloatParameter);
-			//     sub_18003C530(&TypeInfo::UnityEngine::Rendering::MinFloatParameter);
-			//     sub_18003C530(&TypeInfo::UnityEngine::Rendering::Texture2DParameter);
-			//     byte_18D8ED9E5 = 1;
-			//   }
-			//   v3 = (BoolParameter *)sub_180004920(TypeInfo::UnityEngine::Rendering::BoolParameter);
-			//   v6 = v3;
-			//   if ( !v3 )
-			//     goto LABEL_14;
-			//   UnityEngine::Rendering::BoolParameter::BoolParameter(v3, 0, 0, 0LL);
-			//   this.fields.enable = v6;
-			//   sub_1800054D0((HGRenderPathScene *)&this.fields.enable, v7, v8, v9, overrideState, methoda);
-			//   v10 = (FloatParameter *)sub_180004920(TypeInfo::UnityEngine::Rendering::FloatParameter);
-			//   v11 = v10;
-			//   if ( !v10 )
-			//     goto LABEL_14;
-			//   UnityEngine::Rendering::FloatParameter::FloatParameter(v10, 0.0099999998, 0, 0LL);
-			//   this.fields.planeHeight = v11;
-			//   sub_1800054D0((HGRenderPathScene *)&this.fields.planeHeight, v12, v13, v14, overrideStatea, methodb);
-			//   v15 = (ClampedFloatParameter *)sub_180004920(TypeInfo::UnityEngine::Rendering::ClampedFloatParameter);
-			//   v16 = v15;
-			//   if ( !v15 )
-			//     goto LABEL_14;
-			//   UnityEngine::Rendering::ClampedFloatParameter::ClampedFloatParameter(v15, 0.25, 0.0099999998, 1.0, 0, 0LL);
-			//   this.fields.fadeness = v16;
-			//   sub_1800054D0((HGRenderPathScene *)&this.fields.fadeness, v17, v18, v19, overrideStatef, methodg);
-			//   v21 = *UnityEngine::Vector4::get_one(&v61, v20);
-			//   v22 = sub_180004920(TypeInfo::UnityEngine::Rendering::ColorParameter);
-			//   if ( !v22 )
-			//     goto LABEL_14;
-			//   if ( !byte_18D8F3660 )
-			//   {
-			//     sub_18003C530(&MethodInfo::UnityEngine::Rendering::VolumeParameter<UnityEngine::Color>::VolumeParameter);
-			//     byte_18D8F3660 = 1;
-			//   }
-			//   *(_WORD *)(v22 + 41) = 257;
-			//   *(Vector4 *)(v22 + 24) = v21;
-			//   *(_BYTE *)(v22 + 16) = 0;
-			//   this.fields.tintColor = (ColorParameter *)v22;
-			//   sub_1800054D0((HGRenderPathScene *)&this.fields.tintColor, v4, v23, v24, overrideStateb, methodc);
-			//   v25 = (BoolParameter *)sub_180004920(TypeInfo::UnityEngine::Rendering::BoolParameter);
-			//   v26 = v25;
-			//   if ( !v25 )
-			//     goto LABEL_14;
-			//   UnityEngine::Rendering::BoolParameter::BoolParameter(v25, 0, 0, 0LL);
-			//   this.fields.noiseEnable = v26;
-			//   sub_1800054D0((HGRenderPathScene *)&this.fields.noiseEnable, v27, v28, v29, overrideStatec, methodd);
-			//   v30 = (Texture2DParameter *)sub_180004920(TypeInfo::UnityEngine::Rendering::Texture2DParameter);
-			//   v31 = v30;
-			//   if ( !v30 )
-			//     goto LABEL_14;
-			//   UnityEngine::Rendering::Texture2DParameter::Texture2DParameter(v30, 0LL, 0, 0LL);
-			//   this.fields.noiseTexture = v31;
-			//   sub_1800054D0((HGRenderPathScene *)&this.fields.noiseTexture, v32, v33, v34, overrideStated, methode);
-			//   v35 = (FloatParameter *)sub_180004920(TypeInfo::UnityEngine::Rendering::MinFloatParameter);
-			//   v36 = v35;
-			//   if ( !v35
-			//     || (UnityEngine::Rendering::FloatParameter::FloatParameter(v35, 0.0, 0, 0LL),
-			//         LODWORD(v36[1].klass) = 0,
-			//         this.fields.noiseIntensity = (MinFloatParameter *)v36,
-			//         sub_1800054D0((HGRenderPathScene *)&this.fields.noiseIntensity, v37, v38, v39, overrideStatee, methodf),
-			//         v40 = (ClampedFloatParameter *)sub_180004920(TypeInfo::UnityEngine::Rendering::ClampedFloatParameter),
-			//         (v41 = v40) == 0LL) )
-			//   {
-			// LABEL_14:
-			//     sub_180B536AC(v5, v4);
-			//   }
-			//   UnityEngine::Rendering::ClampedFloatParameter::ClampedFloatParameter(v40, 1.0, 0.25, 1.0, 0, 0LL);
-			//   this.fields.rtScale = v41;
-			//   sub_1800054D0((HGRenderPathScene *)&this.fields.rtScale, v42, v43, v44, overrideStateg, methodh);
-			//   UnityEngine::Rendering::VolumeComponent::VolumeComponent((VolumeComponent *)this, 0LL);
-			// }
-			// 
-		}
-
-		public bool IsActive()
-		{
-			// // Boolean IsActive()
-			// bool HG::Rendering::Runtime::ScreenSpacePlanarReflectionVolume::IsActive(
-			//         ScreenSpacePlanarReflectionVolume *this,
-			//         MethodInfo *method)
-			// {
-			//   __int64 v3; // rcx
-			//   BoolParameter *enable; // rdx
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			// 
-			//   if ( !IFix::WrappersManagerImpl::IsPatched(2243, 0LL) )
-			//   {
-			//     enable = this.fields.enable;
-			//     if ( enable )
-			//       return sub_1800023D0(10LL, enable);
-			// LABEL_5:
-			//     sub_180B536AC(v3, enable);
-			//   }
-			//   Patch = IFix::WrappersManagerImpl::GetPatch(2243, 0LL);
-			//   if ( !Patch )
-			//     goto LABEL_5;
-			//   return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_8((ILFixDynamicMethodWrapper_27 *)Patch, (Object *)this, 0LL);
-			// }
-			// 
-			return default(bool);
-		}
-
-		public BoolParameter enable;
-
-		public FloatParameter planeHeight;
-
-		public ClampedFloatParameter fadeness;
-
-		public ColorParameter tintColor;
-
-		public BoolParameter noiseEnable;
-
+		// Fields
+		public BoolParameter enable; // 0x30
+		public FloatParameter planeHeight; // 0x38
+		public ClampedFloatParameter fadeness; // 0x40
+		public ColorParameter tintColor; // 0x48
+		public BoolParameter noiseEnable; // 0x50
 		[Tooltip("Specifies a noise texture for SSPR.")]
-		public Texture2DParameter noiseTexture;
-
-		public MinFloatParameter noiseIntensity;
-
-		public ClampedFloatParameter rtScale;
+		public Texture2DParameter noiseTexture; // 0x58
+		public MinFloatParameter noiseIntensity; // 0x60
+		public ClampedFloatParameter rtScale; // 0x68
+	
+		// Constructors
+		public ScreenSpacePlanarReflectionVolume() {} // 0x000000018402BAB0-0x000000018402BC80
+		// ScreenSpacePlanarReflectionVolume()
+		void HG::Rendering::Runtime::ScreenSpacePlanarReflectionVolume::ScreenSpacePlanarReflectionVolume(
+		        ScreenSpacePlanarReflectionVolume *this,
+		        MethodInfo *method)
+		{
+		  BoolParameter *v3; // rax
+		  HGRuntimeGrassQuery_Node *v4; // rdx
+		  __int64 v5; // rcx
+		  HGRuntimeGrassQuery_Node *v6; // r8
+		  Int32__Array **v7; // r9
+		  __int64 v8; // rax
+		  HGRuntimeGrassQuery_Node *v9; // r8
+		  Int32__Array **v10; // r9
+		  __int64 v11; // rax
+		  HGRuntimeGrassQuery_Node *v12; // r8
+		  Int32__Array **v13; // r9
+		  MethodInfo *v14; // rdx
+		  __int64 v15; // rax
+		  HGRuntimeGrassQuery_Node *v16; // r8
+		  Int32__Array **v17; // r9
+		  Vector4 v18; // xmm0
+		  BoolParameter *v19; // rax
+		  HGRuntimeGrassQuery_Node *v20; // r8
+		  Int32__Array **v21; // r9
+		  Texture2DParameter *v22; // rax
+		  Texture2DParameter *v23; // rdi
+		  HGRuntimeGrassQuery_Node *v24; // rdx
+		  HGRuntimeGrassQuery_Node *v25; // r8
+		  Int32__Array **v26; // r9
+		  __int64 v27; // rax
+		  HGRuntimeGrassQuery_Node *v28; // r8
+		  Int32__Array **v29; // r9
+		  __int64 v30; // rax
+		  HGRuntimeGrassQuery_Node *v31; // r8
+		  Int32__Array **v32; // r9
+		  Vector4 v33; // [rsp+20h] [rbp-18h] BYREF
+		
+		  v3 = (BoolParameter *)sub_1800368D0(TypeInfo::UnityEngine::Rendering::BoolParameter);
+		  if ( !v3 )
+		    goto LABEL_10;
+		  v3->fields._.m_Value = 0;
+		  v3->fields._._.overrideState = 0;
+		  this->fields.enable = v3;
+		  sub_18002D1B0((HGRuntimeGrassQuery_Node *)&this->fields.enable, v4, v6, v7, *(MethodInfo **)&v33.x);
+		  v8 = sub_1800368D0(TypeInfo::UnityEngine::Rendering::FloatParameter);
+		  if ( !v8 )
+		    goto LABEL_10;
+		  *(_DWORD *)(v8 + 24) = 1008981770;
+		  *(_BYTE *)(v8 + 16) = 0;
+		  this->fields.planeHeight = (FloatParameter *)v8;
+		  sub_18002D1B0((HGRuntimeGrassQuery_Node *)&this->fields.planeHeight, v4, v9, v10, *(MethodInfo **)&v33.x);
+		  v11 = sub_1800368D0(TypeInfo::UnityEngine::Rendering::ClampedFloatParameter);
+		  if ( !v11 )
+		    goto LABEL_10;
+		  *(_DWORD *)(v11 + 24) = 1048576000;
+		  *(_BYTE *)(v11 + 16) = 0;
+		  *(_DWORD *)(v11 + 32) = 1008981770;
+		  *(_DWORD *)(v11 + 36) = 1065353216;
+		  *(_DWORD *)(v11 + 40) = 1065353216;
+		  this->fields.fadeness = (ClampedFloatParameter *)v11;
+		  sub_18002D1B0((HGRuntimeGrassQuery_Node *)&this->fields.fadeness, v4, v12, v13, *(MethodInfo **)&v33.x);
+		  v33 = *UnityEngine::Vector4::get_one(&v33, v14);
+		  v15 = sub_1800368D0(TypeInfo::UnityEngine::Rendering::ColorParameter);
+		  if ( !v15 )
+		    goto LABEL_10;
+		  v18 = v33;
+		  *(_WORD *)(v15 + 41) = 257;
+		  *(_BYTE *)(v15 + 16) = 0;
+		  *(Vector4 *)(v15 + 24) = v18;
+		  this->fields.tintColor = (ColorParameter *)v15;
+		  sub_18002D1B0((HGRuntimeGrassQuery_Node *)&this->fields.tintColor, v4, v16, v17, *(MethodInfo **)&v33.x);
+		  v19 = (BoolParameter *)sub_1800368D0(TypeInfo::UnityEngine::Rendering::BoolParameter);
+		  if ( !v19 )
+		    goto LABEL_10;
+		  v19->fields._.m_Value = 0;
+		  v19->fields._._.overrideState = 0;
+		  this->fields.noiseEnable = v19;
+		  sub_18002D1B0((HGRuntimeGrassQuery_Node *)&this->fields.noiseEnable, v4, v20, v21, *(MethodInfo **)&v33.x);
+		  v22 = (Texture2DParameter *)sub_1800368D0(TypeInfo::UnityEngine::Rendering::Texture2DParameter);
+		  v23 = v22;
+		  if ( !v22 )
+		    goto LABEL_10;
+		  UnityEngine::Rendering::Texture2DParameter::Texture2DParameter(v22, 0LL, 0, 0LL);
+		  this->fields.noiseTexture = v23;
+		  sub_18002D1B0((HGRuntimeGrassQuery_Node *)&this->fields.noiseTexture, v24, v25, v26, *(MethodInfo **)&v33.x);
+		  v27 = sub_1800368D0(TypeInfo::UnityEngine::Rendering::MinFloatParameter);
+		  if ( !v27
+		    || (*(_DWORD *)(v27 + 24) = 0,
+		        *(_BYTE *)(v27 + 16) = 0,
+		        *(_DWORD *)(v27 + 32) = 0,
+		        this->fields.noiseIntensity = (MinFloatParameter *)v27,
+		        sub_18002D1B0((HGRuntimeGrassQuery_Node *)&this->fields.noiseIntensity, v4, v28, v29, *(MethodInfo **)&v33.x),
+		        (v30 = sub_1800368D0(TypeInfo::UnityEngine::Rendering::ClampedFloatParameter)) == 0) )
+		  {
+		LABEL_10:
+		    sub_1800D8260(v5, v4);
+		  }
+		  *(_DWORD *)(v30 + 24) = 1065353216;
+		  *(_BYTE *)(v30 + 16) = 0;
+		  *(_DWORD *)(v30 + 32) = 1048576000;
+		  *(_DWORD *)(v30 + 36) = 1065353216;
+		  *(_DWORD *)(v30 + 40) = 1065353216;
+		  this->fields.rtScale = (ClampedFloatParameter *)v30;
+		  sub_18002D1B0((HGRuntimeGrassQuery_Node *)&this->fields.rtScale, v4, v31, v32, *(MethodInfo **)&v33.x);
+		  UnityEngine::Rendering::VolumeComponent::VolumeComponent((VolumeComponent *)this, 0LL);
+		}
+		
+	
+		// Methods
+		public bool IsActive() => default; // 0x0000000189B6DCDC-0x0000000189B6DD38
+		// Boolean IsActive()
+		bool HG::Rendering::Runtime::ScreenSpacePlanarReflectionVolume::IsActive(
+		        ScreenSpacePlanarReflectionVolume *this,
+		        MethodInfo *method)
+		{
+		  __int64 v3; // rcx
+		  BoolParameter *enable; // rdx
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		
+		  if ( !IFix::WrappersManagerImpl::IsPatched(2704, 0LL) )
+		  {
+		    enable = this->fields.enable;
+		    if ( enable )
+		      return sub_180006280(10LL, enable);
+		LABEL_5:
+		    sub_1800D8260(v3, enable);
+		  }
+		  Patch = IFix::WrappersManagerImpl::GetPatch(2704, 0LL);
+		  if ( !Patch )
+		    goto LABEL_5;
+		  return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_14((ILFixDynamicMethodWrapper_20 *)Patch, (Object *)this, 0LL);
+		}
+		
 	}
 }

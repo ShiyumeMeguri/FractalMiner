@@ -1,182 +1,159 @@
-﻿using System;
+using System;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using UnityEngine.Rendering;
+
+// Image 4: HG.RenderPipelines.Runtime.dll - Assembly: HG.RenderPipelines.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null - Types 37354-38879
 
 namespace HG.Rendering.Runtime
 {
-	[VolumeComponentMenuForRenderPipeline("Post-processing/HGSharpen", new Type[] { typeof(HGRenderPipeline) })]
 	[Serializable]
-	public sealed class HGSharpen : VolumeComponent, IPostProcessComponent
+	[VolumeComponentMenuForRenderPipeline("Post-processing/HGSharpen", new System.Type[1] {typeof(HGRenderPipeline) })]
+	public sealed class HGSharpen : VolumeComponent, IPostProcessComponent // TypeDefIndex: 38048
 	{
-		public HGSharpen()
+		// Fields
+		public HGSharpenModeParameter sharpenMode; // 0x30
+		public ClampedFloatParameter sharpenIntensity; // 0x38
+		public FloatParameter sharpenRange; // 0x40
+		public ClampedFloatParameter sharpenThreshold; // 0x48
+	
+		// Constructors
+		public HGSharpen() {} // 0x0000000184667ED0-0x0000000184667FC0
+		// HGSharpen()
+		void HG::Rendering::Runtime::HGSharpen::HGSharpen(HGSharpen *this, MethodInfo *method)
 		{
-			// // HGSharpen()
-			// void HG::Rendering::Runtime::HGSharpen::HGSharpen(HGSharpen *this, MethodInfo *method)
-			// {
-			//   HGSharpenModeParameter *v3; // rax
-			//   __int64 v4; // rdx
-			//   __int64 v5; // rcx
-			//   HGSharpenModeParameter *v6; // rdi
-			//   HGRenderPathBase_HGRenderPathResources *v7; // rdx
-			//   PassConstructorID__Enum__Array *v8; // r8
-			//   HGCamera *v9; // r9
-			//   ClampedFloatParameter *v10; // rax
-			//   ClampedFloatParameter *v11; // rdi
-			//   HGRenderPathBase_HGRenderPathResources *v12; // rdx
-			//   PassConstructorID__Enum__Array *v13; // r8
-			//   HGCamera *v14; // r9
-			//   FloatParameter *v15; // rax
-			//   FloatParameter *v16; // rdi
-			//   HGRenderPathBase_HGRenderPathResources *v17; // rdx
-			//   PassConstructorID__Enum__Array *v18; // r8
-			//   HGCamera *v19; // r9
-			//   ClampedFloatParameter *v20; // rax
-			//   ClampedFloatParameter *v21; // rdi
-			//   HGRenderPathBase_HGRenderPathResources *v22; // rdx
-			//   PassConstructorID__Enum__Array *v23; // r8
-			//   HGCamera *v24; // r9
-			//   MethodInfo *overrideState; // [rsp+20h] [rbp-28h]
-			//   MethodInfo *overrideStateb; // [rsp+20h] [rbp-28h]
-			//   MethodInfo *overrideStatea; // [rsp+20h] [rbp-28h]
-			//   MethodInfo *overrideStatec; // [rsp+20h] [rbp-28h]
-			//   MethodInfo *methoda; // [rsp+28h] [rbp-20h]
-			//   MethodInfo *methodc; // [rsp+28h] [rbp-20h]
-			//   MethodInfo *methodb; // [rsp+28h] [rbp-20h]
-			//   MethodInfo *methodd; // [rsp+28h] [rbp-20h]
-			// 
-			//   if ( !byte_18D8ED9DE )
-			//   {
-			//     sub_18003C530(&TypeInfo::UnityEngine::Rendering::ClampedFloatParameter);
-			//     sub_18003C530(&TypeInfo::UnityEngine::Rendering::FloatParameter);
-			//     sub_18003C530(&TypeInfo::HG::Rendering::Runtime::HGSharpenModeParameter);
-			//     byte_18D8ED9DE = 1;
-			//   }
-			//   v3 = (HGSharpenModeParameter *)sub_180004920(TypeInfo::HG::Rendering::Runtime::HGSharpenModeParameter);
-			//   v6 = v3;
-			//   if ( !v3 )
-			//     goto LABEL_8;
-			//   HG::Rendering::Runtime::HGSharpenModeParameter::HGSharpenModeParameter(v3, HGSharpenMode__Enum_Off, 0, 0LL);
-			//   this.fields.sharpenMode = v6;
-			//   sub_1800054D0((HGRenderPathScene *)&this.fields.sharpenMode, v7, v8, v9, overrideState, methoda);
-			//   v10 = (ClampedFloatParameter *)sub_180004920(TypeInfo::UnityEngine::Rendering::ClampedFloatParameter);
-			//   v11 = v10;
-			//   if ( !v10 )
-			//     goto LABEL_8;
-			//   UnityEngine::Rendering::ClampedFloatParameter::ClampedFloatParameter(v10, 0.0, 0.0, 5.0, 0, 0LL);
-			//   this.fields.sharpenIntensity = v11;
-			//   sub_1800054D0((HGRenderPathScene *)&this.fields.sharpenIntensity, v12, v13, v14, overrideStateb, methodc);
-			//   v15 = (FloatParameter *)sub_180004920(TypeInfo::UnityEngine::Rendering::FloatParameter);
-			//   v16 = v15;
-			//   if ( !v15
-			//     || (UnityEngine::Rendering::FloatParameter::FloatParameter(v15, 1.0, 0, 0LL),
-			//         this.fields.sharpenRange = v16,
-			//         sub_1800054D0((HGRenderPathScene *)&this.fields.sharpenRange, v17, v18, v19, overrideStatea, methodb),
-			//         v20 = (ClampedFloatParameter *)sub_180004920(TypeInfo::UnityEngine::Rendering::ClampedFloatParameter),
-			//         (v21 = v20) == 0LL) )
-			//   {
-			// LABEL_8:
-			//     sub_180B536AC(v5, v4);
-			//   }
-			//   UnityEngine::Rendering::ClampedFloatParameter::ClampedFloatParameter(v20, 0.0, 0.0, 1.0, 0, 0LL);
-			//   this.fields.sharpenThreshold = v21;
-			//   sub_1800054D0((HGRenderPathScene *)&this.fields.sharpenThreshold, v22, v23, v24, overrideStatec, methodd);
-			//   UnityEngine::Rendering::VolumeComponent::VolumeComponent((VolumeComponent *)this, 0LL);
-			// }
-			// 
+		  HGSharpenModeParameter *v3; // rax
+		  HGRuntimeGrassQuery_Node *v4; // rdx
+		  __int64 v5; // rcx
+		  HGRuntimeGrassQuery_Node *v6; // r8
+		  Int32__Array **v7; // r9
+		  __int64 v8; // rax
+		  HGRuntimeGrassQuery_Node *v9; // r8
+		  Int32__Array **v10; // r9
+		  __int64 v11; // rax
+		  HGRuntimeGrassQuery_Node *v12; // r8
+		  Int32__Array **v13; // r9
+		  __int64 v14; // rax
+		  HGRuntimeGrassQuery_Node *v15; // r8
+		  Int32__Array **v16; // r9
+		  MethodInfo *v17; // [rsp+20h] [rbp-8h]
+		  MethodInfo *v18; // [rsp+20h] [rbp-8h]
+		  MethodInfo *v19; // [rsp+20h] [rbp-8h]
+		  MethodInfo *v20; // [rsp+20h] [rbp-8h]
+		
+		  v3 = (HGSharpenModeParameter *)sub_1800368D0(TypeInfo::HG::Rendering::Runtime::HGSharpenModeParameter);
+		  if ( !v3 )
+		    goto LABEL_6;
+		  v3->fields._.m_Value = 0;
+		  v3->fields._._.overrideState = 0;
+		  this->fields.sharpenMode = v3;
+		  sub_18002D1B0((HGRuntimeGrassQuery_Node *)&this->fields.sharpenMode, v4, v6, v7, v17);
+		  v8 = sub_1800368D0(TypeInfo::UnityEngine::Rendering::ClampedFloatParameter);
+		  if ( !v8 )
+		    goto LABEL_6;
+		  *(_DWORD *)(v8 + 24) = 0;
+		  *(_BYTE *)(v8 + 16) = 0;
+		  *(_DWORD *)(v8 + 32) = 0;
+		  *(_DWORD *)(v8 + 36) = 1084227584;
+		  *(_DWORD *)(v8 + 40) = 1065353216;
+		  this->fields.sharpenIntensity = (ClampedFloatParameter *)v8;
+		  sub_18002D1B0((HGRuntimeGrassQuery_Node *)&this->fields.sharpenIntensity, v4, v9, v10, v18);
+		  v11 = sub_1800368D0(TypeInfo::UnityEngine::Rendering::FloatParameter);
+		  if ( !v11
+		    || (*(_DWORD *)(v11 + 24) = 1065353216,
+		        *(_BYTE *)(v11 + 16) = 0,
+		        this->fields.sharpenRange = (FloatParameter *)v11,
+		        sub_18002D1B0((HGRuntimeGrassQuery_Node *)&this->fields.sharpenRange, v4, v12, v13, v19),
+		        (v14 = sub_1800368D0(TypeInfo::UnityEngine::Rendering::ClampedFloatParameter)) == 0) )
+		  {
+		LABEL_6:
+		    sub_1800D8260(v5, v4);
+		  }
+		  *(_DWORD *)(v14 + 24) = 0;
+		  *(_BYTE *)(v14 + 16) = 0;
+		  *(_DWORD *)(v14 + 32) = 0;
+		  *(_DWORD *)(v14 + 36) = 1065353216;
+		  *(_DWORD *)(v14 + 40) = 1065353216;
+		  this->fields.sharpenThreshold = (ClampedFloatParameter *)v14;
+		  sub_18002D1B0((HGRuntimeGrassQuery_Node *)&this->fields.sharpenThreshold, v4, v15, v16, v20);
+		  UnityEngine::Rendering::VolumeComponent::VolumeComponent((VolumeComponent *)this, 0LL);
 		}
-
-		public bool IsActive()
+		
+	
+		// Methods
+		public bool IsActive() => default; // 0x0000000183DF2F20-0x0000000183DF2F90
+		// Boolean IsActive()
+		bool HG::Rendering::Runtime::HGSharpen::IsActive(HGSharpen *this, MethodInfo *method)
 		{
-			// // Boolean IsActive()
-			// bool HG::Rendering::Runtime::HGSharpen::IsActive(HGSharpen *this, MethodInfo *method)
-			// {
-			//   struct ILFixDynamicMethodWrapper_2__Class *v3; // rcx
-			//   HGSharpenModeParameter *wrapperArray; // rdx
-			//   int v5; // eax
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			// 
-			//   if ( !byte_18D8EDC37 )
-			//   {
-			//     sub_18003C530(&TypeInfo::IFix::ILFixDynamicMethodWrapper);
-			//     byte_18D8EDC37 = 1;
-			//   }
-			//   v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper._1.cctor_finished_or_no_cctor )
-			//   {
-			//     il2cpp_runtime_class_init_0(TypeInfo::IFix::ILFixDynamicMethodWrapper, method);
-			//     v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   }
-			//   wrapperArray = (HGSharpenModeParameter *)v3.static_fields.wrapperArray;
-			//   if ( !wrapperArray )
-			//     goto LABEL_11;
-			//   if ( wrapperArray.fields._.m_Value <= 963 )
-			//     goto LABEL_7;
-			//   if ( !v3._1.cctor_finished_or_no_cctor )
-			//   {
-			//     il2cpp_runtime_class_init_0(v3, wrapperArray);
-			//     v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
-			//   }
-			//   v3 = (struct ILFixDynamicMethodWrapper_2__Class *)v3.static_fields.wrapperArray;
-			//   if ( !v3 )
-			// LABEL_11:
-			//     sub_180B536AC(v3, wrapperArray);
-			//   if ( LODWORD(v3._0.namespaze) <= 0x3C3 )
-			//     sub_180070270(v3, wrapperArray);
-			//   if ( *(_QWORD *)&v3[20]._1.initializationExceptionGCHandle )
-			//   {
-			//     Patch = IFix::WrappersManagerImpl::GetPatch(963, 0LL);
-			//     if ( Patch )
-			//     {
-			//       LOBYTE(v5) = IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_8(
-			//                      (ILFixDynamicMethodWrapper_27 *)Patch,
-			//                      (Object *)this,
-			//                      0LL);
-			//       return v5;
-			//     }
-			//     goto LABEL_11;
-			//   }
-			// LABEL_7:
-			//   wrapperArray = this.fields.sharpenMode;
-			//   if ( !wrapperArray )
-			//     goto LABEL_11;
-			//   v5 = sub_18003ED00(10LL);
-			//   if ( v5 )
-			//     LOBYTE(v5) = 1;
-			//   return v5;
-			// }
-			// 
-			return default(bool);
+		  struct ILFixDynamicMethodWrapper_2__Class *v3; // rcx
+		  HGSharpenModeParameter *wrapperArray; // rdx
+		  int v5; // eax
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		
+		  v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  if ( !TypeInfo::IFix::ILFixDynamicMethodWrapper->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(TypeInfo::IFix::ILFixDynamicMethodWrapper);
+		    v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  wrapperArray = (HGSharpenModeParameter *)v3->static_fields->wrapperArray;
+		  if ( !wrapperArray )
+		    goto LABEL_9;
+		  if ( wrapperArray->fields._.m_Value <= 1060 )
+		    goto LABEL_5;
+		  if ( !v3->_1.cctor_finished_or_no_cctor )
+		  {
+		    il2cpp_runtime_class_init_1(v3);
+		    v3 = TypeInfo::IFix::ILFixDynamicMethodWrapper;
+		  }
+		  v3 = (struct ILFixDynamicMethodWrapper_2__Class *)v3->static_fields->wrapperArray;
+		  if ( !v3 )
+		LABEL_9:
+		    sub_1800D8260(v3, wrapperArray);
+		  if ( LODWORD(v3->_0.namespaze) <= 0x424 )
+		    sub_1800D2AB0(v3, wrapperArray);
+		  if ( v3[22]._1.genericContainerHandle )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(1060, 0LL);
+		    if ( Patch )
+		    {
+		      LOBYTE(v5) = IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_14(
+		                     (ILFixDynamicMethodWrapper_20 *)Patch,
+		                     (Object *)this,
+		                     0LL);
+		      return v5;
+		    }
+		    goto LABEL_9;
+		  }
+		LABEL_5:
+		  wrapperArray = this->fields.sharpenMode;
+		  if ( !wrapperArray )
+		    goto LABEL_9;
+		  v5 = sub_180002F70(10LL, wrapperArray);
+		  if ( v5 )
+		    LOBYTE(v5) = 1;
+		  return v5;
 		}
-
-		public bool IsTileCompatible()
+		
+		public bool IsTileCompatible() => default; // 0x0000000189B6D800-0x0000000189B6D84C
+		// Boolean IsTileCompatible()
+		bool HG::Rendering::Runtime::HGSharpen::IsTileCompatible(HGSharpen *this, MethodInfo *method)
 		{
-			// // Boolean IsTileCompatible()
-			// bool HG::Rendering::Runtime::HGSharpen::IsTileCompatible(HGSharpen *this, MethodInfo *method)
-			// {
-			//   bool result; // al
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			//   __int64 v5; // rdx
-			//   __int64 v6; // rcx
-			// 
-			//   result = IFix::WrappersManagerImpl::IsPatched(2232, 0LL);
-			//   if ( result )
-			//   {
-			//     Patch = IFix::WrappersManagerImpl::GetPatch(2232, 0LL);
-			//     if ( !Patch )
-			//       sub_180B536AC(v6, v5);
-			//     return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_8((ILFixDynamicMethodWrapper_27 *)Patch, (Object *)this, 0LL);
-			//   }
-			//   return result;
-			// }
-			// 
-			return default(bool);
+		  bool result; // al
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		  __int64 v5; // rdx
+		  __int64 v6; // rcx
+		
+		  result = IFix::WrappersManagerImpl::IsPatched(2692, 0LL);
+		  if ( result )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(2692, 0LL);
+		    if ( !Patch )
+		      sub_1800D8260(v6, v5);
+		    return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_14((ILFixDynamicMethodWrapper_20 *)Patch, (Object *)this, 0LL);
+		  }
+		  return result;
 		}
-
-		public HGSharpenModeParameter sharpenMode;
-
-		public ClampedFloatParameter sharpenIntensity;
-
-		public FloatParameter sharpenRange;
-
-		public ClampedFloatParameter sharpenThreshold;
+		
 	}
 }

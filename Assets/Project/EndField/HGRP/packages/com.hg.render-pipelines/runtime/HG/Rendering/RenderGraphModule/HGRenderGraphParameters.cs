@@ -1,24 +1,21 @@
-﻿using System;
-using System.Runtime.InteropServices;
+using System;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using UnityEngine.Rendering;
+
+// Image 4: HG.RenderPipelines.Runtime.dll - Assembly: HG.RenderPipelines.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null - Types 37354-38879
 
 namespace HG.Rendering.RenderGraphModule
 {
-	[StructLayout(LayoutKind.Sequential, Pack = 1)]
-	public struct HGRenderGraphParameters
+	public struct HGRenderGraphParameters // TypeDefIndex: 37415
 	{
-		public string executionName;
-
-		public int currentFrameIndex;
-
-		public bool rendererListCulling;
-
-		public ScriptableRenderContext scriptableRenderContext;
-
-		public CommandBuffer commandBuffer;
-
-		public int executorID;
-
-		public int executorFrameIndex;
+		// Fields
+		public string executionName; // 0x00
+		public int currentFrameIndex; // 0x08
+		public bool rendererListCulling; // 0x0C
+		public ScriptableRenderContext scriptableRenderContext; // 0x10
+		public CommandBuffer commandBuffer; // 0x18
+		public int executorID; // 0x20
+		public int executorFrameIndex; // 0x24
 	}
 }

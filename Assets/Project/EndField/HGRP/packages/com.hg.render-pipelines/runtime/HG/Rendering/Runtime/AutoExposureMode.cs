@@ -1,10 +1,14 @@
-﻿using System;
+using System;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
+
+// Image 4: HG.RenderPipelines.Runtime.dll - Assembly: HG.RenderPipelines.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null - Types 37354-38879
 
 namespace HG.Rendering.Runtime
 {
-	public enum AutoExposureMode
+	public enum AutoExposureMode // TypeDefIndex: 38013
 	{
-		Auto,
-		Manual
+		Auto = 0,
+		Manual = 1
 	}
 }

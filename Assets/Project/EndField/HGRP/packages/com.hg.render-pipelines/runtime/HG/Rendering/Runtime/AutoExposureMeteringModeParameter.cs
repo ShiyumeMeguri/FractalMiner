@@ -1,34 +1,28 @@
-﻿using System;
+using System;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using UnityEngine.Rendering;
+
+// Image 4: HG.RenderPipelines.Runtime.dll - Assembly: HG.RenderPipelines.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null - Types 37354-38879
 
 namespace HG.Rendering.Runtime
 {
 	[Serializable]
-	public sealed class AutoExposureMeteringModeParameter : VolumeParameter<AutoExposureMeteringMode>
+	public sealed class AutoExposureMeteringModeParameter : VolumeParameter<HG.Rendering.Runtime.AutoExposureMeteringMode> // TypeDefIndex: 38017
 	{
-		public AutoExposureMeteringModeParameter(AutoExposureMeteringMode value, [MetadataOffset(Offset = "0x01F91414")] bool overrideState = false)
+		// Constructors
+		public AutoExposureMeteringModeParameter() {} // Dummy constructor
+		public AutoExposureMeteringModeParameter(AutoExposureMeteringMode value, bool overrideState = false /* Metadata: 0x0230382C */) {} // 0x0000000184DA09B0-0x0000000184DA09C0
+		// VolumeParameter`1[UnityEngine.LayerMask](LayerMask, Boolean)
+		void UnityEngine::Rendering::VolumeParameter<UnityEngine::LayerMask>::VolumeParameter(
+		        VolumeParameter_1_UnityEngine_LayerMask_ *this,
+		        LayerMask value,
+		        bool overrideState,
+		        MethodInfo *method)
 		{
-			// // AutoExposureMeteringModeParameter(AutoExposureMeteringMode, Boolean)
-			// void HG::Rendering::Runtime::AutoExposureMeteringModeParameter::AutoExposureMeteringModeParameter(
-			//         AutoExposureMeteringModeParameter *this,
-			//         AutoExposureMeteringMode__Enum value,
-			//         bool overrideState,
-			//         MethodInfo *method)
-			// {
-			//   if ( byte_18D8ED9CB )
-			//   {
-			//     this.fields._.m_Value = value;
-			//     this.fields._._.overrideState = overrideState;
-			//   }
-			//   else
-			//   {
-			//     sub_18003C530(&MethodInfo::UnityEngine::Rendering::VolumeParameter<HG::Rendering::Runtime::AutoExposureMeteringMode>::VolumeParameter);
-			//     this.fields._.m_Value = value;
-			//     this.fields._._.overrideState = overrideState;
-			//     byte_18D8ED9CB = 1;
-			//   }
-			// }
-			// 
+		  this->fields.m_Value = value;
+		  this->fields._.overrideState = overrideState;
 		}
+		
 	}
 }

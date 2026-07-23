@@ -1,158 +1,103 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using IniParser;
+
+// Image 4: HG.RenderPipelines.Runtime.dll - Assembly: HG.RenderPipelines.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null - Types 37354-38879
 
 namespace IniParser.Model
 {
-	public class Property : IDeepCloneable<Property>
+	public class Property : IDeepCloneable<Property> // TypeDefIndex: 37378
 	{
-		// (get) Token: 0x06000070 RID: 112 RVA: 0x000025D2 File Offset: 0x000007D2
-		// (set) Token: 0x06000071 RID: 113 RVA: 0x000025D0 File Offset: 0x000007D0
-		public List<string> Comments
+		// Fields
+		private List<string> _comments; // 0x20
+	
+		// Properties
+		public List<string> Comments { get => default; set {} } // 0x0000000189B32160-0x0000000189B321BC 0x00000001835A9FB0-0x00000001835AA040
+		public string Value { get; set; } // 0x0000000182B2ECC0-0x0000000182B2ECD0 0x00000001853908C0-0x00000001853908D0
+		// IValueSource get_source()
+		IValueSource *Beyond::ValueAdapter<Beyond::GameSetting::ScreenResolution>::get_source(
+		        ValueAdapter_1_GameSetting_ScreenResolution_ *this,
+		        MethodInfo *method)
 		{
-			get
-			{
-				return null;
-			}
-			set
-			{
-			}
+		  return this->fields.m_source;
 		}
+		
 
-		// (get) Token: 0x06000072 RID: 114 RVA: 0x000025D2 File Offset: 0x000007D2
-		// (set) Token: 0x06000073 RID: 115 RVA: 0x000025D0 File Offset: 0x000007D0
-		public string Value
+		// SortedList`2[TKey,TValue]+ValueList[System.Object,System.Object](SortedList`2[System.Object,System.Object])
+		void System::Collections::Generic::SortedList_2_TKey_TValue_::ValueList<System::Object,System::Object>::ValueList(
+		        SortedList_2_TKey_TValue_ValueList_System_Object_System_Object_ *this,
+		        SortedList_2_System_Object_System_Object_ *dictionary,
+		        MethodInfo *method)
 		{
-			[CompilerGenerated]
-			get
-			{
-				// // Object get_Current()
-				// Object *Rewired::Utils::Classes::Data::RingBuffer_1_T_::VFEweixJrFjiYwjUzBFjtcEMiCZW<System::Object>::get_Current(
-				//         RingBuffer_1_T_VFEweixJrFjiYwjUzBFjtcEMiCZW_System_Object_ *this,
-				//         MethodInfo *method)
-				// {
-				//   return this.current;
-				// }
-				// 
-				return null;
-			}
-			[CompilerGenerated]
-			set
-			{
-				// // SortedList`2[TKey,TValue]+ValueList[System.Object,System.Object](SortedList`2[System.Object,System.Object])
-				// void System::Collections::Generic::SortedList_2_TKey_TValue_::ValueList<System::Object,System::Object>::ValueList(
-				//         SortedList_2_TKey_TValue_ValueList_System_Object_System_Object_ *this,
-				//         SortedList_2_System_Object_System_Object_ *dictionary,
-				//         MethodInfo *method)
-				// {
-				//   Transform **v3; // r9
-				//   MeshRenderer **v4; // [rsp+28h] [rbp+28h]
-				//   Vector3 *v5; // [rsp+30h] [rbp+30h]
-				//   Quaternion *v6; // [rsp+38h] [rbp+38h]
-				//   Vector3 *v7; // [rsp+40h] [rbp+40h]
-				//   Object *v8; // [rsp+48h] [rbp+48h]
-				//   Object *v9; // [rsp+50h] [rbp+50h]
-				//   Object *v10; // [rsp+58h] [rbp+58h]
-				//   Object *v11; // [rsp+60h] [rbp+60h]
-				//   MethodInfo *v12; // [rsp+68h] [rbp+68h]
-				// 
-				//   this.fields._dict = dictionary;
-				//   sub_1800054D0(
-				//     (ILFixDynamicMethodWrapper_2 *)&this.fields,
-				//     (UberPostPassUtils_ColorGradingData **)dictionary,
-				//     (VolumetricPipelineRT **)method,
-				//     v3,
-				//     v4,
-				//     v5,
-				//     v6,
-				//     v7,
-				//     v8,
-				//     v9,
-				//     v10,
-				//     v11,
-				//     v12);
-				// }
-				// 
-			}
+		  VolumetricPipelineRT **v3; // r9
+		  VolumetricPipelineRT **v4; // [rsp+28h] [rbp+28h]
+		  MethodInfo *v5; // [rsp+30h] [rbp+30h]
+		
+		  this->fields._dict = dictionary;
+		  sub_18002D1B0(
+		    (ILFixDynamicMethodWrapper_2 *)&this->fields,
+		    (UberPostPassUtils_ColorGradingData **)dictionary,
+		    (VolumetricPipelineRT **)method,
+		    v3,
+		    v4,
+		    v5);
 		}
-
-		// (get) Token: 0x06000074 RID: 116 RVA: 0x000025D2 File Offset: 0x000007D2
-		// (set) Token: 0x06000075 RID: 117 RVA: 0x000025D0 File Offset: 0x000007D0
-		public string Key
+		
+		public string Key { get; set; } // 0x000000018385B100-0x000000018385B110 0x0000000185392C40-0x0000000185392C50
+		// Object System.Collections.IEnumerator.get_Current()
+		Object *Rewired::Platforms::Custom::HardwareJoystickMapCustomPlatformMap_1_TMatchingCriteria_::vFJqwhcHvHdpsRAHqwODiJDbwkcr<System::Object>::System_Collections_IEnumerator_get_Current(
+		        HardwareJoystickMapCustomPlatformMap_1_TMatchingCriteria_vFJqwhcHvHdpsRAHqwODiJDbwkcr_System_Object_ *this,
+		        MethodInfo *method)
 		{
-			[CompilerGenerated]
-			get
-			{
-				// // Object System.Collections.IEnumerator.get_Current()
-				// Object *Rewired::Platforms::Custom::HardwareJoystickMapCustomPlatformMap_1_TMatchingCriteria_::vFJqwhcHvHdpsRAHqwODiJDbwkcr<System::Object>::System_Collections_IEnumerator_get_Current(
-				//         HardwareJoystickMapCustomPlatformMap_1_TMatchingCriteria_vFJqwhcHvHdpsRAHqwODiJDbwkcr_System_Object_ *this,
-				//         MethodInfo *method)
-				// {
-				//   return (Object *)this.fields.YcoKziTgrGqKCwJTNRuXadHqwkUP;
-				// }
-				// 
-				return null;
-			}
-			[CompilerGenerated]
-			set
-			{
-				// // Void set_getValueDelegate(Func`1[Boolean])
-				// void Rewired::Utils::Classes::Utility::ValueWatcher<bool>::set_getValueDelegate(
-				//         ValueWatcher_1_System_Boolean_ *this,
-				//         Func_1_Boolean_ *value,
-				//         MethodInfo *method)
-				// {
-				//   Object__Array *v3; // r9
-				//   MethodInfo *v4; // [rsp+28h] [rbp+28h]
-				//   MethodInfo *v5; // [rsp+30h] [rbp+30h]
-				// 
-				//   this.fields.MHRAQZbVaKflzQthDWnBRvhnUSmRA = value;
-				//   sub_1800054D0(
-				//     (BSP *)&this.fields.MHRAQZbVaKflzQthDWnBRvhnUSmRA,
-				//     (IEnumerable_1_HG_Rendering_Runtime_CSG_CSGPolygon_ *)value,
-				//     (Bounds *)method,
-				//     v3,
-				//     v4,
-				//     v5);
-				// }
-				// 
-			}
+		  return (Object *)this->fields.YcoKziTgrGqKCwJTNRuXadHqwkUP;
 		}
+		
 
-		public Property(string keyName, [MetadataOffset(Offset = "0x01F909CA")] string value = "")
+		// Void set_getValueDelegate(Func`1[Boolean])
+		void Rewired::Utils::Classes::Utility::ValueWatcher<bool>::set_getValueDelegate(
+		        ValueWatcher_1_System_Boolean_ *this,
+		        Func_1_Boolean_ *value,
+		        MethodInfo *method)
 		{
+		  VolumetricPipelineRT **v3; // r9
+		  VolumetricPipelineRT **v4; // [rsp+28h] [rbp+28h]
+		  MethodInfo *v5; // [rsp+30h] [rbp+30h]
+		
+		  this->fields.MHRAQZbVaKflzQthDWnBRvhnUSmRA = value;
+		  sub_18002D1B0(
+		    (ILFixDynamicMethodWrapper_2 *)&this->fields.MHRAQZbVaKflzQthDWnBRvhnUSmRA,
+		    (UberPostPassUtils_ColorGradingData **)value,
+		    (VolumetricPipelineRT **)method,
+		    v3,
+		    v4,
+		    v5);
 		}
-
-		public Property(Property ori)
+		
+	
+		// Constructors
+		public Property() {} // Dummy constructor
+		public Property(string keyName, string value = "" /* Metadata: 0x02302D3D */) {} // 0x00000001835A9F20-0x00000001835A9F60
+		public Property(Property ori) {} // 0x0000000189B32108-0x0000000189B32160
+	
+		// Methods
+		public Property DeepClone() => default; // 0x0000000189B320C4-0x0000000189B32108
+		// Property DeepClone()
+		Property *IniParser::Model::Property::DeepClone(Property *this, MethodInfo *method)
 		{
+		  Property *v3; // rax
+		  __int64 v4; // rdx
+		  __int64 v5; // rcx
+		  Property *v6; // rbx
+		
+		  v3 = (Property *)sub_18002C620(TypeInfo::IniParser::Model::Property);
+		  v6 = v3;
+		  if ( !v3 )
+		    sub_1800D8260(v5, v4);
+		  IniParser::Model::Property::Property(v3, this, 0LL);
+		  return v6;
 		}
-
-		public Property DeepClone()
-		{
-			// // Property DeepClone()
-			// Property *IniParser::Model::Property::DeepClone(Property *this, MethodInfo *method)
-			// {
-			//   Property *v3; // rax
-			//   __int64 v4; // rdx
-			//   __int64 v5; // rcx
-			//   Property *v6; // rbx
-			// 
-			//   if ( !byte_18D9192DB )
-			//   {
-			//     sub_18003C530(&TypeInfo::IniParser::Model::Property);
-			//     byte_18D9192DB = 1;
-			//   }
-			//   v3 = (Property *)sub_180004920(TypeInfo::IniParser::Model::Property);
-			//   v6 = v3;
-			//   if ( !v3 )
-			//     sub_180B536AC(v5, v4);
-			//   IniParser::Model::Property::Property(v3, this, 0LL);
-			//   return v6;
-			// }
-			// 
-			return null;
-		}
-
-		private List<string> _comments;
+		
 	}
 }

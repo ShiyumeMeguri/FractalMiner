@@ -1,21 +1,14 @@
-﻿using System;
+using System;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
+
+// Image 4: HG.RenderPipelines.Runtime.dll - Assembly: HG.RenderPipelines.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null - Types 37354-38879
 
 namespace HG.Rendering.Runtime
 {
-	[StructLayout(LayoutKind.Sequential, Pack = 1, Size = 96)]
-	internal struct ClothSkeletonData
+	internal struct ClothSkeletonData // TypeDefIndex: 37563
 	{
-		[FixedBuffer(typeof(float), 24)]
-		public ClothSkeletonData.<skeletonData>e__FixedBuffer skeletonData;
-
-		[CompilerGenerated]
-		[UnsafeValueType]
-		[StructLayout(LayoutKind.Sequential, Pack = 1, Size = 96)]
-		public struct <skeletonData>e__FixedBuffer
-		{
-			public float FixedElementField;
-		}
+		// Fields
+		public unsafe fixed /* 0x00000000-0x00000000 */ float skeletonData[0]; // 0x00
 	}
 }

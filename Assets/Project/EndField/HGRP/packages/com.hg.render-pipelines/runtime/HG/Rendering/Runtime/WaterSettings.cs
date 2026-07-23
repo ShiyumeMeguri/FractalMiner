@@ -1,256 +1,249 @@
-﻿using System;
+using System;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using UnityEngine;
+
+// Image 4: HG.RenderPipelines.Runtime.dll - Assembly: HG.RenderPipelines.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null - Types 37354-38879
 
 namespace HG.Rendering.Runtime
 {
-	public static class WaterSettings
+	public static class WaterSettings // TypeDefIndex: 38483
 	{
-		public static Mesh CreateQuad(int numVertsX, int numVertsY)
+		// Fields
+		public const int SCREEN_SPACE_MESH_VERTEX_NUM = 16; // Metadata: 0x02303CEB
+		public const int MAX_SCREEN_SPACE_MESH_NUM = 16; // Metadata: 0x02303CEC
+		private static Vector4 prepassTextureSize_256x256; // 0x00
+		private static Vector4 prepassTextureSize_512x512; // 0x10
+		private static Vector4 prepassTextureSize_1024x1024; // 0x20
+		public static Vector4 prepassTextureSize; // 0x30
+	
+		// Constructors
+		static WaterSettings() {} // 0x0000000184D4F5F0-0x0000000184D4F660
+		// WaterSettings()
+		void HG::Rendering::Runtime::WaterSettings::cctor(MethodInfo *method)
 		{
-			// // Mesh CreateQuad(Int32, Int32)
-			// Mesh *HG::Rendering::Runtime::WaterSettings::CreateQuad(int32_t numVertsX, int32_t numVertsY, MethodInfo *method)
-			// {
-			//   __int64 v5; // r8
-			//   __int64 v6; // r9
-			//   Vector3__Array *v7; // rsi
-			//   __int64 v8; // r9
-			//   Vector2__Array *v9; // rdi
-			//   __int64 v10; // r8
-			//   __int64 v11; // r9
-			//   __int64 v12; // rax
-			//   __int64 v13; // rdx
-			//   int v14; // r11d
-			//   __int64 v15; // rcx
-			//   Int32__Array *v16; // rbx
-			//   int v17; // r10d
-			//   int v18; // r9d
-			//   int v19; // r8d
-			//   __m128 v20; // xmm2
-			//   __m128 v21; // xmm1
-			//   __int64 v22; // rax
-			//   int32_t v23; // r9d
-			//   int32_t v24; // r10d
-			//   int v25; // r14d
-			//   int v26; // r11d
-			//   int32_t v27; // r8d
-			//   int32_t v28; // r9d
-			//   int32_t v29; // r9d
-			//   __int64 v30; // rax
-			//   unsigned int v31; // r9d
-			//   int v32; // eax
-			//   int v33; // ecx
-			//   __int64 v34; // rax
-			//   int32_t v35; // r9d
-			//   int32_t v36; // r9d
-			//   __int64 v37; // rax
-			//   Mesh *v38; // rax
-			//   Mesh *v39; // rbp
-			//   ILFixDynamicMethodWrapper_2 *Patch; // rax
-			// 
-			//   if ( !byte_18D8EDAD7 )
-			//   {
-			//     sub_18003C530(&TypeInfo::System::Int32);
-			//     sub_18003C530(&TypeInfo::UnityEngine::Mesh);
-			//     sub_18003C530(&TypeInfo::UnityEngine::Vector2);
-			//     sub_18003C530(&TypeInfo::UnityEngine::Vector3);
-			//     sub_18003C530(&off_18C8FC8E0);
-			//     byte_18D8EDAD7 = 1;
-			//   }
-			//   if ( IFix::WrappersManagerImpl::IsPatched(961, 0LL) )
-			//   {
-			//     Patch = IFix::WrappersManagerImpl::GetPatch(961, 0LL);
-			//     if ( !Patch )
-			//       goto LABEL_30;
-			//     return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_354(Patch, numVertsX, numVertsY, 0LL);
-			//   }
-			//   else
-			//   {
-			//     v7 = (Vector3__Array *)il2cpp_array_new_specific_0(
-			//                              TypeInfo::UnityEngine::Vector3,
-			//                              (unsigned int)((numVertsY + 1) * (numVertsX + 1)),
-			//                              v5,
-			//                              v6);
-			//     v9 = (Vector2__Array *)il2cpp_array_new_specific_0(
-			//                              TypeInfo::UnityEngine::Vector2,
-			//                              (unsigned int)((numVertsX + 1) * (numVertsY + 1)),
-			//                              (unsigned int)(numVertsX + 1),
-			//                              v8);
-			//     v12 = il2cpp_array_new_specific_0(TypeInfo::System::Int32, (unsigned int)(6 * numVertsY * numVertsX), v10, v11);
-			//     v14 = 0;
-			//     v15 = (unsigned int)(numVertsX + 1);
-			//     v16 = (Int32__Array *)v12;
-			//     if ( (int)v15 > 0 )
-			//     {
-			//       v17 = numVertsY + 1;
-			//       v18 = numVertsX + 1;
-			//       while ( 1 )
-			//       {
-			//         v19 = 0;
-			//         if ( v17 > 0 )
-			//           break;
-			// LABEL_13:
-			//         if ( ++v14 >= v18 )
-			//           goto LABEL_14;
-			//       }
-			//       v13 = (unsigned int)v14;
-			//       v20 = (__m128)COERCE_UNSIGNED_INT((float)v14);
-			//       v20.m128_f32[0] = v20.m128_f32[0] / (float)numVertsX;
-			//       while ( 1 )
-			//       {
-			//         v21 = (__m128)COERCE_UNSIGNED_INT((float)v19);
-			//         v21.m128_f32[0] = v21.m128_f32[0] / (float)numVertsY;
-			//         if ( !v9 )
-			//           break;
-			//         if ( (unsigned int)v13 >= v9.max_length.size )
-			//           goto LABEL_42;
-			//         LODWORD(v9.vector[(int)v13].x) = v20.m128_i32[0];
-			//         LODWORD(v9.vector[(int)v13].y) = v21.m128_i32[0];
-			//         if ( !v7 )
-			//           break;
-			//         if ( (unsigned int)v13 >= v7.max_length.size )
-			// LABEL_42:
-			//           sub_180070270(v15, v13);
-			//         v22 = (int)v13;
-			//         ++v19;
-			//         v13 = (unsigned int)(v18 + v13);
-			//         v15 = 3 * v22;
-			//         *(_QWORD *)(&v7.vector[0].x + v15) = _mm_unpacklo_ps(v20, v21).m128_u64[0];
-			//         *((_DWORD *)&v7.vector[0].z + v15) = 0;
-			//         if ( v19 >= v17 )
-			//           goto LABEL_13;
-			//       }
-			// LABEL_30:
-			//       sub_180B536AC(v15, v13);
-			//     }
-			// LABEL_14:
-			//     v23 = 0;
-			//     v24 = 0;
-			//     if ( numVertsX > 0 )
-			//     {
-			//       v25 = -1;
-			//       v26 = numVertsX + 1;
-			//       do
-			//       {
-			//         v27 = 0;
-			//         if ( numVertsY > 0 )
-			//         {
-			//           v13 = (unsigned int)(v24 + 1);
-			//           do
-			//           {
-			//             if ( (((_BYTE)v27 + (_BYTE)v24) & 1) != 0 )
-			//             {
-			//               if ( !v16 )
-			//                 goto LABEL_30;
-			//               if ( (unsigned int)v23 >= v16.max_length.size )
-			//                 goto LABEL_42;
-			//               v16.vector[v23] = v13 - 1;
-			//               v15 = v23 + 1LL;
-			//               if ( (unsigned int)v15 >= v16.max_length.size )
-			//                 goto LABEL_42;
-			//               v28 = v23 + 2;
-			//               v16.vector[v15] = v13 + numVertsX;
-			//               if ( (unsigned int)v28 >= v16.max_length.size )
-			//                 goto LABEL_42;
-			//               v15 = v28 + 1LL;
-			//               v16.vector[v28] = v13;
-			//               if ( (unsigned int)v15 >= v16.max_length.size )
-			//                 goto LABEL_42;
-			//               v29 = v28 + 2;
-			//               v16.vector[v15] = v13 + numVertsX;
-			//               if ( (unsigned int)v29 >= v16.max_length.size )
-			//                 goto LABEL_42;
-			//               v30 = v29;
-			//               v15 = (unsigned int)(v13 + v26);
-			//               v31 = v29 + 1;
-			//               v16.vector[v30] = v15;
-			//               if ( v31 >= v16.max_length.size )
-			//                 goto LABEL_42;
-			//               v32 = v25;
-			//             }
-			//             else
-			//             {
-			//               if ( !v16 )
-			//                 goto LABEL_30;
-			//               if ( (unsigned int)v23 >= v16.max_length.size )
-			//                 goto LABEL_42;
-			//               v16.vector[v23] = v13 - 1;
-			//               v15 = v23 + 1LL;
-			//               if ( (unsigned int)v15 >= v16.max_length.size )
-			//                 goto LABEL_42;
-			//               v35 = v23 + 2;
-			//               v16.vector[v15] = v13 + v26;
-			//               if ( (unsigned int)v35 >= v16.max_length.size )
-			//                 goto LABEL_42;
-			//               v15 = v35 + 1LL;
-			//               v16.vector[v35] = v13;
-			//               if ( (unsigned int)v15 >= v16.max_length.size )
-			//                 goto LABEL_42;
-			//               v36 = v35 + 2;
-			//               v16.vector[v15] = v13 - 1;
-			//               if ( (unsigned int)v36 >= v16.max_length.size )
-			//                 goto LABEL_42;
-			//               v37 = v36;
-			//               v15 = (unsigned int)(v13 + numVertsX);
-			//               v31 = v36 + 1;
-			//               v16.vector[v37] = v15;
-			//               if ( v31 >= v16.max_length.size )
-			//                 goto LABEL_42;
-			//               v32 = v25 + v26;
-			//             }
-			//             ++v27;
-			//             v33 = v13 + v32 + 1;
-			//             v34 = (int)v31;
-			//             v15 = (unsigned int)(v24 + v33);
-			//             v13 = (unsigned int)(v26 + v13);
-			//             v23 = v31 + 1;
-			//             v16.vector[v34] = v15;
-			//           }
-			//           while ( v27 < numVertsY );
-			//         }
-			//         ++v24;
-			//         --v25;
-			//       }
-			//       while ( v24 < numVertsX );
-			//     }
-			//     if ( !v7 )
-			//       goto LABEL_30;
-			//     if ( v7.max_length.size > 65000 )
-			//     {
-			//       return 0LL;
-			//     }
-			//     else
-			//     {
-			//       v38 = (Mesh *)sub_180004920(TypeInfo::UnityEngine::Mesh);
-			//       v39 = v38;
-			//       if ( !v38 )
-			//         goto LABEL_30;
-			//       UnityEngine::Mesh::Mesh(v38, 0LL);
-			//       UnityEngine::Mesh::set_vertices(v39, v7, 0LL);
-			//       UnityEngine::Mesh::set_uv(v39, v9, 0LL);
-			//       UnityEngine::Mesh::set_triangles(v39, v16, 0LL);
-			//       UnityEngine::Object::set_name((Object_1 *)v39, (String *)"Water Mesh", 0LL);
-			//       return v39;
-			//     }
-			//   }
-			// }
-			// 
-			return null;
+		  Vector4 si128; // xmm1
+		  Vector4 v2; // xmm0
+		
+		  si128 = (Vector4)_mm_load_si128((const __m128i *)&xmmword_18DA45A90);
+		  TypeInfo::HG::Rendering::Runtime::WaterSettings->static_fields->prepassTextureSize_256x256 = (Vector4)_mm_load_si128((const __m128i *)&xmmword_18DA45AA0);
+		  v2 = (Vector4)_mm_load_si128((const __m128i *)&xmmword_18DA45A80);
+		  TypeInfo::HG::Rendering::Runtime::WaterSettings->static_fields->prepassTextureSize_512x512 = si128;
+		  TypeInfo::HG::Rendering::Runtime::WaterSettings->static_fields->prepassTextureSize_1024x1024 = v2;
+		  TypeInfo::HG::Rendering::Runtime::WaterSettings->static_fields->prepassTextureSize = TypeInfo::HG::Rendering::Runtime::WaterSettings->static_fields->prepassTextureSize_512x512;
 		}
-
-		public const int SCREEN_SPACE_MESH_VERTEX_NUM = 16;
-
-		public const int MAX_SCREEN_SPACE_MESH_NUM = 16;
-
-		[StaticFieldOffset(ThreadStatic = false, Offset = "0x00")]
-		private static Vector4 prepassTextureSize_256x256;
-
-		[StaticFieldOffset(ThreadStatic = false, Offset = "0x10")]
-		private static Vector4 prepassTextureSize_512x512;
-
-		[StaticFieldOffset(ThreadStatic = false, Offset = "0x20")]
-		private static Vector4 prepassTextureSize_1024x1024;
-
-		[StaticFieldOffset(ThreadStatic = false, Offset = "0x30")]
-		public static Vector4 prepassTextureSize;
+		
+	
+		// Methods
+		public static Mesh CreateQuad(int numVertsX, int numVertsY) => default; // 0x0000000183D9DD50-0x0000000183D9E0C0
+		// Mesh CreateQuad(Int32, Int32)
+		Mesh *HG::Rendering::Runtime::WaterSettings::CreateQuad(int32_t numVertsX, int32_t numVertsY, MethodInfo *method)
+		{
+		  Vector3__Array *v5; // rsi
+		  Vector2__Array *v6; // rdi
+		  __int64 v7; // rax
+		  __int64 v8; // rdx
+		  int v9; // r11d
+		  __int64 v10; // rcx
+		  Int32__Array *v11; // rbx
+		  int v12; // r10d
+		  int v13; // r9d
+		  int v14; // r8d
+		  __m128 v15; // xmm2
+		  __m128 v16; // xmm1
+		  __int64 v17; // rax
+		  int32_t v18; // r9d
+		  int32_t v19; // r10d
+		  int v20; // r14d
+		  int v21; // r11d
+		  int32_t v22; // r8d
+		  int32_t v23; // r9d
+		  int32_t v24; // r9d
+		  __int64 v25; // rax
+		  unsigned int v26; // r9d
+		  int v27; // eax
+		  int v28; // ecx
+		  __int64 v29; // rax
+		  int32_t v30; // r9d
+		  int32_t v31; // r9d
+		  __int64 v32; // rax
+		  Mesh *v33; // rax
+		  Mesh *v34; // rbp
+		  ILFixDynamicMethodWrapper_2 *Patch; // rax
+		
+		  if ( IFix::WrappersManagerImpl::IsPatched(1055, 0LL) )
+		  {
+		    Patch = IFix::WrappersManagerImpl::GetPatch(1055, 0LL);
+		    if ( !Patch )
+		      goto LABEL_28;
+		    return IFix::ILFixDynamicMethodWrapper::__Gen_Wrap_404(Patch, numVertsX, numVertsY, 0LL);
+		  }
+		  else
+		  {
+		    v5 = (Vector3__Array *)il2cpp_array_new_specific_1(
+		                             TypeInfo::UnityEngine::Vector3,
+		                             (unsigned int)((numVertsY + 1) * (numVertsX + 1)));
+		    v6 = (Vector2__Array *)il2cpp_array_new_specific_1(
+		                             TypeInfo::UnityEngine::Vector2,
+		                             (unsigned int)((numVertsX + 1) * (numVertsY + 1)));
+		    v7 = il2cpp_array_new_specific_1(TypeInfo::System::Int32, (unsigned int)(6 * numVertsY * numVertsX));
+		    v9 = 0;
+		    v10 = (unsigned int)(numVertsX + 1);
+		    v11 = (Int32__Array *)v7;
+		    if ( (int)v10 > 0 )
+		    {
+		      v12 = numVertsY + 1;
+		      v13 = numVertsX + 1;
+		      while ( 1 )
+		      {
+		        v14 = 0;
+		        if ( v12 > 0 )
+		          break;
+		LABEL_11:
+		        if ( ++v9 >= v13 )
+		          goto LABEL_12;
+		      }
+		      v8 = (unsigned int)v9;
+		      v15 = (__m128)COERCE_UNSIGNED_INT((float)v9);
+		      v15.m128_f32[0] = v15.m128_f32[0] / (float)numVertsX;
+		      while ( 1 )
+		      {
+		        v16 = (__m128)COERCE_UNSIGNED_INT((float)v14);
+		        v16.m128_f32[0] = v16.m128_f32[0] / (float)numVertsY;
+		        if ( !v6 )
+		          break;
+		        if ( (unsigned int)v8 >= v6->max_length.size )
+		          goto LABEL_40;
+		        LODWORD(v6->vector[(int)v8].x) = v15.m128_i32[0];
+		        LODWORD(v6->vector[(int)v8].y) = v16.m128_i32[0];
+		        if ( !v5 )
+		          break;
+		        if ( (unsigned int)v8 >= v5->max_length.size )
+		LABEL_40:
+		          sub_1800D2AB0(v10, v8);
+		        v17 = (int)v8;
+		        ++v14;
+		        v8 = (unsigned int)(v13 + v8);
+		        v10 = 3 * v17;
+		        *(_QWORD *)(&v5->vector[0].x + v10) = _mm_unpacklo_ps(v15, v16).m128_u64[0];
+		        *((_DWORD *)&v5->vector[0].z + v10) = 0;
+		        if ( v14 >= v12 )
+		          goto LABEL_11;
+		      }
+		LABEL_28:
+		      sub_1800D8260(v10, v8);
+		    }
+		LABEL_12:
+		    v18 = 0;
+		    v19 = 0;
+		    if ( numVertsX > 0 )
+		    {
+		      v20 = -1;
+		      v21 = numVertsX + 1;
+		      do
+		      {
+		        v22 = 0;
+		        if ( numVertsY > 0 )
+		        {
+		          v8 = (unsigned int)(v19 + 1);
+		          do
+		          {
+		            if ( (((_BYTE)v22 + (_BYTE)v19) & 1) != 0 )
+		            {
+		              if ( !v11 )
+		                goto LABEL_28;
+		              if ( (unsigned int)v18 >= v11->max_length.size )
+		                goto LABEL_40;
+		              v11->vector[v18] = v8 - 1;
+		              v10 = v18 + 1LL;
+		              if ( (unsigned int)v10 >= v11->max_length.size )
+		                goto LABEL_40;
+		              v23 = v18 + 2;
+		              v11->vector[v10] = v8 + numVertsX;
+		              if ( (unsigned int)v23 >= v11->max_length.size )
+		                goto LABEL_40;
+		              v10 = v23 + 1LL;
+		              v11->vector[v23] = v8;
+		              if ( (unsigned int)v10 >= v11->max_length.size )
+		                goto LABEL_40;
+		              v24 = v23 + 2;
+		              v11->vector[v10] = v8 + numVertsX;
+		              if ( (unsigned int)v24 >= v11->max_length.size )
+		                goto LABEL_40;
+		              v25 = v24;
+		              v10 = (unsigned int)(v8 + v21);
+		              v26 = v24 + 1;
+		              v11->vector[v25] = v10;
+		              if ( v26 >= v11->max_length.size )
+		                goto LABEL_40;
+		              v27 = v20;
+		            }
+		            else
+		            {
+		              if ( !v11 )
+		                goto LABEL_28;
+		              if ( (unsigned int)v18 >= v11->max_length.size )
+		                goto LABEL_40;
+		              v11->vector[v18] = v8 - 1;
+		              v10 = v18 + 1LL;
+		              if ( (unsigned int)v10 >= v11->max_length.size )
+		                goto LABEL_40;
+		              v30 = v18 + 2;
+		              v11->vector[v10] = v8 + v21;
+		              if ( (unsigned int)v30 >= v11->max_length.size )
+		                goto LABEL_40;
+		              v10 = v30 + 1LL;
+		              v11->vector[v30] = v8;
+		              if ( (unsigned int)v10 >= v11->max_length.size )
+		                goto LABEL_40;
+		              v31 = v30 + 2;
+		              v11->vector[v10] = v8 - 1;
+		              if ( (unsigned int)v31 >= v11->max_length.size )
+		                goto LABEL_40;
+		              v32 = v31;
+		              v10 = (unsigned int)(v8 + numVertsX);
+		              v26 = v31 + 1;
+		              v11->vector[v32] = v10;
+		              if ( v26 >= v11->max_length.size )
+		                goto LABEL_40;
+		              v27 = v20 + v21;
+		            }
+		            ++v22;
+		            v28 = v8 + v27 + 1;
+		            v29 = (int)v26;
+		            v10 = (unsigned int)(v19 + v28);
+		            v8 = (unsigned int)(v21 + v8);
+		            v18 = v26 + 1;
+		            v11->vector[v29] = v10;
+		          }
+		          while ( v22 < numVertsY );
+		        }
+		        ++v19;
+		        --v20;
+		      }
+		      while ( v19 < numVertsX );
+		    }
+		    if ( !v5 )
+		      goto LABEL_28;
+		    if ( v5->max_length.size > 65000 )
+		    {
+		      return 0LL;
+		    }
+		    else
+		    {
+		      v33 = (Mesh *)sub_1800368D0(TypeInfo::UnityEngine::Mesh);
+		      v34 = v33;
+		      if ( !v33 )
+		        goto LABEL_28;
+		      UnityEngine::Mesh::Mesh(v33, 0LL);
+		      UnityEngine::Mesh::set_vertices(v34, v5, 0LL);
+		      UnityEngine::Mesh::set_uv(v34, v6, 0LL);
+		      UnityEngine::Mesh::set_triangles(v34, v11, 0LL);
+		      UnityEngine::Object::set_name((Object_1 *)v34, (String *)"Water Mesh", 0LL);
+		      return v34;
+		    }
+		  }
+		}
+		
 	}
 }

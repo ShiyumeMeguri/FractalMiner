@@ -1,318 +1,306 @@
-﻿using System;
-using System.Runtime.InteropServices;
+using System;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using HG.Rendering.Runtime;
 using UnityEngine.Rendering;
 
+// Image 4: HG.RenderPipelines.Runtime.dll - Assembly: HG.RenderPipelines.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null - Types 37354-38879
+
 [Serializable]
-[StructLayout(LayoutKind.Sequential, Pack = 1)]
-public struct HGColorCurve : IEnvConfig
+public struct HGColorCurve : IEnvConfig // TypeDefIndex: 37357
 {
-	// (get) Token: 0x06000003 RID: 3 RVA: 0x000025D8 File Offset: 0x000007D8
-	// (set) Token: 0x06000004 RID: 4 RVA: 0x000025D0 File Offset: 0x000007D0
-	public bool active
+	// Fields
+	public TextureCurve master; // 0x00
+	public TextureCurve red; // 0x08
+	public TextureCurve green; // 0x10
+	public TextureCurve blue; // 0x18
+	public TextureCurve hueVsHue; // 0x20
+	public TextureCurve hueVsSat; // 0x28
+	public TextureCurve satVsSat; // 0x30
+	public TextureCurve lumVsSat; // 0x38
+	public bool masterOverriding; // 0x40
+	public bool redOverriding; // 0x41
+	public bool greenOverriding; // 0x42
+	public bool blueOverriding; // 0x43
+	public bool hueVsHueOverriding; // 0x44
+	public bool hueVsSatOverriding; // 0x45
+	public bool satVsSatOverriding; // 0x46
+	public bool lumVsSatOverriding; // 0x47
+	public static HGColorCurve defaultConfig; // 0x00
+
+	// Properties
+	public bool active { get => default; set {} } // 0x0000000182FFF600-0x0000000182FFF610 0x00000001841E1670-0x00000001841E1680
+	// Boolean get_alwaysRebindOnRefresh()
+	bool UnityEngine::UIElements::VerticalVirtualizationController<System::Object>::get_alwaysRebindOnRefresh(
+	        VerticalVirtualizationController_1_System_Object_ *this,
+	        MethodInfo *method)
 	{
-		get
-		{
-			// // Boolean get_alwaysRebindOnRefresh()
-			// bool UnityEngine::UIElements::VerticalVirtualizationController<System::Object>::get_alwaysRebindOnRefresh(
-			//         VerticalVirtualizationController_1_System_Object_ *this,
-			//         MethodInfo *method)
-			// {
-			//   return 1;
-			// }
-			// 
-			return default(bool);
-		}
-		set
-		{
-			// // Void Lerp[HGWindConfig](HGWindConfig ByRef, HGWindConfig ByRef, Single)
-			// void HG::Rendering::Runtime::HGCelestialConfig::HGCelestialAdvancedObjectConfig::Lerp<HG::Rendering::Runtime::HGWindConfig>(
-			//         HGCelestialConfig_HGCelestialAdvancedObjectConfig *this,
-			//         HGWindConfig *cSrc,
-			//         HGWindConfig *cDst,
-			//         float t,
-			//         MethodInfo *method)
-			// {
-			//   ;
-			// }
-			// 
-		}
+	  return 1;
 	}
+	
 
-	public HGColorCurve(bool active)
+	// Void Lerp[HGWindConfig](HGWindConfig ByRef, HGWindConfig ByRef, Single)
+	void HG::Rendering::Runtime::HGCelestialConfig::HGCelestialAdvancedObjectConfig::Lerp<HG::Rendering::Runtime::HGWindConfig>(
+	        HGCelestialConfig_HGCelestialAdvancedObjectConfig *this,
+	        HGWindConfig *cSrc,
+	        HGWindConfig *cDst,
+	        float t,
+	        MethodInfo *method)
 	{
-		// // HGColorCurve(Boolean)
-		// void HGColorCurve::HGColorCurve(HGColorCurve *this, bool active, MethodInfo *method)
-		// {
-		//   __int64 v3; // r9
-		//   __int64 v5; // rax
-		//   __int64 v6; // rdx
-		//   __int64 v7; // rcx
-		//   __m128i si128; // xmm0
-		//   Keyframe__Array *v9; // rbx
-		//   __m128i v10; // xmm0
-		//   TextureCurve *v11; // rsi
-		//   OneofDescriptorProto *v12; // rdx
-		//   FileDescriptor *v13; // r8
-		//   MessageDescriptor *v14; // r9
-		//   __int64 v15; // r8
-		//   __int64 v16; // r9
-		//   __int64 v17; // rax
-		//   __m128i v18; // xmm0
-		//   Keyframe__Array *v19; // rbx
-		//   __m128i v20; // xmm0
-		//   TextureCurve *v21; // rsi
-		//   OneofDescriptorProto *v22; // rdx
-		//   FileDescriptor *v23; // r8
-		//   MessageDescriptor *v24; // r9
-		//   __int64 v25; // r8
-		//   __int64 v26; // r9
-		//   __int64 v27; // rax
-		//   __m128i v28; // xmm0
-		//   Keyframe__Array *v29; // rbx
-		//   __m128i v30; // xmm0
-		//   TextureCurve *v31; // rsi
-		//   OneofDescriptorProto *v32; // rdx
-		//   FileDescriptor *v33; // r8
-		//   MessageDescriptor *v34; // r9
-		//   __int64 v35; // r8
-		//   __int64 v36; // r9
-		//   __int64 v37; // rax
-		//   __m128i v38; // xmm0
-		//   Keyframe__Array *v39; // rbx
-		//   __m128i v40; // xmm0
-		//   TextureCurve *v41; // rsi
-		//   OneofDescriptorProto *v42; // rdx
-		//   FileDescriptor *v43; // r8
-		//   MessageDescriptor *v44; // r9
-		//   __int64 v45; // r8
-		//   __int64 v46; // r9
-		//   Keyframe__Array *v47; // rsi
-		//   TextureCurve *v48; // rbx
-		//   OneofDescriptorProto *v49; // rdx
-		//   FileDescriptor *v50; // r8
-		//   MessageDescriptor *v51; // r9
-		//   __int64 v52; // r8
-		//   __int64 v53; // r9
-		//   Keyframe__Array *v54; // rsi
-		//   TextureCurve *v55; // rbx
-		//   OneofDescriptorProto *v56; // rdx
-		//   FileDescriptor *v57; // r8
-		//   MessageDescriptor *v58; // r9
-		//   __int64 v59; // r8
-		//   __int64 v60; // r9
-		//   Keyframe__Array *v61; // rsi
-		//   TextureCurve *v62; // rbx
-		//   OneofDescriptorProto *v63; // rdx
-		//   FileDescriptor *v64; // r8
-		//   MessageDescriptor *v65; // r9
-		//   __int64 v66; // r8
-		//   __int64 v67; // r9
-		//   Keyframe__Array *v68; // rsi
-		//   TextureCurve *v69; // rbx
-		//   OneofDescriptorProto *v70; // rdx
-		//   FileDescriptor *v71; // r8
-		//   MessageDescriptor *v72; // r9
-		//   String__Array *bounds; // [rsp+20h] [rbp-60h]
-		//   String__Array *boundsa; // [rsp+20h] [rbp-60h]
-		//   String__Array *boundsb; // [rsp+20h] [rbp-60h]
-		//   String__Array *boundsc; // [rsp+20h] [rbp-60h]
-		//   String__Array *boundsd; // [rsp+20h] [rbp-60h]
-		//   String__Array *boundse; // [rsp+20h] [rbp-60h]
-		//   String__Array *boundsf; // [rsp+20h] [rbp-60h]
-		//   String__Array *boundsg; // [rsp+20h] [rbp-60h]
-		//   MethodInfo *methoda; // [rsp+28h] [rbp-58h]
-		//   MethodInfo *methodb; // [rsp+28h] [rbp-58h]
-		//   MethodInfo *methodc; // [rsp+28h] [rbp-58h]
-		//   MethodInfo *methodd; // [rsp+28h] [rbp-58h]
-		//   MethodInfo *methode; // [rsp+28h] [rbp-58h]
-		//   MethodInfo *methodf; // [rsp+28h] [rbp-58h]
-		//   MethodInfo *methodg; // [rsp+28h] [rbp-58h]
-		//   MethodInfo *methodh; // [rsp+28h] [rbp-58h]
-		//   MethodInfo *v89; // [rsp+30h] [rbp-50h]
-		//   MethodInfo *v90; // [rsp+30h] [rbp-50h]
-		//   MethodInfo *v91; // [rsp+30h] [rbp-50h]
-		//   MethodInfo *v92; // [rsp+30h] [rbp-50h]
-		//   MethodInfo *v93; // [rsp+30h] [rbp-50h]
-		//   MethodInfo *v94; // [rsp+30h] [rbp-50h]
-		//   MethodInfo *v95; // [rsp+30h] [rbp-50h]
-		//   MethodInfo *v96; // [rsp+30h] [rbp-50h]
-		//   Vector2 v97; // [rsp+B8h] [rbp+38h] BYREF
-		// 
-		//   if ( !byte_18D8ED904 )
-		//   {
-		//     sub_18003C530(&TypeInfo::UnityEngine::Keyframe);
-		//     sub_18003C530(&TypeInfo::UnityEngine::Rendering::TextureCurve);
-		//     byte_18D8ED904 = 1;
-		//   }
-		//   v5 = il2cpp_array_new_specific_0(TypeInfo::UnityEngine::Keyframe, 2LL, method, v3);
-		//   si128 = _mm_load_si128((const __m128i *)&xmmword_18A357450);
-		//   v9 = (Keyframe__Array *)v5;
-		//   if ( !v5 )
-		//     goto LABEL_24;
-		//   if ( !*(_DWORD *)(v5 + 24)
-		//     || (*(__m128i *)(v5 + 32) = si128,
-		//         *(_QWORD *)(v5 + 48) = 0LL,
-		//         v10 = _mm_load_si128((const __m128i *)&xmmword_18A357460),
-		//         *(_DWORD *)(v5 + 56) = 0,
-		//         *(_DWORD *)(v5 + 24) <= 1u) )
-		//   {
-		// LABEL_25:
-		//     sub_180070270(v7, v6);
-		//   }
-		//   *(__m128i *)(v5 + 60) = v10;
-		//   *(_QWORD *)(v5 + 76) = 0LL;
-		//   *(_DWORD *)(v5 + 84) = 0;
-		//   v97 = (Vector2)_mm_unpacklo_ps((__m128)0LL, (__m128)0x3F800000u).m128_u64[0];
-		//   v11 = (TextureCurve *)sub_180004920(TypeInfo::UnityEngine::Rendering::TextureCurve);
-		//   if ( !v11
-		//     || (UnityEngine::Rendering::TextureCurve::TextureCurve(v11, v9, 0.0, 0, &v97, 0LL),
-		//         this.master = v11,
-		//         sub_1800054D0((OneofDescriptor *)this, v12, v13, v14, bounds, (String *)methoda, v89),
-		//         v17 = il2cpp_array_new_specific_0(TypeInfo::UnityEngine::Keyframe, 2LL, v15, v16),
-		//         v18 = _mm_load_si128((const __m128i *)&xmmword_18A357450),
-		//         (v19 = (Keyframe__Array *)v17) == 0LL) )
-		//   {
-		// LABEL_24:
-		//     sub_180B536AC(v7, v6);
-		//   }
-		//   if ( !*(_DWORD *)(v17 + 24) )
-		//     goto LABEL_25;
-		//   *(__m128i *)(v17 + 32) = v18;
-		//   *(_QWORD *)(v17 + 48) = 0LL;
-		//   v20 = _mm_load_si128((const __m128i *)&xmmword_18A357460);
-		//   *(_DWORD *)(v17 + 56) = 0;
-		//   if ( *(_DWORD *)(v17 + 24) <= 1u )
-		//     goto LABEL_25;
-		//   *(__m128i *)(v17 + 60) = v20;
-		//   *(_QWORD *)(v17 + 76) = 0LL;
-		//   *(_DWORD *)(v17 + 84) = 0;
-		//   v97 = (Vector2)_mm_unpacklo_ps((__m128)0LL, (__m128)0x3F800000u).m128_u64[0];
-		//   v21 = (TextureCurve *)sub_180004920(TypeInfo::UnityEngine::Rendering::TextureCurve);
-		//   if ( !v21 )
-		//     goto LABEL_24;
-		//   UnityEngine::Rendering::TextureCurve::TextureCurve(v21, v19, 0.0, 0, &v97, 0LL);
-		//   this.red = v21;
-		//   sub_1800054D0((OneofDescriptor *)&this.red, v22, v23, v24, boundsa, (String *)methodb, v90);
-		//   v27 = il2cpp_array_new_specific_0(TypeInfo::UnityEngine::Keyframe, 2LL, v25, v26);
-		//   v28 = _mm_load_si128((const __m128i *)&xmmword_18A357450);
-		//   v29 = (Keyframe__Array *)v27;
-		//   if ( !v27 )
-		//     goto LABEL_24;
-		//   if ( !*(_DWORD *)(v27 + 24) )
-		//     goto LABEL_25;
-		//   *(__m128i *)(v27 + 32) = v28;
-		//   *(_QWORD *)(v27 + 48) = 0LL;
-		//   v30 = _mm_load_si128((const __m128i *)&xmmword_18A357460);
-		//   *(_DWORD *)(v27 + 56) = 0;
-		//   if ( *(_DWORD *)(v27 + 24) <= 1u )
-		//     goto LABEL_25;
-		//   *(__m128i *)(v27 + 60) = v30;
-		//   *(_QWORD *)(v27 + 76) = 0LL;
-		//   *(_DWORD *)(v27 + 84) = 0;
-		//   v97 = (Vector2)_mm_unpacklo_ps((__m128)0LL, (__m128)0x3F800000u).m128_u64[0];
-		//   v31 = (TextureCurve *)sub_180004920(TypeInfo::UnityEngine::Rendering::TextureCurve);
-		//   if ( !v31 )
-		//     goto LABEL_24;
-		//   UnityEngine::Rendering::TextureCurve::TextureCurve(v31, v29, 0.0, 0, &v97, 0LL);
-		//   this.green = v31;
-		//   sub_1800054D0((OneofDescriptor *)&this.green, v32, v33, v34, boundsb, (String *)methodc, v91);
-		//   v37 = il2cpp_array_new_specific_0(TypeInfo::UnityEngine::Keyframe, 2LL, v35, v36);
-		//   v38 = _mm_load_si128((const __m128i *)&xmmword_18A357450);
-		//   v39 = (Keyframe__Array *)v37;
-		//   if ( !v37 )
-		//     goto LABEL_24;
-		//   if ( !*(_DWORD *)(v37 + 24) )
-		//     goto LABEL_25;
-		//   *(__m128i *)(v37 + 32) = v38;
-		//   *(_QWORD *)(v37 + 48) = 0LL;
-		//   v40 = _mm_load_si128((const __m128i *)&xmmword_18A357460);
-		//   *(_DWORD *)(v37 + 56) = 0;
-		//   if ( *(_DWORD *)(v37 + 24) <= 1u )
-		//     goto LABEL_25;
-		//   *(__m128i *)(v37 + 60) = v40;
-		//   *(_QWORD *)(v37 + 76) = 0LL;
-		//   *(_DWORD *)(v37 + 84) = 0;
-		//   v97 = (Vector2)_mm_unpacklo_ps((__m128)0LL, (__m128)0x3F800000u).m128_u64[0];
-		//   v41 = (TextureCurve *)sub_180004920(TypeInfo::UnityEngine::Rendering::TextureCurve);
-		//   if ( !v41 )
-		//     goto LABEL_24;
-		//   UnityEngine::Rendering::TextureCurve::TextureCurve(v41, v39, 0.0, 0, &v97, 0LL);
-		//   this.blue = v41;
-		//   sub_1800054D0((OneofDescriptor *)&this.blue, v42, v43, v44, boundsc, (String *)methodd, v92);
-		//   v47 = (Keyframe__Array *)il2cpp_array_new_specific_0(TypeInfo::UnityEngine::Keyframe, 0LL, v45, v46);
-		//   v97 = (Vector2)_mm_unpacklo_ps((__m128)0LL, (__m128)0x3F800000u).m128_u64[0];
-		//   v48 = (TextureCurve *)sub_180004920(TypeInfo::UnityEngine::Rendering::TextureCurve);
-		//   if ( !v48 )
-		//     goto LABEL_24;
-		//   UnityEngine::Rendering::TextureCurve::TextureCurve(v48, v47, 0.5, 1, &v97, 0LL);
-		//   this.hueVsHue = v48;
-		//   sub_1800054D0((OneofDescriptor *)&this.hueVsHue, v49, v50, v51, boundsd, (String *)methode, v93);
-		//   v54 = (Keyframe__Array *)il2cpp_array_new_specific_0(TypeInfo::UnityEngine::Keyframe, 0LL, v52, v53);
-		//   v97 = (Vector2)_mm_unpacklo_ps((__m128)0LL, (__m128)0x3F800000u).m128_u64[0];
-		//   v55 = (TextureCurve *)sub_180004920(TypeInfo::UnityEngine::Rendering::TextureCurve);
-		//   if ( !v55 )
-		//     goto LABEL_24;
-		//   UnityEngine::Rendering::TextureCurve::TextureCurve(v55, v54, 0.5, 1, &v97, 0LL);
-		//   this.hueVsSat = v55;
-		//   sub_1800054D0((OneofDescriptor *)&this.hueVsSat, v56, v57, v58, boundse, (String *)methodf, v94);
-		//   v61 = (Keyframe__Array *)il2cpp_array_new_specific_0(TypeInfo::UnityEngine::Keyframe, 0LL, v59, v60);
-		//   v97 = (Vector2)_mm_unpacklo_ps((__m128)0LL, (__m128)0x3F800000u).m128_u64[0];
-		//   v62 = (TextureCurve *)sub_180004920(TypeInfo::UnityEngine::Rendering::TextureCurve);
-		//   if ( !v62 )
-		//     goto LABEL_24;
-		//   UnityEngine::Rendering::TextureCurve::TextureCurve(v62, v61, 0.5, 0, &v97, 0LL);
-		//   this.satVsSat = v62;
-		//   sub_1800054D0((OneofDescriptor *)&this.satVsSat, v63, v64, v65, boundsf, (String *)methodg, v95);
-		//   v68 = (Keyframe__Array *)il2cpp_array_new_specific_0(TypeInfo::UnityEngine::Keyframe, 0LL, v66, v67);
-		//   v97 = (Vector2)_mm_unpacklo_ps((__m128)0LL, (__m128)0x3F800000u).m128_u64[0];
-		//   v69 = (TextureCurve *)sub_180004920(TypeInfo::UnityEngine::Rendering::TextureCurve);
-		//   if ( !v69 )
-		//     goto LABEL_24;
-		//   UnityEngine::Rendering::TextureCurve::TextureCurve(v69, v68, 0.5, 0, &v97, 0LL);
-		//   this.lumVsSat = v69;
-		//   sub_1800054D0((OneofDescriptor *)&this.lumVsSat, v70, v71, v72, boundsg, (String *)methodh, v96);
-		//   *(_QWORD *)&this.masterOverriding = 0LL;
-		// }
-		// 
+	  ;
 	}
+	
 
-	public void Lerp<T>(ref T src, ref T dst, float t) where T : struct, IEnvConfig
+	// Constructors
+	public HGColorCurve(bool active) : this() {
+		master = default;
+		red = default;
+		green = default;
+		blue = default;
+		hueVsHue = default;
+		hueVsSat = default;
+		satVsSat = default;
+		lumVsSat = default;
+		masterOverriding = default;
+		redOverriding = default;
+		greenOverriding = default;
+		blueOverriding = default;
+		hueVsHueOverriding = default;
+		hueVsSatOverriding = default;
+		satVsSatOverriding = default;
+		lumVsSatOverriding = default;
+	} // 0x0000000184543B80-0x0000000184544070
+	// HGColorCurve(Boolean)
+	void HGColorCurve::HGColorCurve(HGColorCurve *this, bool active, MethodInfo *method)
 	{
+	  __int64 v4; // rax
+	  __int64 v5; // rdx
+	  __int64 v6; // rcx
+	  __m128i si128; // xmm0
+	  Keyframe__Array *v8; // rdi
+	  __m128i v9; // xmm0
+	  TextureCurve *v10; // rsi
+	  Type *v11; // rdx
+	  PropertyInfo_1 *v12; // r8
+	  Int32__Array **v13; // r9
+	  __int64 v14; // rax
+	  __m128i v15; // xmm0
+	  Keyframe__Array *v16; // rdi
+	  __m128i v17; // xmm0
+	  TextureCurve *v18; // rsi
+	  Type *v19; // rdx
+	  PropertyInfo_1 *v20; // r8
+	  Int32__Array **v21; // r9
+	  __int64 v22; // rax
+	  __m128i v23; // xmm0
+	  Keyframe__Array *v24; // rdi
+	  __m128i v25; // xmm0
+	  TextureCurve *v26; // rsi
+	  Type *v27; // rdx
+	  PropertyInfo_1 *v28; // r8
+	  Int32__Array **v29; // r9
+	  __int64 v30; // rax
+	  __m128i v31; // xmm0
+	  Keyframe__Array *v32; // rdi
+	  __m128i v33; // xmm0
+	  TextureCurve *v34; // rsi
+	  Type *v35; // rdx
+	  PropertyInfo_1 *v36; // r8
+	  Int32__Array **v37; // r9
+	  Keyframe__Array *v38; // rsi
+	  TextureCurve *v39; // rdi
+	  Type *v40; // rdx
+	  PropertyInfo_1 *v41; // r8
+	  Int32__Array **v42; // r9
+	  Keyframe__Array *v43; // rsi
+	  TextureCurve *v44; // rdi
+	  Type *v45; // rdx
+	  PropertyInfo_1 *v46; // r8
+	  Int32__Array **v47; // r9
+	  Keyframe__Array *v48; // rsi
+	  TextureCurve *v49; // rdi
+	  Type *v50; // rdx
+	  PropertyInfo_1 *v51; // r8
+	  Int32__Array **v52; // r9
+	  Keyframe__Array *v53; // rsi
+	  TextureCurve *v54; // rdi
+	  Type *v55; // rdx
+	  PropertyInfo_1 *v56; // r8
+	  Int32__Array **v57; // r9
+	  MethodInfo *bounds; // [rsp+20h] [rbp-60h]
+	  MethodInfo *boundsa; // [rsp+20h] [rbp-60h]
+	  MethodInfo *boundsb; // [rsp+20h] [rbp-60h]
+	  MethodInfo *boundsc; // [rsp+20h] [rbp-60h]
+	  MethodInfo *boundsd; // [rsp+20h] [rbp-60h]
+	  MethodInfo *boundse; // [rsp+20h] [rbp-60h]
+	  MethodInfo *boundsf; // [rsp+20h] [rbp-60h]
+	  MethodInfo *boundsg; // [rsp+20h] [rbp-60h]
+	  Vector2 v66; // [rsp+B8h] [rbp+38h] BYREF
+	
+	  v4 = il2cpp_array_new_specific_1(TypeInfo::UnityEngine::Keyframe, 2LL);
+	  si128 = _mm_load_si128((const __m128i *)&xmmword_18B959770);
+	  v8 = (Keyframe__Array *)v4;
+	  if ( !v4 )
+	LABEL_2:
+	    sub_1800D8260(v6, v5);
+	  if ( !*(_DWORD *)(v4 + 24) )
+	    goto LABEL_23;
+	  *(__m128i *)(v4 + 32) = si128;
+	  *(_QWORD *)(v4 + 48) = 0LL;
+	  v9 = _mm_load_si128((const __m128i *)&xmmword_18B959780);
+	  *(_DWORD *)(v4 + 56) = 0;
+	  if ( *(_DWORD *)(v4 + 24) <= 1u )
+	    goto LABEL_23;
+	  *(__m128i *)(v4 + 60) = v9;
+	  *(_QWORD *)(v4 + 76) = 0LL;
+	  *(_DWORD *)(v4 + 84) = 0;
+	  v66 = (Vector2)_mm_unpacklo_ps((__m128)0LL, (__m128)0x3F800000u).m128_u64[0];
+	  v10 = (TextureCurve *)sub_1800368D0(TypeInfo::UnityEngine::Rendering::TextureCurve);
+	  if ( !v10 )
+	    goto LABEL_2;
+	  UnityEngine::Rendering::TextureCurve::TextureCurve(v10, v8, 0.0, 0, &v66, 0LL);
+	  this->master = v10;
+	  sub_18002D1B0((SingleFieldAccessor *)this, v11, v12, v13, bounds);
+	  v14 = il2cpp_array_new_specific_1(TypeInfo::UnityEngine::Keyframe, 2LL);
+	  v15 = _mm_load_si128((const __m128i *)&xmmword_18B959770);
+	  v16 = (Keyframe__Array *)v14;
+	  if ( !v14 )
+	    goto LABEL_2;
+	  if ( !*(_DWORD *)(v14 + 24) )
+	    goto LABEL_23;
+	  *(__m128i *)(v14 + 32) = v15;
+	  *(_QWORD *)(v14 + 48) = 0LL;
+	  v17 = _mm_load_si128((const __m128i *)&xmmword_18B959780);
+	  *(_DWORD *)(v14 + 56) = 0;
+	  if ( *(_DWORD *)(v14 + 24) <= 1u )
+	    goto LABEL_23;
+	  *(__m128i *)(v14 + 60) = v17;
+	  *(_QWORD *)(v14 + 76) = 0LL;
+	  *(_DWORD *)(v14 + 84) = 0;
+	  v66 = (Vector2)_mm_unpacklo_ps((__m128)0LL, (__m128)0x3F800000u).m128_u64[0];
+	  v18 = (TextureCurve *)sub_1800368D0(TypeInfo::UnityEngine::Rendering::TextureCurve);
+	  if ( !v18 )
+	    goto LABEL_2;
+	  UnityEngine::Rendering::TextureCurve::TextureCurve(v18, v16, 0.0, 0, &v66, 0LL);
+	  this->red = v18;
+	  sub_18002D1B0((SingleFieldAccessor *)&this->red, v19, v20, v21, boundsa);
+	  v22 = il2cpp_array_new_specific_1(TypeInfo::UnityEngine::Keyframe, 2LL);
+	  v23 = _mm_load_si128((const __m128i *)&xmmword_18B959770);
+	  v24 = (Keyframe__Array *)v22;
+	  if ( !v22 )
+	    goto LABEL_2;
+	  if ( !*(_DWORD *)(v22 + 24) )
+	    goto LABEL_23;
+	  *(__m128i *)(v22 + 32) = v23;
+	  *(_QWORD *)(v22 + 48) = 0LL;
+	  v25 = _mm_load_si128((const __m128i *)&xmmword_18B959780);
+	  *(_DWORD *)(v22 + 56) = 0;
+	  if ( *(_DWORD *)(v22 + 24) <= 1u )
+	    goto LABEL_23;
+	  *(__m128i *)(v22 + 60) = v25;
+	  *(_QWORD *)(v22 + 76) = 0LL;
+	  *(_DWORD *)(v22 + 84) = 0;
+	  v66 = (Vector2)_mm_unpacklo_ps((__m128)0LL, (__m128)0x3F800000u).m128_u64[0];
+	  v26 = (TextureCurve *)sub_1800368D0(TypeInfo::UnityEngine::Rendering::TextureCurve);
+	  if ( !v26 )
+	    goto LABEL_2;
+	  UnityEngine::Rendering::TextureCurve::TextureCurve(v26, v24, 0.0, 0, &v66, 0LL);
+	  this->green = v26;
+	  sub_18002D1B0((SingleFieldAccessor *)&this->green, v27, v28, v29, boundsb);
+	  v30 = il2cpp_array_new_specific_1(TypeInfo::UnityEngine::Keyframe, 2LL);
+	  v31 = _mm_load_si128((const __m128i *)&xmmword_18B959770);
+	  v32 = (Keyframe__Array *)v30;
+	  if ( !v30 )
+	    goto LABEL_2;
+	  if ( !*(_DWORD *)(v30 + 24)
+	    || (*(__m128i *)(v30 + 32) = v31,
+	        *(_QWORD *)(v30 + 48) = 0LL,
+	        v33 = _mm_load_si128((const __m128i *)&xmmword_18B959780),
+	        *(_DWORD *)(v30 + 56) = 0,
+	        *(_DWORD *)(v30 + 24) <= 1u) )
+	  {
+	LABEL_23:
+	    sub_1800D2AB0(v6, v5);
+	  }
+	  *(__m128i *)(v30 + 60) = v33;
+	  *(_QWORD *)(v30 + 76) = 0LL;
+	  *(_DWORD *)(v30 + 84) = 0;
+	  v66 = (Vector2)_mm_unpacklo_ps((__m128)0LL, (__m128)0x3F800000u).m128_u64[0];
+	  v34 = (TextureCurve *)sub_1800368D0(TypeInfo::UnityEngine::Rendering::TextureCurve);
+	  if ( !v34 )
+	    goto LABEL_2;
+	  UnityEngine::Rendering::TextureCurve::TextureCurve(v34, v32, 0.0, 0, &v66, 0LL);
+	  this->blue = v34;
+	  sub_18002D1B0((SingleFieldAccessor *)&this->blue, v35, v36, v37, boundsc);
+	  v38 = (Keyframe__Array *)il2cpp_array_new_specific_1(TypeInfo::UnityEngine::Keyframe, 0LL);
+	  v66 = (Vector2)_mm_unpacklo_ps((__m128)0LL, (__m128)0x3F800000u).m128_u64[0];
+	  v39 = (TextureCurve *)sub_1800368D0(TypeInfo::UnityEngine::Rendering::TextureCurve);
+	  if ( !v39 )
+	    goto LABEL_2;
+	  UnityEngine::Rendering::TextureCurve::TextureCurve(v39, v38, 0.5, 1, &v66, 0LL);
+	  this->hueVsHue = v39;
+	  sub_18002D1B0((SingleFieldAccessor *)&this->hueVsHue, v40, v41, v42, boundsd);
+	  v43 = (Keyframe__Array *)il2cpp_array_new_specific_1(TypeInfo::UnityEngine::Keyframe, 0LL);
+	  v66 = (Vector2)_mm_unpacklo_ps((__m128)0LL, (__m128)0x3F800000u).m128_u64[0];
+	  v44 = (TextureCurve *)sub_1800368D0(TypeInfo::UnityEngine::Rendering::TextureCurve);
+	  if ( !v44 )
+	    goto LABEL_2;
+	  UnityEngine::Rendering::TextureCurve::TextureCurve(v44, v43, 0.5, 1, &v66, 0LL);
+	  this->hueVsSat = v44;
+	  sub_18002D1B0((SingleFieldAccessor *)&this->hueVsSat, v45, v46, v47, boundse);
+	  v48 = (Keyframe__Array *)il2cpp_array_new_specific_1(TypeInfo::UnityEngine::Keyframe, 0LL);
+	  v66 = (Vector2)_mm_unpacklo_ps((__m128)0LL, (__m128)0x3F800000u).m128_u64[0];
+	  v49 = (TextureCurve *)sub_1800368D0(TypeInfo::UnityEngine::Rendering::TextureCurve);
+	  if ( !v49 )
+	    goto LABEL_2;
+	  UnityEngine::Rendering::TextureCurve::TextureCurve(v49, v48, 0.5, 0, &v66, 0LL);
+	  this->satVsSat = v49;
+	  sub_18002D1B0((SingleFieldAccessor *)&this->satVsSat, v50, v51, v52, boundsf);
+	  v53 = (Keyframe__Array *)il2cpp_array_new_specific_1(TypeInfo::UnityEngine::Keyframe, 0LL);
+	  v66 = (Vector2)_mm_unpacklo_ps((__m128)0LL, (__m128)0x3F800000u).m128_u64[0];
+	  v54 = (TextureCurve *)sub_1800368D0(TypeInfo::UnityEngine::Rendering::TextureCurve);
+	  if ( !v54 )
+	    goto LABEL_2;
+	  UnityEngine::Rendering::TextureCurve::TextureCurve(v54, v53, 0.5, 0, &v66, 0LL);
+	  this->lumVsSat = v54;
+	  sub_18002D1B0((SingleFieldAccessor *)&this->lumVsSat, v55, v56, v57, boundsg);
+	  *(_QWORD *)&this->masterOverriding = 0LL;
 	}
+	
+	static HGColorCurve() {
+		defaultConfig = default;
+	} // 0x0000000184543470-0x0000000184543500
+	// HGColorCurve()
+	void HGColorCurve::cctor(MethodInfo *method)
+	{
+	  __int128 v1; // xmm2
+	  __int128 v2; // xmm3
+	  HGColorCurve__StaticFields *static_fields; // rcx
+	  __int128 v4; // xmm4
+	  __int64 v5; // xmm0_8
+	  Type *v6; // rdx
+	  PropertyInfo_1 *v7; // r8
+	  Int32__Array **v8; // r9
+	  HGColorCurve v9; // [rsp+20h] [rbp-58h] BYREF
+	
+	  memset(&v9, 0, sizeof(v9));
+	  HGColorCurve::HGColorCurve(&v9, 0, 0LL);
+	  v1 = *(_OWORD *)&v9.green;
+	  v2 = *(_OWORD *)&v9.hueVsHue;
+	  static_fields = TypeInfo::HGColorCurve->static_fields;
+	  v4 = *(_OWORD *)&v9.satVsSat;
+	  v5 = *(_QWORD *)&v9.masterOverriding;
+	  *(_OWORD *)&static_fields->defaultConfig.master = *(_OWORD *)&v9.master;
+	  *(_OWORD *)&static_fields->defaultConfig.green = v1;
+	  *(_OWORD *)&static_fields->defaultConfig.hueVsHue = v2;
+	  *(_OWORD *)&static_fields->defaultConfig.satVsSat = v4;
+	  *(_QWORD *)&static_fields->defaultConfig.masterOverriding = v5;
+	  sub_18002D1B0((SingleFieldAccessor *)TypeInfo::HGColorCurve->static_fields, v6, v7, v8, (MethodInfo *)v9.master);
+	}
+	
 
-	public TextureCurve master;
-
-	public TextureCurve red;
-
-	public TextureCurve green;
-
-	public TextureCurve blue;
-
-	public TextureCurve hueVsHue;
-
-	public TextureCurve hueVsSat;
-
-	public TextureCurve satVsSat;
-
-	public TextureCurve lumVsSat;
-
-	public bool masterOverriding;
-
-	public bool redOverriding;
-
-	public bool greenOverriding;
-
-	public bool blueOverriding;
-
-	public bool hueVsHueOverriding;
-
-	public bool hueVsSatOverriding;
-
-	public bool satVsSatOverriding;
-
-	public bool lumVsSatOverriding;
-
-	[StaticFieldOffset(ThreadStatic = false, Offset = "0x00")]
-	public static HGColorCurve defaultConfig;
+	// Methods
+	public void Lerp<T>(ref ref T src, ref ref T dst, float t)
+		where T : struct, IEnvConfig {}
 }
+
