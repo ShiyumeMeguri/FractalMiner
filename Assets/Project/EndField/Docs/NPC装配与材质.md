@@ -94,6 +94,38 @@ Blender 侧 `roster_panel._npc_materials` 按 `avatarMeshName` 末段找 `data_n
 
 自测：`Game/EndField/selftest_npc.py`（`blender --background --python 它`，可加 `-- --npc <templateId>`）。
 
+## 🔴 脸/耳不是「对齐」上去的，是「挂」上去的（朝向 bug 根因）
+
+装配表里只有 **Face(3) 与 Ear(6/7/9)** 这两类 slot 带这三个字段，Body/Hair/Tail 全为空：
+
+```
+bUseSelfAvatar          = 1
+parentBoneTransformName = Root/Bip001/.../Bip001_Neck/Bip001_Head
+parentBoneName          = Bip001_Head
+selfAvatarName          = SK_npc_girl_face_common_a_02Avatar
+```
+
+含义：脸/耳是**自带骨架、按父骨局部系在原点建模**的部件，游戏把它**挂到 `Bip001_Head` 变换下**
+（`NPCAvatarCreatorUtils.CreateSkeletalMorphGo`），不做任何矩阵对齐。
+
+实测两个 rest（Unity 空间，`npc_girl_efstaff_a_04`）：
+
+```
+身体 avatar Bip001_Head : R_body = [[0,0,-1],[-1,0,0],[0,1,0]]  t=(0, 1.4706, -0.0137)
+脸 avatar  Bip001_Head : R_face = [[0,-1,0],[0,0,1],[-1,0,0]]  t=(0, 0, 0)   ← 平移为 0
+```
+
+`R_face = R_body⁻¹`，`t_face = 0`——这正是「在父骨局部系、原点建模」的样子。
+
+`SkeletonBinder._alignment` 用的是 `body_attach @ inv(part_attach)`，前提是**部件也在站立世界系**
+（body/hair/tail 成立）。对脸不成立：`R_body @ inv(R_body⁻¹) = R_body²`，**等于把头骨朝向乘了两次**。
+因为 `t_face = 0`，平移恰好不受影响——所以症状是「位置对、只有朝向错」，
+手动把脸的旋转设成 `R_body`（四元数 WXYZ = -0.5,-0.5,0.5,0.5）就完全正确。
+
+**正解**：表里标了 `bUseSelfAvatar=1` + `parentBoneName` 的部件，offset 就是
+**共享骨架里那根父骨的世界 rest**，不做任何 `inv(part_attach)` 抵消——即按表说的挂，不靠猜。
+现有 `_alignment` 是按「哪根共享骨下面挂的部件骨最多」推断附着骨的启发式，对这两类部件是错的。
+
 ## 原先为何是白模
 
 `roster_panel._import_part` 走 `prefab_importer.import_mesh_from_db(...)` 且**不传 materials**，
