@@ -75,18 +75,24 @@ avatarSlotMeshDatas[] : NPCAvatarLodMeshAssets
 
 ## 导入侧（已接通）
 
- —— 读清单、按缩进走装配表文本、
+`EndfieldNpcMaterials.Resolve(vfsRoots, templateId, assetTexts)` —— 读清单、按缩进走装配表文本、
 解十六进制、查 LUT，返回「部件 / 网格名 / 材质路径」列式三元组。哈希→路径表提到
- 并按 root 集缓存（原先每次场景发现都重建一遍）。
+`EndfieldSceneBridge.AssetPathHashLut(vfsRoots)` 并按 root 集缓存
+（原先每次场景发现都重建一遍这十几万条）。
 
-Blender 侧  按  末段找 ，
-拿到 {网格名: [材质路径]}； 把这些材质路径解析成 CAB **并进部件自己的闭包一起导**
-（材质住在别的 CAB，不并进来就找不到），再按 Mesh 的  绑到对应网格上。
+Blender 侧 `roster_panel._npc_materials` 按 `avatarMeshName` 末段找 `data_npc_avatarmesh_<leaf>`，
+拿到 `{网格名: [材质路径]}`；`_import_part` 把这些材质路径解析成 CAB
+**并进部件自己的闭包一起导**（材质住在别的 CAB，不并进来就找不到），
+再按 Mesh 自己的 `m_Name` 绑到对应网格上。
 
-实测 ：9 个网格 9 个材质、17 张贴图，且
- → （部件 02 配材质 01），
- → （跨族共享材质）——
-两条都是按名字匹配绝对得不到的。自测：。
+实测 `npc_girl_efstaff_a_04`：9 个网格 9 个材质、17 张贴图，其中两条按名字绝对匹配不到——
+
+| 网格 | 得到的材质 | 为什么名字匹配会错 |
+|---|---|---|
+| `S_npc_girl_face_common_a_02` | `M_npc_girl_face_common_a_01` | 部件 02 配材质 01 |
+| `S_npc_girl_eyeshadow_common_a_02` | `M_npc_common_shared_eyeshadow_com01` | 跨族共享材质 |
+
+自测：`Game/EndField/selftest_npc.py`（`blender --background --python 它`，可加 `-- --npc <templateId>`）。
 
 ## 原先为何是白模
 
