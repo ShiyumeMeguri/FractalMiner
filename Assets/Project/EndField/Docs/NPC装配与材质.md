@@ -73,7 +73,22 @@ avatarSlotMeshDatas[] : NPCAvatarLodMeshAssets
 `m_Keys` = `df3715cb 65661c52 f3561b25 50c37fbb c6f378cc`，第三项小端 int32 = `0x251B56F3`
 = **622548723** = 清单 `materialCodes[0]`（对应 `S_npc_girl_body_efengineer_a_01`）。
 
-## 导入侧现状
+## 导入侧（已接通）
+
+ —— 读清单、按缩进走装配表文本、
+解十六进制、查 LUT，返回「部件 / 网格名 / 材质路径」列式三元组。哈希→路径表提到
+ 并按 root 集缓存（原先每次场景发现都重建一遍）。
+
+Blender 侧  按  末段找 ，
+拿到 {网格名: [材质路径]}； 把这些材质路径解析成 CAB **并进部件自己的闭包一起导**
+（材质住在别的 CAB，不并进来就找不到），再按 Mesh 的  绑到对应网格上。
+
+实测 ：9 个网格 9 个材质、17 张贴图，且
+ → （部件 02 配材质 01），
+ → （跨族共享材质）——
+两条都是按名字匹配绝对得不到的。自测：。
+
+## 原先为何是白模
 
 `roster_panel._import_part` 走 `prefab_importer.import_mesh_from_db(...)` 且**不传 materials**，
 所以部件一律平白导入。清单读取（`EndfieldNpcPrefabInfo.Read`）也只取了
