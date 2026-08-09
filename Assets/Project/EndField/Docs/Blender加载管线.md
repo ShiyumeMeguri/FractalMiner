@@ -18,6 +18,31 @@
 
 **Python 侧不写二进制解析；游戏特化不进 `ruri_pybridge`。**
 
+## 搜索与过滤：一套引擎，四个 tab
+
+面板每个列表（VirtualAssetBundle / Scene / World / Character）都是同一个搜索框 + 同一个
+Include/Exclude 多重规则编辑器，**匹配全部在 C# 跑，Python 侧零匹配代码**。
+
+C# 侧（内核，不属于任何游戏）：
+
+| 位置 | 作用 |
+|---|---|
+| `Core/Tables/ColumnTable.cs` | 列式表（UTF-8 blob + offsets），一切行的统一形状 |
+| `Core/Tables/ColumnSearch.cs` | 向量化 quick search（每列折叠一次 + 并行 IndexOf） |
+| `Core/Tables/RuleFilter.cs` | `FilterRule` + 十种 relation 的**唯一**求值器 |
+| `Core/Tables/TableRegistry.cs` | 按 handle 持表；`OpenHostTable` 收宿主自己拼的列表 |
+
+`CabTableSearch`（23 万行 cabmap）和任意 `ColumnTable` 共用 `RuleFilter`——relation 语义只声明
+一处。**搜索不需要游戏 hook**，只有「把 VFS 容器投影成表」才是游戏特化
+（`EndfieldTableBridge.Query`，留在 submodule 里）。
+
+Python 侧 `filter_ui.py`：一个列表注册一个 `FilterSpec`（可过滤字段 + 状态位置 + 重跑回调），
+其余（规则存储、popover、操作符）全共用。字段可以是**回调**——roster 的可过滤字段就是当前
+投影表的真实列，Characters 和 NPCs 天然不同，读出来而不是列表写死。
+
+**坑:** popover 面板必须 `bl_region_type = "HEADER"`。写 `"UI"` 就是侧边栏面板，没有
+`bl_category` 会被 Blender 丢进默认的 "Misc" 页，表现为凭空多出一个侧边栏。
+
 ## 场景导入链路
 
 ```
