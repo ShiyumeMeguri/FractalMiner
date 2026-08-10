@@ -18,6 +18,7 @@
 | [传送点设计.md](传送点设计.md) | 协议传送点在哪、找过哪些地方 |
 | [关卡逻辑数据.md](关卡逻辑数据.md) | MemoryPack 侧的关卡实体数据 |
 | [NPC装配与材质.md](NPC装配与材质.md) | 行人 NPC 的部件/材质码链路 |
+| [角色着色器.md](角色着色器.md) | CharacterNPR 五个 shader、影色/ramp/SDF 脸影/发丝各向异性 |
 | [Blender加载管线.md](Blender加载管线.md) | 导入架构、内存代价、自测 |
 
 ## 环境
