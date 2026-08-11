@@ -49,6 +49,26 @@ LOD 选择规则的**唯一实现**在 C# `SceneAssetPaths.SelectBestLod`（CLI 
 
 ⚠ **一个进程里别连跑两次大导入**——内存不释放会把 32 GB 机器压到剩 4 GB。
 
+## 动画：ACL 泛型 clip，不是 humanoid 肌肉 clip
+
+本作角色动画走 ACL 压缩，解出来是**完整的逐骨 transform 轨**（yvonne postmodel 实测：289 条
+position + 289 条 rotation + 22 条 scale，全部绑到真骨），**一条肌肉通道都没有**。
+
+但它**同时**带 Unity 的根运动浮点通道 `RootT.*` / `RootQ.*` / `MotionT.*` / `MotionQ.*`
+（实测 17 条 float，其余是未解析的 `typetree_0x…` 占位）。
+
+🔴 **判据：根运动通道 ≠ humanoid 肌肉编码。** 拿 RootT/RootQ 的存在去判"这是 humanoid clip"，
+会把本作**每一条**动画都误判成肌肉 clip。真正的区分是**身体运动在浮点里还是在 transform 轨里**：
+有 transform 轨 = 身体运动就在那儿，不需要肌肉求解器。
+
+实锤（2026-08-12，`A_actor_yvonne_ui_overview_start_loop`）：误判后 humanoid→generic 通道会拿
+**静止骨架**的 FK 算出一个"body transform"，**追加**一条 `Bip001` 的 position+rotation 曲线到
+本来就有真数据的同一条 path 上——同 path 两条绑定，读侧按 path 建字典时后写的赢，整个身体的摆位
+（`(0.4605, 0.8619, -1.1564)`，Y=0.86 即胯高）被 `(-0.0, -0.0601, -0.0437)` 顶掉。
+表现为角色像是根骨在原点、全身绕原点旋转并陷进地下。
+
+**验收判据**：`Bip001_L_Toe0` 的世界坐标 **z 必须 ≥ 0**。修复前 z = −0.8859，修复后 z = +0.0095。
+
 ## 自测
 
 ```bash
