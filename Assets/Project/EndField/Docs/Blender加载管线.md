@@ -87,6 +87,23 @@ avatar/角色 CAB co-seed**——闭包就是 clip 自己。等价性实测：�
 导出期转换（AR_HumanoidToGeneric hook）保留为**可选**，服务 Unity 工程导出场景：勾上 = 导出的
 .anim 直接是通用动画；不勾 = 保留肌肉编码（可移植形态）。
 
+### 多游戏会话：一次解码一游戏，多份 cabmap 并存
+
+一个进程能同时开多个游戏的 cabmap，但**上游一次只解码一个游戏**——游戏 hook 在 C# 侧互斥
+（`RuriHook.ApplyHooks`，同一批方法打不同 typetree 布局）。所以桥 `RipperBridge` 里：
+
+- **`maps_by_game`**：游戏名 → 已加载的 `CabMapHandle`。CabMapHandle 是纯值对象，可持有多份，
+  各游戏的行表同时驻留、互不覆盖（实测 EF 242222 行 + KK 48129 行并存于同一进程）。
+- **`use_game(game)`** 切当前解码器：`_map` 指向该游戏 handle，并在解码器不同时把 hook 重新
+  Initialize 成「该游戏的 game-hook ＋ 所有非游戏 AR_* 特性 hook」（一个游戏的解码器换掉另一个，
+  与上游互斥语义一致）。`enumerate_table`/`search` 只需 `_map` 切换；`import`/`game_data` 走新解码器。
+
+🔴 **判据：解码器真的切了 = `list_game_data()` 跟着换整套数据集 id、`hook_ids` 跟着换**，不是只换
+Python 视图。实测切换：`hook_ids` 在 `(EndField_1.4.4,)` ↔ `(Koikatu_1.0,)`；数据集 id 在
+EF `endfield.*`（models/npc.*/scene.* 8 个）↔ KK `koikatu.*`（anime.catalog/chara.*/face.* 8 个）。
+会话态（ROWS／选择／文件夹树／动画交接）按 `cabmap_state.GameSession` 按游戏隔离，进程级唯一共享
+的只有 CLR 桥本身。
+
 ### 跨游戏重定向：泛型 clip 走骨名对照表
 
 肌肉 clip 自带可移植性（肌肉值是 avatar 相对的），**泛型 clip 没有**——曲线是源骨轴向下的
@@ -108,6 +125,40 @@ Koikatu 侧 `cf_j_*`，**男女核心骨名完全一致**（p_cf_body_00 / p_cm_
 `cf_j_waist01/02` 是腿侧中间骨、EF 无对应，同样不映射。已落表 53 条
 （`KoikatuToEndField.json`：root+22 人形槽+30 指节），hips/root 开 `loc` + `scale_mode AUTO`
 （髋高比缩放），其余纯旋转；饰品/裙/胸/物理骨一律不进表。
+
+#### 直导链路：不导源角色，按 CRC 覆盖打分选源 avatar
+
+源游戏的 clip 直接套到「已在场的另一游戏骨架」上，**全程不导源角色**。数据流：
+
+```
+clip 绑定 CRC 集   ← clip.transform_channel_lists() 每条 channel.path 取 entry_crc
+选源 avatar        ← 扫源游戏 cabmap 全部 Avatar 类 CAB（按闭包依赖数升序，最便宜先试），
+                     逐个导出比对其 m_TOS 覆盖了几条 clip 绑定 CRC，取覆盖最高者
+                     （100% 即早停；(game, clipCab) 缓存，同包第二条 clip 跳过整轮扫描）
+临时源骨架         ← build_armature_from_avatar 从选中 avatar 的 m_AvatarSkeleton 建骨架
+烘 clip → 重定向    ← clip 烘到临时源骨架，再经 <src>To<dst> 骨名表 retarget 到目标骨架
+回收               ← 删临时源骨架＋中间烘焙动作，只留目标骨架上的产物（无源游戏残骨）
+```
+
+🔴 **按名字猜源 avatar 会错，必须按 CRC 覆盖打分**。实测 `L_SF_IN_Loop`（343 条绑定 CRC）：
+`cf_body_00Avatar`（女性基体，m_AvatarSkeleton 579 骨、依赖数 0＝最便宜先试）只覆盖 **326/343，
+缺 17 条**——女性基体没有的那些骨（男性体／剪影专属，与上文 p_cf/p_cm 差异对应）；
+`cf_panst_spats02Avatar`（服装 avatar，内嵌 560 骨全身骨架、依赖数 1）覆盖 **343/343**。
+所以打分跳过更便宜但只 95% 的女体、选 100% 的服装 avatar。**KK 服装 avatar 内嵌全身骨架，
+多份常并列 100%**（合法：产物一致，`_rank_key` 取依赖最少＋骨最全＋名字序）。
+
+🔴 **avatar 骨架真源 = `m_AvatarSkeleton`（＋`m_AvatarSkeletonPose` 摆 rest），不是
+`m_Human.m_Skeleton`**：后者只是归一到近原点的 **24 骨人形子集**，且**泛型 avatar 里为空**。
+实测：EF pelica（人形 avatar）m_AvatarSkeleton=415／m_Human.m_Skeleton=24／m_TOS=415；
+KK 全部 avatar 都是泛型，m_Human.m_Skeleton 一律 **0**（cf_body_00=579 骨、cf_panst_spats02=560 骨、
+手 24 骨，全靠 m_AvatarSkeleton 才建得出骨架）。读 m_Human.m_Skeleton 会让 KK 骨架空、EF 只剩 24 骨
+——这就是 `skeleton_nodes` 改取 m_AvatarSkeleton 全骨架的原因。
+
+🔴 **缺表 = AI 提示词工作流**：`<src>To<dst>.json` 不存在时，直导**在建好临时源骨架、烘完 clip
+之后**才报错（此刻两副骨架都在），把两副骨架结构各导一份 JSON 到
+`presets/AnimationRetarget/SkeletonConfig/`（源＝`<avatar名>_xg_source.json`、目标＝角色名），
+报错文本本身就是可粘贴提示词：目标表路径＋两份骨架 JSON 路径＋「只映射共有人形体骨、饰品骨不进表、
+一份双向」的写表规则。目标表路径被命名但故意不存在（那正是要人／AI 去创建的文件）。补好表重跑即成。
 
 ## 自测
 
