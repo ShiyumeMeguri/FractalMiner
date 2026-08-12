@@ -49,17 +49,23 @@ LOD 选择规则的**唯一实现**在 C# `SceneAssetPaths.SelectBestLod`（CLI 
 
 ⚠ **一个进程里别连跑两次大导入**——内存不释放会把 32 GB 机器压到剩 4 GB。
 
-## 动画：ACL 泛型 clip，不是 humanoid 肌肉 clip
+## 动画：ACL 泛型轨为主，战斗 clip 是「ACL + 肌肉」双编码
 
 本作角色动画走 ACL 压缩，解出来是**完整的逐骨 transform 轨**（yvonne postmodel 实测：289 条
-position + 289 条 rotation + 22 条 scale，全部绑到真骨），**一条肌肉通道都没有**。
-
-但它**同时**带 Unity 的根运动浮点通道 `RootT.*` / `RootQ.*` / `MotionT.*` / `MotionQ.*`
+position + 289 条 rotation + 22 条 scale，全部绑到真骨）。UI/剧情类 clip **一条肌肉通道都没有**，
+只带 Unity 的根运动浮点通道 `RootT.*` / `RootQ.*` / `MotionT.*` / `MotionQ.*`
 （实测 17 条 float，其余是未解析的 `typetree_0x…` 占位）。
 
-🔴 **判据：根运动通道 ≠ humanoid 肌肉编码。** 拿 RootT/RootQ 的存在去判"这是 humanoid clip"，
-会把本作**每一条**动画都误判成肌肉 clip。真正的区分是**身体运动在浮点里还是在 transform 轨里**：
-有 transform 轨 = 身体运动就在那儿，不需要肌肉求解器。
+🔴 **但战斗 clip 是双编码**（2026-08-12，pelica `battle_air_atk_*` / `battle_attack_01` 四条实测）：
+328 条 ACL 真骨轨（上身+辅助骨）**加** ~123 条肌肉浮点通道，其中肌肉编码**只覆盖腿部与 hips**
+——ACL 轨里没有 Thigh/Calf/Foot/Toe0/Bip001，解算净增 22–23 条 rotation +（hips、motion 各）1–2 条
+position，**与既有 ACL 轨零路径冲突**（solved/unsolved 逐路径 diff：replaced = 0）。
+IK 目标通道（`LeftFootT/Q`、`LeftHandT/Q` 等 28 条）不属于肌肉也不属于根运动，解算后原样保留。
+
+🔴 **判据：根运动通道 ≠ humanoid 肌肉编码；肌肉解算必须逐骨绑定，不是整条 clip 二选一。**
+拿 RootT/RootQ 判 humanoid 会把每条动画都误判成肌肉 clip；反过来拿"有 transform 轨"整体跳过
+解算，战斗 clip 的腿就全冻住。正确语义 = Unity 自己的语义：clip 里出现哪块肌肉的浮点通道，
+就解算哪根骨（`AnyMuscleBound`），解算结果**拥有**它绑的路径（同 path 顶替）。
 
 实锤（2026-08-12，`A_actor_yvonne_ui_overview_start_loop`）：误判后 humanoid→generic 通道会拿
 **静止骨架**的 FK 算出一个"body transform"，**追加**一条 `Bip001` 的 position+rotation 曲线到
@@ -68,6 +74,18 @@ position + 289 条 rotation + 22 条 scale，全部绑到真骨），**一条肌
 表现为角色像是根骨在原点、全身绕原点旋转并陷进地下。
 
 **验收判据**：`Bip001_L_Toe0` 的世界坐标 **z 必须 ≥ 0**。修复前 z = −0.8859，修复后 z = +0.0095。
+
+### 肌肉解算：avatar 烙印 + 绑定时解算（2026-08-12 起）
+
+骨架导入时把 Animator `m_Avatar` guid 指向的 **Avatar 文档树整棵**（Unity 自己的
+`m_Avatar/m_Human/m_AxesArray/m_TOS` 字段，JSON）烙进 armature 自定义属性 `ruri_unity_avatar`
+（pelica 实测 300 KB、415 条 TOS）；`ruri_unity_rig` 照旧烙路径→骨名+局部 rest。
+clip 绑定时把浮点通道连同烙印交给 C# `RipperBlenderBridge.SolveHumanoidClip`（相当于 Animator
+本身），解算出的骨骼曲线经 suffix-CRC 归一后按 path 顶替合并。**独立 clip 导入不再需要任何
+avatar/角色 CAB co-seed**——闭包就是 clip 自己。等价性实测：与旧导出期解算基线逐位对比，
+73 条曲线 grand max|delta| = 0.000e+00；Blender 端 2940 条 fcurve 与旧管线完全一致，6/6 腿骨动。
+导出期转换（AR_HumanoidToGeneric hook）保留为**可选**，服务 Unity 工程导出场景：勾上 = 导出的
+.anim 直接是通用动画；不勾 = 保留肌肉编码（可移植形态）。
 
 ## 自测
 
