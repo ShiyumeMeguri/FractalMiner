@@ -87,6 +87,28 @@ avatar/角色 CAB co-seed**——闭包就是 clip 自己。等价性实测：�
 导出期转换（AR_HumanoidToGeneric hook）保留为**可选**，服务 Unity 工程导出场景：勾上 = 导出的
 .anim 直接是通用动画；不勾 = 保留肌肉编码（可移植形态）。
 
+### 跨游戏重定向：泛型 clip 走骨名对照表
+
+肌肉 clip 自带可移植性（肌肉值是 avatar 相对的），**泛型 clip 没有**——曲线是源骨轴向下的
+局部旋转，换一副骨架就是废数据。所以跨游戏套动画走真重定向（世界旋转经两边 rest 换算），
+数学交给 AnimationRetarget 插件，本仓只提供它无法知道的两件事：
+
+- **骨架烙 `ruri_source_game`**（上游 GameType 成员名，如 `EndField`/`Koikatsu`），
+  由面板一次性解析 `Game.active_module` 后随导入选项 `source_game` 下发；
+- **对照表**：AnimationRetarget 预设格式，文件名 `<GameA>To<GameB>.json`，**一份双向**
+  （反向读时整表 source/dest 对调），两份互为反向 = 双真源会漂移，禁止。
+
+Endfield 侧骨名取自 pelica avatar 的 `m_HumanBoneIndex`（游戏自己声明，非按名猜）：
+`Hips=Bip001`（**不是** `Bip001_Pelvis`，后者不是人形骨，不映射）、
+`Spine/Chest/UpperChest=Bip001_Spine/Spine1/Spine2`、四肢 = 3ds Max Biped
+`Clavicle/UpperArm/Forearm/Hand`、`Thigh/Calf/Foot/Toe0`；手指 `Finger0..4` = 拇指→小指，
+`FingerN/N1/N2` = 近/中/远节，`FingerNNub` 是末端不动。
+Koikatsu 侧 `cf_j_*`，**男女核心骨名完全一致**（p_cf_body_00 / p_cm_body_00 实测差异只有
+生殖器与剪影物体）；`cf_j_leg01` 是膝、`cf_j_leg03` 是扭曲骨不映射，
+`cf_j_waist01/02` 是腿侧中间骨、EF 无对应，同样不映射。已落表 53 条
+（`KoikatsuToEndField.json`：root+22 人形槽+30 指节），hips/root 开 `loc` + `scale_mode AUTO`
+（髋高比缩放），其余纯旋转；饰品/裙/胸/物理骨一律不进表。
+
 ## 自测
 
 ```bash
