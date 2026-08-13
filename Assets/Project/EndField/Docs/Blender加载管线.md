@@ -49,6 +49,14 @@ LOD 选择规则的**唯一实现**在 C# `SceneAssetPaths.SelectBestLod`（CLI 
 
 ⚠ **一个进程里别连跑两次大导入**——内存不释放会把 32 GB 机器压到剩 4 GB。
 
+## 剧情动画从哪来
+
+演出动画不在角色自己的动画目录下，而在演出自己的目录里（分镜 + 演员命名法全在
+[剧情演出数据.md](剧情演出数据.md)）。数据来源是两个纯 cabmap 数据集，零解码：
+`endfield.story.units`（channel = cutscene | dialog）与 `endfield.story.clips`
+（channel + unit）。**这两个都只读 cabmap 的 container 路径**，所以列 4000 条剧情动画
+与 88 场演出是表查询而不是导入；clip 只在被选中导入时才解。
+
 ## 动画：ACL 泛型轨为主，战斗 clip 是「ACL + 肌肉」双编码
 
 本作角色动画走 ACL 压缩，解出来是**完整的逐骨 transform 轨**（yvonne postmodel 实测：289 条
@@ -179,6 +187,19 @@ Ruri.RipperHook.CLI.exe --hook EndField_1.4.4 --load "<gameRoot>" --cab-map "<ca
     --export "<dir>" --export-scene map01 --scene-landmark map01_lv007
 # 裸矩形版（前导负号必须用 = 形式）
 #   "--scene-window=<minX>,<minZ>,<maxX>,<maxZ>[,<sceneStateId>...]"
+```
+
+**查数据用只读 cabmap 的查询模式，不要为了看一眼就 --load/--export**（几秒 vs 几分钟，
+后者还容易把闭包炸开）：
+
+```bash
+# 路径搜索：浏览器那套 field|relation|value 规则，命中什么打什么
+Ruri.RipperHook.CLI.exe --hook EndField_1.4.4 --cab-map "<cabmap>" \
+    --cab-query "gameplay/cutscene/" --cab-rule extension|is|fbx --query-limit 0
+# 数据集：面板读什么，这里就读什么
+Ruri.RipperHook.CLI.exe --hook EndField_1.4.4 --data-list
+Ruri.RipperHook.CLI.exe --hook EndField_1.4.4 --cab-map "<cabmap>" \
+    --data endfield.story.units --data-arg channel=cutscene --query-limit 0
 ```
 
 编译验证三重反证：**0 错误 + 产物 dll 时间戳刚更新 + dll 字节里搜到新符号名**（控制台干净不算数）。
