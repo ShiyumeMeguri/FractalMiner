@@ -9,13 +9,43 @@
 |---|---|---|
 | 模板清单 | `Data/Json/NPC/PrefabInfo/<templateId>.json`（真 JSON，非 MemoryPack） | 部件名、渲染器名、**材质码** |
 | 共享装配表 | `…/gameplay/npc/avatarmesh/<族>/data_npc_avatarmesh_<leaf>.asset` | 每部件每子网格的**材质路径哈希** |
-| 骨架模板 | `…/gameplay/npc/avatartemplet/<族>/data_npc_avatartemplet_<leaf>.asset` | 共享骨架（已在用） |
+| 骨架模板 | `…/gameplay/npc/avatartemplet/<族>/data_npc_avatartemplet_<leaf>.asset` | 共享骨架 |
+
+骨架模板那条要注意：1.4.4 的 `data_npc_avatartemplet_*` MonoBehaviour **没有 `sizeAvatar` 字段**
+（只有 `avatarTempletTag / bonePaths / bonePathsStr / faceBonePath / collider / boundingBoxType`），
+**骨架是同一个 bundle 里那个 `Avatar` 资产**（`SK_npc_major_deathgirl_01Avatar`、
+`SK_actor_girlnpc_01Avatar`）。按 `sizeAvatar` 找会一无所获，然后整条装配静默走空。
+实测 deathgirl：338 根骨的站立世界 rest + 338 条路径 + 338 个叶名。
 
 `avatarMeshName` / `avatarTempletName` 是**运行时寻址键**（`NPC/AvatarMesh/Pedestrain/girl`），
 **不是容器路径**：容器里叫 `data_npc_avatarmesh_<最后一段>.asset`。两者靠这条命名换算相接。
 
 装配表是**整族共享的**：全部 girl 行人共用同一份 `data_npc_avatarmesh_girl`（实测 119 个 slot，
 覆盖该族所有部件）。这就是「NPC 都是通用的东西」的真实含义。
+
+## 🔴 部件名是 slot id，不是资产名（网格链）
+
+`partNameIdList` 的元素是**装配表里的 slot 名**。行人那族看着像资产名纯属巧合，
+「主要 NPC」那族根本不是：
+
+| 模板 | 部件（slot） | 实际网格 |
+|---|---|---|
+| `npc_spl_deathgirl_01`（芬诺菈） | `npc_8001_deathgirl_postmodel` | `S_npc_major_deathgirl_body_01_lod0` 等 9 个 |
+| `npc_spl_mon3ter_01`（M3） | `npc_1004_mon3ter_postmodel` | `S_npc_major_mon3ter_*_lod0` 等 10 个 |
+| `npc_chr_0003_endminf` | `chr_0003_endminf_postmodel` | `S_actor_endminf_*_lod0` 等 12 个 |
+| `npc_girl_unionscholar_a_04` | `P_npc_girl_body_unionscholar_a_02` | `S_npc_girl_body_unionscholar_**a_01**_lod0` |
+
+最后一行是判据：**行人也不能按名字猜**——slot `_a_02` 穿的是 `_a_01` 的网格。
+
+**网格的位置由 slot 自己给**：`SubMeshInfo.meshPathHash`（十进制 long，与
+`materialPathHashes` 同一套哈希空间）→ `StringPathHash LUT` → 容器路径 → `ResolveCabsForPaths`。
+必须走它:主要 NPC 的 brow/eyeshadow/hairshadow/iris 和一切 LOD1-3 网格**在 cabmap 里没有自己的行**
+（是共享 fbx 的子资产 / `generated/` 下的烘焙网格），按名字查一个都找不到。
+
+每个 slot 按 `partSubMeshsLOD0..3` 分级，且**分级不等长**：deathgirl 的 LOD0/1 是 9 个网格、
+LOD2/3 只有 7 个（去掉 eyeshadow 与 hairshadow）。某级没有就退到最近的一级。
+
+导入侧：`endfield.npc.meshes`（part / lod / mesh / path）。
 
 ## 材质链（源码定谳）
 
@@ -136,3 +166,9 @@ selfAvatarName          = SK_npc_girl_face_common_a_02Avatar
 部件不一定有 prefab：`P_npc_girl_body_efengineer_a_01` 只有 `sk_*.fbx`，
 `npc_girl_ear_fox_c` 才有 `p_*_variant.prefab`。即便有 prefab，它也只带默认材质，
 盖不住模板级材质码，所以走 prefab 也不能替代这条链。
+
+## 另一个静默零：BridgeAssetDatabase 不给 mesh_blobs
+
+本作顶点数据是流式/打包的，`prefab_scan.load_mesh` 先看数据库有没有原始几何 blob，
+没有才回退去解 YAML —— 而回退在这个游戏上**必然解出 0 顶点**，表现是部件"导入成功但什么都没有"。
+构造数据库时 `mesh_blobs=BRIDGE.mesh_blobs_by_guid` 是必给项，不是优化项。
