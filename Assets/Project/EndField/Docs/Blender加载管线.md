@@ -52,10 +52,22 @@ LOD 选择规则的**唯一实现**在 C# `SceneAssetPaths.SelectBestLod`（CLI 
 ## 剧情动画从哪来
 
 演出动画不在角色自己的动画目录下，而在演出自己的目录里（分镜 + 演员命名法全在
-[剧情演出数据.md](剧情演出数据.md)）。数据来源是两个纯 cabmap 数据集，零解码：
-`endfield.story.units`（channel = cutscene | dialog）与 `endfield.story.clips`
-（channel + unit）。**这两个都只读 cabmap 的 container 路径**，所以列 4000 条剧情动画
-与 88 场演出是表查询而不是导入；clip 只在被选中导入时才解。
+[剧情演出数据.md](剧情演出数据.md)）。数据来源是三个数据集：
+
+| 数据集 | 代价 | 内容 |
+|---|---|---|
+| `endfield.story.units`（channel） | 纯 cabmap，~2s | 88 场演出 / 421 条对话时间线 |
+| `endfield.story.clips`（channel/unit/actor） | 纯 cabmap | 某场戏的动画，或**某个角色**跨全部演出+对话+自有库的动画 |
+| `endfield.story.actors`（channel） | 纯 cabmap | 963 个 actor 索引，带 `characterdata` 资产解出的角色 id |
+| `endfield.story.timeline`（unit） | 只解那场戏的 playable/prefab CAB | **播放计划**：每条 timeline clip 的轨道/绑定/起止/clipIn/速度/混合/采样率/clip 全长 |
+
+前三个只读 container 路径（列 4000 条剧情动画是表查询不是导入）；第四个用
+`ClosureReader` 只加载这一场戏自己的 playable + prefab，读 Timeline 的 MonoBehaviour 字段。
+
+**等价播放的换算**（秒 → 帧）：条带跨度 `duration × 场景fps`，消耗动作帧
+`duration × timeScale × 采样率`，起点 `clipIn × 采样率`。采样率**取导入器盖在动作上的
+`ruri_sample_rate` 戳**，不取资产的 `m_SampleRate`（后者与 ACL 解码率不一致）。
+Blender 一条 NLA 轨不许重叠，所以游戏轨道内部交叉混合时自动分层 `<track>.2`。
 
 ## 动画：ACL 泛型轨为主，战斗 clip 是「ACL + 肌肉」双编码
 
