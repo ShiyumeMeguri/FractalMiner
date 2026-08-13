@@ -23,6 +23,24 @@
 装配表是**整族共享的**：全部 girl 行人共用同一份 `data_npc_avatarmesh_girl`（实测 119 个 slot，
 覆盖该族所有部件）。这就是「NPC 都是通用的东西」的真实含义。
 
+## NPC 的名字：三张表，覆盖 467/2063
+
+模型模板有 2063 个，**游戏自己只给其中 467 个起了名**。名字按「说得多具体」分三处：
+
+| 来源 | 键 | 名字怎么取 | 命中 |
+|---|---|---|---|
+| `NpcTemplateGroupTable` | `templateId` | `name` 是**文本键**（`npcName_laotuoshou1`）→ `TextTable.id` → `I18nTextTable_<LANG>` | 461 |
+| `NpcGroupTable` | **`<templateId>_gNN`** | `name.id` 直接是 i18n id（`I18nText = {id:Int64, text:String}`） | +6 |
+| `NpcTable` | `npcId`（经 `NpcInfoTable` 的 npcId↔templateId 回到模板） | 同上 | +0 |
+
+🔴 **剩下 1596 个是群众衣柜，游戏里就没有名字**（判据：`npc_boy_efengineer_a_01` 全 693 张表里
+只有 `NpcGroupTable` 提到过它，那行的 `name.id = 0`、`name.text` 为空；22,210 个文本键里
+`npcName_*` 只有 536 个，没有一个提到这些模板）。它们是 `_a_01`…`_a_99` 这种换装编号。
+游戏有 `npcName_anonUnion039 = 工团成员` 这类通用名，但**是逐 npc 实例挂上去的**，不挂在模板上。
+
+`I18nText` 结构自带 `text` 字段，但表里**从来不填**（940 行 NpcGroupTable 全空），
+名字一律走 id → `I18nTextTable_<LANG>`。
+
 ## 🔴 部件名是 slot id，不是资产名（网格链）
 
 `partNameIdList` 的元素是**装配表里的 slot 名**。行人那族看着像资产名纯属巧合，
