@@ -18,6 +18,46 @@
 
 **Python 侧不写二进制解析；游戏特化不进 `ruri_pybridge`。**
 
+## 网格（Mesh）字段完整性核账（2026-08-22）
+
+逐字段核对 Unity Mesh（ClassID 43）序列化布局 vs `mesh_decoder.py`/`MeshRawBlob.cs` 实际读取范围，
+再用直连桥探针（不开 Blender GUI）拿 `chr_0025_ardelia_postmodel` 的 64 个网格（body/brow/
+cloth×5/eyeshadow/face/fur/hair×2/hairshadow/iris/vfxpart，各到 LOD3）实测验证：`import_cabs`
+拉整个 prefab 闭包，逐网格比对源 YAML 字段与 `decode_mesh_blob` 输出。
+
+**结果：64/64 全部走 blob 快路径（C# 未跳过任何一个），顶点数/三角形数与源
+`m_VertexData.m_VertexCount`／`sum(subMesh.indexCount)/3` 逐一相等，骨骼权重和 100% 落在
+[0.98,1.02]。这个角色本身没有触发任何已知缺口。**已完整搬运：position/normal/tangent/color/
+UV0-7/legacy `m_Skin`/现代 BlendWeight+BlendIndices（固定 4 槽）/子网格三角形列表/index buffer/
+bindpose/boneNameHashes。
+
+🔴 **两个结构性缺口（该角色未触发，但格式里真实存在，换个网格就可能踩）**：
+1. `m_VariableBoneCountWeights`（Unity"无限骨骼权重"，单顶点超 4 个影响时用它而非固定 4 槽）
+   ——C# `MeshRawBlob.cs` 和 python `mesh_decoder.py` 都不读这个字段，也没有诊断信息。Ardelia
+   全部 64 网格该字段都是 `{"m_Data": null}`（真实存在但为空），所以这次没事；换一个真用无限
+   骨骼权重的网格，超出 4 个的骨骼影响会被静默丢弃且不报错、不降级。
+2. Unity `BlendShapeVertex` 结构每帧含 vertex+normal+**tangent** 三个 delta，`MeshRawBlob.cs`
+   打包 shape 顶点时 stride 硬编码 28 字节（index 4 + vertex 12 + normal 12），tangent delta
+   从未进桥；即使进了桥，`mesh_builder._apply_blendshapes` 也只写位置 delta——法线 delta
+   （已经解到 Python 这一步，变量名 `_delta_n`）在应用到 shape key 前一行被丢弃。Ardelia 全部
+   64 网格 `m_Shapes.channels` 都是 0（这游戏表情走 SkeletalMorph 骨骼 ΔTRS，不是 blendshape，
+   见 [[endfield-skeletalmorph-face]]），所以这条链没被踩到，但格式支持是真的。
+
+**验证过「像丢字节、实测是假警报」的一例**：body/face 网格的 UV2 槽声明维度 4、格式 SNorm8
+（不是标准 2 分量纹理坐标），`mesh_decoder.py` 只取前 2 分量存成 UV2。逐顶点核对第 3、4 分量：
+3156 个顶点全部恒为 0.0（std=0）——不是被丢弃的有效数据，是原始美术管线导出时留下的 padding。
+**判据是逐分量 std，不能只看 dimension 数字大于 2 就下结论是丢数据。**
+
+**切线/法线整字打包**（`EndfieldVertexFrame.cs`，`[Since("1.1.9")]`，1.4.4 仍生效）在 C# 读路径
+解开，两条解码路径（YAML/blob）都只会看到解开后的标准 float3/float4——这一层不是缺口。Ardelia
+body/face 网格的 TANGENT 声明维度就是 0（游戏本来没烤切线），落回 Blender `calc_tangents()`
+是设计内的正确兜底，不是解码失败。
+
+⚠ `chr_0025_ardelia_postmodel` 这个名字在 cabmap 里有两条不相关的行：
+`.../postmodels/npc/chr_0025_ardelia_postmodel.prefab` 与
+`.../postmodels/characters/chr_0025_ardelia_postmodel.prefab`，64 个网格 guid 零重叠（两套完全
+独立的资产，同名不同物）。按名字搜索/自动化脚本处理这个角色时，两条都要枚举，不能假设唯一命中。
+
 ## 场景导入链路
 
 ```
