@@ -31,17 +31,37 @@ cloth×5/eyeshadow/face/fur/hair×2/hairshadow/iris/vfxpart，各到 LOD3）实�
 UV0-7/legacy `m_Skin`/现代 BlendWeight+BlendIndices（固定 4 槽）/子网格三角形列表/index buffer/
 bindpose/boneNameHashes。
 
-🔴 **两个结构性缺口（该角色未触发，但格式里真实存在，换个网格就可能踩）**：
-1. `m_VariableBoneCountWeights`（Unity"无限骨骼权重"，单顶点超 4 个影响时用它而非固定 4 槽）
-   ——C# `MeshRawBlob.cs` 和 python `mesh_decoder.py` 都不读这个字段，也没有诊断信息。Ardelia
-   全部 64 网格该字段都是 `{"m_Data": null}`（真实存在但为空），所以这次没事；换一个真用无限
-   骨骼权重的网格，超出 4 个的骨骼影响会被静默丢弃且不报错、不降级。
-2. Unity `BlendShapeVertex` 结构每帧含 vertex+normal+**tangent** 三个 delta，`MeshRawBlob.cs`
-   打包 shape 顶点时 stride 硬编码 28 字节（index 4 + vertex 12 + normal 12），tangent delta
-   从未进桥；即使进了桥，`mesh_builder._apply_blendshapes` 也只写位置 delta——法线 delta
-   （已经解到 Python 这一步，变量名 `_delta_n`）在应用到 shape key 前一行被丢弃。Ardelia 全部
-   64 网格 `m_Shapes.channels` 都是 0（这游戏表情走 SkeletalMorph 骨骼 ΔTRS，不是 blendshape，
-   见 [[endfield-skeletalmorph-face]]），所以这条链没被踩到，但格式支持是真的。
+🔴 **两个结构性缺口（该角色未触发，但格式里真实存在）——2026-08-22 已修**：
+
+1. **形变顶点丢切线（真丢字节，已修）**。Unity `BlendShapeVertex` = index + vertex + normal +
+   **tangent**（反射 `IMeshBlendShapeVertex` 实证四个字段都在），而 `MeshRawBlob.cs` 打包 shape
+   顶点时 stride 硬编码 **28** 字节（index 4 + vertex 12 + normal 12），**每条形变顶点稳定丢 12
+   字节**。同时 `IMeshBlendShape` 有 `HasNormals` **和 `HasTangents`** 两个标志，桥只带了前者。
+   修法：stride 28→40 全量打包 tangent，`hasTangents` 一并过桥，python 两条解码路径（YAML 与
+   blob）的 delta 元组由三元组变**四元组** `(index, vertex, normal, tangent)`。
+   ⚠ **这是破坏性格式变更，C# 与 python 两半必须同时部署**（铁律禁兼容：不留双格式 reader）。
+   旧 dll 配新 py 会拿 40 字节的步长去读 28 字节的负载 = 形变数据直接错乱。
+2. **无限骨骼权重（未真丢字节，已改成不再静默）**。`m_VariableBoneCountWeights` 是 Unity 存
+   「单顶点超 4 个骨骼影响」的地方，C#/python 都不读。**但它的字节布局在本机没有任何真源可依**
+   ——AssetRipper 自己整棵树对这个字段零引用（`Extensions` 全文搜过），它只读进来不解释。所以
+   **没有去猜布局写解码器**（铁律：禁凭训练记忆推测 API、禁占位实现），改成把 `m_Data` 的字数经
+   blob meta → `DecodedMesh` → `MeshLoad` 带到宿主，非零时明确报「只建了前 4 个影响，这是截断」。
+   真碰到用它的资产时，拿真样本反推布局再实现。
+
+**实测覆盖（为什么敢说"没真丢"）**：Koikatu **3616 个网格** + Endfield Ardelia 64 个网格全量扫描，
+`m_VariableBoneCountWeights` 命中 **0**；带形变的 34 个网格里 `hasNormals`/`hasTangents` 命中
+**0**——即被丢的那 12 字节在已测资产里恒为零。修的是**静默丢失这一类**，不是找回了已丢的细节。
+
+**验收判据（跨路径对拍）**：blob 导出只清 `VertexData`/`IndexBuffer`，`m_Shapes` 仍留在 YAML，
+所以同一个网格能被两套独立实现各解一遍再逐条比。Koikatu 8 个形变网格、**3246 条 delta 逐条比对，
+float32 逐位一致，最大分歧 0.0**，8/8 的 shapeVertices 段长度 = 40×条数。Blender 侧真导入 8 个
+网格建出 20 个形变键、0 失败；Ardelia 64 网格回归仍 64/64 顶点数与三角形数一致。
+
+🔴 **Blender 存不下形变的法线/切线，这是宿主边界不是解码丢失**。实测 `bpy.types.ShapeKeyPoint`
+**只有 `co` 一个属性**，`ShapeKey` 上也不存在任何 normal/tangent 槽（整表枚举过），形变后的法线
+由 Blender 按变形几何自己重算。所以解码层做到无损，`mesh_builder._apply_blendshapes` 只在这些
+delta **真带数据**时打一行说明，不假装导全了。（顺带实测：Blender 顶点组本身能存 >4 个权重，
+单顶点挂 8 组正常——所以缺口 2 真拿到布局后在 Blender 侧是**能完整表达**的，不存在宿主限制。）
 
 **验证过「像丢字节、实测是假警报」的一例**：body/face 网格的 UV2 槽声明维度 4、格式 SNorm8
 （不是标准 2 分量纹理坐标），`mesh_decoder.py` 只取前 2 分量存成 UV2。逐顶点核对第 3、4 分量：
