@@ -41,12 +41,15 @@ bindpose/boneNameHashes。
    blob）的 delta 元组由三元组变**四元组** `(index, vertex, normal, tangent)`。
    ⚠ **这是破坏性格式变更，C# 与 python 两半必须同时部署**（铁律禁兼容：不留双格式 reader）。
    旧 dll 配新 py 会拿 40 字节的步长去读 28 字节的负载 = 形变数据直接错乱。
-2. **无限骨骼权重（未真丢字节，已改成不再静默）**。`m_VariableBoneCountWeights` 是 Unity 存
-   「单顶点超 4 个骨骼影响」的地方，C#/python 都不读。**但它的字节布局在本机没有任何真源可依**
-   ——AssetRipper 自己整棵树对这个字段零引用（`Extensions` 全文搜过），它只读进来不解释。所以
-   **没有去猜布局写解码器**（铁律：禁凭训练记忆推测 API、禁占位实现），改成把 `m_Data` 的字数经
-   blob meta → `DecodedMesh` → `MeshLoad` 带到宿主，非零时明确报「只建了前 4 个影响，这是截断」。
-   真碰到用它的资产时，拿真样本反推布局再实现。
+2. **无限骨骼权重：管线本来就支持，别再说"只建 4 个"**。🔴 **影响数在任何一层都没有被截到 4**：
+   `_decode_channel` 按 BlendWeight/BlendIndices 声明的 `dimension` 原样读，`_apply_skin` 用
+   `indices.shape[1]` 逐影响建顶点组，`bake_bind_pose` 同样逐影响混合，而 **Blender 顶点组天生
+   无上限**。合成数据实测：单顶点 8 个影响 → `min=max=8` 个顶点组，权重逐个精确。
+   真正没解的只有 `m_VariableBoneCountWeights` 这一个**另一种存法**——**它的字节布局在本机没有
+   任何真源可依**（AssetRipper 整棵树对该字段零引用，只读进来不解释），而且 3680 个网格里
+   命中 **0**，连一个能反推布局的样本都没有。所以**没有去猜布局写解码器**（铁律：禁凭训练记忆
+   推测 API、禁占位实现），只把 `m_Data` 字数经 blob meta → `DecodedMesh` → `MeshLoad` 带到宿主
+   当**绊线**：真出现时立刻看得见，拿到真样本再按真字节实现。
 
 **实测覆盖（为什么敢说"没真丢"）**：Koikatu **3616 个网格** + Endfield Ardelia 64 个网格全量扫描，
 `m_VariableBoneCountWeights` 命中 **0**；带形变的 34 个网格里 `hasNormals`/`hasTangents` 命中
@@ -57,11 +60,21 @@ bindpose/boneNameHashes。
 float32 逐位一致，最大分歧 0.0**，8/8 的 shapeVertices 段长度 = 40×条数。Blender 侧真导入 8 个
 网格建出 20 个形变键、0 失败；Ardelia 64 网格回归仍 64/64 顶点数与三角形数一致。
 
-🔴 **Blender 存不下形变的法线/切线，这是宿主边界不是解码丢失**。实测 `bpy.types.ShapeKeyPoint`
-**只有 `co` 一个属性**，`ShapeKey` 上也不存在任何 normal/tangent 槽（整表枚举过），形变后的法线
-由 Blender 按变形几何自己重算。所以解码层做到无损，`mesh_builder._apply_blendshapes` 只在这些
-delta **真带数据**时打一行说明，不假装导全了。（顺带实测：Blender 顶点组本身能存 >4 个权重，
-单顶点挂 8 组正常——所以缺口 2 真拿到布局后在 Blender 侧是**能完整表达**的，不存在宿主限制。）
+🔴 **形变的法线/切线 delta 存进具名网格属性，着色器直读**。`ShapeKeyPoint` 确实只有 `co`，
+但**那只是 shape key 这个原语的限制，不是 Blender 的**——网格能挂任意具名属性，这条管线本来
+就靠它传 `ruri_tangent`/`ruri_tangent_sign`/`Color` 给生成的着色图。所以形变法线/切线走同一条路：
+`ruri_shape_normal_<n>` / `ruri_shape_tangent_<n>`，FLOAT_VECTOR、**POINT 域**（delta 按顶点下标
+寻址，不是 CORNER）。序号 `<n>` 是**非 Basis 形变键的创建序号**，`ruri_shape_normal_0` 归
+`key_blocks[1]`——不用形变名，因为形变名可以很长而 Blender 属性名有长度上限，截断会让两个形变
+悄悄撞名。
+
+**判据不是标志位而是数据本身**：缓冲区遇到第一个非零 delta 才分配，全零形变一个属性都不建
+（Blender 读不到的属性一律返回零向量，与建一份全零属性语义相同、代价为零；实测 Koikatu 那 8 个
+全零形变网格建出 **0** 个属性）。这样即使 `hasNormals`/`hasTangents` 标志说谎也不会丢字节。
+
+**着色器真的读得到（渲染实证，不是断言）**：造一张挂了 `ruri_shape_normal_7 = (0.25,0.5,0.75)`
+的面片，材质 `Attribute → Emission → Output`，EEVEE 渲 4×4 EXR（view_transform=Standard），
+中心像素读回 **(0.25, 0.5, 0.75)**，逐位命中。
 
 **验证过「像丢字节、实测是假警报」的一例**：body/face 网格的 UV2 槽声明维度 4、格式 SNorm8
 （不是标准 2 分量纹理坐标），`mesh_decoder.py` 只取前 2 分量存成 UV2。逐顶点核对第 3、4 分量：
