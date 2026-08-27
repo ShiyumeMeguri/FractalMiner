@@ -1,0 +1,1165 @@
+[0000000146864000] = CryptCreateHash
+[0000000146864008] = RegDeleteValueW
+[0000000146864010] = RegDeleteKeyW
+[0000000146864018] = RegCreateKeyExW
+[0000000146864020] = RegEnumValueW
+[0000000146864028] = RegQueryValueExW
+[0000000146864030] = RegSetValueExW
+[0000000146864038] = LookupPrivilegeValueA
+[0000000146864040] = AdjustTokenPrivileges
+[0000000146864048] = OpenProcessToken
+[0000000146864050] = RegQueryValueExA
+[0000000146864058] = RegOpenKeyExA
+[0000000146864060] = CryptGenRandom
+[0000000146864068] = CryptAcquireContextA
+[0000000146864070] = GetUserNameW
+[0000000146864078] = RegCloseKey
+[0000000146864080] = RegOpenKeyExW
+[0000000146864088] = RegGetValueW
+[0000000146864090] = ReportEventW
+[0000000146864098] = RegisterEventSourceW
+[00000001468640A0] = DeregisterEventSource
+[00000001468640A8] = AllocateLocallyUniqueId
+[00000001468640B0] = CryptAcquireContextW
+[00000001468640B8] = CryptReleaseContext
+[00000001468640C0] = CryptDestroyKey
+[00000001468640C8] = CryptSetHashParam
+[00000001468640D0] = CryptGetProvParam
+[00000001468640D8] = CryptGetUserKey
+[00000001468640E0] = CryptExportKey
+[00000001468640E8] = CryptDecrypt
+[00000001468640F0] = RegEnumKeyExW
+[00000001468640F8] = CryptDestroyHash
+[0000000146864100] = CryptSignHashW
+[0000000146864108] = CryptEnumProvidersW
+[0000000146864110] = EtwEventRegister
+[0000000146864118] = EtwEventWriteTransfer
+[0000000146864120] = EtwEventSetInformation
+[0000000146864128] = EtwEventUnregister
+
+[0000000146864138] = CertGetCRLContextProperty
+[0000000146864140] = CertFreeCertificateContext
+[0000000146864148] = CertDuplicateCertificateContext
+[0000000146864150] = CertFindCertificateInStore
+[0000000146864158] = CertOpenStore
+[0000000146864160] = CertEnumCertificatesInStore
+[0000000146864168] = CertGetNameStringW
+[0000000146864170] = CertOpenSystemStoreW
+[0000000146864178] = CertCloseStore
+
+[0000000146864188] = GetStockObject
+[0000000146864190] = Rectangle
+[0000000146864198] = CreateBitmap
+[00000001468641A0] = CreateFontIndirectW
+[00000001468641A8] = CreateRectRgn
+[00000001468641B0] = CreateRoundRectRgn
+[00000001468641B8] = DeleteObject
+[00000001468641C0] = GetDeviceCaps
+[00000001468641C8] = RemoveFontMemResourceEx
+[00000001468641D0] = AddFontMemResourceEx
+[00000001468641D8] = CreateSolidBrush
+[00000001468641E0] = SetDCBrushColor
+[00000001468641E8] = PtInRegion
+[00000001468641F0] = SelectObject
+[00000001468641F8] = TextOutW
+[0000000146864200] = GetObjectW
+[0000000146864208] = CreateDIBSection
+[0000000146864210] = SetBkColor
+[0000000146864218] = SetBkMode
+[0000000146864220] = SetTextColor
+[0000000146864228] = SetTextAlign
+[0000000146864230] = CreateCompatibleDC
+[0000000146864238] = DeleteDC
+[0000000146864240] = GetTextExtentPoint32W
+[0000000146864248] = CreatePen
+
+[0000000146864258] = ImmCreateContext
+[0000000146864260] = ImmGetProperty
+[0000000146864268] = ImmGetIMEFileNameW
+[0000000146864270] = ImmDestroyContext
+[0000000146864278] = ImmGetContext
+[0000000146864280] = ImmReleaseContext
+[0000000146864288] = ImmAssociateContext
+[0000000146864290] = ImmGetCompositionStringW
+[0000000146864298] = ImmNotifyIME
+[00000001468642A0] = ImmSetCompositionWindow
+[00000001468642A8] = ImmSetCandidateWindow
+[00000001468642B0] = ImmGetDescriptionW
+
+[00000001468642C0] = GetAdaptersAddresses
+[00000001468642C8] = IcmpCreateFile
+[00000001468642D0] = IcmpCloseHandle
+[00000001468642D8] = IcmpSendEcho
+[00000001468642E0] = GetAdaptersInfo
+
+[00000001468642F0] = GetTimeZoneInformationStub
+[00000001468642F8] = GetTimeFormatExStub
+[0000000146864300] = GetDateFormatExStub
+[0000000146864308] = RtlTryAcquireSRWLockExclusive
+[0000000146864310] = SystemTimeToTzSpecificLocalTimeStub
+[0000000146864318] = RtlTryAcquireSRWLockShared
+[0000000146864320] = DeleteFileA
+[0000000146864328] = GetTempPathA
+[0000000146864330] = GetTempFileNameA
+[0000000146864338] = OutputDebugStringAStub
+[0000000146864340] = CreateWaitableTimerExW
+[0000000146864348] = VirtualQueryStub
+[0000000146864350] = MapViewOfFileExStub
+[0000000146864358] = GetThreadPriorityStub
+[0000000146864360] = QueryThreadCycleTimeStub
+[0000000146864368] = RtlAddFunctionTableStub
+[0000000146864370] = RtlDeleteFunctionTableStub
+[0000000146864378] = CreateSemaphoreA
+[0000000146864380] = RtlRunOnceInitialize
+[0000000146864388] = RtlWakeConditionVariable
+[0000000146864390] = ResolveLocaleNameStub
+[0000000146864398] = GetCurrencyFormatExStub
+[00000001468643A0] = GetNumberFormatExStub
+[00000001468643A8] = LocaleNameToLCIDStub
+[00000001468643B0] = LCIDToLocaleNameStub
+[00000001468643B8] = GetDynamicTimeZoneInformationStub
+[00000001468643C0] = GetLocaleInfoExStub
+[00000001468643C8] = RtlWakeAllConditionVariable
+[00000001468643D0] = ReadConsoleW
+[00000001468643D8] = ReadConsoleA
+[00000001468643E0] = SetConsoleMode
+[00000001468643E8] = GetConsoleMode
+[00000001468643F0] = ConvertThreadToFiber
+[00000001468643F8] = ConvertFiberToThread
+[0000000146864400] = CreateFiber
+[0000000146864408] = DeleteFiber
+[0000000146864410] = SwitchToFiber
+[0000000146864418] = FlushViewOfFileStub
+[0000000146864420] = GetTickCount64Kernel32
+[0000000146864428] = ProcessIdToSessionIdStub
+[0000000146864430] = WaitForSingleObjectEx
+[0000000146864438] = IsDebuggerPresentStub
+[0000000146864440] = GetProcessHeapStub
+[0000000146864448] = HeapFreeStub
+[0000000146864450] = RtlAllocateHeap
+[0000000146864458] = RtlRemoveVectoredExceptionHandler
+[0000000146864460] = K32GetModuleFileNameExAStub
+[0000000146864468] = K32EnumProcessModulesStub
+[0000000146864470] = LoadLibraryAStub
+[0000000146864478] = LoadLibraryExAStub
+[0000000146864480] = GetModuleFileNameAStub
+[0000000146864488] = RtlAddVectoredExceptionHandler
+[0000000146864490] = SetConsoleWindowInfo
+[0000000146864498] = SetConsoleTextAttribute
+[00000001468644A0] = SetConsoleScreenBufferSize
+[00000001468644A8] = GetConsoleScreenBufferInfo
+[00000001468644B0] = AttachConsole
+[00000001468644B8] = FreeConsole
+[00000001468644C0] = AllocConsole
+[00000001468644C8] = GlobalLock
+[00000001468644D0] = GlobalUnlock
+[00000001468644D8] = GlobalAllocStub
+[00000001468644E0] = GetVersionStub
+[00000001468644E8] = GetProcessHandleCountStub
+[00000001468644F0] = Thread32Next
+[00000001468644F8] = Thread32First
+[0000000146864500] = Process32NextW
+[0000000146864508] = Process32FirstW
+[0000000146864510] = CreateToolhelp32Snapshot
+[0000000146864518] = K32GetProcessMemoryInfoStub
+[0000000146864520] = K32GetModuleFileNameExWStub
+[0000000146864528] = K32EnumProcessModulesExStub
+[0000000146864530] = GetConsoleWindow
+[0000000146864538] = SetConsoleCtrlHandler
+[0000000146864540] = GetUserDefaultLocaleNameStub
+[0000000146864548] = GetUserPreferredUILanguagesStub
+[0000000146864550] = GetUserGeoID
+[0000000146864558] = GetGeoInfoW
+[0000000146864560] = GetSystemPowerStatus
+[0000000146864568] = SystemTimeToFileTimeStub
+[0000000146864570] = FileTimeToSystemTime
+[0000000146864578] = GetComputerNameW
+[0000000146864580] = MoveFileW
+[0000000146864588] = GetDllDirectoryW
+[0000000146864590] = QueryFullProcessImageNameWStub
+[0000000146864598] = SetThreadAffinityMask
+[00000001468645A0] = GetProcessAffinityMask
+[00000001468645A8] = FindResourceWStub
+[00000001468645B0] = SizeofResourceStub
+[00000001468645B8] = LockResourceStub
+[00000001468645C0] = LoadResourceStub
+[00000001468645C8] = GetModuleHandleExWStub
+[00000001468645D0] = SleepConditionVariableSRW
+[00000001468645D8] = DuplicateHandle
+[00000001468645E0] = InitOnceExecuteOnce
+[00000001468645E8] = WaitForMultipleObjectsEx
+[00000001468645F0] = GetModuleHandleWStub
+[00000001468645F8] = GetModuleFileNameWStub
+[0000000146864600] = GetProcessWorkingSetSizeExStub
+[0000000146864608] = VirtualFreeStub
+[0000000146864610] = VirtualProtectStub
+[0000000146864618] = VirtualAllocStub
+[0000000146864620] = GetNativeSystemInfoStub
+[0000000146864628] = GetLogicalProcessorInformationEx
+[0000000146864630] = GetVersionExWStub
+[0000000146864638] = GetLocalTimeStub
+[0000000146864640] = GetSystemTimeAsFileTimeStub
+[0000000146864648] = GetSystemDirectoryWStub
+[0000000146864650] = WriteConsoleA
+[0000000146864658] = SetConsoleTitleA
+[0000000146864660] = CreateEventA
+[0000000146864668] = InitializeCriticalSectionEx
+[0000000146864670] = SleepConditionVariableCS
+[0000000146864678] = FlsAllocStub
+[0000000146864680] = FlsSetValueStub
+[0000000146864688] = GetLargePageMinimumStub
+[0000000146864690] = VirtualUnlockStub
+[0000000146864698] = GetEnvironmentVariableAStub
+[00000001468646A0] = ExpandEnvironmentStringsAStub
+[00000001468646A8] = GetSystemDirectoryAStub
+[00000001468646B0] = VerifyVersionInfoA
+[00000001468646B8] = MulDiv
+[00000001468646C0] = MoveFileExWStub
+[00000001468646C8] = GetUserDefaultUILanguageStub
+[00000001468646D0] = GetErrorModeStub
+[00000001468646D8] = GetTickCountKernel32
+[00000001468646E0] = IsProcessorFeaturePresentStub
+[00000001468646E8] = GetSystemTimeStub
+[00000001468646F0] = RtlCaptureContext
+[00000001468646F8] = RtlLookupFunctionEntryStub
+[0000000146864700] = RtlVirtualUnwindStub
+[0000000146864708] = UnhandledExceptionFilterStub
+[0000000146864710] = InitializeSListHead
+[0000000146864718] = GetSystemInfoStub
+[0000000146864720] = GetStartupInfoWStub
+[0000000146864728] = GlobalMemoryStatusExStub
+[0000000146864730] = DebugBreakStub
+[0000000146864738] = GetACPStub
+[0000000146864740] = OpenProcessStub
+[0000000146864748] = GetThreadContextStub
+[0000000146864750] = UpdateProcThreadAttribute
+0000000146864758  00007FFB55A4DAB0  °Ú¤Uû...  kernelbase.void __cdecl HMONITOR_UserFree64(unsigned long *, struct HMONITOR__**)
+[0000000146864760] = InitializeProcThreadAttributeList
+[0000000146864768] = GetProcessIdStub
+[0000000146864770] = CreateProcessWStub
+[0000000146864778] = ResumeThreadStub
+[0000000146864780] = SuspendThreadStub
+[0000000146864788] = SetThreadPriorityStub
+[0000000146864790] = OpenThreadStub
+[0000000146864798] = GetCurrentThread
+[00000001468647A0] = CreateThreadStub
+[00000001468647A8] = SwitchToThreadStub
+[00000001468647B0] = GetExitCodeProcessImplementation
+[00000001468647B8] = FatalExit
+[00000001468647C0] = GetCurrentProcessId
+[00000001468647C8] = GetProcessTimesStub
+[00000001468647D0] = CreateSemaphoreW
+[00000001468647D8] = ReleaseSemaphore
+[00000001468647E0] = ResetEvent
+[00000001468647E8] = QueryPerformanceFrequencyStub
+[00000001468647F0] = PeekNamedPipeStub
+[00000001468647F8] = SetThreadErrorModeStub
+[0000000146864800] = SetUnhandledExceptionFilterStub
+[0000000146864808] = RaiseExceptionStub
+[0000000146864810] = OutputDebugStringWStub
+[0000000146864818] = GetTempPathW
+[0000000146864820] = SetFileTime
+[0000000146864828] = SetFilePointer
+[0000000146864830] = SetFileAttributesW
+[0000000146864838] = SetEndOfFile
+[0000000146864840] = RemoveDirectoryW
+[0000000146864848] = GetLongPathNameW
+[0000000146864850] = GetFullPathNameW
+[0000000146864858] = GetFinalPathNameByHandleW
+[0000000146864860] = GetFileSizeEx
+[0000000146864868] = GetFileAttributesExW
+[0000000146864870] = GetFileAttributesW
+[0000000146864878] = GetDiskFreeSpaceExW
+[0000000146864880] = FlushFileBuffers
+[0000000146864888] = FindNextFileW
+[0000000146864890] = DeleteFileW
+[0000000146864898] = CreateFileW
+[00000001468648A0] = CreateDirectoryW
+[00000001468648A8] = GetCurrentDirectoryWStub
+[00000001468648B0] = SetCurrentDirectoryWStub
+[00000001468648B8] = SetEnvironmentVariableWStub
+[00000001468648C0] = GetEnvironmentVariableWStub
+[00000001468648C8] = RtlInitializeCriticalSection
+[00000001468648D0] = RtlSetCriticalSectionSpinCount
+[00000001468648D8] = RtlDeleteCriticalSection
+[00000001468648E0] = RtlEnterCriticalSection
+[00000001468648E8] = RtlLeaveCriticalSection
+[00000001468648F0] = QueryPerformanceCounterStub
+[00000001468648F8] = GetCurrentThreadId
+[0000000146864900] = TlsGetValueStub
+[0000000146864908] = TlsSetValueStub
+[0000000146864910] = GetStdHandleStub
+[0000000146864918] = GetCommandLineWStub
+[0000000146864920] = FindClose
+[0000000146864928] = FindFirstFileW
+[0000000146864930] = GetFileType
+[0000000146864938] = GetLastErrorStub
+[0000000146864940] = SetErrorModeStub
+[0000000146864948] = ReleaseMutex
+[0000000146864950] = CreateMutexW
+[0000000146864958] = SleepStub
+[0000000146864960] = LocalFreeStub
+[0000000146864968] = WriteConsoleW
+[0000000146864970] = RtlTryEnterCriticalSection
+[0000000146864978] = RtlAcquireSRWLockShared
+[0000000146864980] = RtlReleaseSRWLockShared
+[0000000146864988] = RtlAcquireSRWLockExclusive
+[0000000146864990] = RtlReleaseSRWLockExclusive
+[0000000146864998] = RtlRunOnceInitialize
+[00000001468649A0] = TlsAllocStub
+[00000001468649A8] = TlsFreeStub
+[00000001468649B0] = WideCharToMultiByteStub
+[00000001468649B8] = GetFileSize
+[00000001468649C0] = CloseHandle
+[00000001468649C8] = CreateFileMappingWStub
+[00000001468649D0] = MapViewOfFileStub
+[00000001468649D8] = UnmapViewOfFileStub
+[00000001468649E0] = VerSetConditionMask
+[00000001468649E8] = SetLastErrorStub
+[00000001468649F0] = CreateIoCompletionPortStub
+[00000001468649F8] = GetQueuedCompletionStatusStub
+[0000000146864A00] = PostQueuedCompletionStatusStub
+[0000000146864A08] = CancelIoExStub
+[0000000146864A10] = InitializeCriticalSectionAndSpinCount
+[0000000146864A18] = SetEvent
+[0000000146864A20] = WaitForSingleObject
+[0000000146864A28] = SleepEx
+[0000000146864A30] = CreateEventW
+[0000000146864A38] = SetWaitableTimer
+[0000000146864A40] = WaitForMultipleObjects
+[0000000146864A48] = CreateWaitableTimerW
+[0000000146864A50] = QueueUserAPCStub
+[0000000146864A58] = TerminateThreadStub
+[0000000146864A60] = GetModuleHandleAStub
+[0000000146864A68] = GetProcAddressStub
+[0000000146864A70] = FormatMessageAStub
+[0000000146864A78] = VerifyVersionInfoW
+[0000000146864A80] = MultiByteToWideCharStub
+[0000000146864A88] = LoadLibraryWStub
+[0000000146864A90] = LoadLibraryExWStub
+[0000000146864A98] = LocalAllocStub
+[0000000146864AA0] = FreeLibraryStub
+[0000000146864AA8] = FormatMessageWStub
+[0000000146864AB0] = SetDllDirectoryW
+[0000000146864AB8] = GetCurrentProcess
+[0000000146864AC0] = TerminateProcessStub
+[0000000146864AC8] = HeapSetInformationStub
+[0000000146864AD0] = SetHandleInformation
+[0000000146864AD8] = CreatePipeStub
+[0000000146864AE0] = GetOverlappedResultStub
+[0000000146864AE8] = WriteFile
+[0000000146864AF0] = ReadFile
+[0000000146864AF8] = RtlCaptureStackBackTraceStub
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[00000001468651A0] = AcceptEx
+[00000001468651A8] = GetAcceptExSockaddrs
+
+[00000001468651B8] = IdnToAscii
+
+[00000001468651C8] = SafeArrayPutElement
+[00000001468651D0] = VariantClear
+[00000001468651D8] = SysFreeString
+[00000001468651E0] = VariantCopy
+[00000001468651E8] = SysAllocString
+[00000001468651F0] = SafeArrayCreateVector
+
+[0000000146865200] = wglGetProcAddress
+
+[0000000146865210] = SetupDiGetClassDevsExW
+[0000000146865218] = SetupDiGetClassDevsA
+[0000000146865220] = SetupDiGetDevicePropertyW
+[0000000146865228] = CM_Get_Device_IDW
+[0000000146865230] = SetupGetInfDriverStoreLocationW
+[0000000146865238] = SetupDiOpenDevRegKey
+[0000000146865240] = SetupDiEnumDeviceInfo
+[0000000146865248] = SetupDiGetDeviceRegistryPropertyW
+[0000000146865250] = SetupDiDestroyDeviceInfoList
+[0000000146865258] = SetupDiEnumDeviceInterfaces
+[0000000146865260] = SetupDiGetDeviceInterfaceDetailW
+[0000000146865268] = SetupDiGetClassDevsW
+
+[0000000146865278] = ShellExecuteExW
+[0000000146865280] = SHGetFolderPathW
+[0000000146865288] = SHGetKnownFolderPath
+[0000000146865290] = SHGetSpecialFolderPathW
+[0000000146865298] = SHCreateDirectory
+[00000001468652A0] = ShellExecuteW
+[00000001468652A8] = CommandLineToArgvW
+[00000001468652B0] = SHCreateDirectoryExW
+
+[00000001468652C0] = UiaClientsAreListening
+[00000001468652C8] = UiaRaiseAutomationEvent
+[00000001468652D0] = UiaHostProviderFromHwnd
+[00000001468652D8] = UiaReturnRawElementProvider
+[00000001468652E0] = UiaRaiseAutomationPropertyChangedEvent
+
+[00000001468652F0] = GetWindowInfo
+[00000001468652F8] = ClientToScreen
+[0000000146865300] = GetClipCursor
+[0000000146865308] = GetCursorPos
+[0000000146865310] = SetCursor
+[0000000146865318] = SetCursorPos
+[0000000146865320] = ShowCursor
+[0000000146865328] = AdjustWindowRectEx
+[0000000146865330] = InvalidateRect
+[0000000146865338] = SetWindowRgn
+[0000000146865340] = GetMonitorInfoW
+[0000000146865348] = MonitorFromWindow
+[0000000146865350] = MonitorFromRect
+[0000000146865358] = MonitorFromPoint
+[0000000146865360] = SystemParametersInfoW
+[0000000146865368] = EnumDisplaySettingsW
+[0000000146865370] = CreateIconIndirect
+[0000000146865378] = LoadImageW
+[0000000146865380] = EnumDisplayMonitors
+[0000000146865388] = ReleaseDC
+[0000000146865390] = GetDC
+[0000000146865398] = AttachThreadInput
+[00000001468653A0] = ShowWindow
+[00000001468653A8] = SetWindowPos
+[00000001468653B0] = GetForegroundWindow
+[00000001468653B8] = SetForegroundWindow
+[00000001468653C0] = GetWindowThreadProcessId
+[00000001468653C8] = LoadIconW
+[00000001468653D0] = LoadCursorFromFileW
+[00000001468653D8] = LoadCursorW
+[00000001468653E0] = GetRawInputData
+[00000001468653E8] = GetRawInputDeviceInfoA
+[00000001468653F0] = GetRawInputDeviceInfoW
+[00000001468653F8] = RegisterRawInputDevices
+[0000000146865400] = GetRawInputDeviceList
+[0000000146865408] = GetMessageW
+[0000000146865410] = TranslateMessage
+[0000000146865418] = DispatchMessageW
+[0000000146865420] = NtdllDefWindowProc_W
+[0000000146865428] = RegisterClassW
+[0000000146865430] = CreateWindowExW
+[0000000146865438] = DestroyWindow
+[0000000146865440] = GetSystemMetrics
+[0000000146865448] = UpdateWindow
+[0000000146865450] = BeginPaint
+[0000000146865458] = EndPaint
+[0000000146865460] = SetWindowTextW
+[0000000146865468] = ClipCursor
+[0000000146865470] = GetDlgItem
+[0000000146865478] = DrawTextW
+[0000000146865480] = LoadStringW
+[0000000146865488] = GetDialogBaseUnits
+[0000000146865490] = CreateDialogIndirectParamW
+[0000000146865498] = NtdllDefWindowProc_A
+[00000001468654A0] = PostMessageA
+[00000001468654A8] = SendMessageA
+[00000001468654B0] = DispatchMessageA
+[00000001468654B8] = GetMessageA
+[00000001468654C0] = GetClientRect
+[00000001468654C8] = FillRect
+[00000001468654D0] = GetWindowLongW
+[00000001468654D8] = SetWindowLongW
+[00000001468654E0] = PeekMessageW
+[00000001468654E8] = RegisterHotKey
+[00000001468654F0] = UnregisterHotKey
+[00000001468654F8] = PostQuitMessage
+[0000000146865500] = DialogBoxParamW
+[0000000146865508] = EndDialog
+[0000000146865510] = WindowFromPoint
+[0000000146865518] = SetDlgItemTextW
+[0000000146865520] = AllowSetForegroundWindow
+[0000000146865528] = GetWindowRect
+[0000000146865530] = MessageBoxW
+[0000000146865538] = ScreenToClient
+[0000000146865540] = GetTopWindow
+[0000000146865548] = EnumDisplayDevicesW
+[0000000146865550] = MapVirtualKeyW
+[0000000146865558] = GetKeyboardLayout
+[0000000146865560] = DisableProcessWindowsGhosting
+[0000000146865568] = PostMessageW
+[0000000146865570] = UnregisterClassW
+[0000000146865578] = IsWindow
+[0000000146865580] = SetLayeredWindowAttributes
+[0000000146865588] = FlashWindowEx
+[0000000146865590] = GetWindowPlacement
+[0000000146865598] = SetWindowPlacement
+[00000001468655A0] = IsIconic
+[00000001468655A8] = IsZoomed
+[00000001468655B0] = OpenClipboard
+[00000001468655B8] = CloseClipboard
+[00000001468655C0] = SetClipboardData
+[00000001468655C8] = GetClipboardData
+[00000001468655D0] = EmptyClipboard
+[00000001468655D8] = SetFocus
+[00000001468655E0] = GetActiveWindow
+[00000001468655E8] = GetFocus
+[00000001468655F0] = GetKeyState
+[00000001468655F8] = GetAsyncKeyState
+[0000000146865600] = SendInput
+[0000000146865608] = GetTouchInputInfo
+[0000000146865610] = CloseTouchInputHandle
+[0000000146865618] = RegisterTouchWindow
+[0000000146865620] = GetCapture
+[0000000146865628] = SetCapture
+[0000000146865630] = ReleaseCapture
+[0000000146865638] = SetTimer
+[0000000146865640] = KillTimer
+[0000000146865648] = SetActiveWindow
+[0000000146865650] = EnableWindow
+[0000000146865658] = EnumDisplayDevicesA
+[0000000146865660] = MessageBoxA
+[0000000146865668] = IsWindowEnabled
+[0000000146865670] = GetUserObjectInformationW
+[0000000146865678] = GetProcessWindowStation
+[0000000146865680] = SetParent
+[0000000146865688] = GetParent
+[0000000146865690] = IsChild
+[0000000146865698] = GetSystemMenu
+[00000001468656A0] = EnableMenuItem
+[00000001468656A8] = SetWindowDisplayAffinity
+[00000001468656B0] = GetWindowDisplayAffinity
+[00000001468656B8] = ChangeDisplaySettingsExW
+[00000001468656C0] = ChangeDisplaySettingsW
+[00000001468656C8] = DrawStateW
+
+[00000001468656D8] = _purecall
+[00000001468656E0] = __C_specific_handler
+[00000001468656E8] = memmove
+[00000001468656F0] = memmove
+[00000001468656F8] = memset
+[0000000146865700] = wcsstr
+[0000000146865708] = strrchr
+[0000000146865710] = memcmp
+[0000000146865718] = __std_terminate
+[0000000146865720] = memchr
+[0000000146865728] = __std_exception_copy
+[0000000146865730] = __std_exception_destroy
+[0000000146865738] = _CxxThrowException
+[0000000146865740] = __std_type_info_compare
+[0000000146865748] = __RTDynamicCast
+[0000000146865750] = strchr
+[0000000146865758] = wcschr
+[0000000146865760] = wcsrchr
+[0000000146865768] = _set_purecall_handler
+[0000000146865770] = longjmp
+[0000000146865778] = __RTtypeid
+[0000000146865780] = __std_type_info_name
+[0000000146865788] = __CxxFrameHandler3
+[0000000146865790] = __current_exception
+[0000000146865798] = __current_exception_context
+[00000001468657A0] = __intrinsic_setjmp
+[00000001468657A8] = strstr
+
+[00000001468657B8] = __CxxFrameHandler4
+
+[00000001468657C8] = WinHttpGetDefaultProxyConfiguration
+[00000001468657D0] = WinHttpGetIEProxyConfigForCurrentUser
+
+[00000001468657E0] = midiInReset
+[00000001468657E8] = midiOutLongMsg
+[00000001468657F0] = midiInStop
+[00000001468657F8] = midiInStart
+[0000000146865800] = midiInAddBuffer
+[0000000146865808] = midiInUnprepareHeader
+[0000000146865810] = midiInPrepareHeader
+[0000000146865818] = midiInClose
+[0000000146865820] = midiInOpen
+[0000000146865828] = midiInGetErrorTextA
+[0000000146865830] = midiInGetDevCapsA
+[0000000146865838] = midiInGetNumDevs
+[0000000146865840] = midiOutShortMsg
+[0000000146865848] = waveOutGetNumDevs
+[0000000146865850] = timeBeginPeriod
+[0000000146865858] = timeEndPeriod
+[0000000146865860] = timeGetTime
+[0000000146865868] = timeSetEvent
+[0000000146865870] = midiOutGetNumDevs
+[0000000146865878] = midiStreamOpen
+[0000000146865880] = midiStreamClose
+[0000000146865888] = midiStreamProperty
+[0000000146865890] = midiStreamPosition
+[0000000146865898] = midiStreamOut
+[00000001468658A0] = midiStreamRestart
+[00000001468658A8] = midiStreamStop
+[00000001468658B0] = midiOutGetDevCapsA
+[00000001468658B8] = midiOutGetErrorTextA
+[00000001468658C0] = midiOutOpen
+[00000001468658C8] = midiOutClose
+[00000001468658D0] = midiOutPrepareHeader
+[00000001468658D8] = midiOutUnprepareHeader
+
+[00000001468658E8] = WinVerifyTrust
+
+[00000001468658F8] = ldap_memfree
+[0000000146865900] = ldap_get_dn
+[0000000146865908] = ldap_value_free_len
+[0000000146865910] = ldap_get_values_lenA
+[0000000146865918] = ldap_next_attributeA
+[0000000146865920] = ldap_first_attribute
+[0000000146865928] = ber_free
+[0000000146865930] = ldap_first_entry
+[0000000146865938] = ldap_err2string
+[0000000146865940] = ldap_msgfree
+[0000000146865948] = ldap_set_optionA
+[0000000146865950] = ldap_search_s
+[0000000146865958] = ldap_unbind_s
+[0000000146865960] = ldap_init
+[0000000146865968] = ldap_next_entry
+[0000000146865970] = ldap_simple_bind_s
+
+[0000000146865980] = InetNtopW
+[0000000146865988] = inet_addr
+[0000000146865990] = inet_pton
+[0000000146865998] = getnameinfo
+[00000001468659A0] = FreeAddrInfoW
+[00000001468659A8] = getaddrinfo
+[00000001468659B0] = gethostname
+[00000001468659B8] = socket
+[00000001468659C0] = accept
+[00000001468659C8] = send
+[00000001468659D0] = select
+[00000001468659D8] = recvfrom
+[00000001468659E0] = __WSAFDIsSet
+[00000001468659E8] = WSAIoctl
+[00000001468659F0] = bind
+[00000001468659F8] = recv
+[0000000146865A00] = WSAAddressToStringW
+[0000000146865A08] = WSASocketW
+[0000000146865A10] = WSASend
+[0000000146865A18] = WSARecv
+[0000000146865A20] = WSAGetLastError
+[0000000146865A28] = WSASetLastError
+[0000000146865A30] = WSACleanup
+[0000000146865A38] = WSAStartup
+[0000000146865A40] = shutdown
+[0000000146865A48] = setsockopt
+[0000000146865A50] = htons
+[0000000146865A58] = ntohl
+[0000000146865A60] = listen
+[0000000146865A68] = htons
+[0000000146865A70] = ntohl
+[0000000146865A78] = getsockopt
+[0000000146865A80] = getpeername
+[0000000146865A88] = ioctlsocket
+[0000000146865A90] = closesocket
+[0000000146865A98] = getsockname
+[0000000146865AA0] = connect
+[0000000146865AA8] = sendto
+
+[0000000146865AB8] = X3DAudioInitialize
+[0000000146865AC0] = X3DAudioCalculate
+
+[0000000146865AD0] = CreateFX
+
+[0000000146865AE0] = XInputGetState
+[0000000146865AE8] = XInputSetState
+
+[0000000146865AF8] = RtlWakeAddressSingle
+[0000000146865B00] = WaitOnAddress
+
+[0000000146865B10] = _cputs
+
+[0000000146865B20] = strtoimax
+[0000000146865B28] = strtold
+[0000000146865B30] = strtoimax
+[0000000146865B38] = wcstoumax
+[0000000146865B40] = atof
+[0000000146865B48] = wcstoul
+[0000000146865B50] = atoi
+[0000000146865B58] = strtoul
+[0000000146865B60] = strtof
+[0000000146865B68] = strtoull
+[0000000146865B70] = wcstold
+[0000000146865B78] = _wtoll
+[0000000146865B80] = strtol
+[0000000146865B88] = _wtof
+[0000000146865B90] = _wtoi
+[0000000146865B98] = _wcstoi64
+[0000000146865BA0] = strtoull
+
+[0000000146865BB0] = getenv
+
+[0000000146865BC0] = remove
+[0000000146865BC8] = _fstat64
+[0000000146865BD0] = _stat64
+[0000000146865BD8] = _fstat64i32
+[0000000146865BE0] = _unlock_file
+[0000000146865BE8] = rename
+[0000000146865BF0] = _lock_file
+[0000000146865BF8] = _wrmdir
+[0000000146865C00] = _wmkdir
+[0000000146865C08] = _wstat64
+[0000000146865C10] = _wremove
+[0000000146865C18] = _wrename
+[0000000146865C20] = _stat64i32
+
+[0000000146865C30] = _get_heap_handle
+[0000000146865C38] = _heapchk
+[0000000146865C40] = _callnewh
+[0000000146865C48] = _set_new_mode
+[0000000146865C50] = free
+[0000000146865C58] = realloc
+[0000000146865C60] = calloc
+[0000000146865C68] = _msize
+[0000000146865C70] = _aligned_malloc
+[0000000146865C78] = _aligned_free
+[0000000146865C80] = malloc
+
+[0000000146865C90] = _free_locale
+[0000000146865C98] = _configthreadlocale
+[0000000146865CA0] = _create_locale
+
+[0000000146865CB0] = sqrt
+[0000000146865CB8] = truncf
+[0000000146865CC0] = atan2
+[0000000146865CC8] = atan
+[0000000146865CD0] = asin
+[0000000146865CD8] = round
+[0000000146865CE0] = atan2f
+[0000000146865CE8] = asinf
+[0000000146865CF0] = cosf
+[0000000146865CF8] = _isnan
+[0000000146865D00] = acosf
+[0000000146865D08] = logf
+[0000000146865D10] = trunc
+[0000000146865D18] = _dtest
+[0000000146865D20] = _ldsign
+[0000000146865D28] = _fdsign
+[0000000146865D30] = copysign
+[0000000146865D38] = expf
+[0000000146865D40] = sin
+[0000000146865D48] = sqrtf
+[0000000146865D50] = pow
+[0000000146865D58] = nextafterl
+[0000000146865D60] = log10
+[0000000146865D68] = ceilf
+[0000000146865D70] = floorf
+[0000000146865D78] = floor
+[0000000146865D80] = ceil
+[0000000146865D88] = exp
+[0000000146865D90] = fmod
+[0000000146865D98] = roundf
+[0000000146865DA0] = log10f
+[0000000146865DA8] = sinhf
+[0000000146865DB0] = nextafterf
+[0000000146865DB8] = acos
+[0000000146865DC0] = lrintf
+[0000000146865DC8] = tanf
+[0000000146865DD0] = _fpclass
+[0000000146865DD8] = log
+[0000000146865DE0] = powf
+[0000000146865DE8] = fminl
+[0000000146865DF0] = sinf
+[0000000146865DF8] = fmodf
+[0000000146865E00] = cos
+[0000000146865E08] = lrint
+[0000000146865E10] = scalbln
+[0000000146865E18] = _dclass
+[0000000146865E20] = atanf
+[0000000146865E28] = copysignf
+[0000000146865E30] = exp2f
+[0000000146865E38] = exp2
+[0000000146865E40] = modff
+[0000000146865E48] = fmaxl
+[0000000146865E50] = __setusermatherr
+[0000000146865E58] = _fdclass
+[0000000146865E60] = nearbyintl
+[0000000146865E68] = ldexp
+[0000000146865E70] = log2
+[0000000146865E78] = tan
+[0000000146865E80] = frexp
+[0000000146865E88] = modf
+[0000000146865E90] = nearbyintf
+[0000000146865E98] = _finite
+
+[0000000146865EA8] = _set_invalid_parameter_handler
+[0000000146865EB0] = _wassert
+[0000000146865EB8] = terminate
+[0000000146865EC0] = strerror
+[0000000146865EC8] = __sys_nerr
+[0000000146865ED0] = _getpid
+[0000000146865ED8] = _register_thread_local_exe_atexit_callback
+[0000000146865EE0] = abort
+[0000000146865EE8] = _c_exit
+[0000000146865EF0] = _invalid_parameter_noinfo_noreturn
+[0000000146865EF8] = _invoke_watson
+[0000000146865F00] = _configure_narrow_argv
+[0000000146865F08] = _initialize_narrow_environment
+[0000000146865F10] = _initterm_e
+[0000000146865F18] = _initialize_onexit_table
+[0000000146865F20] = _register_onexit_function
+[0000000146865F28] = _crt_atexit
+[0000000146865F30] = exit
+[0000000146865F38] = _cexit
+[0000000146865F40] = signal
+[0000000146865F48] = _beginthreadex
+[0000000146865F50] = _initterm
+[0000000146865F58] = raise
+[0000000146865F60] = _errno
+[0000000146865F68] = _Exit
+[0000000146865F70] = _invalid_parameter_noinfo
+[0000000146865F78] = _seh_filter_exe
+[0000000146865F80] = _set_app_type
+[0000000146865F88] = strerror_s
+[0000000146865F90] = _get_narrow_winmain_command_line
+
+[0000000146865FA0] = fopen
+[0000000146865FA8] = ferror
+[0000000146865FB0] = fseek
+[0000000146865FB8] = fclose
+[0000000146865FC0] = ftell
+[0000000146865FC8] = _ftelli64
+[0000000146865FD0] = fwrite
+[0000000146865FD8] = __stdio_common_vsprintf_s
+[0000000146865FE0] = fputc
+[0000000146865FE8] = ungetc
+[0000000146865FF0] = _wfopen
+[0000000146865FF8] = fsetpos
+[0000000146866000] = fputs
+[0000000146866008] = fgetpos
+[0000000146866010] = fgetc
+[0000000146866018] = _get_stream_buffer_pointers
+[0000000146866020] = puts
+[0000000146866028] = __stdio_common_vsscanf
+[0000000146866030] = fopen_s
+[0000000146866038] = feof
+[0000000146866040] = __stdio_common_vsprintf
+[0000000146866048] = rewind
+[0000000146866050] = _set_fmode
+[0000000146866058] = _setmode
+[0000000146866060] = __stdio_common_vswprintf
+[0000000146866068] = _wfopen_s
+[0000000146866070] = __stdio_common_vsnprintf_s
+[0000000146866078] = _fileno
+[0000000146866080] = __stdio_common_vfprintf
+[0000000146866088] = fgetws
+[0000000146866090] = setbuf
+[0000000146866098] = clearerr
+[00000001468660A0] = _lseeki64
+[00000001468660A8] = __p__commode
+[00000001468660B0] = setvbuf
+[00000001468660B8] = fflush
+[00000001468660C0] = fread
+[00000001468660C8] = __stdio_common_vfwprintf
+[00000001468660D0] = __acrt_iob_func
+[00000001468660D8] = _read
+[00000001468660E0] = _write
+[00000001468660E8] = _close
+[00000001468660F0] = __stdio_common_vswprintf_s
+[00000001468660F8] = _fseeki64
+[0000000146866100] = __stdio_common_vfprintf_s
+[0000000146866108] = _filelengthi64
+[0000000146866110] = _open
+[0000000146866118] = fgets
+[0000000146866120] = _wfsopen
+
+[0000000146866130] = toupper
+[0000000146866138] = isprint
+[0000000146866140] = wcscat_s
+[0000000146866148] = wcscpy_s
+[0000000146866150] = _wcsdup
+[0000000146866158] = _wcsicmp
+[0000000146866160] = _wcsnicmp
+[0000000146866168] = _iswalnum_l
+[0000000146866170] = strtok
+[0000000146866178] = strncat_s
+[0000000146866180] = wcsncat_s
+[0000000146866188] = iswxdigit
+[0000000146866190] = isspace
+[0000000146866198] = strncat
+[00000001468661A0] = strnlen
+[00000001468661A8] = wcsncmp
+[00000001468661B0] = wcsncpy_s
+[00000001468661B8] = _strnicmp
+[00000001468661C0] = strcpy_s
+[00000001468661C8] = isxdigit
+[00000001468661D0] = wcsncpy
+[00000001468661D8] = strpbrk
+[00000001468661E0] = isalnum
+[00000001468661E8] = iswspace
+[00000001468661F0] = strncmp
+[00000001468661F8] = isalpha
+[0000000146866200] = tolower
+[0000000146866208] = strncpy
+[0000000146866210] = strspn
+[0000000146866218] = _strdup
+[0000000146866220] = _stricmp
+[0000000146866228] = isupper
+[0000000146866230] = islower
+[0000000146866238] = isgraph
+[0000000146866240] = _towupper_l
+[0000000146866248] = wcstok_s
+[0000000146866250] = strcspn
+[0000000146866258] = iswalpha
+[0000000146866260] = isdigit
+[0000000146866268] = iswupper
+[0000000146866270] = iswpunct
+[0000000146866278] = strncpy_s
+[0000000146866280] = iswlower
+[0000000146866288] = strcmp
+[0000000146866290] = _iswdigit_l
+
+[00000001468662A0] = _localtime64_s
+[00000001468662A8] = __timezone
+[00000001468662B0] = __tzname
+[00000001468662B8] = _tzset
+[00000001468662C0] = strftime
+[00000001468662C8] = _gmtime64
+[00000001468662D0] = _time64
+[00000001468662D8] = _gmtime64_s
+
+[00000001468662E8] = rand_s
+[00000001468662F0] = rand
+[00000001468662F8] = ldiv
+[0000000146866300] = bsearch
+[0000000146866308] = qsort
+[0000000146866310] = srand
+
+[0000000146866320] = BCryptGenRandom
+
+[0000000146866330] = D3D11CreateDevice
+
+[0000000146866340] = D3DPERF_EndEvent
+[0000000146866348] = D3DPERF_BeginEvent
+
+[0000000146866358] = DwmSetWindowAttribute
+[0000000146866360] = DwmFlush
+[0000000146866368] = DwmGetCompositionTimingInfo
+[0000000146866370] = DwmIsCompositionEnabled
+
+[0000000146866380] = CreateDXGIFactory1
+[0000000146866388] = CreateDXGIFactory
+
+[0000000146866398] = CoTaskMemAlloc
+[00000001468663A0] = CoTaskMemFree
+[00000001468663A8] = ReleaseStgMedium
+[00000001468663B0] = RevokeDragDrop
+[00000001468663B8] = RegisterDragDrop
+[00000001468663C0] = OleUninitialize
+[00000001468663C8] = OleInitialize
+[00000001468663D0] = CoSetProxyBlanket
+[00000001468663D8] = CoCreateInstance
+[00000001468663E0] = IIDFromString
+[00000001468663E8] = PropVariantCopy
+[00000001468663F0] = PropVariantClear
+[00000001468663F8] = CoCreateGuid
+[0000000146866400] = CoUninitialize
+[0000000146866408] = CoInitializeEx
+[0000000146866410] = StringFromGUID2
+[0000000146866418] = CoInitialize
+
+[0000000146866428] = PdhAddCounterW
+[0000000146866430] = PdhCollectQueryData
+[0000000146866438] = PdhCloseQuery
+[0000000146866440] = PdhGetFormattedCounterValue
+[0000000146866448] = PdhGetRawCounterValue
+[0000000146866450] = PdhCalculateCounterFromRawValue
+[0000000146866458] = PdhOpenQueryW
+
