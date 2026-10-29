@@ -1,0 +1,62 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: FractalWorld
+  m_Shader: {fileID: 4800000, guid: e4413783d59d4fae9a97fa9c85b81f02, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties:
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs: []
+    m_Ints:
+    - _BlendOp: 0
+    - _Cull: 0
+    - _DstAlpha: 0
+    - _SrcAlpha: 1
+    - _ZTest: 4
+    - _ZWrite: 1
+    m_Floats:
+    - _ColorAnimationTime: 1200
+    - _DepthOffsetFactor: 0
+    - _DepthOffsetUnits: 0
+    - _EpsilonScale: 1
+    - _FractalAnimationTime: 300
+    - _GlowExponent: 0.58
+    - _GlowScale: 0.866
+    - _KleinianIterations: 10
+    - _MandelbrotCX: -0.8
+    - _MandelbrotCY: 0.156
+    - _MandelbrotCenterX: 0
+    - _MandelbrotCenterY: 0
+    - _MandelbrotIterations: 10
+    - _MandelbrotReverse: 0
+    - _MandelbrotScale: 1
+    - _MandelbrotUseJulia: 0
+    - _MaxSteps: 384
+    - _MinimumStepScale: 0.25
+    - _NormalScale: 1
+    - _PixelAngle: 0.002
+    - _RaymarchingMaxDist: 5
+    - _RaymarchingMinDist: 0.00035
+    - _SafetyFactor: 1
+    - _StartStep: 0.015
+    m_Colors:
+    - _FractalOffset: {r: 0, g: 0, b: 0, a: 0}
+    - _MandelbrotPower: {r: 2, g: 0, b: 0, a: 0}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1
