@@ -17,8 +17,13 @@ Shader "Ruri/Fractal/FractalWorld" {
         _GlowExponent ("Glow Exponent", Float) = 0.58
 
         [Header(Animation)]
-        _FractalAnimationTime ("Fractal Animation Time", Float) = 18.7
-        _ColorAnimationTime ("Color Animation Time", Float) = 18.7
+        _FractalAnimationTime ("Fractal Animation Time", Float) = 300
+        _ColorAnimationTime ("Color Animation Time", Float) = 1200
+
+        [Header(Sapphire Grade)]
+        _SapphireViolet ("Violet Shadow Strength", Range(0, 1)) = 0.45
+        _SapphireAquaLow ("Aqua Tint Low", Float) = -0.12
+        _SapphireAquaHigh ("Aqua Tint High", Float) = 0.28
 
         [Header(Mandelbrot Fractal)]
         _MandelbrotPower ("Power (Real, Imag)", Vector) = (2,0,0,0)
@@ -106,6 +111,9 @@ Shader "Ruri/Fractal/FractalWorld" {
                 float _GlowExponent;
                 float _FractalAnimationTime;
                 float _ColorAnimationTime;
+                float _SapphireViolet;
+                float _SapphireAquaLow;
+                float _SapphireAquaHigh;
                 float4 _MandelbrotPower;
                 float _MandelbrotIterations;
                 float _MandelbrotCenterX;
@@ -347,7 +355,54 @@ Shader "Ruri/Fractal/FractalWorld" {
                 float3 colorMix = baseFractalColors2 - baseFractalColors1;
                 colorMix = adjustedColorTime * colorMix + baseFractalColors1;
                 colorMix = colorIntensityFactor * colorMix + float3(0.0, 0.05, 0.0);
-                return saturate(0.7 - colorMix);
+                return 0.7 - colorMix;
+            }
+
+            static const float SapphireToneKnots[9] = { -0.47, -0.34, -0.15, 0.25, 0.48, 0.78, 1.15, 1.75, 8.0 };
+            static const float SapphireToneValues[9] = { 0.05, 0.10, 0.17, 0.26, 0.38, 0.54, 0.72, 0.89, 1.0 };
+            static const float SapphireStopPositions[8] = { 0.0, 0.12, 0.28, 0.46, 0.64, 0.80, 0.92, 1.0 };
+            static const float3 SapphireRamps[24] = {
+                float3(10, 26, 84) / 255.0, float3(14, 42, 132) / 255.0, float3(22, 74, 192) / 255.0, float3(44, 118, 236) / 255.0,
+                float3(92, 168, 251) / 255.0, float3(158, 216, 255) / 255.0, float3(216, 243, 255) / 255.0, float3(251, 254, 255) / 255.0,
+                float3(8, 34, 80) / 255.0, float3(10, 58, 122) / 255.0, float3(14, 102, 168) / 255.0, float3(22, 154, 208) / 255.0,
+                float3(68, 206, 232) / 255.0, float3(148, 235, 245) / 255.0, float3(213, 249, 251) / 255.0, float3(251, 255, 255) / 255.0,
+                float3(18, 18, 82) / 255.0, float3(30, 28, 128) / 255.0, float3(50, 48, 184) / 255.0, float3(80, 92, 234) / 255.0,
+                float3(126, 150, 251) / 255.0, float3(180, 208, 255) / 255.0, float3(224, 239, 255) / 255.0, float3(252, 254, 255) / 255.0
+            };
+
+            float EvaluateSapphireTone(float luminance)
+            {
+                float value = SapphireToneValues[0];
+                [unroll]
+                for (int index = 1; index < 9; index++)
+                {
+                    float blend = saturate((luminance - SapphireToneKnots[index - 1]) / (SapphireToneKnots[index] - SapphireToneKnots[index - 1]));
+                    value += (SapphireToneValues[index] - SapphireToneValues[index - 1]) * blend;
+                }
+                return value;
+            }
+
+            float3 EvaluateSapphireRamp(float value, int rampIndex)
+            {
+                float3 color = SapphireRamps[rampIndex * 8];
+                [unroll]
+                for (int index = 1; index < 8; index++)
+                {
+                    float blend = saturate((value - SapphireStopPositions[index - 1]) / (SapphireStopPositions[index] - SapphireStopPositions[index - 1]));
+                    color += (SapphireRamps[rampIndex * 8 + index] - SapphireRamps[rampIndex * 8 + index - 1]) * blend;
+                }
+                return color;
+            }
+
+            float3 GradeSapphire(float3 rawColor)
+            {
+                rawColor = max(rawColor, -1.0);
+                float luminance = dot(rawColor, float3(0.2126, 0.7152, 0.0722));
+                float value = EvaluateSapphireTone(luminance);
+                float aquaWeight = smoothstep(_SapphireAquaLow, _SapphireAquaHigh, rawColor.b - rawColor.r);
+                float indigoWeight = smoothstep(0.35, 0.05, value) * _SapphireViolet;
+                float3 mixed = lerp(EvaluateSapphireRamp(value, 0), EvaluateSapphireRamp(value, 1), aquaWeight);
+                return lerp(mixed, EvaluateSapphireRamp(value, 2), indigoWeight);
             }
 
             FragmentOutput frag(VertexOutput input)
@@ -384,7 +439,7 @@ Shader "Ruri/Fractal/FractalWorld" {
                 float diffuseFactor = 0.5 * dot(normalFactor, normalize(_MainLightPosition.xyz)) + 0.5;
                 float glow = min(_GlowScale * pow(stepCount, _GlowExponent), 40.0);
 
-                output.color = float4(CalcColor(stepLength, glow, diffuseFactor), 1.0);
+                output.color = float4(GradeSapphire(CalcColor(stepLength, glow, diffuseFactor)), 1.0);
 
                 float4 clipPosition = TransformWorldToHClip(TransformObjectToWorld(fractalPosition - _FractalOffset.xyz));
                 output.depth = clipPosition.z / clipPosition.w;

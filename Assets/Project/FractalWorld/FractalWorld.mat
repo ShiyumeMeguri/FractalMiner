@@ -54,6 +54,9 @@ Material:
     - _RaymarchingMaxDist: 5
     - _RaymarchingMinDist: 0.00035
     - _SafetyFactor: 1
+    - _SapphireAquaHigh: 0.28
+    - _SapphireAquaLow: -0.12
+    - _SapphireViolet: 0.45
     - _StartStep: 0.015
     m_Colors:
     - _FractalOffset: {r: 0, g: 0, b: 0, a: 0}
